@@ -1,0 +1,21 @@
+endercore.tooltip.oreDictNames=Имена словаря руд:
+
+endercore.command.config.result.success=Перезапуск конфигурации для %s успешен
+endercore.command.config.result.fail=Перезапуск конфигурации для %s не удался
+endercore.command.config.result.invalid=Modid %s недействителен
+
+enchantment.xpboost=Увеличение опыта
+enchantment.xpboost.tooltip=Дополнительный опыт за убитых мобов
+
+enchantment.autosmelt=Авто-плавка
+enchantment.autosmelt.tooltip=Автоматическая плавка всего, что добывается
+
+endercore.celebrate=С Новым Годом!
+
+endercore.resourcepack.readme=Этот файл используется для ресурсов в игре. 
+endercore.resourcepack.readme2=Не редактируйте его, он будет создан/удалён модификацией.
+
+endercore.gui.normal=Обычный
+endercore.gui.search=Поиск:
+endercore.gui.modlistinfo1=О Боже всё иное!
+endercore.gui.modlistinfo2=Новый дизайн добавлен:

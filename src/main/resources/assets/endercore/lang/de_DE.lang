@@ -1,0 +1,4 @@
+endercore.tooltip.oreDictNames=OreDictionary-Namen:
+endercore.command.config.result.success=Config-Reload für %s war erfolgreich
+endercore.command.config.result.fail=Config-Reload für %s fehlgeschlagen
+endercore.command.config.result.invalid=ModID %s ist ungültig

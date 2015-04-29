@@ -1,0 +1,192 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT' }
+}
+
+apply plugin: 'forge'
+apply plugin: 'maven-publish'
+apply plugin: 'curseforge'
+
+ext.buildnumber = 0
+if (System.getenv('BUILD_NUMBER') != null)
+    project.buildnumber = System.getenv('BUILD_NUMBER')
+else
+    logger.lifecycle "No build number detected, setting to 0"
+
+group = "com.enderio.core"
+archivesBaseName = "EnderCore"
+version = "${minecraft_version}-${mod_version}.${buildnumber}"
+
+if (project.hasProperty('mod_appendix'))
+    version += "_${project.mod_appendix}"
+
+minecraft {
+    version = "${minecraft_version}-${forge_version}"
+    runDir = 'run'
+
+    replace "@VERSION@", project.version
+    replaceIn "EnderCore.java"
+}
+
+configurations {
+    compile.extendsFrom exportedCompile
+}
+
+dependencies {
+    compile "org.projectlombok:lombok:1.16.4"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            exclude '**/enderio/trigger/**'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+        include '**/*.properties'
+
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude '**/*.info'
+        exclude '**/*.properties'
+    }
+}
+
+jar {
+    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes 'FMLCorePlugin': 'com.enderio.core.common.transform.EnderCorePlugin'
+		attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+task apiJar(type: Jar) {
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+	include 'crazypants/enderio/api/**/*'
+    classifier = 'api'
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude 'powercrystals/**'
+    classifier = 'dev'
+}
+
+task exportJavadoc(type: Javadoc) {
+    include 'crazypants/enderio/api/**/*'
+    source = sourceSets.main.allSource
+}
+
+build.dependsOn sourceJar, deobfJar, apiJar, exportJavadoc
+
+publishing {
+    tasks.publish.dependsOn 'build'
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar
+            artifact apiJar
+            artifact deobfJar
+        }
+    }
+
+    repositories {
+        if (project.hasProperty('mavendir')) {
+            maven { url mavendir }
+        }
+    }
+}
+
+String getChangelogText() {
+    def changelogFile = new File('ReleaseNotes.txt')
+    String str = ''
+    String separator = '---'
+    int lineCount = 0
+    boolean done = false
+    changelogFile.eachLine {
+        if (done || it == null) {
+            return
+        }
+        if (lineCount < 3) {
+            lineCount++
+            if (it.startsWith(separator)) {return}
+        }
+        if (!it.startsWith(separator)) {
+            str += "$it" + (lineCount < 3 ? ':\n\n' : '\n')
+            return
+        }
+        done = true // once we go past the first version block, parse no more
+    }
+    return str
+}
+
+curse {
+    dependsOn 'reobf'
+    
+    onlyIf {
+        return project.hasProperty('cp_curseforge_key') && System.getenv("CURSE") != null && System.getenv("CURSE").equalsIgnoreCase("true")
+    }
+
+    if (project.hasProperty('cp_curseforge_key')) apiKey = project.curseforge_key
+    projectId = project.curse_projectId
+    changelog = System.getenv("CHANGELOG").equals("none") ? getChangelogText() : System.getenv("CHANGELOG")
+    releaseType = project.hasProperty('mod_appendix') ? "${mod_appendix}".toString() : 'release'
+    additionalArtifact deobfJar, sourceJar, apiJar
+}
+
+task checkTranslations << {
+    Map<String, String> mapen = new HashMap<String, String>()
+    (new File('resources/assets/enderio/lang/en_US.lang')).eachLine {
+        def (value1, value2) = it.tokenize( '=' )
+        if (value1 == null || value2 == null) {return}
+        mapen.put(value1, value2)
+    }
+    
+    new File('resources/assets/enderio/lang/').eachFileMatch( ~".*\\.lang\$" ) { langfile ->
+        if (!langfile.getName().contains("en_US")) {
+	        Map<String, String> map = new HashMap<String, String>()
+	        File outfile = new File("${langfile}.txt")
+	        Writer outwriter = outfile.newWriter("UTF8")
+	        outwriter.write("\n// Additional translations:\n")
+	        outwriter << langfile.filterLine {
+	            def (value1, value2) = it.tokenize( '=' )
+	            if (value1 == null || value2 == null) {return false}
+	            map.put(value1, value2)
+	            return !mapen.containsKey(value1)
+	        }
+	        
+	        outwriter.append("\n// Missing translations:\n")
+	        for (e in mapen) {
+	            if (!map.containsKey(e.key)) {
+	                outwriter.append(e.key + "=" + e.value + "\n")
+	            }
+	        }
+        println "Created translation report ${outfile}"
+        }
+    }
+}
