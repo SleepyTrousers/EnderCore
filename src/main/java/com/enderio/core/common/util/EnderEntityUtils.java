@@ -69,13 +69,12 @@ public class EnderEntityUtils
     {
         World world = DimensionManager.getWorld(dimID);
 
-        BlockCoord pos = new BlockCoord(0, 0, 0);
-        pos.setPosition(block.x, block.y, block.z);
+        BlockCoord pos = new BlockCoord(block.x, block.y, block.z);
 
         // don't bother if there's no randomness at all
         if (range > 0)
         {
-            pos.setPosition(moveRandomly(block.x, range), block.y, moveRandomly(block.z, range));
+            pos = new BlockCoord(moveRandomly(block.x, range), block.y, moveRandomly(block.z, range));
 
             int tries = -1;
             while (!world.isAirBlock(pos.x, pos.y, pos.z) && !world.getBlock(pos.x, pos.y, pos.z).isReplaceable(world, pos.x, pos.y, pos.z))

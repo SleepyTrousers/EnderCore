@@ -60,7 +60,7 @@ public class FireworkHandler
             if (fireworksLeft > 0 && (!player.getEntityData().getBoolean("fireworkDelay") || player.worldObj.getTotalWorldTime() % 20 == 0))
             {
                 BlockCoord pos = getBlockCoord(player);
-                pos.y += 2;
+                pos = pos.withY(pos.y + 2);
                 EnderEntityUtils.spawnFirework(pos, player.worldObj.provider.dimensionId, 12);
                 player.getEntityData().setInteger("fireworksLeft", fireworksLeft - 1);
 

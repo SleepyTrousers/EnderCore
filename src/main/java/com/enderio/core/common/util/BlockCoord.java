@@ -1,91 +1,123 @@
 package com.enderio.core.common.util;
 
+import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Wither;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import com.google.common.base.Strings;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class BlockCoord
-{
-    @Wither
-    public int x, y, z;
+public class BlockCoord {
+  @Wither
+  public final int x, y, z;
 
-    public BlockCoord(Entity e)
-    {
-        this(MathHelper.floor_double(e.posX), MathHelper.floor_double(e.posY), MathHelper.floor_double(e.posZ));
-    }
+  public BlockCoord() {
+    this(0, 0, 0);
+  }
 
-    public BlockCoord(TileEntity te)
-    {
-        this(te.xCoord, te.yCoord, te.zCoord);
-    }
+  public BlockCoord(double x, double y, double z) {
+    this(MathHelper.floor_double(x), MathHelper.floor_double(y), MathHelper.floor_double(z));
+  }
 
-    public BlockCoord(BlockCoord other)
-    {
-        this(other.x, other.y, other.z);
-    }
+  public BlockCoord(TileEntity tile) {
+    this(tile.xCoord, tile.yCoord, tile.zCoord);
+  }
 
-    public Block getBlock(World world)
-    {
-        return world.getBlock(x, y, z);
-    }
+  public BlockCoord(Entity e) {
+    this(e.posX, e.posY, e.posZ);
+  }
 
-    public int getMetadata(World world)
-    {
-        return world.getBlockMetadata(x, y, z);
-    }
+  public BlockCoord(BlockCoord bc) {
+    this(bc.x, bc.y, bc.z);
+  }
 
-    public TileEntity getTileEntity(World world)
-    {
-        return world.getTileEntity(x, y, z);
-    }
+  public BlockCoord getLocation(ForgeDirection dir) {
+    return new BlockCoord(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+  }
 
-    public double getDistSq(BlockCoord other)
-    {
-        double xDiff = x + 0.5D - other.x;
-        double yDiff = y + 0.5D - other.y;
-        double zDiff = z + 0.5D - other.z;
-        return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
-    }
+  public BlockCoord(String x, String y, String z) {
+    this(Strings.isNullOrEmpty(x) ? 0 : Integer.parseInt(x), Strings.isNullOrEmpty(y) ? 0 : Integer.parseInt(y), Strings.isNullOrEmpty(z) ? 0 : Integer
+        .parseInt(z));
+  }
 
-    public double getDistSq(TileEntity other)
-    {
-        return other.getDistanceFrom(x + 0.5, y + 0.5, z + 0.5);
-    }
+  public BlockCoord(MovingObjectPosition mop) {
+    this(mop.blockX, mop.blockY, mop.blockZ);
+  }
 
-    public void writeToNBT(NBTTagCompound tag)
-    {
-        tag.setInteger("blockCoordx", x);
-        tag.setInteger("blockCoordy", y);
-        tag.setInteger("blockCoordz", z);
-    }
+  public int getMetadata(World world) {
+    return world.getBlockMetadata(x, y, z);
+  }
 
-    public static BlockCoord readFromNBT(NBTTagCompound tag)
-    {
-        int x = tag.getInteger("blockCoordx");
-        int y = tag.getInteger("blockCoordy");
-        int z = tag.getInteger("blockCoordz");
+  public TileEntity getTileEntity(World world) {
+    return world.getTileEntity(x, y, z);
+  }
 
-        return new BlockCoord(x, y, z);
-    }
+  public double getDistSq(BlockCoord other) {
+    double xDiff = x + 0.5D - other.x;
+    double yDiff = y + 0.5D - other.y;
+    double zDiff = z + 0.5D - other.z;
+    return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
+  }
 
-    public void setPosition(double x, double y, double z)
-    {
-        this.x = MathHelper.floor_double(x);
-        this.y = MathHelper.floor_double(y);
-        this.z = MathHelper.floor_double(z);
-    }
+  public double getDistSq(TileEntity other) {
+    return other.getDistanceFrom(x + 0.5, y + 0.5, z + 0.5);
+  }
 
-    @Override
-    public String toString()
-    {
-        return "X: " + x + "  Y: " + y + "  Z: " + z;
-    }
+  public int getDist(BlockCoord other) {
+    double dsq = getDistSq(other);
+    return (int) Math.ceil(Math.sqrt(dsq));
+  }
+
+  public int getDist(TileEntity other) {
+    double dsq = getDistSq(other);
+    return (int) Math.ceil(Math.sqrt(dsq));
+  }
+  
+  public void writeToBuf(ByteBuf buf) {
+    buf.writeInt(x);
+    buf.writeInt(y);
+    buf.writeInt(z);
+  }
+
+  public static BlockCoord readFromBuf(ByteBuf buf) {
+    return new BlockCoord(buf.readInt(), buf.readInt(), buf.readInt());
+  }
+
+  public void writeToNBT(NBTTagCompound tag) {
+    tag.setInteger("bc:x", x);
+    tag.setInteger("bc:y", y);
+    tag.setInteger("bc:z", z);
+  }
+
+  public static BlockCoord readFromNBT(NBTTagCompound tag) {
+    return new BlockCoord(tag.getInteger("bc:x"), tag.getInteger("bc:y"), tag.getInteger("bc:z"));
+  }
+
+  public String chatString() {
+    return chatString(EnumChatFormatting.WHITE);
+  }
+
+  public String chatString(EnumChatFormatting defaultColor) {
+    return String.format(
+        "x%s%d%s y%s%d%s z%s%d",
+        EnumChatFormatting.GREEN, x, defaultColor,
+        EnumChatFormatting.GREEN, y, defaultColor,
+        EnumChatFormatting.GREEN, z
+        );
+  }
+
+  @Override
+  public String toString() {
+    return "X: " + x + "  Y: " + y + "  Z: " + z;
+  }
 }
