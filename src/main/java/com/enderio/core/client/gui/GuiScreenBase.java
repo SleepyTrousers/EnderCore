@@ -12,7 +12,9 @@ import net.minecraft.client.renderer.RenderHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
+import com.enderio.core.client.gui.widget.GuiToolTip;
 
 public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer, IGuiScreen {
 

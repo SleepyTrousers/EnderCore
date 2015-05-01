@@ -12,7 +12,7 @@ import net.minecraftforge.client.model.IModelCustom;
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.model.IEnderModel;
-import com.enderio.core.common.util.EnderItemUtils;
+import com.enderio.core.common.util.ItemUtil;
 
 /**
  * Renders a model with directional placement
@@ -151,7 +151,7 @@ public class DirectionalModelRenderer<T extends TileEntity> extends TileEntitySp
             break;
         }
 
-        renderDirectionalTileEntityAt(null, 0, 0, 0, EnderItemUtils.getNBTTag(item).getInteger("storedMetaData"));
+        renderDirectionalTileEntityAt(null, 0, 0, 0, ItemUtil.getNBTTag(item).getInteger("storedMetaData"));
 
         GL11.glPopMatrix();
     }

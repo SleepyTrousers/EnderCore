@@ -1,4 +1,4 @@
-package com.enderio.core.client.render;
+package com.enderio.core.api.client.render;
 
 public interface IConnectedTextureRenderer {
   

@@ -1,23 +1,24 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.button;
 
 import java.awt.Rectangle;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import com.enderio.core.client.render.RenderUtil;
+import com.enderio.core.api.client.gui.IGuiScreen;
+import com.enderio.core.api.client.render.IWidgetIcon;
+import com.enderio.core.client.gui.widget.GuiToolTip;
+import com.enderio.core.client.render.EnderWidget;
 
-public class IconButtonEIO extends GuiButton {
+public class IconButton extends GuiButton {
 
   public static final int DEFAULT_WIDTH = 16;
   public static final int DEFAULT_HEIGHT = 16;
 
-  protected IconEIO icon;
-  protected ResourceLocation texture;
+  protected IWidgetIcon icon;
   private int xOrigin;
   private int yOrigin;
 
@@ -27,31 +28,30 @@ public class IconButtonEIO extends GuiButton {
   private int marginY = 0;
   private int marginX = 0;
 
-  public IconButtonEIO(IGuiScreen gui, int id, int x, int y, IconEIO icon) {
+  public IconButton(IGuiScreen gui, int id, int x, int y, IWidgetIcon icon) {
     super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
     this.gui = gui;
     this.icon = icon;
-    texture = IconEIO.TEXTURE;
     this.xOrigin = x;
     this.yOrigin = y;
   }
- 
+
   public void setToolTip(String... tooltipText) {
-    if(toolTip == null) {
+    if (toolTip == null) {
       toolTip = new GuiToolTip(getBounds(), tooltipText);
       //gui.addToolTip(toolTip);
     } else {
       toolTip.setToolTipText(tooltipText);
     }
   }
-  
+
   public final Rectangle getBounds() {
     return new Rectangle(xOrigin, yOrigin, getWidth(), getHeight());
   }
-  
+
   public void onGuiInit() {
     gui.addButton(this);
-    if(toolTip != null) {
+    if (toolTip != null) {
       gui.addToolTip(toolTip);
     }
     xPosition = xOrigin + gui.getGuiLeft();
@@ -69,7 +69,7 @@ public class IconButtonEIO extends GuiButton {
     updateTooltipBounds();
   }
 
-  public IconButtonEIO setPosition(int x, int y) {
+  public IconButton setPosition(int x, int y) {
     this.xOrigin = x;
     this.yOrigin = y;
     updateTooltipBounds();
@@ -77,12 +77,12 @@ public class IconButtonEIO extends GuiButton {
   }
 
   private void updateTooltipBounds() {
-    if(toolTip != null) {
+    if (toolTip != null) {
       toolTip.setBounds(new Rectangle(xOrigin, yOrigin, width, height));
     }
   }
 
-  public IconButtonEIO setIconMargin(int x, int y) {
+  public IconButton setIconMargin(int x, int y) {
     marginX = x;
     marginY = y;
     return this;
@@ -96,24 +96,29 @@ public class IconButtonEIO extends GuiButton {
     return height;
   }
 
-  public IconEIO getIcon() {
+  public IWidgetIcon getIcon() {
     return icon;
   }
 
-  public void setIcon(IconEIO icon) {
+  public void setIcon(IWidgetIcon icon) {
     this.icon = icon;
   }
-  
+
   public GuiToolTip getToolTip() {
     return toolTip;
   }
 
   /**
    * Override this to handle mouse clicks with other buttons than the left
-   * @param mc The MC instance
-   * @param x X coordinate of mouse click
-   * @param y Y coordinate of mouse click
-   * @param button the mouse button - only called for button >= 1
+   * 
+   * @param mc
+   *          The MC instance
+   * @param x
+   *          X coordinate of mouse click
+   * @param y
+   *          Y coordinate of mouse click
+   * @param button
+   *          the mouse button - only called for button >= 1
    * @return true if the mouse click is handled
    */
   public boolean mousePressedButton(Minecraft mc, int x, int y, int button) {
@@ -131,20 +136,18 @@ public class IconButtonEIO extends GuiButton {
   @SuppressWarnings("synthetic-access")
   @Override
   public void drawButton(Minecraft mc, int mouseX, int mouseY) {
-    if(toolTip != null) {
+    if (toolTip != null) {
       toolTip.setVisible(visible);
-    }    
-    if(visible) {
+    }
+    if (visible) {
 
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + width
-          && mouseY < this.yPosition + height;
+      this.field_146123_n = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + width && mouseY < this.yPosition + height;
       int hoverState = getHoverState(this.field_146123_n);
       mouseDragged(mc, mouseX, mouseY);
 
-      IconEIO background = getIconForHoverState(hoverState);
+      IWidgetIcon background = getIconForHoverState(hoverState);
 
-      RenderUtil.bindTexture(texture);
       GL11.glColor3f(1, 1, 1);
 
       Tessellator tes = Tessellator.instance;
@@ -157,9 +160,9 @@ public class IconButtonEIO extends GuiButton {
       GL11.glEnable(GL11.GL_BLEND);
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-      background.renderIcon(x, y, width, height, 0, false);
-      if(icon != null) {
-        icon.renderIcon(x + marginX, y + marginY, width - (2 * marginX), height - (2 * marginY), 0, false);
+      background.getMap().render(background, x, y, width, height, 0, false);
+      if (icon != null) {
+        icon.getMap().render(icon, x + marginX, y + marginY, width - (2 * marginX), height - (2 * marginY), 0, false);
       }
 
       tes.draw();
@@ -169,14 +172,14 @@ public class IconButtonEIO extends GuiButton {
     }
   }
 
-  protected IconEIO getIconForHoverState(int hoverState) {
-    if(hoverState == 0) {
-      return IconEIO.BUTTON_DISABLED;
+  protected IWidgetIcon getIconForHoverState(int hoverState) {
+    if (hoverState == 0) {
+      return EnderWidget.BUTTON_DISABLED;
     }
-    if(hoverState == 2) {
-      return IconEIO.BUTTON_HIGHLIGHT;
+    if (hoverState == 2) {
+      return EnderWidget.BUTTON_HIGHLIGHT;
     }
-    return IconEIO.BUTTON;
+    return EnderWidget.BUTTON;
   }
 
 }

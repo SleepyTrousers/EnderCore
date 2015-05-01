@@ -2,6 +2,8 @@ package com.enderio.core.client.render;
 
 import java.util.Collection;
 
+import com.enderio.core.api.client.render.VertexTransform;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;

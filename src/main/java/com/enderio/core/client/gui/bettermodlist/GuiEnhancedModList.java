@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.bettermodlist;
 
 import java.lang.reflect.Field;
 import java.util.Collections;

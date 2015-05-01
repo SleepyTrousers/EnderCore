@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.widget;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;

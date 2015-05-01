@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.widget;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -10,6 +10,9 @@ import net.minecraft.client.renderer.Tessellator;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import com.enderio.core.api.client.gui.IGuiScreen;
+import com.enderio.core.api.client.gui.ListSelectionListener;
 
 public abstract class GuiScrollableList<T> {
 

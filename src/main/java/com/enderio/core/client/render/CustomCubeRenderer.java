@@ -2,6 +2,8 @@ package com.enderio.core.client.render;
 
 import java.util.Collection;
 
+import com.enderio.core.api.client.render.IRenderFace;
+
 import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;

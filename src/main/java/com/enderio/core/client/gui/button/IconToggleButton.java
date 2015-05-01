@@ -1,10 +1,10 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.button;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
-public class IconToggleButton extends IconButton {
+public class IconToggleButton extends IIconButton {
 
   private boolean selected = false;
 

@@ -1,7 +1,8 @@
-package com.enderio.core.client.render;
+package com.enderio.core.api.client.render;
 
 import java.util.List;
 
+import com.enderio.core.client.render.CustomRenderBlocks;
 import com.enderio.core.common.vecmath.Vertex;
 
 import net.minecraft.block.Block;

@@ -13,7 +13,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.Handlers.Handler.HandlerType;
 import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.util.EnderItemUtils;
+import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -43,7 +43,7 @@ public class RightClickCropHandler
 
         public void init()
         {
-            seedStack = EnderItemUtils.parseStringIntoItemStack(seed);
+            seedStack = ItemUtil.parseStringIntoItemStack(seed);
             String[] blockinfo = block.split(":");
             blockInst = GameRegistry.findBlock(blockinfo[0], blockinfo[1]);
         }

@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.widget;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.bettermodlist;
 
 import java.lang.reflect.Field;
 
@@ -14,7 +14,7 @@ import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Handler(HandlerType.FORGE)
-public class GuiEventHandler
+public class EventHandlerGui
 {
     private static Field _mainMenu, _parentScreen;
 

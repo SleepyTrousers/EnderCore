@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.enderio.core.api.client.render.IRenderFace;
 import com.enderio.core.common.vecmath.Vertex;
 
 import net.minecraft.block.Block;

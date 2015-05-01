@@ -23,7 +23,14 @@ import codechicken.nei.VisiblityData;
 import codechicken.nei.api.INEIGuiHandler;
 import codechicken.nei.api.TaggedInventoryArea;
 
+import com.enderio.core.api.client.gui.IGuiOverlay;
+import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
+import com.enderio.core.client.gui.button.IconButton;
+import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.client.gui.widget.GuiToolTip;
+import com.enderio.core.client.gui.widget.TextFieldEnder;
+import com.enderio.core.client.gui.widget.VScrollbar;
 import com.enderio.core.client.render.RenderUtil;
 import com.google.common.collect.Lists;
 
@@ -36,12 +43,12 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   protected ToolTipManager ttMan = new ToolTipManager();
   protected List<IGuiOverlay> overlays = new ArrayList<IGuiOverlay>();
-  protected List<TextFieldEIO> textFields = Lists.newArrayList();
-  protected List<VScrollbarEIO> scrollbars = new ArrayList<VScrollbarEIO>();
+  protected List<TextFieldEnder> textFields = Lists.newArrayList();
+  protected List<VScrollbar> scrollbars = new ArrayList<VScrollbar>();
   protected List<GhostSlot> ghostSlots = new ArrayList<GhostSlot>();
 
   protected GhostSlot hoverGhostSlot;
-  protected VScrollbarEIO draggingScrollbar;
+  protected VScrollbar draggingScrollbar;
 
   protected GuiContainerBase(Container par1Container) {
     super(par1Container);
@@ -54,7 +61,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     for (IGuiOverlay overlay : overlays) {
       overlay.init(this);
     }
-    for (TextFieldEIO f : textFields) {
+    for (TextFieldEnder f : textFields) {
       f.init(this);
     }
   }
@@ -87,7 +94,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     // If the user pressed tab, switch to the next text field, or unfocus if there are none
     if(c == '\t') {
       for (int i = 0; i < textFields.size(); i++) {
-        TextFieldEIO f = textFields.get(i);
+        TextFieldEnder f = textFields.get(i);
         if (f.isFocused()) {
           textFields.get((i + 1) % textFields.size()).setFocused(true);
           f.setFocused(false);
@@ -194,7 +201,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
         draggingScrollbar.mouseClicked(x, y, button);
         return;
       }
-      for(VScrollbarEIO vs : scrollbars) {
+      for(VScrollbar vs : scrollbars) {
         if(vs.mouseClicked(x, y, button)) {
           draggingScrollbar = vs;
           return;
@@ -210,7 +217,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     }
     // Right click field clearing
     if(button == 1) {
-      for (TextFieldEIO tf : textFields) {
+      for (TextFieldEnder tf : textFields) {
         if(tf.contains(x, y)) {
           tf.setText("");
         }
@@ -219,8 +226,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     // Button events for non-left-clicks
     if(button >= 1) {
       for(Object obj : buttonList) {
-        if(obj instanceof IconButtonEIO) {
-          IconButtonEIO btn = (IconButtonEIO) obj;
+        if(obj instanceof IconButton) {
+          IconButton btn = (IconButton) obj;
           if(btn.mousePressedButton(mc, x, y, button)) {
             btn.func_146113_a(this.mc.getSoundHandler());
             actionPerformedButton(btn, button);
@@ -251,13 +258,13 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   protected void mouseWheel(int x, int y, int delta) {
     if(!scrollbars.isEmpty()) {
-      for(VScrollbarEIO vs : scrollbars) {
+      for(VScrollbar vs : scrollbars) {
         vs.mouseWheel(x, y, delta);
       }
     }
   }
 
-  protected void actionPerformedButton(IconButtonEIO btn, int mouseButton) {
+  protected void actionPerformedButton(IconButton btn, int mouseButton) {
     actionPerformed(btn);
   }
 
@@ -269,12 +276,12 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     overlays.remove(overlay);
   }
 
-  public void addScrollbar(VScrollbarEIO vs) {
+  public void addScrollbar(VScrollbar vs) {
     scrollbars.add(vs);
     vs.adjustPosition();
   }
 
-  public void removeScrollbar(VScrollbarEIO vs) {
+  public void removeScrollbar(VScrollbar vs) {
     scrollbars.remove(vs);
     if(draggingScrollbar == vs) {
       draggingScrollbar = null;
@@ -309,7 +316,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
       f.drawTextBox();
     }
     if(!scrollbars.isEmpty()) {
-      for(VScrollbarEIO vs : scrollbars) {
+      for(VScrollbar vs : scrollbars) {
         vs.drawScrollbar(mouseX, mouseY);
       }
     }

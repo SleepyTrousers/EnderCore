@@ -1,38 +1,39 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.client.gui.widget;
 
 import java.lang.reflect.Field;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
 
+import com.enderio.core.api.client.gui.IGuiScreen;
 import com.google.common.base.Strings;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
-public class TextFieldEIO extends GuiTextField {
+public class TextFieldEnder extends GuiTextField {
 
   public interface ICharFilter {
 
-    boolean passesFilter(TextFieldEIO tf, char c);
+    boolean passesFilter(TextFieldEnder tf, char c);
   }
 
   public static final ICharFilter FILTER_NUMERIC = new ICharFilter() {
     @Override
-    public boolean passesFilter(TextFieldEIO tf, char c) {
+    public boolean passesFilter(TextFieldEnder tf, char c) {
       return Character.isDigit(c) || (c == '-' && Strings.isNullOrEmpty(tf.getText()));
     }
   };
 
   public static ICharFilter FILTER_ALPHABETICAL = new ICharFilter() {
     @Override
-    public boolean passesFilter(TextFieldEIO tf, char c) {
+    public boolean passesFilter(TextFieldEnder tf, char c) {
       return Character.isLetter(c);
     }
   };
 
   public static ICharFilter FILTER_ALPHANUMERIC = new ICharFilter() {
     @Override
-    public boolean passesFilter(TextFieldEIO tf, char c) {
+    public boolean passesFilter(TextFieldEnder tf, char c) {
       return FILTER_NUMERIC.passesFilter(tf, c) || FILTER_ALPHABETICAL.passesFilter(tf, c);
     }
   };
@@ -52,11 +53,11 @@ public class TextFieldEIO extends GuiTextField {
     }
   }
 
-  public TextFieldEIO(FontRenderer fnt, int x, int y, int width, int height) {
+  public TextFieldEnder(FontRenderer fnt, int x, int y, int width, int height) {
     this(fnt, x, y, width, height, null);
   }
   
-  public TextFieldEIO(FontRenderer fnt, int x, int y, int width, int height, ICharFilter charFilter) {
+  public TextFieldEnder(FontRenderer fnt, int x, int y, int width, int height, ICharFilter charFilter) {
     super(fnt, x, y, width, height);
     this.xOrigin = x;
     this.yOrigin = y;
@@ -68,7 +69,7 @@ public class TextFieldEIO extends GuiTextField {
     this.yPosition = yOrigin + gui.getGuiTop();
   }
 
-  public TextFieldEIO setCharFilter(ICharFilter filter) {
+  public TextFieldEnder setCharFilter(ICharFilter filter) {
     this.filter = filter;
     return this;
   }

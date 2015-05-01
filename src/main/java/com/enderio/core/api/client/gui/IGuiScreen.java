@@ -1,6 +1,10 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.api.client.gui;
 
 import java.util.List;
+
+import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.client.gui.widget.GuiToolTip;
+
 import net.minecraft.client.gui.GuiButton;
 
 public interface IGuiScreen {

@@ -3,6 +3,7 @@ package com.enderio.core.client.render;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.enderio.core.api.client.render.VertexTransform;
 import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.vecmath.Vector2f;
 import com.enderio.core.common.vecmath.Vector3d;

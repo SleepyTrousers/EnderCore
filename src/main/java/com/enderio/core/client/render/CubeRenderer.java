@@ -1,5 +1,6 @@
 package com.enderio.core.client.render;
 
+import com.enderio.core.api.client.render.VertexTransform;
 import com.enderio.core.common.vecmath.Vector3d;
 
 import net.minecraft.block.Block;

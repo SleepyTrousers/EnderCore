@@ -6,6 +6,8 @@ import java.util.List;
 
 import net.minecraft.client.gui.FontRenderer;
 
+import com.enderio.core.client.gui.widget.GuiToolTip;
+
 public class ToolTipManager {
 
   public static interface ToolTipRenderer {
@@ -17,7 +19,7 @@ public class ToolTipManager {
 
     FontRenderer getFontRenderer();
 
-    void drawHoveringText(List par1List, int par2, int par3, FontRenderer font);
+    void drawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font);
   }
 
   private List<GuiToolTip> toolTips = new ArrayList<GuiToolTip>();
@@ -58,7 +60,7 @@ public class ToolTipManager {
 
     if(mouseX > renderer.getGuiLeft() + renderer.getXSize() / 2) {
       int maxWidth = 0;
-      Iterator iterator = formatted.iterator();
+      Iterator<String> iterator = formatted.iterator();
       while (iterator.hasNext()) {
         String s = (String) iterator.next();
         int w = renderer.getFontRenderer().getStringWidth(s);

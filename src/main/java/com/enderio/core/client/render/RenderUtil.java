@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -28,12 +29,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.obj.Face;
+import net.minecraftforge.client.model.obj.GroupObject;
+import net.minecraftforge.client.model.obj.TextureCoordinate;
+import net.minecraftforge.client.model.obj.WavefrontObject;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
 import org.lwjgl.opengl.GL11;
 
+import com.enderio.core.api.client.render.IConnectedTextureRenderer;
+import com.enderio.core.client.handlers.ClientHandler;
 import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.util.Log;
 import com.enderio.core.common.vecmath.Matrix4d;
@@ -45,8 +52,9 @@ import com.enderio.core.common.vecmath.Vector4d;
 import com.enderio.core.common.vecmath.Vector4f;
 import com.enderio.core.common.vecmath.Vertex;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import static org.lwjgl.opengl.GL11.*;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import static net.minecraftforge.common.util.ForgeDirection.*;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -116,7 +124,7 @@ public class RenderUtil {
 
   @Nullable
   public static Timer getTimer() {
-    if(timerField == null) {
+    if (timerField == null) {
       return null;
     }
     try {
@@ -209,13 +217,13 @@ public class RenderUtil {
   }
 
   public static float getColorMultiplierForFace(ForgeDirection face) {
-    if(face == ForgeDirection.UP) {
+    if (face == ForgeDirection.UP) {
       return 1;
     }
-    if(face == ForgeDirection.DOWN) {
+    if (face == ForgeDirection.DOWN) {
       return 0.5f;
     }
-    if(face.offsetX != 0) {
+    if (face.offsetX != 0) {
       return 0.6f;
     }
     return 0.8f; // z
@@ -299,13 +307,13 @@ public class RenderUtil {
    */
   public static List<ForgeDirection> getEdgesForFace(ForgeDirection face) {
     List<ForgeDirection> result = new ArrayList<ForgeDirection>(4);
-    if(face.offsetY != 0) {
+    if (face.offsetY != 0) {
       result.add(NORTH);
       result.add(EAST);
       result.add(SOUTH);
       result.add(WEST);
 
-    } else if(face.offsetX != 0) {
+    } else if (face.offsetX != 0) {
       result.add(DOWN);
       result.add(SOUTH);
       result.add(UP);
@@ -325,16 +333,16 @@ public class RenderUtil {
 
   public static void addVerticesToTessellator(List<Vertex> vertices, Tessellator tes) {
     for (Vertex v : vertices) {
-      if(v.brightness != -1) {
+      if (v.brightness != -1) {
         tes.setBrightness(v.brightness);
       }
-      if(v.color != null) {
+      if (v.color != null) {
         tes.setColorRGBA_F(v.r(), v.g(), v.b(), v.a());
       }
-      if(v.uv != null) {
+      if (v.uv != null) {
         tes.setTextureUV(v.u(), v.v());
       }
-      if(v.normal != null) {
+      if (v.normal != null) {
         tes.setNormal(v.nx(), v.ny(), v.nz());
       }
       tes.addVertex(v.x(), v.y(), v.z());
@@ -349,16 +357,16 @@ public class RenderUtil {
   public static void renderConnectedTextureFace(IBlockAccess blockAccess, Block block, int x, int y, int z, ForgeDirection face, IIcon texture,
       boolean forceAllEdges, boolean translateToXYZ, boolean applyFaceShading) {
 
-    if((blockAccess == null && !forceAllEdges) || face == null || texture == null) {
+    if ((blockAccess == null && !forceAllEdges) || face == null || texture == null) {
       return;
     }
 
-    if(!forceAllEdges) {
+    if (!forceAllEdges) {
       Block check = blockAccess.getBlock(x, y, z);
-      if(check == null) {
+      if (check == null) {
         return;
       }
-      if(!check.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
+      if (!check.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
         return;
       }
     }
@@ -366,7 +374,7 @@ public class RenderUtil {
     BlockCoord bc = new BlockCoord(x, y, z);
 
     List<ForgeDirection> edges;
-    if(forceAllEdges) {
+    if (forceAllEdges) {
       edges = RenderUtil.getEdgesForFace(face);
     } else {
       edges = RenderUtil.getNonConectedEdgesForFace(blockAccess, x, y, z, face);
@@ -374,7 +382,7 @@ public class RenderUtil {
 
     Tessellator tes = Tessellator.instance;
     tes.setNormal(face.offsetX, face.offsetY, face.offsetZ);
-    if(applyFaceShading) {
+    if (applyFaceShading) {
       float cm = RenderUtil.getColorMultiplierForFace(face);
       tes.setColorOpaque_F(cm, cm, cm);
     }
@@ -397,7 +405,7 @@ public class RenderUtil {
 
       for (Vector3f unitCorn : corners) {
         Vector3d corner = new Vector3d(unitCorn);
-        if(translateToXYZ) {
+        if (translateToXYZ) {
           corner.x += x;
           corner.y += y;
           corner.z += z;
@@ -407,7 +415,7 @@ public class RenderUtil {
         corner.y += (float) (edge.offsetY * 0.5) - Math.signum(edge.offsetY) * yLen / 2f;
         corner.z += (float) (edge.offsetZ * 0.5) - Math.signum(edge.offsetZ) * zLen / 2f;
 
-        if(translateToXYZ) {
+        if (translateToXYZ) {
           RenderUtil.getUvForCorner(uv, corner, x, y, z, face, texture);
         } else {
           RenderUtil.getUvForCorner(uv, corner, 0, 0, 0, face, texture);
@@ -427,10 +435,10 @@ public class RenderUtil {
       IConnectedTextureRenderer render) {
 
     Block block = blockAccess.getBlock(x, y, z);
-    if(block == null) {
+    if (block == null) {
       return Collections.emptyList();
     }
-    if(!block.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
+    if (!block.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
       return Collections.emptyList();
     }
     BlockCoord bc = new BlockCoord(x, y, z);
@@ -442,10 +450,10 @@ public class RenderUtil {
     List<ForgeDirection> result = new ArrayList<ForgeDirection>(4);
     for (EdgeNeighbour edge : edges) {
       boolean matchingNeighbour = blockAccess.getBlock(edge.bc.x, edge.bc.y, edge.bc.z) == block;
-      if(matchingNeighbour && render != null) {
+      if (matchingNeighbour && render != null) {
         matchingNeighbour = render.matchesMetadata(blockAccess.getBlockMetadata(x, y, z), blockAccess.getBlockMetadata(edge.bc.x, edge.bc.y, edge.bc.z));
       }
-      if(!matchingNeighbour) {
+      if (!matchingNeighbour) {
         result.add(edge.dir);
       }
 
@@ -454,7 +462,7 @@ public class RenderUtil {
   }
 
   public static void getUvForCorner(Vector2f uv, Vector3d corner, int x, int y, int z, ForgeDirection face, IIcon icon) {
-    if(icon == null) {
+    if (icon == null) {
       return;
     }
 
@@ -465,7 +473,7 @@ public class RenderUtil {
 
     float uWidth = 1;
     float vWidth = 1;
-    if(icon != null) {
+    if (icon != null) {
       uWidth = icon.getMaxU() - icon.getMinU();
       vWidth = icon.getMaxV() - icon.getMinV();
     }
@@ -473,7 +481,7 @@ public class RenderUtil {
     uv.x = (float) VecmathUtil.distanceFromPointToPlane(getUPlaneForFace(face), p);
     uv.y = (float) VecmathUtil.distanceFromPointToPlane(getVPlaneForFace(face), p);
 
-    if(icon != null) {
+    if (icon != null) {
       uv.x = icon.getMinU() + (uv.x * uWidth);
       uv.y = icon.getMinV() + (uv.y * vWidth);
     }
@@ -559,14 +567,14 @@ public class RenderUtil {
   }
 
   public static void renderGuiTank(FluidStack fluid, int capacity, int amount, double x, double y, double zLevel, double width, double height) {
-    if(fluid == null || fluid.getFluid() == null || fluid.amount <= 0) {
+    if (fluid == null || fluid.getFluid() == null || fluid.amount <= 0) {
       return;
     }
 
     IIcon icon = fluid.getFluid().getStillIcon();
-    if(icon == null) {
+    if (icon == null) {
       icon = fluid.getFluid().getIcon();
-      if(icon == null) {
+      if (icon == null) {
         return;
       }
     }
@@ -625,11 +633,11 @@ public class RenderUtil {
     glRotatef(-RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
 
     glTranslatef(-fnt.getStringWidth(text) / 2, 0, 0);
-    if(drawBackground) {
+    if (drawBackground) {
       renderBackground(fnt, text, bgCol);
     }
     fnt.drawString(text, 0, 0, ColorUtil.getRGBA(txtCol));
-    if(drawShadow) {
+    if (drawShadow) {
       glTranslatef(0.5f, 0.5f, 0.1f);
       fnt.drawString(text, 0, 0, ColorUtil.getRGBA(shadowCol));
     }
@@ -662,6 +670,63 @@ public class RenderUtil {
     tessellator.draw();
 
     glPopAttrib();
+  }
+
+  /**
+   * Renders an item entity in 3D
+   * 
+   * @param item
+   *          The item to render
+   * @param rotate
+   *          Whether to "spin" the item like it would if it were a real dropped
+   *          entity
+   */
+  public static void render3DItem(EntityItem item, boolean rotate) {
+    float rot = getRotation(1.0f);
+
+    glPushMatrix();
+    glDepthMask(true);
+    rotate &= Minecraft.getMinecraft().gameSettings.fancyGraphics;
+
+    if (rotate) {
+      glRotatef(rot, 0, 1, 0);
+    }
+
+    item.hoverStart = 0.0F;
+    RenderManager.instance.renderEntityWithPosYaw(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+
+    glPopMatrix();
+  }
+
+  public static float getRotation(float mult) {
+    return ClientHandler.getTicksElapsed() * mult;
+  }
+
+  public static void renderBillboardQuad(float rot, double scale) {
+    glPushMatrix();
+    
+    rotateToPlayer();
+    
+    glPushMatrix();
+
+    glRotatef(rot, 0, 0, 1);
+
+    Tessellator tessellator = Tessellator.instance;
+    tessellator.startDrawingQuads();
+    glColor3f(1, 1, 1);
+    tessellator.setColorRGBA(255, 255, 255, 255);
+    tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
+    tessellator.addVertexWithUV(-scale, scale, 0, 0, 1);
+    tessellator.addVertexWithUV(scale, scale, 0, 1, 1);
+    tessellator.addVertexWithUV(scale, -scale, 0, 1, 0);
+    tessellator.draw();
+    glPopMatrix();
+    glPopMatrix();
+  }
+
+  public static void rotateToPlayer() {
+    glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+    glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
   }
 
   private static class EdgeNeighbour {

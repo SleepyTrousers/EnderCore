@@ -1,4 +1,4 @@
-package com.enderio.core.client.render;
+package com.enderio.core.api.client.render;
 
 import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;

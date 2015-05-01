@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.enderio.core.api.client.render.IConnectedTextureRenderer;
+import com.enderio.core.api.client.render.IRenderFace;
 import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.util.ForgeDirectionOffsets;
 import com.enderio.core.common.vecmath.Vector2f;

@@ -2,6 +2,8 @@ package com.enderio.core.client.render;
 
 import java.awt.Color;
 
+import org.lwjgl.opengl.GL11;
+
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vector4f;
 
@@ -40,9 +42,9 @@ public final class ColorUtil {
   }
 
   public static int getRGBA(Vector4f col) {
-    return getRGBA(col.x, col.y,col.z,col.w);
+    return getRGBA(col.x, col.y, col.z, col.w);
   }
-  
+
   public static int getRGBA(float r, float g, float b, float a) {
     return getRGBA((int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255));
   }
@@ -61,6 +63,26 @@ public final class ColorUtil {
 
   public static int getRGBA(int r, int g, int b, int a) {
     return (r & 0xFF) << 24 | (g & 0xFF) << 16 | (b & 0xFF) << 8 | (a & 0xFF);
+  }
+
+  /**
+   * Turns an int into a glColor4f function
+   * 
+   * @author Buildcraft team
+   */
+  public static void setGLColorFromInt(int color) {
+    float red = (color >> 16 & 255) / 255.0F;
+    float green = (color >> 8 & 255) / 255.0F;
+    float blue = (color & 255) / 255.0F;
+    GL11.glColor4f(red, green, blue, 1.0F);
+  }
+
+  public static int toHex(int r, int g, int b) {
+    int hex = 0;
+    hex = hex | ((r) << 16);
+    hex = hex | ((g) << 8);
+    hex = hex | ((b));
+    return hex;
   }
 
   private ColorUtil() {

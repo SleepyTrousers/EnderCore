@@ -1,4 +1,4 @@
-package com.enderio.core.client.gui;
+package com.enderio.core.api.client.gui;
 
 import java.awt.Rectangle;
 
