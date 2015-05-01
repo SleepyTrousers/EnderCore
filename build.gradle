@@ -36,8 +36,13 @@ configurations {
     compile.extendsFrom exportedCompile
 }
 
+repositories {
+    maven { url = "http://chickenbones.net/maven/" }
+}
+
 dependencies {
     compile "org.projectlombok:lombok:1.16.4"
+    compile "codechicken:NotEnoughItems:${minecraft_version}-${NEI_version}:dev"
 }
 
 sourceSets {

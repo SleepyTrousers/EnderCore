@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Wither;
+import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -53,6 +54,10 @@ public class BlockCoord {
   public BlockCoord(MovingObjectPosition mop) {
     this(mop.blockX, mop.blockY, mop.blockZ);
   }
+  
+  public Block getBlock(World world) {
+    return world.getBlock(x, y, z);
+  }
 
   public int getMetadata(World world) {
     return world.getBlockMetadata(x, y, z);
@@ -62,15 +67,15 @@ public class BlockCoord {
     return world.getTileEntity(x, y, z);
   }
 
-  public double getDistSq(BlockCoord other) {
-    double xDiff = x + 0.5D - other.x;
-    double yDiff = y + 0.5D - other.y;
-    double zDiff = z + 0.5D - other.z;
+  public int getDistSq(BlockCoord other) {
+    int xDiff = x - other.x;
+    int yDiff = y - other.y;
+    int zDiff = z - other.z;
     return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
   }
 
-  public double getDistSq(TileEntity other) {
-    return other.getDistanceFrom(x + 0.5, y + 0.5, z + 0.5);
+  public int getDistSq(TileEntity other) {
+    return getDistSq(new BlockCoord(other));
   }
 
   public int getDist(BlockCoord other) {
@@ -79,8 +84,7 @@ public class BlockCoord {
   }
 
   public int getDist(TileEntity other) {
-    double dsq = getDistSq(other);
-    return (int) Math.ceil(Math.sqrt(dsq));
+    return getDist(new BlockCoord(other));
   }
   
   public void writeToBuf(ByteBuf buf) {
@@ -114,6 +118,10 @@ public class BlockCoord {
         EnumChatFormatting.GREEN, y, defaultColor,
         EnumChatFormatting.GREEN, z
         );
+  }
+  
+  public boolean equals(int x, int y, int z) {
+    return equals(new BlockCoord(x, y, z));
   }
 
   @Override

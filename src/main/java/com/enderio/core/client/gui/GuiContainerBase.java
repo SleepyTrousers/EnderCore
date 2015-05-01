@@ -28,10 +28,6 @@ import com.enderio.core.client.render.RenderUtil;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.Optional;
-import crazypants.enderio.gui.IGuiOverlay;
-import crazypants.enderio.gui.IconButtonEIO;
-import crazypants.enderio.gui.TextFieldEIO;
-import crazypants.enderio.gui.VScrollbarEIO;
 
 @Optional.InterfaceList({
     @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems")
