@@ -1,4 +1,6 @@
 endercore.tooltip.oreDictNames=Ore Dictionary Names:
+endercore.tooltip.showDetails=<Hold Shift>
+endercore.tooltip.durability=Durability:
 
 endercore.command.config.result.success=Reloading configs for %s was successful
 endercore.command.config.result.fail=Reloading configs for %s failed

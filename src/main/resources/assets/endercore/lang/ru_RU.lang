@@ -1,4 +1,6 @@
 endercore.tooltip.oreDictNames=Имена словаря руд:
+endercore.tooltip.showDetails=<Зажмите Shift>
+endercore.tooltip.durability=Прочность:
 
 endercore.command.config.result.success=Перезапуск конфигурации для %s успешен
 endercore.command.config.result.fail=Перезапуск конфигурации для %s не удался
