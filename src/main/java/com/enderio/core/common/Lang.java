@@ -38,6 +38,10 @@ public class Lang {
    * @return A localized string.
    */
   public String localize(String unloc, Object... args) {
+    // Compat for old EIO code
+    if (args.length == 1 && args[0] instanceof Boolean && !((Boolean) args[0]).booleanValue()) {
+      return localizeExact(unloc);
+    }
     return localizeExact(addPrefix(unloc), args);
   }
 

@@ -289,7 +289,7 @@ public class ItemUtil {
     if (item == null) {
       return null;
     }
-    return EnderCore.lang.localize("item.darkSteel.tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
+    return EnderCore.lang.localize("tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
   }
 
   public static NBTTagCompound getOrCreateNBT(ItemStack stack) {

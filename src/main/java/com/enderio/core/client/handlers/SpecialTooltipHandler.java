@@ -145,7 +145,7 @@ public class SpecialTooltipHandler {
   }
 
   public static void addShowDetailsTooltip(List list) {
-    list.add(EnumChatFormatting.WHITE + "" + EnumChatFormatting.ITALIC + EnderCore.lang.localize("item.tooltip.showDetails"));
+    list.add(EnumChatFormatting.WHITE + "" + EnumChatFormatting.ITALIC + EnderCore.lang.localize("tooltip.showDetails"));
   }
 
   public static boolean showAdvancedTooltips() {
@@ -169,7 +169,7 @@ public class SpecialTooltipHandler {
     int line = 1;
     while (!done) {
       String key = keyBase + line;
-      String val = EnderCore.lang.localize(key, false);
+      String val = EnderCore.lang.localizeExact(key);
       if(val == null || val.trim().length() < 0 || val.equals(key) || line > 12) {
         done = true;
       } else {

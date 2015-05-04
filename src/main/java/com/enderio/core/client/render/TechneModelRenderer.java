@@ -2,12 +2,14 @@ package com.enderio.core.client.render;
 
 import java.util.Collection;
 
-import com.enderio.core.api.client.render.VertexTransform;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.obj.GroupObject;
+
+import com.enderio.core.api.client.render.VertexTransform;
+
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
@@ -38,13 +40,21 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
   @Override
   public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
     TechneUtil.vt = this.vt;
-    TechneUtil.renderInventoryBlock(model, block, metadata, renderer);
+    TechneUtil.renderInventoryBlock(model, getModelIcon(block, metadata), block, metadata, renderer);
   }
 
   @Override
   public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
     TechneUtil.vt = this.vt;
-    return TechneUtil.renderWorldBlock(model, world, x, y, z, block, renderer);
+    return TechneUtil.renderWorldBlock(model, getModelIcon(world, x, y, z, block), world, x, y, z, block, renderer);
+  }
+  
+  protected IIcon getModelIcon(Block block, int metadata) {
+    return block.getIcon(0, metadata);
+  }
+
+  protected IIcon getModelIcon(IBlockAccess world, int x, int y, int z, Block block) {
+    return block.getIcon(world, x, y, z, 0);
   }
 
   @Override
