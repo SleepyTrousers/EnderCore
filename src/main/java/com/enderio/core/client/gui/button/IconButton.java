@@ -150,9 +150,6 @@ public class IconButton extends GuiButton {
 
       GL11.glColor3f(1, 1, 1);
 
-      Tessellator tes = Tessellator.instance;
-      tes.startDrawingQuads();
-
       int x = xPosition;
       int y = yPosition;
 
@@ -160,12 +157,10 @@ public class IconButton extends GuiButton {
       GL11.glEnable(GL11.GL_BLEND);
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-      background.getMap().render(background, x, y, width, height, 0, false);
+      background.getMap().render(background, x, y, width, height, 0, true);
       if (icon != null) {
-        icon.getMap().render(icon, x + marginX, y + marginY, width - (2 * marginX), height - (2 * marginY), 0, false);
+        icon.getMap().render(icon, x + marginX, y + marginY, width - (2 * marginX), height - (2 * marginY), 0, true);
       }
-
-      tes.draw();
 
       GL11.glPopAttrib();
 

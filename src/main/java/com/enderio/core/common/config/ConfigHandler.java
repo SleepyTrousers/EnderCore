@@ -37,6 +37,12 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     @Range(min = 0, max = 3)
     @NoSync
     public static int showRegistryNameTooltips = 3;
+    
+    @Config
+    @Comment({ "Show durability on item tooltips.", "0 - Off", "1 - Always on", "2 - Only with shift", "3 - Only in debug mode" })
+    @Range(min = 0, max = 3)
+    @NoSync
+    public static int showDurabilityTooltips = 1;
 
     @Config
     @Comment({ "Removes all void fog.", "0 = off", "1 = DEFAULT worldtype only", "2 = all world types" })
