@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.oredict.OreDictionary;
 
+import com.enderio.core.api.common.util.IProgressTile;
 import com.enderio.core.common.vecmath.Vector3d;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;

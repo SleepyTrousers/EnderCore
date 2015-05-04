@@ -6,10 +6,10 @@ import com.enderio.core.common.vecmath.Vertex;
 
 public interface VertexTransform {
 
-  public abstract void apply(Vertex vertex);
+  void apply(Vertex vertex);
 
-  public abstract void apply(Vector3d vec);
+  void apply(Vector3d vec);
 
-  public abstract void applyToNormal(Vector3f vec);
+  void applyToNormal(Vector3f vec);
 
 }

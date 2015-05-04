@@ -1,4 +1,4 @@
-package com.enderio.core.common.util;
+package com.enderio.core.api.common.util;
 
 import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.relauncher.Side;

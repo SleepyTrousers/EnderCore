@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.enderio.core.api.common.util.IFluidReceptor;
+import com.enderio.core.api.common.util.ITankAccess;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;

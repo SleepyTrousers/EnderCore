@@ -1,4 +1,4 @@
-package com.enderio.core.common.util;
+package com.enderio.core.api.common.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;

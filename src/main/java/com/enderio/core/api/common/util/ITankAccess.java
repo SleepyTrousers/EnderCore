@@ -1,4 +1,4 @@
-package com.enderio.core.common.util;
+package com.enderio.core.api.common.util;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
