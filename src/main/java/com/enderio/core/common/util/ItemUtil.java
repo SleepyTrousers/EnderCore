@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.util.IItemReceptor;
 
 import net.minecraft.block.Block;
@@ -288,7 +289,7 @@ public class ItemUtil {
     if (item == null) {
       return null;
     }
-    return Lang.localize("item.darkSteel.tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
+    return EnderCore.lang.localize("item.darkSteel.tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
   }
 
   public static NBTTagCompound getOrCreateNBT(ItemStack stack) {

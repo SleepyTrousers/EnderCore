@@ -20,13 +20,13 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import org.lwjgl.input.Keyboard;
 
+import com.enderio.core.EnderCore;
 import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
 import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.Handlers.Handler.HandlerType;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.ItemUtil;
-import com.enderio.core.common.util.Lang;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -145,7 +145,7 @@ public class SpecialTooltipHandler {
   }
 
   public static void addShowDetailsTooltip(List list) {
-    list.add(EnumChatFormatting.WHITE + "" + EnumChatFormatting.ITALIC + Lang.localize("item.tooltip.showDetails"));
+    list.add(EnumChatFormatting.WHITE + "" + EnumChatFormatting.ITALIC + EnderCore.lang.localize("item.tooltip.showDetails"));
   }
 
   public static boolean showAdvancedTooltips() {
@@ -169,7 +169,7 @@ public class SpecialTooltipHandler {
     int line = 1;
     while (!done) {
       String key = keyBase + line;
-      String val = Lang.localize(key, false);
+      String val = EnderCore.lang.localize(key, false);
       if(val == null || val.trim().length() < 0 || val.equals(key) || line > 12) {
         done = true;
       } else {
