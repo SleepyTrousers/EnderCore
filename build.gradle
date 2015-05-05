@@ -102,7 +102,7 @@ task deobfJar(type: Jar) {
 }
 
 task exportJavadoc(type: Javadoc) {
-    include 'crazypants/enderio/api/**/*'
+    include 'com/enderio/core/**/*'
     source = sourceSets.main.allSource
 }
 
