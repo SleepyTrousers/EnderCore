@@ -2,6 +2,8 @@ package com.enderio.core.common.util;
 
 import javax.annotation.concurrent.Immutable;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Wither;
 
@@ -13,6 +15,7 @@ import lombok.experimental.Wither;
  */
 @Immutable
 @Value
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 //@AllArgsConstructor(staticName = "of") // Broken with javac 1.8...
 public class Bound<T extends Number & Comparable<T>> {
   public static final Bound<Double> MAX_BOUND = Bound.of(Double.MIN_VALUE, Double.MAX_VALUE);
