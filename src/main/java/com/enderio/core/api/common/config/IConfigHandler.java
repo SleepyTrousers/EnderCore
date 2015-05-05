@@ -9,25 +9,22 @@ import net.minecraftforge.common.config.ConfigCategory;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 
-public interface IConfigHandler
-{
-    void initialize(File cfg);
+public interface IConfigHandler {
+  void initialize(File cfg);
 
-    List<Section> getSections();
+  List<Section> getSections();
 
-    ConfigCategory getCategory(String name);
+  ConfigCategory getCategory(String name);
 
-    String getModID();
-    
-    /**
-     * A hook for the {@link FMLInitializationEvent}, also called during config reloads depending on
-     * {@link #shouldHookOnReload()}
-     */
-    void initHook();
-    
-    /**
-     * A hook for the {@link FMLPostInitializationEvent}, also called during config reloads
-     * depending on {@link #shouldHookOnReload()}
-     */
-    void postInitHook();
+  String getModID();
+
+  /**
+   * A hook for the {@link FMLInitializationEvent}.
+   */
+  void initHook();
+
+  /**
+   * A hook for the {@link FMLPostInitializationEvent}.
+   */
+  void postInitHook();
 }

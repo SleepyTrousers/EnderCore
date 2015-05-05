@@ -101,12 +101,12 @@ task deobfJar(type: Jar) {
     classifier = 'dev'
 }
 
-task exportJavadoc(type: Javadoc) {
+javadoc {
+    options.addStringOption('Xdoclint:none', '-quiet') 
     include 'com/enderio/core/**/*'
-    source = sourceSets.main.allSource
 }
 
-build.dependsOn sourceJar, deobfJar, apiJar, exportJavadoc
+build.dependsOn sourceJar, deobfJar, apiJar, javadoc
 
 publishing {
     tasks.publish.dependsOn 'build'

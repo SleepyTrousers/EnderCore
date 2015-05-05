@@ -118,7 +118,7 @@ public class IconButton extends GuiButton {
    * @param y
    *          Y coordinate of mouse click
    * @param button
-   *          the mouse button - only called for button >= 1
+   *          the mouse button - only called for button {@literal >}= 1
    * @return true if the mouse click is handled
    */
   public boolean mousePressedButton(Minecraft mc, int x, int y, int button) {

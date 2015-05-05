@@ -103,9 +103,9 @@ public class EnderStringUtils
      * @param max
      *            The max number
      * 
-     * @return if num <= 10% of max : RED<br>
-     *         if 10% < num <= 25% of max: GOLD (orange-ish)<br>
-     *         if num > 25% of max: GREEN
+     * @return if num {@literal <}= 10% of max : RED<br>
+     *         if 10% {@literal <} num {@literal <}= 25% of max: GOLD (orange-ish)<br>
+     *         if num {@literal >} 25% of max: GREEN
      */
     public EnumChatFormatting getColorFor(double num, double max)
     {

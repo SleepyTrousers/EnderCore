@@ -56,7 +56,7 @@ public class Handlers
             FORGE,
 
             /**
-             * Represents the {@link FMLCommonHandler#instance()#bus()}
+             * Represents the {@link FMLCommonHandler#bus()}
              */
             FML
         }
