@@ -19,7 +19,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLStateEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CompatabilityRegistry
+public class CompatRegistry
 {
     @Value
     private static class Registration
@@ -40,7 +40,7 @@ public class CompatabilityRegistry
         }
     }
 
-    public static final CompatabilityRegistry INSTANCE = new CompatabilityRegistry();
+    public static final CompatRegistry INSTANCE = new CompatRegistry();
 
     private Map<Registration, String> compatMap = new HashMap<Registration, String>();
 
@@ -102,11 +102,11 @@ public class CompatabilityRegistry
         {
             EnderCore.logger.info("[Compat] Loading compatability class " + clazz);
             Class<?> compat = Class.forName(clazz);
-            compat.getDeclaredMethod(ICompatability.METHOD_NAME).invoke(null);
+            compat.getDeclaredMethod(ICompat.METHOD_NAME).invoke(null);
         }
         catch (NoSuchMethodException e)
         {
-            EnderCore.logger.error("[Compat] ICompatability class {} did not contain static method {}!", clazz, ICompatability.METHOD_NAME);
+            EnderCore.logger.error("[Compat] ICompatability class {} did not contain static method {}!", clazz, ICompat.METHOD_NAME);
             e.printStackTrace();
         }
         catch (InvocationTargetException e)

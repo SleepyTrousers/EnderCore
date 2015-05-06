@@ -19,7 +19,7 @@ import com.enderio.core.common.Lang;
 import com.enderio.core.common.OreDict;
 import com.enderio.core.common.command.CommandReloadConfigs;
 import com.enderio.core.common.command.CommandScoreboardInfo;
-import com.enderio.core.common.compat.CompatabilityRegistry;
+import com.enderio.core.common.compat.CompatRegistry;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.enchant.EnchantAutoSmelt;
 import com.enderio.core.common.enchant.EnchantXPBoost;
@@ -77,7 +77,7 @@ public class EnderCore implements IEnderMod {
     ConfigHandler.instance().initialize(ConfigHandler.configFile);
     Handlers.findPackages();
 
-    CompatabilityRegistry.INSTANCE.handle(event);
+    CompatRegistry.INSTANCE.handle(event);
     OreDict.registerVanilla();
 
     EnchantXPBoost.INSTANCE.register();
@@ -91,7 +91,7 @@ public class EnderCore implements IEnderMod {
     }
 
     Handlers.register();
-    CompatabilityRegistry.INSTANCE.handle(event);
+    CompatRegistry.INSTANCE.handle(event);
     ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
     if (event.getSide().isServer()) {
       ((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
@@ -106,7 +106,7 @@ public class EnderCore implements IEnderMod {
       c.postInitHook();
     }
 
-    CompatabilityRegistry.INSTANCE.handle(event);
+    CompatRegistry.INSTANCE.handle(event);
     ConfigHandler.instance().loadRightClickCrops();
   }
 

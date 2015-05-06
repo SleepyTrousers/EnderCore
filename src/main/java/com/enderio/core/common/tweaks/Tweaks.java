@@ -38,6 +38,7 @@ public class Tweaks
     public static void loadNonIngameTweaks()
     {
         tweaks.add(new SlabRecipes());
+        tweaks.add(new InfiniBow());
 
         tweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
             @Override
