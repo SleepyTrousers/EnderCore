@@ -2,9 +2,13 @@ package com.enderio.core.client.gui.button;
 
 import net.minecraft.client.Minecraft;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.api.client.render.IWidgetIcon;
+import com.enderio.core.client.gui.widget.GuiToolTip;
 import com.enderio.core.client.render.EnderWidget;
+import com.google.common.collect.Lists;
 
 public class ToggleButton extends IconButton {
 
@@ -12,8 +16,7 @@ public class ToggleButton extends IconButton {
   private final IWidgetIcon unselectedIcon;
   private final IWidgetIcon selectedIcon;
 
-  private String[] selectedTooltip;
-  private String[] unselectedTooltip;
+  private GuiToolTip selectedTooltip, unselectedTooltip;
   private boolean paintSelectionBorder;
 
   public ToggleButton(IGuiScreen gui, int id, int x, int y, IWidgetIcon unselectedIcon, IWidgetIcon selectedIcon) {
@@ -67,17 +70,18 @@ public class ToggleButton extends IconButton {
   }
 
   public void setSelectedToolTip(String... tt) {
-    this.selectedTooltip = tt;
+    String[] combinedTooltip = ArrayUtils.addAll(toolTipText, tt);
+    selectedTooltip = new GuiToolTip(getBounds(), Lists.newArrayList(combinedTooltip));
     setSelected(selected);
   }
 
   public void setUnselectedToolTip(String... tt) {
-    this.unselectedTooltip = tt;
+    String[] combinedTooltip = ArrayUtils.addAll(toolTipText, tt);
+    unselectedTooltip = new GuiToolTip(getBounds(), Lists.newArrayList(combinedTooltip));
     setSelected(selected);
   }
 
   public void setPaintSelectedBorder(boolean b) {
     this.paintSelectionBorder = b;
   }
-
 }

@@ -1,6 +1,5 @@
 package com.enderio.core.client.gui;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -42,10 +41,10 @@ import cpw.mods.fml.common.Optional;
 public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen, INEIGuiHandler {
 
   protected ToolTipManager ttMan = new ToolTipManager();
-  protected List<IGuiOverlay> overlays = new ArrayList<IGuiOverlay>();
+  protected List<IGuiOverlay> overlays = Lists.newArrayList();
   protected List<TextFieldEnder> textFields = Lists.newArrayList();
-  protected List<VScrollbar> scrollbars = new ArrayList<VScrollbar>();
-  protected List<GhostSlot> ghostSlots = new ArrayList<GhostSlot>();
+  protected List<VScrollbar> scrollbars = Lists.newArrayList();
+  protected List<GhostSlot> ghostSlots = Lists.newArrayList();
 
   protected GhostSlot hoverGhostSlot;
   protected VScrollbar draggingScrollbar;
@@ -71,8 +70,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   protected void keyTyped(char c, int key) {
-    GuiTextField focused = null;
-    for (GuiTextField f : textFields) {
+    TextFieldEnder focused = null;
+    for (TextFieldEnder f : textFields) {
       if (f.isFocused()) {
         focused = f;
       }
@@ -105,7 +104,9 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
     // If there is a focused text field, attempt to type into it
     if(focused != null) {
+      String old = focused.getText();
       if(focused.textboxKeyTyped(c, key)) {
+        onTextFieldChanged(focused, old);
         return;
       }
     }
@@ -126,6 +127,16 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
     // If the key was not captured, let NEI do its thing
     super.keyTyped(c, key);
+  }
+
+  protected final void setText(TextFieldEnder tf, String newText) {
+    String old = tf.getText();
+    tf.setText(newText);
+    onTextFieldChanged(tf, old);
+  }
+
+  protected void onTextFieldChanged(TextFieldEnder tf, String old) {
+
   }
 
   public boolean hideOverlays() {
@@ -219,7 +230,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     if(button == 1) {
       for (TextFieldEnder tf : textFields) {
         if(tf.contains(x, y)) {
-          tf.setText("");
+          setText(tf, "");
         }
       }
     }
@@ -340,10 +351,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
     if(draggingScrollbar == null) {
       if(hoverGhostSlot != null && mc.thePlayer.inventory.getItemStack() == null) {
-        ItemStack stack = hoverGhostSlot.getStack();
-        if(stack != null) {
-          renderToolTip(stack, par1, par2);
-        }
+        drawGhostSlotTooltip(hoverGhostSlot, par1, par2);
       }
 
       ttMan.drawTooltips(this, par1, par2);
@@ -397,6 +405,13 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     GL11.glPopAttrib();
     itemRender.zLevel = 0.0F;
     zLevel = 0.0F;
+  }
+
+  protected void drawGhostSlotTooltip(GhostSlot slot, int mouseX, int mouseY) {
+    ItemStack stack = slot.getStack();
+    if(stack != null) {
+      renderToolTip(stack, mouseX, mouseY);
+    }
   }
 
   protected void drawGhostSlots(int mouseX, int mouseY) {

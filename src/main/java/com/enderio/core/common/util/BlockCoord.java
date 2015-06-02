@@ -11,7 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.base.Strings;
@@ -55,15 +55,15 @@ public class BlockCoord {
     this(mop.blockX, mop.blockY, mop.blockZ);
   }
   
-  public Block getBlock(World world) {
+  public Block getBlock(IBlockAccess world) {
     return world.getBlock(x, y, z);
   }
 
-  public int getMetadata(World world) {
+  public int getMetadata(IBlockAccess world) {
     return world.getBlockMetadata(x, y, z);
   }
 
-  public TileEntity getTileEntity(World world) {
+  public TileEntity getTileEntity(IBlockAccess world) {
     return world.getTileEntity(x, y, z);
   }
 
