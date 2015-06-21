@@ -48,11 +48,12 @@ public class IconButton extends GuiButton {
   }
   
   protected void setToolTip(GuiToolTip newToolTip) {
+    boolean addTooltip = false;
     if (toolTip != null) {
-      gui.removeToolTip(toolTip);
+      addTooltip = gui.removeToolTip(toolTip);
     }
     toolTip = newToolTip;
-    if (toolTip != null) {
+    if (addTooltip && toolTip != null) {
       gui.addToolTip(toolTip);
     }
   }

@@ -461,8 +461,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void removeToolTip(GuiToolTip toolTip) {
-    ttMan.removeToolTip(toolTip);
+  public boolean removeToolTip(GuiToolTip toolTip) {
+    return ttMan.removeToolTip(toolTip);
   }
 
   protected void drawForegroundImpl(int mouseX, int mouseY) {

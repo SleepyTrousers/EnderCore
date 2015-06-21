@@ -30,8 +30,8 @@ public class ToolTipManager {
     }
   }
 
-  public void removeToolTip(GuiToolTip toolTip) {
-    toolTips.remove(toolTip);
+  public boolean removeToolTip(GuiToolTip toolTip) {
+    return toolTips.remove(toolTip);
   }
 
   protected final void drawTooltips(ToolTipRenderer renderer, int mouseX, int mouseY) {
