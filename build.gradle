@@ -101,12 +101,12 @@ task deobfJar(type: Jar) {
     classifier = 'dev'
 }
 
-javadoc {
-    if (JavaVersion.current().isJava8Compatible()) {
-        options.addStringOption('Xdoclint:none') 
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
     }
-    options.addStringOption('-quiet')
-    include 'com/enderio/core/**/*'
 }
 
 build.dependsOn sourceJar, deobfJar, apiJar, javadoc
