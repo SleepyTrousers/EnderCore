@@ -84,16 +84,16 @@ public class TechneUtil {
 
   private static final Tessellator tes = Tessellator.instance;
 
-  public static List<GroupObject> bakeModel(ModelRenderer model) {
-    return bakeModel(model, 1);
+  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel) {
+    return bakeModel(model, supermodel, 1);
   }
 
-  public static List<GroupObject> bakeModel(ModelRenderer model, float scale) {
-    return bakeModel(model, scale, new Matrix4f());
+  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel, float scale) {
+    return bakeModel(model, supermodel, scale, new Matrix4f());
   }
 
-  public static List<GroupObject> bakeModel(ModelRenderer model, float scale, Matrix4f matrix) {
-    return bakeModel(model, scale, matrix, false);
+  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel, float scale, Matrix4f matrix) {
+    return bakeModel(model, supermodel, scale, matrix, false);
   }
 
   /**
@@ -111,19 +111,30 @@ public class TechneUtil {
    *          ModelRenderer.render
    */
   @SuppressWarnings("unchecked")
-  public static List<GroupObject> bakeModel(ModelRenderer model, float scale, Matrix4f matrix, boolean rotateYFirst) {
+  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel, float scale, Matrix4f matrix,
+      boolean rotateYFirst) {
+
+    // Correction for the fact that TechneModel sets the texture size on the
+    // ModelRenderer after the texture positions have been calculated. It also
+    // never sets the size on the TechneModel, so we can use that value (which
+    // is taken by the ModelRenderer for the calculations) to correct the
+    // positions.
+
+    float uCorrection = ((int) model.textureWidth) / supermodel.textureWidth;
+    float vCorrection = ((int) model.textureHeight) / supermodel.textureHeight;
+
     Matrix4f m = new Matrix4f(matrix);
 
     m.translate(new Vector3f(model.offsetX + model.rotationPointX * scale, model.offsetY + model.rotationPointY * scale, model.offsetZ + model.rotationPointZ
         * scale));
 
-    if (!rotateYFirst) {
+    if(!rotateYFirst) {
       m.rotate(model.rotateAngleZ, new Vector3f(0, 0, 1));
     }
     m.rotate(model.rotateAngleY, new Vector3f(0, 1, 0));
     m.rotate(model.rotateAngleX, new Vector3f(1, 0, 0));
 
-    if (rotateYFirst) {
+    if(rotateYFirst) {
       m.rotate(model.rotateAngleZ, new Vector3f(0, 0, 1));
     }
 
@@ -137,6 +148,16 @@ public class TechneUtil {
         Face face = new Face();
         face.vertices = new Vertex[4];
         face.textureCoordinates = new TextureCoordinate[4];
+        float minU = -1, minV = -1;
+        for (int j = 0; j < 4; j++) {
+          PositionTextureVertex pv = quads[i].vertexPositions[j];
+          if (minU < 0 || minU > pv.texturePositionX) {
+            minU = pv.texturePositionX;
+          }
+          if (minV < 0 || minV > pv.texturePositionY) {
+            minV = pv.texturePositionY;
+          }
+        }
         for (int j = 0; j < 4; j++) {
           PositionTextureVertex pv = quads[i].vertexPositions[j];
 
@@ -149,15 +170,23 @@ public class TechneUtil {
 
           face.vertices[j] = new Vertex(vec.x / vec.w, vec.y / vec.w, vec.z / vec.w);
 
-          // Increase the interpolation scale by multiples of 2
-          while (pv.texturePositionX > uMult) {
-            uMult *= 2;
+          // The small offset will reduce the amount of visible errors (white
+          // pixels) at the edges of textures a lot. The introduced visible
+          // offset is very small, about 1 screen pixel between a 1/16 block
+          // wide element and a 1 block wide element when standing "on touch".
+          float u;
+          float v;
+          if (pv.texturePositionX == minU) {
+            u = pv.texturePositionX / uCorrection + 0.0001f;
+          } else {
+            u = pv.texturePositionX / uCorrection - 0.0001f;
           }
-          while (pv.texturePositionY > vMult) {
-            vMult *= 2;
+          if (pv.texturePositionY == minV) {
+            v = pv.texturePositionY / vCorrection + 0.0001f;
+          } else {
+            v = pv.texturePositionY / vCorrection - 0.0001f;
           }
-
-          face.textureCoordinates[j] = new TextureCoordinate(pv.texturePositionX, pv.texturePositionY);
+          face.textureCoordinates[j] = new TextureCoordinate(u, v);
         }
         face.faceNormal = face.calculateFaceNormal();
         obj.faces.add(face);
@@ -180,9 +209,6 @@ public class TechneUtil {
     return bakeModel(model, scale, m, false);
   }
 
-  // Used in the second pass of baking to adjust UVs to the proper interpolation
-  private static int uMult = 1, vMult = 1;
-
   /**
    * Use this to convert TechneModel to it's static representation
    */
@@ -192,23 +218,9 @@ public class TechneUtil {
     Map<String, GroupObject> res = Maps.newHashMap();
 
     for (Map.Entry<String, ModelRenderer> e : parts.entrySet()) {
-      GroupObject obj = bakeModel(e.getValue(), scale, m, rotateYFirst).get(0);
+      GroupObject obj = bakeModel(e.getValue(), model, scale, m, rotateYFirst).get(0);
       res.put(e.getKey(), obj);
     }
-
-    // Second pass, adjust the UVs to be on a 0-1 interpolation scale
-    if (uMult + vMult != 2) {
-      for (GroupObject go : res.values()) {
-        for (Face f : go.faces) {
-          for (TextureCoordinate tc : f.textureCoordinates) {
-            tc.u /= uMult;
-            tc.v /= vMult;
-          }
-        }
-      }
-    }
-
-    uMult = vMult = 1;
 
     return res;
   }
@@ -222,7 +234,7 @@ public class TechneUtil {
     TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(), modelPath + ".tcn"));
     return TechneUtil.bakeModel(tm, 1f / 16, new Matrix4f().scale(new Vector3f(-1, -1, 1))).values();
   }
-
+  
   public static void renderWithIcon(WavefrontObject model, IIcon icon, Tessellator tes) {
     renderWithIcon(model.groupObjects, icon, null, tes);
   }
@@ -258,12 +270,12 @@ public class TechneUtil {
       tes.setNormal(n.x, n.y, n.z);
       ForgeDirection normal = getNormalFor(n);
       ForgeDirection right = normal.getRotation(ForgeDirection.DOWN);
-      if (normal == right) {
+      if(normal == right) {
         right = ForgeDirection.EAST;
       }
       ForgeDirection down = normal.getRotation(right.getOpposite());
 
-      if (isbrh && world != null && world.getBlock(x, y, z).getLightOpacity() > 0) {
+      if(isbrh && world != null && world.getBlock(x, y, z).getLightOpacity() > 0) {
         int bx = x + normal.offsetX;
         int by = y + normal.offsetY;
         int bz = z + normal.offsetZ;
@@ -275,18 +287,18 @@ public class TechneUtil {
         Vector3d v = new Vector3d(vert);
         Vector3d tv = new Vector3d(v);
         tv.add(0.5, 0, 0.5);
-        if (vt != null) {
+        if(vt != null) {
           vt.apply(v);
         }
 
-        if (isbrh) {
+        if(isbrh) {
           float factor = normal.offsetX != 0 ? 0.8f : normal.offsetZ != 0 ? 0.6f : normal.offsetY < 0 ? 0.5f : 1;
           int c = (int) (0xFF * factor);
 
           tes.setColorOpaque(c, c, c);
         }
 
-        if (override != null) {
+        if(override != null) {
 
           double interpX = Math.abs(tv.x * right.offsetX + tv.y * right.offsetY + tv.z * right.offsetZ);
           double interpY = Math.abs(tv.x * down.offsetX + tv.y * down.offsetY + tv.z * down.offsetZ);
@@ -299,25 +311,35 @@ public class TechneUtil {
             interpY--;
           }
 
-          if (normal == ForgeDirection.SOUTH || normal == ForgeDirection.WEST) {
+          if(normal == ForgeDirection.SOUTH || normal == ForgeDirection.WEST) {
             interpX = 1 - interpX;
           }
-          if (normal != ForgeDirection.UP && normal != ForgeDirection.DOWN) {
+          if(normal != ForgeDirection.UP && normal != ForgeDirection.DOWN) {
             interpY = 1 - interpY;
           }
           tes.addVertexWithUV(v.x, v.y, v.z, override.getInterpolatedU(interpX * 16), override.getInterpolatedV(interpY * 16));
         } else {
           TextureCoordinate t = f.textureCoordinates[i];
-          tes.addVertexWithUV(v.x, v.y, v.z, icon.getInterpolatedU(t.u * 16), icon.getInterpolatedV(t.v * 16));
+          tes.addVertexWithUV(v.x, v.y, v.z, getInterpolatedU(icon, t.u), getInterpolatedV(icon, t.v));
         }
       }
     }
   }
 
+  // reducing texture positioning error by working in double and not multiplying
+  // and dividing by 16.
+  public static double getInterpolatedV(IIcon icon, double offset) {
+    return icon.getMinV() + (icon.getMaxV() - icon.getMinV()) * offset;
+  }
+
+  public static double getInterpolatedU(IIcon icon, double offset) {
+    return icon.getMinU() + (icon.getMaxU() - icon.getMinU()) * offset;
+  }
+
   private static ForgeDirection getNormalFor(Vertex n) {
-    if (n.x != 0) {
+    if(n.x != 0) {
       return n.x > 0 ? ForgeDirection.EAST : ForgeDirection.WEST;
-    } else if (n.y != 0) {
+    } else if(n.y != 0) {
       return n.y > 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
     } else {
       return n.z > 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
@@ -329,13 +351,21 @@ public class TechneUtil {
   }
 
   public static void renderInventoryBlock(Collection<GroupObject> model, IIcon icon, Block block, int metadata, RenderBlocks rb) {
-    if (icon == null) {
-      return;
-    }
     tes.startDrawingQuads();
     tes.setColorOpaque_F(1, 1, 1);
     tes.addTranslation(0, -0.47f, 0);
     renderWithIcon(model, icon, rb.overrideBlockTexture, tes, vt);
+    tes.addTranslation(0, 0.47f, 0);
+    tes.draw();
+    resetVT();
+  }
+
+  public static void renderInventoryBlock(GroupObject model, Block block, int metadata, RenderBlocks rb) {
+    IIcon icon = getIconFor(block, metadata);
+    tes.startDrawingQuads();
+    tes.setColorOpaque_F(1, 1, 1);
+    tes.addTranslation(0, -0.47f, 0);
+    renderWithIcon(model, icon, rb.overrideBlockTexture, tes, null, 0, 0, 0, vt, true);
     tes.addTranslation(0, 0.47f, 0);
     tes.draw();
     resetVT();
@@ -347,13 +377,21 @@ public class TechneUtil {
   }
 
   public static boolean renderWorldBlock(Collection<GroupObject> model, IIcon icon, IBlockAccess world, int x, int y, int z, Block block, RenderBlocks rb) {
-    if (icon == null) {
-      return false;
-    }
     tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
     tes.setColorOpaque_F(1, 1, 1);
     tes.addTranslation(x + .5F, y + 0.0375f, z + .5F);
     renderWithIcon(model, icon, rb.overrideBlockTexture, tes, world, x, y, z, vt);
+    tes.addTranslation(-x - .5F, -y - 0.0375f, -z - .5F);
+    resetVT();
+    return true;
+  }
+
+  public static boolean renderWorldBlock(GroupObject model, IBlockAccess world, int x, int y, int z, Block block, RenderBlocks rb) {
+    IIcon icon = getIconFor(block, world, x, y, z);
+    tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
+    tes.setColorOpaque_F(1, 1, 1);
+    tes.addTranslation(x + .5F, y + 0.0375f, z + .5F);
+    renderWithIcon(model, icon, rb.overrideBlockTexture, tes, world, x, y, z, vt, true);
     tes.addTranslation(-x - .5F, -y - 0.0375f, -z - .5F);
     resetVT();
     return true;
@@ -365,16 +403,16 @@ public class TechneUtil {
 
   // TODO
   private static IIcon getIconFor(Block block, IBlockAccess world, int x, int y, int z) {
-    //    if(block instanceof AbstractMachineBlock<?>) {
-    //      return ((AbstractMachineBlock<?>) block).getModelIcon(world, x, y, z);
-    //    }
+//    if(block instanceof AbstractMachineBlock<?>) {
+//      return ((AbstractMachineBlock<?>) block).getModelIcon(world, x, y, z);
+//    }
     return block.getIcon(world, x, y, z, 0);
   }
 
   private static IIcon getIconFor(Block block, int metadata) {
-    //    if(block instanceof AbstractMachineBlock<?>) {
-    //      return ((AbstractMachineBlock<?>) block).getModelIcon();
-    //    }
+//    if(block instanceof AbstractMachineBlock<?>) {
+//      return ((AbstractMachineBlock<?>) block).getModelIcon();
+//    }
     return block.getIcon(0, metadata);
   }
 }
