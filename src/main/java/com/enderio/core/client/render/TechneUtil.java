@@ -377,6 +377,9 @@ public class TechneUtil {
   }
 
   public static boolean renderWorldBlock(Collection<GroupObject> model, IIcon icon, IBlockAccess world, int x, int y, int z, Block block, RenderBlocks rb) {
+    if (icon == null) {
+      return false;
+    }
     tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
     tes.setColorOpaque_F(1, 1, 1);
     tes.addTranslation(x + .5F, y + 0.0375f, z + .5F);
