@@ -45,7 +45,7 @@ public class XPBoostHandler
             {
                 scheduleXP(entity, getXPBoost(entity, (EntityPlayer) killer));
             }
-            else if (killer instanceof EntityArrow)
+            else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer)
             {
                 NBTTagCompound tag = killer.getEntityData();
                 if (tag.hasKey(NBT_KEY) && tag.getInteger(NBT_KEY) >= 0)
