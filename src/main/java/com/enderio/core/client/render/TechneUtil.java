@@ -404,18 +404,11 @@ public class TechneUtil {
     vt = null;
   }
 
-  // TODO
   private static IIcon getIconFor(Block block, IBlockAccess world, int x, int y, int z) {
-//    if(block instanceof AbstractMachineBlock<?>) {
-//      return ((AbstractMachineBlock<?>) block).getModelIcon(world, x, y, z);
-//    }
     return block.getIcon(world, x, y, z, 0);
   }
 
   private static IIcon getIconFor(Block block, int metadata) {
-//    if(block instanceof AbstractMachineBlock<?>) {
-//      return ((AbstractMachineBlock<?>) block).getModelIcon();
-//    }
     return block.getIcon(0, metadata);
   }
 }

@@ -49,13 +49,13 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
   @Override
   public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
     TechneUtil.vt = this.vt;
-    TechneUtil.renderInventoryBlock(getModel(block, metadata), block, metadata, renderer);
+    TechneUtil.renderInventoryBlock(getModel(block, metadata), getModelIcon(block, metadata), block, metadata, renderer);
   }
 
   @Override
   public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
     TechneUtil.vt = this.vt;
-    return TechneUtil.renderWorldBlock(getModel(world, x, y, z), world, x, y, z, block, renderer);
+    return TechneUtil.renderWorldBlock(getModel(world, x, y, z), getModelIcon(world, x, y, z, block), world, x, y, z, block, renderer);
   }
   
   protected IIcon getModelIcon(Block block, int metadata) {
