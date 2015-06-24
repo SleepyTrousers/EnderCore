@@ -21,3 +21,7 @@ endercore.gui.normal=Normal
 endercore.gui.search=Search:
 endercore.gui.modlistinfo1=OMG everything is different!
 endercore.gui.modlistinfo2=New layout provided by:
+
+endercore.error.ttcore.1=EnderCore cannot reliably be run alongside ttCore.
+endercore.error.ttcore.2=All ttCore features/utils are now included in EnderCore.
+endercore.error.ttcore.3=Please remove ttCore from your instance and try launching again.
