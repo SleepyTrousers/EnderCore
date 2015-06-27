@@ -7,7 +7,7 @@
   "mcversion": "${mcversion}",
   "url": "http://enderio.com",
   "updateUrl": "http://ci.tterrag.com/job/EnderCore",
-  "authors": ["tterrag", "CrazyPants"],
+  "authorList": ["tterrag", "CrazyPants"],
   "credits": "",
   "logoFile": "",
   "screenshots": [],
