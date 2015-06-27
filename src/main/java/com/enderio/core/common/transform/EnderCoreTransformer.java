@@ -105,7 +105,7 @@ public class EnderCoreTransformer implements IClassTransformer
 
                             m.instructions.add(new VarInsnNode(ALOAD, 0));
                             m.instructions.add(new VarInsnNode(ILOAD, 1));
-                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods", "hasVoidParticles",
+                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "hasVoidParticles",
                                     voidFogMethodSig, false));
                             m.instructions.add(new InsnNode(IRETURN));
 
@@ -135,7 +135,7 @@ public class EnderCoreTransformer implements IClassTransformer
                                 next = m.instructions.get(i);
                                 if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40)
                                 {
-                                    m.instructions.set(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods",
+                                    m.instructions.set(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods",
                                             "getMaxAnvilCost", "()I", false));
                                 }
                             }
@@ -172,7 +172,7 @@ public class EnderCoreTransformer implements IClassTransformer
                                         InsnList toAdd = new InsnList();
                                         toAdd.add(new VarInsnNode(ALOAD, indeces[0]));
                                         toAdd.add(new VarInsnNode(ILOAD, indeces[1]));
-                                        toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods",
+                                        toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods",
                                                 "getItemEnchantability", enchantHelperMethodSig, false));
                                         toAdd.add(new VarInsnNode(ISTORE, indeces[1]));
                                         m.instructions.insert(next, toAdd);
@@ -205,7 +205,7 @@ public class EnderCoreTransformer implements IClassTransformer
                             m.instructions.clear();
 
                             m.instructions.add(new VarInsnNode(ALOAD, 0));
-                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods", "getItemRarity",
+                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getItemRarity",
                                     itemStackMethodSig, false));
                             m.instructions.add(new InsnNode(ARETURN));
 
@@ -235,7 +235,7 @@ public class EnderCoreTransformer implements IClassTransformer
                                 {
                                     InsnList toAdd = new InsnList();
                                     toAdd.add(new VarInsnNode(ALOAD, 0));
-                                    toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods", "onArrowUpdate",
+                                    toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "onArrowUpdate",
                                             entityArrowMethodSig, false));
                                     m.instructions.insert(next, toAdd);
                                     break;
@@ -265,7 +265,7 @@ public class EnderCoreTransformer implements IClassTransformer
                             m.instructions.add(new VarInsnNode(ALOAD, 0));
                             m.instructions.add(new VarInsnNode(ALOAD, 1));
                             m.instructions.add(new VarInsnNode(ILOAD, 2));
-                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/TTCoreMethods", "transferStackInSlot",
+                            m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "transferStackInSlot",
                                     containerFurnaceMethodSig, false));
                             m.instructions.add(new InsnNode(ARETURN));
 
