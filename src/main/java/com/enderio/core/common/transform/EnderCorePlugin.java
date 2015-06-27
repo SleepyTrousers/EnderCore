@@ -16,8 +16,8 @@ public class EnderCorePlugin implements IFMLLoadingPlugin
     public String[] getASMTransformerClass()
     {
         return new String[] { 
-                "com.enderio.core.common.transform.TTCoreTransformer",
-                "com.enderio.core.common.transform.TTCoreTransformerClient"
+                "com.enderio.core.common.transform.EnderCoreTransformer",
+                "com.enderio.core.common.transform.EnderCoreTransformerClient"
        };
     }
 
