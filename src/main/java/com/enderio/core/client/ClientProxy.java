@@ -21,7 +21,7 @@ public class ClientProxy extends CommonProxy {
 
   @Override
   public void throwModCompatibilityError(String... msgs) {
-    super.throwModCompatibilityError(msgs); //To change body of generated methods, choose Tools | Templates.
+    throw new EnderCoreModConflictException(msgs);
   }
 
 
