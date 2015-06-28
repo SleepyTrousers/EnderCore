@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import lombok.SneakyThrows;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -31,7 +29,6 @@ import com.enderio.core.common.util.PermanentCache;
 import com.enderio.core.common.util.TextureErrorRemover;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -67,19 +64,11 @@ public class EnderCore implements IEnderMod {
   @SneakyThrows
   public void preInit(FMLPreInitializationEvent event) {
     if (Loader.isModLoaded("ttCore")) {
-      throw new CustomModLoadingErrorDisplayException() {
-        
-        @Override
-        public void initGui(GuiErrorScreen errorScreen, FontRenderer fontRenderer) {
-        }
-        
-        @Override
-        public void drawScreen(GuiErrorScreen errorScreen, FontRenderer fontRenderer, int mouseRelX, int mouseRelY, float tickTime) {
-          errorScreen.drawCenteredString(fontRenderer, lang.localize("error.ttcore.1"), errorScreen.width / 2, errorScreen.height / 2 - 20, 0xFFFFFF);
-          errorScreen.drawCenteredString(fontRenderer, lang.localize("error.ttcore.2"), errorScreen.width / 2, errorScreen.height / 2 - 10, 0xFFFFFF);
-          errorScreen.drawCenteredString(fontRenderer, lang.localize("error.ttcore.3"), errorScreen.width / 2, errorScreen.height / 2, 0xFFFFFF);
-        }
-      };
+      if (event.getSide().isClient()) {
+        throw new EnderCoreModConflictExceptionClient();
+      } else {
+        throw new RuntimeException(lang.localize("error.ttcore.1") + "\n" + lang.localize("error.ttcore.2") + "\n" + lang.localize("error.ttcore.3"));
+      }
     }
     
     if (event.getSide().isClient()) {
