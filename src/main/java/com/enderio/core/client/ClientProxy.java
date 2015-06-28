@@ -18,4 +18,11 @@ public class ClientProxy extends CommonProxy {
   public World getClientWorld() {
     return Minecraft.getMinecraft().theWorld;
   }
+
+  @Override
+  public void throwModCompatibilityError(String... msgs) {
+    super.throwModCompatibilityError(msgs); //To change body of generated methods, choose Tools | Templates.
+  }
+
+
 }

@@ -64,13 +64,9 @@ public class EnderCore implements IEnderMod {
   @SneakyThrows
   public void preInit(FMLPreInitializationEvent event) {
     if (Loader.isModLoaded("ttCore")) {
-      if (event.getSide().isClient()) {
-        throw new EnderCoreModConflictExceptionClient();
-      } else {
-        throw new RuntimeException(lang.localize("error.ttcore.1") + "\n" + lang.localize("error.ttcore.2") + "\n" + lang.localize("error.ttcore.3"));
-      }
+      proxy.throwModCompatibilityError(lang.localize("error.ttcore.1"), lang.localize("error.ttcore.2"), lang.localize("error.ttcore.3"));
     }
-    
+
     if (event.getSide().isClient()) {
       TextureErrorRemover.beginIntercepting();
     }
