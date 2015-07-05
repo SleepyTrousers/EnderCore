@@ -10,7 +10,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketProgress extends MessageTileEntity<TileEntity> implements IMessageHandler<PacketProgress, IMessage>  {
+public class PacketProgress extends MessageTileEntity<TileEntity> implements IMessageHandler<PacketProgress, IMessage> {
 
   private float progress;
 
@@ -40,7 +40,7 @@ public class PacketProgress extends MessageTileEntity<TileEntity> implements IMe
   @Override
   public IMessage onMessage(PacketProgress message, MessageContext ctx) {
     TileEntity tile = message.getTileEntity(EnderCore.proxy.getClientWorld());
-    if(tile instanceof IProgressTile) {
+    if (tile instanceof IProgressTile) {
       ((IProgressTile) tile).setProgress(message.progress);
     }
     return null;

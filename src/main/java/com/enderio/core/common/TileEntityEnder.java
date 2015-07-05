@@ -16,7 +16,7 @@ import com.enderio.core.common.util.Util;
 public abstract class TileEntityEnder extends TileEntity {
 
   private final int checkOffset = (int) (Math.random() * 20);
-  private final boolean isProgressTile;
+  protected final boolean isProgressTile;
 
   protected int lastProgressScaled = -1;
   protected int ticksSinceLastProgressUpdate;

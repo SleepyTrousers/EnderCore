@@ -24,6 +24,7 @@ import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.enchant.EnchantAutoSmelt;
 import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.imc.IMCRegistry;
+import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.PermanentCache;
 import com.enderio.core.common.util.TextureErrorRemover;
@@ -92,6 +93,8 @@ public class EnderCore implements IEnderMod {
 
   @EventHandler
   public void init(FMLInitializationEvent event) {
+    EnderPacketHandler.init();
+    
     for (IConfigHandler c : configs) {
       c.initHook();
     }

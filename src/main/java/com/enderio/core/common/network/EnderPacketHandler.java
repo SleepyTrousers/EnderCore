@@ -12,9 +12,10 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 
 public class EnderPacketHandler {
+  
   public static final SimpleNetworkWrapper INSTANCE = new SimpleNetworkWrapper(EnderCore.NAME);
 
-  static {
+  public static void init() {
     INSTANCE.registerMessage(PacketConfigSync.class, PacketConfigSync.class, 0, Side.CLIENT);
     INSTANCE.registerMessage(PacketProgress.class, PacketProgress.class, 1, Side.CLIENT);
   }

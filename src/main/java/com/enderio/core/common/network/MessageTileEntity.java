@@ -16,7 +16,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   protected int y;
   protected int z;
 
-  private Class<? extends TileEntity> tileClass;
+  protected Class<? extends TileEntity> tileClass;
 
   protected MessageTileEntity() {
   }
