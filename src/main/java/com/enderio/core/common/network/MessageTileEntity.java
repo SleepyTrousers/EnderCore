@@ -1,12 +1,10 @@
 package com.enderio.core.common.network;
 
+import com.google.common.reflect.TypeToken;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-
-import com.enderio.core.common.util.Log;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
@@ -16,13 +14,10 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   protected int y;
   protected int z;
 
-  protected Class<? extends TileEntity> tileClass;
-
   protected MessageTileEntity() {
   }
 
   protected MessageTileEntity(T tile) {
-    tileClass = tile.getClass();
     x = tile.xCoord;
     y = tile.yCoord;
     z = tile.zCoord;
@@ -32,8 +27,6 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     buf.writeInt(x);
     buf.writeInt(y);
     buf.writeInt(z);
-    ByteBufUtils.writeUTF8String(buf, tileClass.getName());
-
   }
 
   @Override
@@ -41,23 +34,19 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     x = buf.readInt();
     y = buf.readInt();
     z = buf.readInt();
-    String str = ByteBufUtils.readUTF8String(buf);
-    try {
-      tileClass = (Class<TileEntity>) Class.forName(str);
-    } catch (Exception e) {
-      Log.error("AbstractPacketTileEntity could not load tile entity class: " + str);
-    }
   }
 
+  @SuppressWarnings("unchecked")
   protected T getTileEntity(World worldObj) {
-    if(worldObj == null) {
+    if (worldObj == null) {
       return null;
     }
     TileEntity te = worldObj.getTileEntity(x, y, z);
-    if(te == null) {
+    if (te == null) {
       return null;
     }
-    if(tileClass.isAssignableFrom(te.getClass())) {
+    TypeToken<?> teType = TypeToken.of(getClass()).resolveType(MessageTileEntity.class.getTypeParameters()[0]);
+    if (teType.isAssignableFrom(te.getClass())) {
       return (T) te;
     }
     return null;
