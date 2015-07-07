@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import com.enderio.core.common.util.EnderFileUtils;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -33,7 +35,6 @@ import com.google.gson.reflect.TypeToken;
  *          constructors.
  */
 public class JsonConfigReader<T> implements Iterable<T> {
-
   /**
    * A class representing some info about your mod.
    * <p>
@@ -42,15 +43,17 @@ public class JsonConfigReader<T> implements Iterable<T> {
    * <b>assetPath</b> is the path to your default json file. This includes the
    * /modid part and whatever subfolders follow.
    */
-  @Value
+  @AllArgsConstructor
+  @Getter
   public static class ModToken {
     private Class<?> mainClass;
     private String assetPath;
   }
 
-  private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-  private static final JsonParser parser = new JsonParser();
   private static final String DEFAULT_KEY = "data";
+  private static final JsonParser parser = new JsonParser();
+
+  private final GsonBuilder builder = new GsonBuilder();
 
   private File file;
   private JsonObject root;
@@ -189,6 +192,14 @@ public class JsonConfigReader<T> implements Iterable<T> {
   }
 
   /**
+   * Gives this reader's {@link GsonBuilder} object so that you may configure
+   * type adapters and other settings.
+   */
+  public GsonBuilder getBuilder() {
+    return builder;
+  }
+
+  /**
    * Reads from the {@link JsonObject} linked to the {@link String key} and
    * returns a List of all the elements contained in its array.
    * 
@@ -197,6 +208,11 @@ public class JsonConfigReader<T> implements Iterable<T> {
    */
   @SuppressWarnings("unchecked")
   public List<T> getElements(String key) {
+    if (!hasKey(key)) {
+      return Lists.newArrayList();
+    }
+
+    Gson gson = builder.create();
     JsonArray elements = root.get(key).getAsJsonArray();
     List<T> list = new ArrayList<T>();
     for (int i = 0; i < elements.size(); i++) {
