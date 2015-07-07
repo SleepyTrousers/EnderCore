@@ -29,7 +29,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Comment({ "Show oredictionary names of every item in its tooltip.", "0 - Off", "1 - Always on", "2 - Only with shift", "3 - Only in debug mode" })
   @Range(min = 0, max = 3)
   @NoSync
-  public static int showOredictTooltips = 1;
+  public static int showOredictTooltips = 2;
 
   @Config
   @Comment({ "Show item registry names in tooltips.", "0 - Off", "1 - Always on", "2 - Only with shift", "3 - Only in debug mode" })
