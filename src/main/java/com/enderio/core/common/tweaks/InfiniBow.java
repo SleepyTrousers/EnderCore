@@ -7,6 +7,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class InfiniBow extends Tweak {
@@ -20,7 +21,7 @@ public class InfiniBow extends Tweak {
     MinecraftForge.EVENT_BUS.register(this);
   }
 
-  @SubscribeEvent
+  @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onArrowNock(ArrowNockEvent event) {
     EntityPlayer player = event.entityPlayer;
     ItemStack stack = player.getHeldItem();
