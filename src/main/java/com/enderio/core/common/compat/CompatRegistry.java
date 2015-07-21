@@ -113,7 +113,7 @@ public class CompatRegistry
         {
             throw new RuntimeException("Error in compatability class " + clazz, e.getTargetException());
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             EnderCore.logger.error("[Compat] An unknown error was thrown loading class {}.", clazz);
             e.printStackTrace();
