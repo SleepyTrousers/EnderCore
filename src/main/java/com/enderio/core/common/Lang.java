@@ -1,5 +1,9 @@
 package com.enderio.core.common;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import lombok.Getter;
 import net.minecraft.util.StatCollector;
 
@@ -106,6 +110,21 @@ public class Lang {
    */
   public String[] localizeList(String unloc) {
     return splitList(localize(unloc));
+  }
+
+  /**
+   * Localizes all strings in a list, using the prefix.
+   * 
+   * @param unloc
+   *          The list of unlocalized strings.
+   * @return A list of localized versions of the passed strings.
+   */
+  public List<String> localizeAll(List<String> unloc) {
+    List<String> ret = Lists.newArrayList();
+    for (String s : unloc) {
+      ret.add(localize(s));
+    }
+    return ret;
   }
 
   /**
