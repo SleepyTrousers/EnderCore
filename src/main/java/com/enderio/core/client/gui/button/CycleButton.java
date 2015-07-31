@@ -8,10 +8,6 @@ import net.minecraft.client.Minecraft;
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.client.gui.button.CycleButton.ICycleEnum;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.relauncher.ReflectionHelper;
 
 /**
  * A button which automatically parses enum constants and cycles between them
@@ -35,7 +31,7 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
     List<String> getTooltipLines();
   }
 
-  private T[] modes;
+  private final T[] modes;
 
   @Getter
   private T mode;
@@ -43,11 +39,7 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
   @SuppressWarnings("unchecked")
   public CycleButton(IGuiScreen gui, int id, int x, int y, Class<T> enumClass) {
     super(gui, id, x, y, null);
-    try {
-      modes = (T[]) ReflectionHelper.findMethod(enumClass, null, new String[] { "values" }).invoke(null);
-    } catch (Exception e) {
-      Throwables.propagate(e);
-    }
+    modes = enumClass.getEnumConstants();
     setMode(modes[0]);
   }
 
@@ -86,7 +78,7 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
       return;
     }
     mode = newMode;
-    List<String> tooltip = Lists.newArrayList(mode.getTooltipLines());
+    List<String> tooltip = mode.getTooltipLines();
     setToolTip(tooltip.toArray(new String[tooltip.size()]));
 
     this.icon = mode.getIcon();
