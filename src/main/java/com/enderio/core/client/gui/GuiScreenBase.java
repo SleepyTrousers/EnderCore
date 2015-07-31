@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL12;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
+import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 
 public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer, IGuiScreen {
@@ -37,6 +38,9 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   protected int guiTop;
 
   protected boolean drawButtons = true;
+  
+  protected GuiScreenBase() {
+  }
 
   protected GuiScreenBase(int xSize, int ySize) {
     this.xSize = xSize;
@@ -229,4 +233,13 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
     actionPerformed(guiButton); 
   }
 
+  @Override
+  public int getOverlayOffsetX() {
+    return 0;
+  }
+
+  @Override
+  public List<GhostSlot> getGhostSlots() {
+    return null;
+  }
 }

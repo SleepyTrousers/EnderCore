@@ -9,7 +9,6 @@ public class PlayerUtil {
 
   public static UUID getPlayerUUID(String username) {
     for (Map.Entry<UUID, String> entry : UsernameCache.getMap().entrySet()) {
-
       if(entry.getValue().equalsIgnoreCase(username)) {
         return entry.getKey();
       }

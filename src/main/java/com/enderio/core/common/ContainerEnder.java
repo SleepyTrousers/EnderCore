@@ -19,7 +19,7 @@ public abstract class ContainerEnder<T extends IInventory> extends Container {
   protected final int startHotBarSlot;
   protected final int endHotBarSlot;
   
-  protected T inv;
+  private T inv;
   
   public ContainerEnder(InventoryPlayer playerInv, T inv) {
     this.inv = inv;
