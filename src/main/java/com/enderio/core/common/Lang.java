@@ -128,6 +128,21 @@ public class Lang {
   }
 
   /**
+   * Localizes all strings in an array, using the prefix.
+   * 
+   * @param unloc
+   *          The array of unlocalized strings.
+   * @return An array of localized versions of the passed strings.
+   */
+  public String[] localizeAll(Lang lang, String... unloc) {
+    String[] ret = new String[unloc.length];
+    for (int i = 0; i < ret.length; i++) {
+      ret[i] = lang.localize(unloc[i]);
+    }
+    return ret;
+  }
+
+  /**
    * Splits a list of strings based on {@value #CHAR}
    * 
    * @param list
