@@ -112,7 +112,7 @@ public abstract class TileEntityEnder extends TileEntity {
   }
 
   protected boolean isPoweredRedstone() {
-    return worldObj.getStrongestIndirectPower(xCoord, yCoord, zCoord) > 0;
+    return worldObj.blockExists(xCoord, yCoord, zCoord) ? worldObj.getStrongestIndirectPower(xCoord, yCoord, zCoord) > 0 : false;
   }
 
   /**
