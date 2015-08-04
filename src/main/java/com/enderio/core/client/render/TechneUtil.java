@@ -289,9 +289,20 @@ public class TechneUtil {
         tv.add(0.5, 0, 0.5);
         if(vt != null) {
           vt.apply(v);
+          // TODO BLECH
+          if (vt instanceof VertexRotationFacing) {
+            normal = ((VertexRotationFacing) vt).rotate(normal);
+          }
+          if (vt instanceof VertexTransformComposite) {
+            for (VertexTransform xform : ((VertexTransformComposite) vt).xforms) {
+              if (xform instanceof VertexRotationFacing) {
+                normal = ((VertexRotationFacing) xform).rotate(normal);
+              }
+            }
+          }
         }
 
-        if (isbrh) {
+        if(isbrh) {
           int c = (int) (0xFF * RenderUtil.getColorMultiplierForFace(normal));
           tes.setColorOpaque(c, c, c);
         }

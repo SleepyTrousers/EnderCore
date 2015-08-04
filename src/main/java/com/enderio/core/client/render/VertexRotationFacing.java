@@ -26,4 +26,20 @@ public class VertexRotationFacing extends VertexRotation {
       setAngle(ROTATION_AMOUNT * 3);
     }
   }
+  
+  public ForgeDirection rotate(ForgeDirection dir) {
+    if (dir.offsetY != 0) {
+      return dir;
+    }
+    if (getAngle() == ROTATION_AMOUNT) {
+      return dir.getRotation(ForgeDirection.DOWN);
+    } 
+    if (getAngle() == ROTATION_AMOUNT * 2) {
+      return dir.getOpposite();
+    } 
+    if (getAngle() == ROTATION_AMOUNT * 3) {
+      return dir.getRotation(ForgeDirection.UP);
+    }
+    return dir;
+  }
 }
