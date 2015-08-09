@@ -48,7 +48,7 @@ public class ChatUtil {
       }
     }
 
-    public static class NoSpamChatHandler implements IMessageHandler<PacketNoSpamChat, IMessage> {
+    public static class Handler implements IMessageHandler<PacketNoSpamChat, IMessage> {
 
       @Override
       public IMessage onMessage(PacketNoSpamChat message, MessageContext ctx) {

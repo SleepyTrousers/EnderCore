@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.PacketConfigSync;
+import com.enderio.core.common.util.ChatUtil.PacketNoSpamChat;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -16,8 +17,9 @@ public class EnderPacketHandler {
   public static final SimpleNetworkWrapper INSTANCE = new SimpleNetworkWrapper(EnderCore.NAME);
 
   public static void init() {
-    INSTANCE.registerMessage(PacketConfigSync.class, PacketConfigSync.class, 0, Side.CLIENT);
-    INSTANCE.registerMessage(PacketProgress.class, PacketProgress.class, 1, Side.CLIENT);
+    INSTANCE.registerMessage(PacketConfigSync.Handler.class, PacketConfigSync.class, 0, Side.CLIENT);
+    INSTANCE.registerMessage(PacketProgress.Handler.class, PacketProgress.class, 1, Side.CLIENT);
+    INSTANCE.registerMessage(PacketNoSpamChat.Handler.class, PacketNoSpamChat.class, 2, Side.CLIENT);
   }
 
   public static void sendToAllAround(IMessage message, TileEntity te, int range) {
