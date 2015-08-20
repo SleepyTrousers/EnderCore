@@ -2,18 +2,18 @@ package com.enderio.core.client.gui.bettermodlist;
 
 import java.lang.reflect.Field;
 
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-
 import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.client.event.GuiOpenEvent;
+
+import com.enderio.core.common.Handlers.Handler;
+
 import cpw.mods.fml.client.GuiIngameModOptions;
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-@Handler(HandlerType.FORGE)
+@Handler
 public class EventHandlerGui
 {
     private static Field _mainMenu, _parentScreen;

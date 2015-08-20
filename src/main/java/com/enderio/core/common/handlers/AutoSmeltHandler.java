@@ -2,21 +2,23 @@ package com.enderio.core.common.handlers;
 
 import java.util.Map;
 
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.enchant.EnchantAutoSmelt;
-
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
+import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.event.world.BlockEvent;
+
+import com.enderio.core.common.Handlers.Handler;
+import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.enchant.EnchantAutoSmelt;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-@Handler(HandlerType.FORGE)
+@Handler
 public class AutoSmeltHandler {
 
   @SubscribeEvent
@@ -86,5 +88,4 @@ public class AutoSmeltHandler {
     }
     return -1;
   }
-
 }

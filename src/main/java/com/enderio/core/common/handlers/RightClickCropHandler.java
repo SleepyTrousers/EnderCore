@@ -11,7 +11,6 @@ import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
@@ -19,7 +18,7 @@ import com.google.common.collect.Lists;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-@Handler(HandlerType.FORGE)
+@Handler
 public class RightClickCropHandler
 {
     @NoArgsConstructor

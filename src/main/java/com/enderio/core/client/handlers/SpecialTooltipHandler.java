@@ -24,7 +24,6 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
 import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
@@ -33,7 +32,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import static com.enderio.core.common.config.ConfigHandler.showOredictTooltips;
 
-@Handler(HandlerType.FORGE)
+@Handler
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpecialTooltipHandler {
 

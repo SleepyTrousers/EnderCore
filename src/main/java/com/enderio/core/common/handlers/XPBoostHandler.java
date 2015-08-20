@@ -3,11 +3,6 @@ package com.enderio.core.common.handlers;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-import com.enderio.core.common.enchant.EnchantXPBoost;
-import com.enderio.core.common.util.Scheduler;
-
 import lombok.SneakyThrows;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -22,10 +17,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
+
+import com.enderio.core.common.Handlers.Handler;
+import com.enderio.core.common.enchant.EnchantXPBoost;
+import com.enderio.core.common.util.Scheduler;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
-@Handler(HandlerType.FORGE)
+@Handler
 public class XPBoostHandler
 {
     private static final Method getExperiencePoints = ReflectionHelper.findMethod(EntityLivingBase.class, null, 

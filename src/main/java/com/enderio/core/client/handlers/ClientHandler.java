@@ -1,14 +1,14 @@
 package com.enderio.core.client.handlers;
 
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-
 import lombok.Getter;
+
+import com.enderio.core.common.Handlers.Handler;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 
-@Handler(HandlerType.FML)
+@Handler
 public class ClientHandler
 {
     @Getter

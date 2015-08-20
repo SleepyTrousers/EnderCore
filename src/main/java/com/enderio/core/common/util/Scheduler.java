@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
 import com.enderio.core.common.Handlers.Handler.Inst;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +21,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 /**
  * Convenience helper to schedule events to happen in the future.
  */
-@Handler(value = HandlerType.FML, getInstFrom = Inst.METHOD)
+@Handler(getInstFrom = Inst.METHOD)
 public class Scheduler
 {
     @AllArgsConstructor

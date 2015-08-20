@@ -2,18 +2,18 @@ package com.enderio.core.client.handlers;
 
 import java.util.Map;
 
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+
+import com.enderio.core.api.common.enchant.IAdvancedEnchant;
+import com.enderio.core.common.Handlers.Handler;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-@Handler(HandlerType.FORGE)
+@Handler
 public class EnchantTooltipHandler
 {
     @SuppressWarnings("unchecked")

@@ -60,7 +60,6 @@ public class EnderCore implements IEnderMod {
 
   public List<IConfigHandler> configs = Lists.newArrayList();
 
-  @SuppressWarnings("serial")
   @EventHandler
   @SneakyThrows
   public void preInit(FMLPreInitializationEvent event) {
@@ -82,7 +81,7 @@ public class EnderCore implements IEnderMod {
     }
 
     ConfigHandler.instance().initialize(ConfigHandler.configFile);
-    Handlers.findPackages();
+    Handlers.preInit(event);
 
     CompatRegistry.INSTANCE.handle(event);
     OreDict.registerVanilla();
@@ -99,7 +98,7 @@ public class EnderCore implements IEnderMod {
       c.initHook();
     }
 
-    Handlers.register();
+    Handlers.register(event);
     CompatRegistry.INSTANCE.handle(event);
     ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
     if (event.getSide().isServer()) {

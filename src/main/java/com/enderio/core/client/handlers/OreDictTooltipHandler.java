@@ -9,13 +9,12 @@ import org.lwjgl.input.Keyboard;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.HandlerType;
-
-import static com.enderio.core.common.config.ConfigHandler.*;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-@Handler(HandlerType.FORGE)
+import static com.enderio.core.common.config.ConfigHandler.*;
+
+@Handler
 public class OreDictTooltipHandler
 {
     @SubscribeEvent
