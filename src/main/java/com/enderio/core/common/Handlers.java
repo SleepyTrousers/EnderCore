@@ -27,8 +27,10 @@ import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+
 import static com.enderio.core.common.Handlers.Handler.Inst.*;
 
 @UtilityClass
@@ -230,11 +232,14 @@ public class Handlers {
         Class<?>[] params = m.getParameterTypes();
         if (params.length >= 1) {
           Class<?> param = params[0];
-          for (HandlerType type : HandlerType.values()) {
-            if (param.getName().contains(type.eventIdentifier)) {
-              types.add(type);
-              break;
+          l: while (param != Event.class && param != null && param != Object.class) {
+            for (HandlerType type : HandlerType.values()) {
+              if (param.getName().contains(type.eventIdentifier)) {
+                types.add(type);
+                break l;
+              }
             }
+            param = param.getSuperclass();
           }
         }
       }
