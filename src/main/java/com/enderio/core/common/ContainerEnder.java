@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -18,12 +19,14 @@ public abstract class ContainerEnder<T extends IInventory> extends Container {
   protected final int endPlayerSlot;
   protected final int startHotBarSlot;
   protected final int endHotBarSlot;
-  
+
   private T inv;
-  
+  private InventoryPlayer playerInv;
+
   public ContainerEnder(InventoryPlayer playerInv, T inv) {
     this.inv = inv;
-    
+    this.playerInv = playerInv;
+
     addSlots(playerInv);
 
     int x = getPlayerInventoryOffset().x;
@@ -64,6 +67,34 @@ public abstract class ContainerEnder<T extends IInventory> extends Container {
 
   public T getInv() {
     return inv;
+  }
+
+  @Override
+  public ItemStack transferStackInSlot(EntityPlayer p_82846_1_, int p_82846_2_) {
+    ItemStack itemstack = null;
+    Slot slot = (Slot) this.inventorySlots.get(p_82846_2_);
+
+    if (slot != null && slot.getHasStack()) {
+      ItemStack itemstack1 = slot.getStack();
+      itemstack = itemstack1.copy();
+
+      int minPlayerSlot = inventorySlots.size() - playerInv.mainInventory.length;
+      if (p_82846_2_ < minPlayerSlot) {
+        if (!this.mergeItemStack(itemstack1, minPlayerSlot, this.inventorySlots.size(), true)) {
+          return null;
+        }
+      } else if (!this.mergeItemStack(itemstack1, 0, minPlayerSlot, false)) {
+        return null;
+      }
+
+      if (itemstack1.stackSize == 0) {
+        slot.putStack((ItemStack) null);
+      } else {
+        slot.onSlotChanged();
+      }
+    }
+
+    return itemstack;
   }
 
   /**
