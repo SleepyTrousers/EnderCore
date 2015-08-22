@@ -59,7 +59,7 @@ public class Handlers {
     /**
      * Represents the {@link MinecraftForge#EVENT_BUS}
      */
-    FORGE("net.minecraftforge.event", MinecraftForge.EVENT_BUS),
+    FORGE("net.minecraftforge", MinecraftForge.EVENT_BUS),
 
     /**
      * Represents the {@link FMLCommonHandler#bus()}
