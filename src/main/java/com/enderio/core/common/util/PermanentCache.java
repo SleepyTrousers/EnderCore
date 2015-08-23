@@ -7,6 +7,8 @@ import lombok.SneakyThrows;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+
 public class PermanentCache<I> extends WorldCache<I> {
 
   private static final List<PermanentCache<?>> allCaches = Lists.newArrayList();
@@ -18,8 +20,10 @@ public class PermanentCache<I> extends WorldCache<I> {
   }
 
   @Override
-  @SneakyThrows
   protected File getSaveFile() {
+    if (FMLCommonHandler.instance().getSide().isServer()) {
+      return new File(ident + ".dat");
+    }
     return new File("saves", ident + ".dat");
   }
   
