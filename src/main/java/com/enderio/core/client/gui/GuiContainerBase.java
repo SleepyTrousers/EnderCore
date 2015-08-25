@@ -158,6 +158,10 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void updateScreen() {
     super.updateScreen();
     
+    if (!inventorySlots.canInteractWith(mc.thePlayer)) {
+      mc.thePlayer.closeScreen();
+    }
+    
     for (GuiTextField f : textFields) {
       f.updateCursorCounter();
     }

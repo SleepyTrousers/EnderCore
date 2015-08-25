@@ -1,5 +1,6 @@
 package com.enderio.core.common;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -99,6 +100,17 @@ public abstract class TileEntityEnder extends TileEntity {
   @Override
   public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
     readCustomNBT(pkt.func_148857_g());
+  }
+  
+  // This implements the IInventory method in a standard way
+  public boolean isUseableByPlayer(EntityPlayer player) {
+    if (worldObj == null) {
+      return true;
+    }
+    if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
+      return false;
+    }
+    return player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
   }
 
   protected abstract void writeCustomNBT(NBTTagCompound root);
