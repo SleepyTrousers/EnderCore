@@ -106,7 +106,7 @@ public enum DyeColor {
   }
 
   public String getLocalisedName() {
-    return EnderCore.lang.localize(DYE_ORE_UNLOCAL_NAMES[ordinal()], false);
+    return EnderCore.lang.localizeExact(DYE_ORE_UNLOCAL_NAMES[ordinal()], false);
   }
 
   @Override
