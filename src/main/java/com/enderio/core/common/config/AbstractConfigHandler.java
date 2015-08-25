@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.NonNull;
 import net.minecraftforge.common.config.ConfigCategory;
@@ -46,7 +47,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler
 
         public String lc()
         {
-            return name.toLowerCase();
+            return name.toLowerCase(Locale.US);
         }
     }
 

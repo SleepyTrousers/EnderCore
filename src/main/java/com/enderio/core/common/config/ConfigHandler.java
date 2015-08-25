@@ -1,6 +1,7 @@
 package com.enderio.core.common.config;
 
 import java.io.File;
+import java.util.Locale;
 
 import net.minecraftforge.common.config.Configuration;
 
@@ -156,7 +157,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   }
 
   public void loadRightClickCrops() {
-    JsonConfigReader<PlantInfo> reader = new JsonConfigReader<PlantInfo>(new ModToken(EnderCore.class, EnderCore.MODID.toLowerCase() + "/config"),
+    JsonConfigReader<PlantInfo> reader = new JsonConfigReader<PlantInfo>(new ModToken(EnderCore.class, EnderCore.MODID.toLowerCase(Locale.US) + "/config"),
         enderConfigFolder.getAbsolutePath() + "/cropConfig.json", PlantInfo.class);
     for (PlantInfo i : reader) {
       i.init();

@@ -37,6 +37,7 @@ package com.enderio.core.client.render;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.minecraft.block.Block;
@@ -226,12 +227,12 @@ public class TechneUtil {
   }
 
   public static Map<String, GroupObject> getModel(String modid, String modelPath) {
-    TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(), modelPath + ".tcn"));
+    TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(Locale.US), modelPath + ".tcn"));
     return TechneUtil.bakeModel(tm, 1f / 16, new Matrix4f().scale(new Vector3f(-1, -1, 1)));
   }
 
   public static Collection<GroupObject> getModelAll(String modid, String modelPath) {
-    TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(), modelPath + ".tcn"));
+    TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(Locale.US), modelPath + ".tcn"));
     return TechneUtil.bakeModel(tm, 1f / 16, new Matrix4f().scale(new Vector3f(-1, -1, 1))).values();
   }
   

@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import lombok.AllArgsConstructor;
 import net.minecraft.client.Minecraft;
@@ -76,7 +77,7 @@ public class ResourcePackAssembler
         this.dir = directory;
         this.zip = new File(dir.getAbsolutePath() + ".zip");
         this.name = packName;
-        this.modid = modid.toLowerCase();
+        this.modid = modid.toLowerCase(Locale.US);
         this.mcmeta = String.format(MC_META_BASE, this.name);
     }
 

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
@@ -54,8 +55,8 @@ public class GuiEnhancedModList extends GuiModList {
 
     @Override
     public int compare(ModContainer o1, ModContainer o2) {
-      String name1 = StringUtils.stripControlCodes(o1.getName()).toLowerCase();
-      String name2 = StringUtils.stripControlCodes(o2.getName()).toLowerCase();
+      String name1 = StringUtils.stripControlCodes(o1.getName()).toLowerCase(Locale.US);
+      String name2 = StringUtils.stripControlCodes(o2.getName()).toLowerCase(Locale.US);
       switch (type) {
       case A_TO_Z:
         return name1.compareTo(name2);
@@ -234,7 +235,7 @@ public class GuiEnhancedModList extends GuiModList {
     List<ModContainer> mods = getMods();
     mods.clear();
     for (ModContainer m : Loader.instance().getActiveModList()) {
-      if (m.getName().toLowerCase().contains(search.getText().toLowerCase()) && m.getMetadata().parentMod == null) {
+      if (m.getName().toLowerCase(Locale.US).contains(search.getText().toLowerCase(Locale.US)) && m.getMetadata().parentMod == null) {
         mods.add(m);
       }
     }
