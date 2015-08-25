@@ -70,6 +70,11 @@ public abstract class ContainerEnder<T extends IInventory> extends Container {
   }
 
   @Override
+  public boolean canInteractWith(EntityPlayer player) {
+    return getInv().isUseableByPlayer(player);
+  }
+
+  @Override
   public ItemStack transferStackInSlot(EntityPlayer p_82846_1_, int p_82846_2_) {
     ItemStack itemstack = null;
     Slot slot = (Slot) this.inventorySlots.get(p_82846_2_);
