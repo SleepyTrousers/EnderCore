@@ -7,10 +7,10 @@ endercore.command.config.result.fail=Reloading configs for %s failed
 endercore.command.config.result.invalid=Modid %s is not valid
 
 enchantment.xpboost=XP Boost
-enchantment.xpboost.tooltip=Extra XP from mob kills
+endercore.enchantment.xpboost.tooltip=Extra XP from mob kills
 
 enchantment.autosmelt=Auto-Smelt
-enchantment.autosmelt.tooltip=Automatically smelts whatever is mined
+endercore.enchantment.autosmelt.tooltip=Automatically smelts whatever is mined
 
 endercore.celebrate=Happy New Year!
 
