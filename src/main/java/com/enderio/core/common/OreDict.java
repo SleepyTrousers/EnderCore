@@ -20,6 +20,8 @@ public class OreDict
         safeRegister("blockObsidian", Blocks.obsidian);
         safeRegister("itemNetherStar", Items.nether_star);
         safeRegister("gravel", Blocks.gravel);
+        safeRegister("chestWood", Blocks.chest);
+        safeRegister("craftingTableWood", Blocks.crafting_table);
 
         safeRegister("itemCoal", Items.coal);
         safeRegister("itemCharcoal", new ItemStack(Items.coal, 1, 1));
