@@ -1,5 +1,8 @@
 package com.enderio.core.api.client.render;
 
+import javax.annotation.Nullable;
+
+
 public interface IWidgetIcon {
 
   int getX();
@@ -10,6 +13,7 @@ public interface IWidgetIcon {
 
   int getHeight();
 
+  @Nullable
   IWidgetIcon getOverlay();
 
   IWidgetMap getMap();

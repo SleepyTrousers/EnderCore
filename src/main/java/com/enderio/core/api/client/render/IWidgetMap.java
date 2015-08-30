@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 
-import org.lwjgl.opengl.GL11;
-
 import com.enderio.core.client.render.RenderUtil;
 
 public interface IWidgetMap {
@@ -55,8 +53,7 @@ public interface IWidgetMap {
 
     @Override
     public void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
-      GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+      
       Tessellator tessellator = Tessellator.instance;
       if (doDraw) {
         RenderUtil.bindTexture(getTexture());
