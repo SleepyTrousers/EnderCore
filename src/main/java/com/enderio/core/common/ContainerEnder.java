@@ -11,7 +11,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public abstract class ContainerEnder<T extends IInventory> extends Container {
+public class ContainerEnder<T extends IInventory> extends Container {
 
   protected Map<Slot, Point> playerSlotLocations = new HashMap<Slot, Point>();
 

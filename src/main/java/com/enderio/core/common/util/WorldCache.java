@@ -181,7 +181,7 @@ public class WorldCache<I> {
 
   @SneakyThrows
   protected File getSaveFile() {
-    return new File(DimensionManager.getCurrentSaveRootDirectory().getAbsolutePath() + "/" + ident + ".json");
+    return new File(DimensionManager.getCurrentSaveRootDirectory(), ident + ".json");
   }
 
   public void addObject(I object, String name) {
