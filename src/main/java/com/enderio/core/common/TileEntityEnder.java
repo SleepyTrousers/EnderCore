@@ -102,15 +102,8 @@ public abstract class TileEntityEnder extends TileEntity {
     readCustomNBT(pkt.func_148857_g());
   }
   
-  // This implements the IInventory method in a standard way
-  public boolean isUseableByPlayer(EntityPlayer player) {
-    if (worldObj == null) {
-      return true;
-    }
-    if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
-      return false;
-    }
-    return player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
+  public boolean canPlayerAccess(EntityPlayer player) {
+    return !isInvalid() && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
   }
 
   protected abstract void writeCustomNBT(NBTTagCompound root);
