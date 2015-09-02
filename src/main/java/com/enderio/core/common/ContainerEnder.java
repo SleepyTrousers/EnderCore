@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -23,7 +25,7 @@ public class ContainerEnder<T extends IInventory> extends Container {
   private T inv;
   private InventoryPlayer playerInv;
 
-  public ContainerEnder(InventoryPlayer playerInv, T inv) {
+  public ContainerEnder(InventoryPlayer playerInv, @Nullable T inv) {
     this.inv = inv;
     this.playerInv = playerInv;
 
@@ -65,13 +67,14 @@ public class ContainerEnder<T extends IInventory> extends Container {
     return new Point(12, 60);
   }
 
+  @Nullable
   public T getInv() {
     return inv;
   }
 
   @Override
   public boolean canInteractWith(EntityPlayer player) {
-    return getInv().isUseableByPlayer(player);
+    return getInv() == null ? true : getInv().isUseableByPlayer(player);
   }
 
   @Override
