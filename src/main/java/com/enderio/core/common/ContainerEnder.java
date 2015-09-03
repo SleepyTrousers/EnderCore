@@ -1,7 +1,6 @@
 package com.enderio.core.common;
 
 import java.awt.Point;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -13,9 +12,11 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import com.google.common.collect.Maps;
+
 public class ContainerEnder<T extends IInventory> extends Container {
 
-  protected Map<Slot, Point> playerSlotLocations = new HashMap<Slot, Point>();
+  protected Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
 
   protected final int startPlayerSlot;
   protected final int endPlayerSlot;
