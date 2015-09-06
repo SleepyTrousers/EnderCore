@@ -304,9 +304,9 @@ public class ItemUtil {
       return 0;
     }
     if (into instanceof ISidedInventory) {
-      return ItemUtil.doInsertItemInv((ISidedInventory) into, item, side);
+      return ItemUtil.doInsertItemInv((ISidedInventory) into, item, side, true);
     } else if (into instanceof IInventory) {
-      return ItemUtil.doInsertItemInv(getInventory((IInventory) into), item, side);
+      return ItemUtil.doInsertItemInv(getInventory((IInventory) into), item, side, true);
     } else if (into instanceof IItemDuct) {
       return ItemUtil.doInsertItem((IItemDuct) into, item, side);
     }
@@ -330,13 +330,17 @@ public class ItemUtil {
   }
 
   public static int doInsertItem(IInventory inv, int startSlot, int endSlot, ItemStack item) {
-    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, ForgeDirection.UNKNOWN);
+    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, ForgeDirection.UNKNOWN, true);
+  }
+
+  public static int doInsertItem(IInventory inv, int startSlot, int endSlot, ItemStack item, boolean doInsert) {
+    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, ForgeDirection.UNKNOWN, doInsert);
   }
 
   /*
    * Insert items into an IInventory or an ISidedInventory.
    */
-  private static int doInsertItemInv(IInventory inv, ItemStack item, ForgeDirection inventorySide) {
+  private static int doInsertItemInv(IInventory inv, ItemStack item, ForgeDirection inventorySide, boolean doInsert) {
     final ISidedInventory sidedInv = inv instanceof ISidedInventory ? (ISidedInventory) inv : null;
     ISlotIterator slots;
 
@@ -350,10 +354,10 @@ public class ItemUtil {
       slots = invSlotter.getInstance(0, inv.getSizeInventory());
     }
 
-    return doInsertItemInv(inv, sidedInv, slots, item, inventorySide);
+    return doInsertItemInv(inv, sidedInv, slots, item, inventorySide, doInsert);
   }
 
-  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, ForgeDirection inventorySide) {
+  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, ForgeDirection inventorySide, boolean doInsert) {
     int numInserted = 0;
     int numToInsert = item.stackSize;
     int firstFreeSlot = -1;
@@ -375,7 +379,9 @@ public class ItemUtil {
               if (sidedInv != null || inv.isItemValidForSlot(slot, toInsert)) {
                 numInserted += noToInsert;
                 numToInsert -= noToInsert;
-                inv.setInventorySlotContents(slot, toInsert);
+                if (doInsert) {
+                  inv.setInventorySlotContents(slot, toInsert);
+                }
               }
             }
           }
@@ -392,11 +398,13 @@ public class ItemUtil {
       if (sidedInv != null || inv.isItemValidForSlot(firstFreeSlot, toInsert)) {
         numInserted += toInsert.stackSize;
         numToInsert -= toInsert.stackSize;
-        inv.setInventorySlotContents(firstFreeSlot, toInsert);
+        if (doInsert) {
+          inv.setInventorySlotContents(firstFreeSlot, toInsert);
+        }
       }
     }
 
-    if (numInserted > 0) {
+    if (numInserted > 0 && doInsert) {
       inv.markDirty();
     }
     return numInserted;
