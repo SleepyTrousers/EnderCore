@@ -7,10 +7,10 @@ endercore.command.config.result.fail=Перезапуск конфигураци
 endercore.command.config.result.invalid=Modid %s недействителен
 
 enchantment.xpboost=Увеличение опыта
-enchantment.xpboost.tooltip=Дополнительный опыт за убитых мобов
+endercore.enchantment.xpboost.tooltip=Дополнительный опыт за убитых мобов
 
 enchantment.autosmelt=Авто-плавка
-enchantment.autosmelt.tooltip=Автоматическая плавка всего, что добывается
+endercore.enchantment.autosmelt.tooltip=Автоматическая плавка всего, что добывается
 
 endercore.celebrate=С Новым Годом!
 
@@ -19,5 +19,9 @@ endercore.resourcepack.readme2=Не редактируйте его, он буд
 
 endercore.gui.normal=Обычный
 endercore.gui.search=Поиск:
-endercore.gui.modlistinfo1=О Боже всё иное!
+endercore.gui.modlistinfo1=О Боже что случилось!
 endercore.gui.modlistinfo2=Новый дизайн добавлен:
+
+endercore.error.ttcore.1=EnderCore не может работать вместе с ttCore.
+endercore.error.ttcore.2=Все функции ttCore имеются в EnderCore.
+endercore.error.ttcore.3=Пожалуйста удалите ttCore и попробуйте запустить игру снова.
