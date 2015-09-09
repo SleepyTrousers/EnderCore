@@ -15,6 +15,7 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
+import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.AbstractConfigHandler.RestartReqs;
 import com.enderio.core.common.config.annot.Comment;
 import com.enderio.core.common.config.annot.Config;
@@ -34,6 +35,7 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 /**
  * This class can be used to automatically process {@link Config} annotations on fields, and sync the data in those fields to clients. It will also
@@ -99,6 +101,7 @@ public class ConfigProcessor
 
     Map<String, Object> configValues = Maps.newHashMap();
     Map<String, Object> defaultValues = Maps.newHashMap();
+    Map<String, Object> originalValues = Maps.newHashMap();
 
     private Set<String> sections = Sets.newHashSet();
 
@@ -236,6 +239,7 @@ public class ConfigProcessor
         Object newValue = getConfigValue(cfg.value(), getComment(f), f, value);
 
         configValues.put(f.getName(), newValue);
+        originalValues.put(f.getName(), newValue);
         f.set(null, newValue);
 
         sections.add(cfg.value());
@@ -355,9 +359,11 @@ public class ConfigProcessor
                 if (annot != null && !getNoSync(f))
                 {
                     Object newVal = configValues.get(s);
+                    Object oldVal = f.get(null);
                     boolean changed = false;
-                    if (!f.get(null).equals(newVal))
+                    if (!oldVal.equals(newVal))
                     {
+                        EnderCore.logger.debug("Config {}.{} differs from new data. Changing from {} to {}", configs.getName(), f.getName(), oldVal, newVal);
                         f.set(null, newVal);
                         changed = true;
                     }
@@ -365,6 +371,10 @@ public class ConfigProcessor
                     {
                         callback.callback(this);
                     }
+                } 
+                else if (annot != null) 
+                {
+                    EnderCore.logger.debug("Skipping syncing field {}.{} as it was marked NoSync", configs.getName(), f.getName());
                 }
             }
             catch (Exception e)
@@ -402,7 +412,15 @@ public class ConfigProcessor
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
+        EnderCore.logger.info("Sending server configs to client for {}", configs.getName());
         EnderPacketHandler.INSTANCE.sendTo(new PacketConfigSync(this), (EntityPlayerMP) event.player);
+    }
+    
+    @SubscribeEvent
+    public void onPlayerLogout(ClientDisconnectionFromServerEvent event)
+    {
+        syncTo(originalValues);
+        EnderCore.logger.info("Reset configs to client values for {}", configs.getName());
     }
 
     @SubscribeEvent
