@@ -93,7 +93,7 @@ public class EnderCore implements IEnderMod {
   @EventHandler
   public void init(FMLInitializationEvent event) {
     EnderPacketHandler.init();
-    
+
     for (IConfigHandler c : configs) {
       c.initHook();
     }

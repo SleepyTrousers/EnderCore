@@ -9,7 +9,7 @@ public class Quat4d {
     double y = axis.y;
     double z = axis.z;
     double length = Math.sqrt(x * x + y * y + z * z);
-    if(length < epsilon) {
+    if (length < epsilon) {
       // ~zero length axis, so reset rotation to zero.
       return new Quat4d();
     }

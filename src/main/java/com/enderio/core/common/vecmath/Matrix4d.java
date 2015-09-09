@@ -90,10 +90,8 @@ public class Matrix4d {
     m33 = other.m33;
   }
 
-  public Matrix4d(double m00, double m01, double m02, double m03,
-      double m10, double m11, double m12, double m13,
-      double m20, double m21, double m22, double m23,
-      double m30, double m31, double m32, double m33) {
+  public Matrix4d(double m00, double m01, double m02, double m03, double m10, double m11, double m12, double m13, double m20, double m21, double m22,
+      double m23, double m30, double m31, double m32, double m33) {
 
     this.m00 = m00;
     this.m01 = m01;
@@ -505,7 +503,7 @@ public class Matrix4d {
 
   public void invert() {
     double det = determinant();
-    if(det == 0) {
+    if (det == 0) {
       throw new RuntimeException("Cannot invert matrix with a determinat of 0.");
     }
     double detInv = 1f / det;
@@ -551,27 +549,10 @@ public class Matrix4d {
   }
 
   public double determinant() {
-    double result =
-        m00
-            * ((m11 * m22 * m33 + m21 * m32 * m13 + m31 * m12 * m23)
-                - m31 * m22 * m13
-                - m11 * m32 * m23
-                - m21 * m12 * m33);
-    result -= m10
-        * ((m01 * m22 * m33 + m21 * m32 * m03 + m31 * m02 * m23)
-            - m31 * m22 * m03
-            - m01 * m32 * m23
-            - m21 * m02 * m33);
-    result += m20
-        * ((m01 * m12 * m33 + m11 * m32 * m03 + m31 * m02 * m13)
-            - m31 * m12 * m03
-            - m01 * m32 * m13
-            - m11 * m02 * m33);
-    result -= m30
-        * ((m01 * m12 * m23 + m11 * m22 * m03 + m21 * m02 * m13)
-            - m21 * m12 * m03
-            - m01 * m22 * m13
-            - m11 * m02 * m23);
+    double result = m00 * ((m11 * m22 * m33 + m21 * m32 * m13 + m31 * m12 * m23) - m31 * m22 * m13 - m11 * m32 * m23 - m21 * m12 * m33);
+    result -= m10 * ((m01 * m22 * m33 + m21 * m32 * m03 + m31 * m02 * m23) - m31 * m22 * m03 - m01 * m32 * m23 - m21 * m02 * m33);
+    result += m20 * ((m01 * m12 * m33 + m11 * m32 * m03 + m31 * m02 * m13) - m31 * m12 * m03 - m01 * m32 * m13 - m11 * m02 * m33);
+    result -= m30 * ((m01 * m12 * m23 + m11 * m22 * m03 + m21 * m02 * m13) - m21 * m12 * m03 - m01 * m22 * m13 - m11 * m02 * m23);
     return result;
   }
 
@@ -581,11 +562,7 @@ public class Matrix4d {
 
   @Override
   public String toString() {
-    return "Matrix4d(\n" +
-        "  " + m00 + ", " + m01 + ", " + m02 + ", " + m03 + "\n" +
-        "  " + m10 + ", " + m11 + ", " + m12 + ", " + m13 + "\n" +
-        "  " + m20 + ", " + m21 + ", " + m22 + ", " + m23 + "\n" +
-        "  " + m30 + ", " + m31 + ", " + m32 + ", " + m33 + "\n" +
-        ")\n";
+    return "Matrix4d(\n" + "  " + m00 + ", " + m01 + ", " + m02 + ", " + m03 + "\n" + "  " + m10 + ", " + m11 + ", " + m12 + ", " + m13 + "\n" + "  " + m20
+        + ", " + m21 + ", " + m22 + ", " + m23 + "\n" + "  " + m30 + ", " + m31 + ", " + m32 + ", " + m33 + "\n" + ")\n";
   }
 }

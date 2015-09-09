@@ -101,7 +101,7 @@ public abstract class TileEntityEnder extends TileEntity {
   public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
     readCustomNBT(pkt.func_148857_g());
   }
-  
+
   public boolean canPlayerAccess(EntityPlayer player) {
     return !isInvalid() && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
   }

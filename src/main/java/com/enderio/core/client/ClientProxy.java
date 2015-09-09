@@ -24,5 +24,4 @@ public class ClientProxy extends CommonProxy {
     throw new EnderCoreModConflictException(msgs);
   }
 
-
 }

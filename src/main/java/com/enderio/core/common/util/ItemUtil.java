@@ -357,7 +357,8 @@ public class ItemUtil {
     return doInsertItemInv(inv, sidedInv, slots, item, inventorySide, doInsert);
   }
 
-  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, ForgeDirection inventorySide, boolean doInsert) {
+  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, ForgeDirection inventorySide,
+      boolean doInsert) {
     int numInserted = 0;
     int numToInsert = item.stackSize;
     int firstFreeSlot = -1;

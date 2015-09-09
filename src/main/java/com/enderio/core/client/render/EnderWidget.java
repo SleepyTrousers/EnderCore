@@ -33,7 +33,7 @@ public enum EnderWidget implements IWidgetIcon {
   BUTTON_DOWN(48, 208),
   BUTTON_DOWN_HIGHLIGHT(64, 208),
   BUTTON_CHECKED(112, 208),
-  
+
   LEFT_ARROW(224, 32, 8, 16),
   LEFT_ARROW_PRESSED(240, 32, 8, 16),
   LEFT_ARROW_HOVER(224, 48, 8, 16),

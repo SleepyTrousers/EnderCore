@@ -38,7 +38,7 @@ public class PacketProgress extends MessageTileEntity<TileEntity> {
   }
 
   public static class Handler implements IMessageHandler<PacketProgress, IMessage> {
-    
+
     @Override
     public IMessage onMessage(PacketProgress message, MessageContext ctx) {
       TileEntity tile = message.getTileEntity(EnderCore.proxy.getClientWorld());

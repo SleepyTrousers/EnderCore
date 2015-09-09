@@ -24,7 +24,7 @@ public class CompressedDataInput extends DataInputStream {
       b = readUnsignedByte();
       res |= (b & 0x7F) << shift;
       shift += 7;
-    } while(b >= 0x80);
+    } while (b >= 0x80);
     return res;
   }
 }

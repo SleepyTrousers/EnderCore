@@ -7,30 +7,25 @@ import com.enderio.core.common.imc.IMCRegistry.IMCBase;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 
-public class IMCRightClickCrop extends IMCBase
-{
-    public IMCRightClickCrop()
-    {
-        super(IMC.ADD_RIGHT_CLICK_CROP);
+public class IMCRightClickCrop extends IMCBase {
+  public IMCRightClickCrop() {
+    super(IMC.ADD_RIGHT_CLICK_CROP);
+  }
+
+  @Override
+  public void act(IMCMessage msg) {
+    if (!msg.isStringMessage()) {
+      return;
     }
 
-    @Override
-    public void act(IMCMessage msg)
-    {
-        if (!msg.isStringMessage())
-        {
-            return;
-        }
+    String[] data = msg.getStringValue().split("\\|");
 
-        String[] data = msg.getStringValue().split("\\|");
-
-        if (data.length != 3)
-        {
-            return;
-        }
-
-        PlantInfo plantinfo = new PlantInfo(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
-        plantinfo.init();
-        RightClickCropHandler.INSTANCE.addCrop(plantinfo);
+    if (data.length != 3) {
+      return;
     }
+
+    PlantInfo plantinfo = new PlantInfo(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
+    plantinfo.init();
+    RightClickCropHandler.INSTANCE.addCrop(plantinfo);
+  }
 }

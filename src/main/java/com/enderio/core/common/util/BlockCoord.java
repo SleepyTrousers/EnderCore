@@ -54,7 +54,7 @@ public class BlockCoord {
   public BlockCoord(MovingObjectPosition mop) {
     this(mop.blockX, mop.blockY, mop.blockZ);
   }
-  
+
   public Block getBlock(IBlockAccess world) {
     return world.getBlock(x, y, z);
   }
@@ -86,7 +86,7 @@ public class BlockCoord {
   public int getDist(TileEntity other) {
     return getDist(new BlockCoord(other));
   }
-  
+
   public void writeToBuf(ByteBuf buf) {
     buf.writeInt(x);
     buf.writeInt(y);
@@ -112,14 +112,10 @@ public class BlockCoord {
   }
 
   public String chatString(EnumChatFormatting defaultColor) {
-    return String.format(
-        "x%s%d%s y%s%d%s z%s%d",
-        EnumChatFormatting.GREEN, x, defaultColor,
-        EnumChatFormatting.GREEN, y, defaultColor,
-        EnumChatFormatting.GREEN, z
-        );
+    return String.format("x%s%d%s y%s%d%s z%s%d", EnumChatFormatting.GREEN, x, defaultColor, EnumChatFormatting.GREEN, y, defaultColor,
+        EnumChatFormatting.GREEN, z);
   }
-  
+
   public boolean equals(int x, int y, int z) {
     return equals(new BlockCoord(x, y, z));
   }

@@ -60,12 +60,11 @@ public class IIconButton extends GuiButton {
   @SuppressWarnings("synthetic-access")
   @Override
   public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
-    if(visible) {
+    if (visible) {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width
-          && par3 < this.yPosition + height;
+      this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width && par3 < this.yPosition + height;
       int hoverState = getHoverState(this.field_146123_n);
 
       // x, y, u, v, width, height
@@ -80,7 +79,7 @@ public class IIconButton extends GuiButton {
 
       mouseDragged(par1Minecraft, par2, par3);
 
-      if(icon != null && texture != null) {
+      if (icon != null && texture != null) {
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

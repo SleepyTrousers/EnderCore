@@ -25,7 +25,7 @@ public class ToolTipManager {
   private List<GuiToolTip> toolTips = new ArrayList<GuiToolTip>();
 
   public void addToolTip(GuiToolTip toolTip) {
-    if(!toolTips.contains(toolTip)) {
+    if (!toolTips.contains(toolTip)) {
       toolTips.add(toolTip);
     }
   }
@@ -37,7 +37,7 @@ public class ToolTipManager {
   protected final void drawTooltips(ToolTipRenderer renderer, int mouseX, int mouseY) {
     for (GuiToolTip toolTip : toolTips) {
       toolTip.onTick(mouseX - renderer.getGuiLeft(), mouseY - renderer.getGuiTop());
-      if(toolTip.shouldDraw()) {
+      if (toolTip.shouldDraw()) {
         drawTooltip(toolTip, mouseX, mouseY, renderer);
       }
     }
@@ -45,26 +45,26 @@ public class ToolTipManager {
 
   protected void drawTooltip(GuiToolTip toolTip, int mouseX, int mouseY, ToolTipRenderer renderer) {
     List<String> list = toolTip.getToolTipText();
-    if(list == null) {
+    if (list == null) {
       return;
     }
 
     List<String> formatted = new ArrayList<String>(list.size());
     for (int i = 0; i < list.size(); i++) {
-      if(i == 0) {
+      if (i == 0) {
         formatted.add("\u00a7f" + list.get(i));
       } else {
         formatted.add("\u00a77" + list.get(i));
       }
     }
 
-    if(mouseX > renderer.getGuiLeft() + renderer.getXSize() / 2) {
+    if (mouseX > renderer.getGuiLeft() + renderer.getXSize() / 2) {
       int maxWidth = 0;
       Iterator<String> iterator = formatted.iterator();
       while (iterator.hasNext()) {
         String s = (String) iterator.next();
         int w = renderer.getFontRenderer().getStringWidth(s);
-        if(w > maxWidth) {
+        if (w > maxWidth) {
           maxWidth = w;
         }
       }

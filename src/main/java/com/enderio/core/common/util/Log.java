@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.enderio.core.EnderCore;
 
-
 public final class Log {
 
   public static final Logger LOGGER = LogManager.getLogger(EnderCore.MODID);

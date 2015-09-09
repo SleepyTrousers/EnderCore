@@ -19,7 +19,7 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
   private int renderId;
 
   protected VertexTransform vt;
-  
+
   public TechneModelRenderer(String modid, String modelPath, int renderId) {
     this(modid, modelPath, renderId, null);
   }
@@ -27,7 +27,7 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
   public TechneModelRenderer(String modid, String modelPath, int renderId, VertexTransform vt) {
     this(TechneUtil.getModel(modid, modelPath), renderId, vt);
   }
-  
+
   public TechneModelRenderer(Map<String, GroupObject> model, int renderId) {
     this(model, renderId, null);
   }
@@ -57,7 +57,7 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
     TechneUtil.vt = this.vt;
     return TechneUtil.renderWorldBlock(getModel(world, x, y, z), getModelIcon(world, x, y, z, block), world, x, y, z, block, renderer);
   }
-  
+
   protected IIcon getModelIcon(Block block, int metadata) {
     return block.getIcon(0, metadata);
   }
@@ -65,7 +65,7 @@ public class TechneModelRenderer implements ISimpleBlockRenderingHandler {
   protected IIcon getModelIcon(IBlockAccess world, int x, int y, int z, Block block) {
     return block.getIcon(world, x, y, z, 0);
   }
-  
+
   @Override
   public boolean shouldRender3DInInventory(int modelId) {
     return true;

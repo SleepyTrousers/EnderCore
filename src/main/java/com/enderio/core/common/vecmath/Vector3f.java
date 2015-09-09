@@ -55,11 +55,11 @@ public class Vector3f {
     y += vec.y;
     z += vec.z;
   }
-  
+
   public void add(int x2, int y2, int z2) {
     x += x2;
     y += y2;
-    z += z2;    
+    z += z2;
   }
 
   public void sub(Vector3f vec) {
@@ -113,7 +113,5 @@ public class Vector3f {
   public Vector3d asVector3d() {
     return new Vector3d(x, y, z);
   }
-
-  
 
 }

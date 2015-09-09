@@ -31,7 +31,7 @@ public class TemplateSlot extends Slot {
 
   @Override
   public void putStack(ItemStack par1ItemStack) {
-    if(par1ItemStack != null) {
+    if (par1ItemStack != null) {
       par1ItemStack.stackSize = 0;
     }
     inventory.setInventorySlotContents(slotIndex, par1ItemStack);

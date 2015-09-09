@@ -6,7 +6,6 @@ public interface IGuiOverlay {
 
   void init(IGuiScreen screen);
 
-
   Rectangle getBounds();
 
   void draw(int mouseX, int mouseY, float partialTick);

@@ -28,7 +28,7 @@ public final class BoundingBox {
   public BoundingBox(AxisAlignedBB bb) {
     this(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
   }
-  
+
   public BoundingBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
     this.minX = minX;
     this.minY = minY;
@@ -60,13 +60,13 @@ public final class BoundingBox {
   }
 
   public BoundingBox(Block block) {
-    this(block.getBlockBoundsMinX(), block.getBlockBoundsMinY(), block.getBlockBoundsMinZ(), block.getBlockBoundsMaxX(), block.getBlockBoundsMaxY(), block.getBlockBoundsMaxZ());
+    this(block.getBlockBoundsMinX(), block.getBlockBoundsMinY(), block.getBlockBoundsMinZ(), block.getBlockBoundsMaxX(), block.getBlockBoundsMaxY(), block
+        .getBlockBoundsMaxZ());
   }
 
   public BoundingBox expandBy(BoundingBox other) {
-    return new BoundingBox(
-        Math.min(minX, other.minX), Math.min(minY, other.minY), Math.min(minZ, other.minZ),
-        Math.max(maxX, other.maxX), Math.max(maxY, other.maxY), Math.max(maxZ, other.maxZ));
+    return new BoundingBox(Math.min(minX, other.minX), Math.min(minY, other.minY), Math.min(minZ, other.minZ), Math.max(maxX, other.maxX), Math.max(maxY,
+        other.maxY), Math.max(maxZ, other.maxZ));
   }
 
   public boolean contains(BoundingBox other) {
@@ -115,9 +115,8 @@ public final class BoundingBox {
     iTransformation.apply(min);
     iTransformation.apply(max);
 
-    return new BoundingBox(
-        Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z),
-        Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(min.z, max.z));
+    return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
+        min.z, max.z));
 
   }
 
@@ -322,28 +321,28 @@ public final class BoundingBox {
     float mxY = maxY;
     float mxZ = maxZ;
     boolean mod = false;
-    if(minX > maxX) {
+    if (minX > maxX) {
       mnX = maxX;
       mxX = minX;
       mod = true;
     }
-    if(minY > maxY) {
+    if (minY > maxY) {
       mnY = maxY;
       mxY = minY;
       mod = true;
     }
-    if(minZ > maxZ) {
+    if (minZ > maxZ) {
       mnZ = maxZ;
       mxZ = minZ;
       mod = true;
     }
-    if(!mod) {
+    if (!mod) {
       return this;
     }
     return new BoundingBox(mnX, mnY, mnZ, mxX, mxY, mxZ);
   }
 
-  public AxisAlignedBB getAxisAlignedBB() {    
+  public AxisAlignedBB getAxisAlignedBB() {
     return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
@@ -362,24 +361,24 @@ public final class BoundingBox {
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj)
+    if (this == obj)
       return true;
-    if(obj == null)
+    if (obj == null)
       return false;
-    if(getClass() != obj.getClass())
+    if (getClass() != obj.getClass())
       return false;
     BoundingBox other = (BoundingBox) obj;
-    if(Float.floatToIntBits(maxX) != Float.floatToIntBits(other.maxX))
+    if (Float.floatToIntBits(maxX) != Float.floatToIntBits(other.maxX))
       return false;
-    if(Float.floatToIntBits(maxY) != Float.floatToIntBits(other.maxY))
+    if (Float.floatToIntBits(maxY) != Float.floatToIntBits(other.maxY))
       return false;
-    if(Float.floatToIntBits(maxZ) != Float.floatToIntBits(other.maxZ))
+    if (Float.floatToIntBits(maxZ) != Float.floatToIntBits(other.maxZ))
       return false;
-    if(Float.floatToIntBits(minX) != Float.floatToIntBits(other.minX))
+    if (Float.floatToIntBits(minX) != Float.floatToIntBits(other.minX))
       return false;
-    if(Float.floatToIntBits(minY) != Float.floatToIntBits(other.minY))
+    if (Float.floatToIntBits(minY) != Float.floatToIntBits(other.minY))
       return false;
-    if(Float.floatToIntBits(minZ) != Float.floatToIntBits(other.minZ))
+    if (Float.floatToIntBits(minZ) != Float.floatToIntBits(other.minZ))
       return false;
     return true;
   }

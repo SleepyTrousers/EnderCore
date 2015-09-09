@@ -52,7 +52,7 @@ public class IconUtil {
   @SubscribeEvent
   public void onIconLoad(TextureStitchEvent.Pre event) {
     for (IIconProvider reg : iconProviders) {
-      if(reg.getTextureType() == event.map.getTextureType()) {
+      if (reg.getTextureType() == event.map.getTextureType()) {
         reg.registerIcons(event.map);
       }
     }
@@ -60,7 +60,7 @@ public class IconUtil {
 
   public static IIcon getIconForItem(int itemId, int meta) {
     Item item = Item.getItemById(itemId);
-    if(item == null) {
+    if (item == null) {
       return null;
     }
     return item.getIconFromDamage(meta);

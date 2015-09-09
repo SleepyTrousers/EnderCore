@@ -57,19 +57,19 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
   @Override
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
     te = handle(ctx.getServerHandler().playerEntity.worldObj);
-    if(te != null && renderOnUpdate) {
-      te.getWorldObj().markBlockForUpdate(x,y,z);
+    if (te != null && renderOnUpdate) {
+      te.getWorldObj().markBlockForUpdate(x, y, z);
     }
     return null;
   }
 
   private TileEntity handle(World world) {
-    if(world == null) {
+    if (world == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null world processing tile entity packet.");
       return null;
     }
     TileEntity te = world.getTileEntity(x, y, z);
-    if(te == null) {
+    if (te == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null when processing tile entity packet.");
       return null;
     }

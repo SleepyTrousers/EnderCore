@@ -53,7 +53,7 @@ public interface IWidgetMap {
 
     @Override
     public void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
-      
+
       Tessellator tessellator = Tessellator.instance;
       if (doDraw) {
         RenderUtil.bindTexture(getTexture());

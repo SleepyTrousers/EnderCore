@@ -36,7 +36,7 @@ public class FluidUtil {
     try {
       Class.forName("crazypants.util.BuildcraftUtil");
     } catch (Exception e) {
-      if(Loader.isModLoaded("BuildCraft|Transport")) {
+      if (Loader.isModLoaded("BuildCraft|Transport")) {
         Log.warn("ItemUtil: Could not register Build Craft pipe handler. Fluid conduits will show connections to all Build Craft pipes.");
       } //Don't log if BC isn't installed, but we still check in case another mod is using their API
     }
@@ -46,7 +46,7 @@ public class FluidUtil {
     Map<ForgeDirection, IFluidHandler> res = new HashMap<ForgeDirection, IFluidHandler>();
     for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
       IFluidHandler fh = getFluidHandler(world, bc.getLocation(dir));
-      if(fh != null) {
+      if (fh != null) {
         res.put(dir, fh);
       }
     }
@@ -63,10 +63,10 @@ public class FluidUtil {
   }
 
   public static IFluidHandler getFluidHandler(TileEntity te) {
-    if(te instanceof IFluidHandler) {
+    if (te instanceof IFluidHandler) {
       IFluidHandler res = (IFluidHandler) te;
       for (IFluidReceptor rec : fluidReceptors) {
-        if(!rec.isValidReceptor(res)) {
+        if (!rec.isValidReceptor(res)) {
           return null;
         }
       }
@@ -76,17 +76,17 @@ public class FluidUtil {
   }
 
   public static FluidStack getFluidFromItem(ItemStack stack) {
-    if(stack != null) {
+    if (stack != null) {
       FluidStack fluidStack = null;
-      if(stack.getItem() instanceof IFluidContainerItem) {
+      if (stack.getItem() instanceof IFluidContainerItem) {
         fluidStack = ((IFluidContainerItem) stack.getItem()).getFluid(stack);
       }
-      if(fluidStack == null) {
+      if (fluidStack == null) {
         fluidStack = FluidContainerRegistry.getFluidForFilledItem(stack);
       }
-      if(fluidStack == null && Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
+      if (fluidStack == null && Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
         Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(stack.getItem())).getFluid();
-        if(fluid != null) {
+        if (fluid != null) {
           return new FluidStack(fluid, 1000);
         }
       }
@@ -99,18 +99,18 @@ public class FluidUtil {
     TileEntity te = (TileEntity) into;
     BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
     IFluidHandler target = FluidUtil.getFluidHandler(te.getWorldObj(), loc);
-    if(target != null) {
+    if (target != null) {
       FluidTankInfo[] infos = target.getTankInfo(fromDir.getOpposite());
-      if(infos != null) {
+      if (infos != null) {
         for (FluidTankInfo info : infos) {
-          if(info.fluid != null && info.fluid.amount > 0) {
-            if(into.canFill(fromDir, info.fluid.getFluid())) {
+          if (info.fluid != null && info.fluid.amount > 0) {
+            if (into.canFill(fromDir, info.fluid.getFluid())) {
               FluidStack canPull = info.fluid.copy();
               canPull.amount = Math.min(maxVolume, canPull.amount);
               FluidStack drained = target.drain(fromDir.getOpposite(), canPull, false);
-              if(drained != null && drained.amount > 0) {
+              if (drained != null && drained.amount > 0) {
                 int filled = into.fill(fromDir, drained, false);
-                if(filled > 0) {
+                if (filled > 0) {
                   drained = target.drain(fromDir.getOpposite(), filled, true);
                   into.fill(fromDir, drained, true);
                   return true;
@@ -129,17 +129,17 @@ public class FluidUtil {
     TileEntity te = (TileEntity) from;
     BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
     IFluidHandler target = getFluidHandler(te.getWorldObj(), loc);
-    if(target == null) {
+    if (target == null) {
       return false;
     }
     FluidTankInfo[] infos = from.getTankInfo(fromDir);
     boolean res = false;
-    if(infos != null) {
+    if (infos != null) {
       for (FluidTankInfo info : infos) {
-        if(info.fluid != null && info.fluid.amount > 0 && from.canDrain(fromDir, info.fluid.getFluid())) {
+        if (info.fluid != null && info.fluid.amount > 0 && from.canDrain(fromDir, info.fluid.getFluid())) {
           FluidStack maxDrain = new FluidStack(info.fluid.getFluid(), maxVolume);
           FluidStack canDrain = from.drain(fromDir, maxDrain, false);
-          if(canDrain != null && canDrain.amount > 0) {
+          if (canDrain != null && canDrain.amount > 0) {
             int filled = target.fill(fromDir.getOpposite(), canDrain, true);
             from.drain(fromDir, new FluidStack(info.fluid.getFluid(), filled), true);
             res |= true;
@@ -219,14 +219,13 @@ public class FluidUtil {
       }
 
       FluidStack resultFluid = FluidContainerRegistry.getFluidForFilledItem(source);
-      if (resultFluid != null && resultFluid.amount > 0 && resultFluid.amount <= maxDrain
-          && (target == null || resultFluid.getFluid() == target.getFluid())) {
+      if (resultFluid != null && resultFluid.amount > 0 && resultFluid.amount <= maxDrain && (target == null || resultFluid.getFluid() == target.getFluid())) {
         ItemStack resultStack = source.getItem().getContainerItem(source);
         // TODO
-//        if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
-//            && source.stackTagCompound == null) {
-//          resultStack = new ItemStack(Items.glass_bottle);
-//        }
+        //        if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
+        //            && source.stackTagCompound == null) {
+        //          resultStack = new ItemStack(Items.glass_bottle);
+        //        }
         ItemStack remainderStack = source.copy();
         remainderStack.stackSize--;
         if (remainderStack.stackSize <= 0) {
@@ -237,7 +236,6 @@ public class FluidUtil {
         return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
       }
 
-
     }
     return new FluidAndStackResult(null, null, source, target);
   }
@@ -247,7 +245,7 @@ public class FluidUtil {
 
       if (source.getItem() instanceof IFluidContainerItem) {
         FluidStack fluid = ((IFluidContainerItem) source.getItem()).getFluid(source);
-        IFluidTank targetTank = fluid != null ? tank.getInputTank(fluid) : null;        
+        IFluidTank targetTank = fluid != null ? tank.getInputTank(fluid) : null;
         if (targetTank != null) {
           FluidStack target = targetTank.getFluid();
           int maxDrain = targetTank.getCapacity() - (target != null ? target.amount : 0);
@@ -276,10 +274,10 @@ public class FluidUtil {
           int maxDrain = targetTank.getCapacity() - (target != null ? target.amount : 0);
           if (resultFluid.amount <= maxDrain && (target == null || resultFluid.getFluid() == target.getFluid())) {
             ItemStack resultStack = source.getItem().getContainerItem(source);
-//            if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
-//                && source.stackTagCompound == null) {
-//              resultStack = new ItemStack(Items.glass_bottle);
-//            }
+            //            if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
+            //                && source.stackTagCompound == null) {
+            //              resultStack = new ItemStack(Items.glass_bottle);
+            //            }
             ItemStack remainderStack = source.copy();
             remainderStack.stackSize--;
             if (remainderStack.stackSize <= 0) {
@@ -323,27 +321,26 @@ public class FluidUtil {
    * @param tank
    * @return true if a container was filled, false otherwise
    */
-  public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer,
-      ITankAccess tank) {
+  public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer, ITankAccess tank) {
 
     for (FluidTank subTank : tank.getOutputTanks()) {
       FluidAndStackResult fill = tryFillContainer(entityPlayer.inventory.getCurrentItem(), subTank.getFluid());
-      if(fill.result.fluidStack != null) {
+      if (fill.result.fluidStack != null) {
 
         subTank.setFluid(fill.remainder.fluidStack);
         tank.setTanksDirty();
-        if(!entityPlayer.capabilities.isCreativeMode) {
-          if(fill.remainder.itemStack == null) {
+        if (!entityPlayer.capabilities.isCreativeMode) {
+          if (fill.remainder.itemStack == null) {
             entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.result.itemStack);
             return true;
           } else {
             entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
           }
 
-          if(fill.result.itemStack.isStackable()) {
+          if (fill.result.itemStack.isStackable()) {
             for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
               ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
-              if(ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
+              if (ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
                 fill.result.itemStack.stackSize += inventoryItem.stackSize;
                 entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
                 return true;
@@ -352,13 +349,13 @@ public class FluidUtil {
           }
 
           for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-            if(entityPlayer.inventory.mainInventory[i] == null) {
+            if (entityPlayer.inventory.mainInventory[i] == null) {
               entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
               return true;
             }
           }
 
-          if(!world.isRemote) {
+          if (!world.isRemote) {
             double x0 = (x + entityPlayer.posX) / 2.0D;
             double y0 = (y + entityPlayer.posY) / 2.0D + 0.5D;
             double z0 = (z + entityPlayer.posZ) / 2.0D;
@@ -372,28 +369,27 @@ public class FluidUtil {
     return false;
   }
 
-  public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer,
-      ITankAccess tank) {
+  public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, ITankAccess tank) {
     FluidAndStackResult fill = tryDrainContainer(entityPlayer.inventory.getCurrentItem(), tank);
-    if(fill.result.fluidStack == null) {
+    if (fill.result.fluidStack == null) {
       return false;
     }
 
     tank.getInputTank(fill.result.fluidStack).setFluid(fill.remainder.fluidStack);
     tank.setTanksDirty();
 
-    if(!entityPlayer.capabilities.isCreativeMode) {
-      if(fill.remainder.itemStack == null) {
+    if (!entityPlayer.capabilities.isCreativeMode) {
+      if (fill.remainder.itemStack == null) {
         entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.result.itemStack);
         return true;
       } else {
         entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
       }
 
-      if(fill.result.itemStack.isStackable()) {
+      if (fill.result.itemStack.isStackable()) {
         for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
           ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
-          if(ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
+          if (ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
             fill.result.itemStack.stackSize += inventoryItem.stackSize;
             entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
             return true;
@@ -402,13 +398,13 @@ public class FluidUtil {
       }
 
       for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-        if(entityPlayer.inventory.mainInventory[i] == null) {
+        if (entityPlayer.inventory.mainInventory[i] == null) {
           entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
           return true;
         }
       }
 
-      if(!world.isRemote) {
+      if (!world.isRemote) {
         double x0 = (x + entityPlayer.posX) / 2.0D;
         double y0 = (y + entityPlayer.posY) / 2.0D + 0.5D;
         double z0 = (z + entityPlayer.posZ) / 2.0D;
@@ -443,14 +439,12 @@ public class FluidUtil {
       this.remainder = remainder;
     }
 
-    public FluidAndStackResult(FluidStack fluidStackResult, ItemStack itemStackResult, FluidStack fluidStackRemainder,
-        ItemStack itemStackRemainder) {
+    public FluidAndStackResult(FluidStack fluidStackResult, ItemStack itemStackResult, FluidStack fluidStackRemainder, ItemStack itemStackRemainder) {
       this.result = new FluidAndStack(fluidStackResult, itemStackResult);
       this.remainder = new FluidAndStack(fluidStackRemainder, itemStackRemainder);
     }
 
-    public FluidAndStackResult(ItemStack itemStackResult, FluidStack fluidStackResult, ItemStack itemStackRemainder,
-        FluidStack fluidStackRemainder) {
+    public FluidAndStackResult(ItemStack itemStackResult, FluidStack fluidStackResult, ItemStack itemStackRemainder, FluidStack fluidStackRemainder) {
       this.result = new FluidAndStack(fluidStackResult, itemStackResult);
       this.remainder = new FluidAndStack(fluidStackRemainder, itemStackRemainder);
     }

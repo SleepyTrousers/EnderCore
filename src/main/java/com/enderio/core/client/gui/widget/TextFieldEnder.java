@@ -56,7 +56,7 @@ public class TextFieldEnder extends GuiTextField {
   public TextFieldEnder(FontRenderer fnt, int x, int y, int width, int height) {
     this(fnt, x, y, width, height, null);
   }
-  
+
   public TextFieldEnder(FontRenderer fnt, int x, int y, int width, int height, ICharFilter charFilter) {
     super(fnt, x, y, width, height);
     this.xOrigin = x;
@@ -76,7 +76,7 @@ public class TextFieldEnder extends GuiTextField {
 
   @Override
   public boolean textboxKeyTyped(char c, int key) {
-    if(filter == null || filter.passesFilter(this, c) || isSpecialChar(c, key)) {
+    if (filter == null || filter.passesFilter(this, c) || isSpecialChar(c, key)) {
       return super.textboxKeyTyped(c, key);
     }
     return false;

@@ -74,7 +74,7 @@ public class WorldCache<I> {
   @SneakyThrows
   protected void loadData(File file) {
     if (!file.createNewFile()) {
-      NBTTagCompound tag = null; 
+      NBTTagCompound tag = null;
       try {
         tag = CompressedStreamTools.read(file);
       } catch (Exception e) {
@@ -169,7 +169,7 @@ public class WorldCache<I> {
     }
     return nextID;
   }
-  
+
   protected void setID(String name) {
     setID(name, getNextAvailableID(name));
   }

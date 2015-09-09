@@ -23,7 +23,7 @@ public class IconButton extends GuiButton {
 
   protected IGuiScreen gui;
   protected String[] toolTipText;
-  
+
   private GuiToolTip toolTip;
   private int marginY = 0;
   private int marginX = 0;
@@ -45,7 +45,7 @@ public class IconButton extends GuiButton {
     }
     this.toolTipText = tooltipText;
   }
-  
+
   protected void setToolTip(GuiToolTip newToolTip) {
     boolean addTooltip = false;
     if (toolTip != null) {

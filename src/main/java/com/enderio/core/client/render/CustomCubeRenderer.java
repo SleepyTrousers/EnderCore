@@ -21,13 +21,13 @@ public class CustomCubeRenderer {
   }
 
   public void renderBlock(IBlockAccess ba, Block par1Block, int par2, int par3, int par4, IRenderFace renderer) {
-    if(rb == null) {
+    if (rb == null) {
       rb = new CustomRenderBlocks(ba);
     }
     rb.blockAccess = ba;
     rb.setOverrideTexture(getOverrideTexture());
     rb.setFaceRenderers(null);
-    if(renderer != null) {
+    if (renderer != null) {
       rb.addFaceRenderer(renderer);
     }
     rb.setRenderBoundsFromBlock(par1Block);
@@ -35,7 +35,7 @@ public class CustomCubeRenderer {
   }
 
   public void renderBlock(IBlockAccess ba, Block par1Block, int par2, int par3, int par4, Collection<IRenderFace> renderers) {
-    if(rb == null) {
+    if (rb == null) {
       rb = new CustomRenderBlocks(ba);
     }
     rb.blockAccess = ba;

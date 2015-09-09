@@ -14,13 +14,13 @@ public class Vertex {
 
   public Vertex(Vertex other) {
     xyz.set(other.xyz);
-    if(other.uv != null) {
+    if (other.uv != null) {
       uv = new Vector2f(other.uv);
     }
-    if(other.normal != null) {
+    if (other.normal != null) {
       normal = new Vector3f(other.normal);
     }
-    if(other.color != null) {
+    if (other.color != null) {
       color = new Vector4f(other.color);
     }
     brightness = other.brightness;
@@ -49,7 +49,7 @@ public class Vertex {
   }
 
   public void setUV(double u, double v) {
-    if(uv == null) {
+    if (uv == null) {
       uv = new Vector2f(u, v);
     } else {
       uv.set(u, v);
@@ -57,7 +57,7 @@ public class Vertex {
   }
 
   public void setNormal(double x, double y, double z) {
-    if(normal == null) {
+    if (normal == null) {
       normal = new Vector3f();
     }
     normal.set((float) x, (float) y, (float) z);
@@ -65,7 +65,7 @@ public class Vertex {
   }
 
   public void setNormal(Vector3f normal2) {
-    if(normal2 == null) {
+    if (normal2 == null) {
       normal = null;
       return;
     }

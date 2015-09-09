@@ -34,23 +34,23 @@ public class Util {
 
   public static Block getBlockFromItemId(ItemStack itemId) {
     Item item = itemId.getItem();
-    if(item instanceof ItemBlock) {
+    if (item instanceof ItemBlock) {
       return ((ItemBlock) item).field_150939_a;
     }
     return null;
   }
 
   public static ItemStack consumeItem(ItemStack stack) {
-    if(stack.getItem() instanceof ItemPotion) {
-      if(stack.stackSize == 1) {
+    if (stack.getItem() instanceof ItemPotion) {
+      if (stack.stackSize == 1) {
         return new ItemStack(Items.glass_bottle);
       } else {
         stack.splitStack(1);
         return stack;
       }
     }
-    if(stack.stackSize == 1) {
-      if(stack.getItem().hasContainerItem(stack)) {
+    if (stack.stackSize == 1) {
+      if (stack.getItem().hasContainerItem(stack)) {
         return stack.getItem().getContainerItem(stack);
       } else {
         return null;
@@ -62,9 +62,9 @@ public class Util {
   }
 
   public static void giveExperience(EntityPlayer thePlayer, float experience) {
-    if(experience < 1.0F) {
+    if (experience < 1.0F) {
       int rndRound = MathHelper.floor_float(experience);
-      if(rndRound < MathHelper.ceiling_float_int(experience) && (float) Math.random() < experience) {
+      if (rndRound < MathHelper.ceiling_float_int(experience) && (float) Math.random() < experience) {
         ++rndRound;
       }
       experience = rndRound;
@@ -80,39 +80,38 @@ public class Util {
   // derived from ItemBlock.onItemUse
   public static BlockCoord canPlaceItem(ItemStack itemUsed, Block blockIdToBePlaced, EntityPlayer player, World world, int x, int y, int z, int side) {
 
-    if(blockIdToBePlaced == null) {
+    if (blockIdToBePlaced == null) {
       return null;
     }
 
     Block block = world.getBlock(x, y, z);
 
-    if(block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
+    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
       side = 1;
-    } else if(block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush
-        && (block == null || !block.isReplaceable(world, x, y, z))) {
+    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush && (block == null || !block.isReplaceable(world, x, y, z))) {
 
-      if(side == 0) {
+      if (side == 0) {
         --y;
-      } else if(side == 1) {
+      } else if (side == 1) {
         ++y;
-      } else if(side == 2) {
+      } else if (side == 2) {
         --z;
-      } else if(side == 3) {
+      } else if (side == 3) {
         ++z;
-      } else if(side == 4) {
+      } else if (side == 4) {
         --x;
-      } else if(side == 5) {
+      } else if (side == 5) {
         ++x;
       }
     }
 
-    if(itemUsed.stackSize == 0) {
+    if (itemUsed.stackSize == 0) {
       return null;
-    } else if(!player.canPlayerEdit(x, y, z, side, itemUsed)) {
+    } else if (!player.canPlayerEdit(x, y, z, side, itemUsed)) {
       return null;
-    } else if(y == 255 && blockIdToBePlaced.getMaterial().isSolid()) {
+    } else if (y == 255 && blockIdToBePlaced.getMaterial().isSolid()) {
       return null;
-    } else if(world.canPlaceEntityOnSide(blockIdToBePlaced, x, y, z, false, side, player, itemUsed)) {
+    } else if (world.canPlaceEntityOnSide(blockIdToBePlaced, x, y, z, false, side, player, itemUsed)) {
       return new BlockCoord(x, y, z);
     }
     return null;
@@ -120,10 +119,10 @@ public class Util {
   }
 
   public static EntityItem createDrop(World world, ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
-    if(stack == null || stack.stackSize <= 0) {
+    if (stack == null || stack.stackSize <= 0) {
       return null;
     }
-    if(doRandomSpread) {
+    if (doRandomSpread) {
       float f1 = 0.7F;
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
@@ -142,7 +141,7 @@ public class Util {
   }
 
   public static void dropItems(World world, ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
-    if(stack == null || stack.stackSize <= 0) {
+    if (stack == null || stack.stackSize <= 0) {
       return;
     }
 
@@ -157,7 +156,7 @@ public class Util {
 
   public static EntityItem createEntityItem(World world, ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
     EntityItem entityitem;
-    if(doRandomSpread) {
+    if (doRandomSpread) {
       float f1 = 0.7F;
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
@@ -175,11 +174,11 @@ public class Util {
   }
 
   public static void dropItems(World world, ItemStack stack, int x, int y, int z, boolean doRandomSpread) {
-    if(stack == null || stack.stackSize <= 0) {
+    if (stack == null || stack.stackSize <= 0) {
       return;
     }
 
-    if(doRandomSpread) {
+    if (doRandomSpread) {
       float f1 = 0.7F;
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
@@ -199,11 +198,11 @@ public class Util {
   }
 
   public static void dropItems(World world, ItemStack[] inventory, int x, int y, int z, boolean doRandomSpread) {
-    if(inventory == null) {
+    if (inventory == null) {
       return;
     }
     for (ItemStack stack : inventory) {
-      if(stack != null && stack.stackSize > 0) {
+      if (stack != null && stack.stackSize > 0) {
         dropItems(world, stack.copy(), x, y, z, doRandomSpread);
       }
     }
@@ -213,7 +212,7 @@ public class Util {
     for (int l = 0; l < inventory.getSizeInventory(); ++l) {
       ItemStack items = inventory.getStackInSlot(l);
 
-      if(items != null && items.stackSize > 0) {
+      if (items != null && items.stackSize > 0) {
         dropItems(world, inventory.getStackInSlot(l).copy(), x, y, z, doRandomSpread);
       }
     }
@@ -223,13 +222,13 @@ public class Util {
 
     StringBuilder sb = new StringBuilder();
     for (Object key : Block.blockRegistry.getKeys()) {
-      if(key != null) {
+      if (key != null) {
         sb.append(key.toString());
         sb.append("\n");
       }
     }
     for (Object key : Item.itemRegistry.getKeys()) {
-      if(key != null) {
+      if (key != null) {
         sb.append(key.toString());
         sb.append("\n");
       }
@@ -260,15 +259,15 @@ public class Util {
 
   public static ItemStack decrStackSize(IInventory inventory, int slot, int size) {
     ItemStack item = inventory.getStackInSlot(slot);
-    if(item != null) {
-      if(item.stackSize <= size) {
+    if (item != null) {
+      if (item.stackSize <= size) {
         ItemStack result = item;
         inventory.setInventorySlotContents(slot, null);
         inventory.markDirty();
         return result;
       }
       ItemStack split = item.splitStack(size);
-      if(item.stackSize == 0) {
+      if (item.stackSize == 0) {
         inventory.setInventorySlotContents(slot, null);
       }
       inventory.markDirty();
@@ -279,12 +278,12 @@ public class Util {
 
   public static Vec3 getEyePosition(EntityPlayer player) {
     Vec3 v = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
-    if(player.worldObj.isRemote) {
+    if (player.worldObj.isRemote) {
       //take into account any eye changes done by mods.
       v.yCoord += player.getEyeHeight() - player.getDefaultEyeHeight();
     } else {
       v.yCoord += player.getEyeHeight();
-      if(player instanceof EntityPlayerMP && player.isSneaking()) {
+      if (player instanceof EntityPlayerMP && player.isSneaking()) {
         v.yCoord -= 0.08;
       }
     }
@@ -293,12 +292,12 @@ public class Util {
 
   public static Vector3d getEyePositionEio(EntityPlayer player) {
     Vector3d res = new Vector3d(player.posX, player.posY, player.posZ);
-    if(player.worldObj.isRemote) {
+    if (player.worldObj.isRemote) {
       //take into account any eye changes done by mods.
       res.y += player.getEyeHeight() - player.getDefaultEyeHeight();
     } else {
       res.y += player.getEyeHeight();
-      if(player instanceof EntityPlayerMP && player.isSneaking()) {
+      if (player instanceof EntityPlayerMP && player.isSneaking()) {
         res.y -= 0.08;
       }
     }
@@ -311,7 +310,7 @@ public class Util {
   }
 
   public static boolean isEquipped(EntityPlayer player, Class<? extends Item> class1) {
-    if(player == null || player.inventory == null || player.inventory.getCurrentItem() == null) {
+    if (player == null || player.inventory == null || player.inventory.getCurrentItem() == null) {
       return false;
     }
     //player.inventory.getCurrentItem().getClass().getItem().isAssignableFrom(class1)
@@ -319,7 +318,7 @@ public class Util {
   }
 
   public static boolean isType(ItemStack stack, Class<?> class1) {
-    if(stack == null || class1 == null) {
+    if (stack == null || class1 == null) {
       return false;
     }
     return class1.isAssignableFrom(stack.getItem().getClass());
@@ -332,9 +331,9 @@ public class Util {
     boolean p_147447_4_ = false;
     boolean p_147447_5_ = false;
 
-    if(!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
-      if(!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
-        
+    if (!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
+      if (!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
+
         int i = MathHelper.floor_double(endVec.xCoord);
         int j = MathHelper.floor_double(endVec.yCoord);
         int k = MathHelper.floor_double(endVec.zCoord);
@@ -344,9 +343,9 @@ public class Util {
         Block block = world.getBlock(l, i1, j1);
         int k1 = world.getBlockMetadata(l, i1, j1);
 
-        if((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
+        if ((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
           MovingObjectPosition movingobjectposition = block.collisionRayTrace(world, l, i1, j1, startVec, endVec);
-          if(movingobjectposition != null) {
+          if (movingobjectposition != null) {
             result.add(movingobjectposition);
           }
         }
@@ -355,12 +354,12 @@ public class Util {
         k1 = 200;
 
         while (k1-- >= 0) {
-          if(Double.isNaN(startVec.xCoord) || Double.isNaN(startVec.yCoord) || Double.isNaN(startVec.zCoord)) {
+          if (Double.isNaN(startVec.xCoord) || Double.isNaN(startVec.yCoord) || Double.isNaN(startVec.zCoord)) {
             return null;
           }
 
-          if(l == i && i1 == j && j1 == k) {
-            if(p_147447_5_) {
+          if (l == i && i1 == j && j1 == k) {
+            if (p_147447_5_) {
               result.add(movingobjectposition2);
             } else {
               return result;
@@ -374,25 +373,25 @@ public class Util {
           double d1 = 999.0D;
           double d2 = 999.0D;
 
-          if(i > l) {
+          if (i > l) {
             d0 = l + 1.0D;
-          } else if(i < l) {
+          } else if (i < l) {
             d0 = l + 0.0D;
           } else {
             flag6 = false;
           }
 
-          if(j > i1) {
+          if (j > i1) {
             d1 = i1 + 1.0D;
-          } else if(j < i1) {
+          } else if (j < i1) {
             d1 = i1 + 0.0D;
           } else {
             flag3 = false;
           }
 
-          if(k > j1) {
+          if (k > j1) {
             d2 = j1 + 1.0D;
-          } else if(k < j1) {
+          } else if (k < j1) {
             d2 = j1 + 0.0D;
           } else {
             flag4 = false;
@@ -405,21 +404,21 @@ public class Util {
           double d7 = endVec.yCoord - startVec.yCoord;
           double d8 = endVec.zCoord - startVec.zCoord;
 
-          if(flag6) {
+          if (flag6) {
             d3 = (d0 - startVec.xCoord) / d6;
           }
-          if(flag3) {
+          if (flag3) {
             d4 = (d1 - startVec.yCoord) / d7;
           }
-          if(flag4) {
+          if (flag4) {
             d5 = (d2 - startVec.zCoord) / d8;
           }
 
           boolean flag5 = false;
           byte b0;
 
-          if(d3 < d4 && d3 < d5) {
-            if(i > l) {
+          if (d3 < d4 && d3 < d5) {
+            if (i > l) {
               b0 = 4;
             } else {
               b0 = 5;
@@ -428,8 +427,8 @@ public class Util {
             startVec.xCoord = d0;
             startVec.yCoord += d7 * d3;
             startVec.zCoord += d8 * d3;
-          } else if(d4 < d5) {
-            if(j > i1) {
+          } else if (d4 < d5) {
+            if (j > i1) {
               b0 = 0;
             } else {
               b0 = 1;
@@ -439,7 +438,7 @@ public class Util {
             startVec.yCoord = d1;
             startVec.zCoord += d8 * d4;
           } else {
-            if(k > j1) {
+            if (k > j1) {
               b0 = 2;
             } else {
               b0 = 3;
@@ -452,21 +451,21 @@ public class Util {
 
           Vec3 vec32 = Vec3.createVectorHelper(startVec.xCoord, startVec.yCoord, startVec.zCoord);
           l = (int) (vec32.xCoord = MathHelper.floor_double(startVec.xCoord));
-          if(b0 == 5) {
+          if (b0 == 5) {
             --l;
             ++vec32.xCoord;
           }
 
           i1 = (int) (vec32.yCoord = MathHelper.floor_double(startVec.yCoord));
 
-          if(b0 == 1) {
+          if (b0 == 1) {
             --i1;
             ++vec32.yCoord;
           }
 
           j1 = (int) (vec32.zCoord = MathHelper.floor_double(startVec.zCoord));
 
-          if(b0 == 3) {
+          if (b0 == 3) {
             --j1;
             ++vec32.zCoord;
           }
@@ -474,10 +473,10 @@ public class Util {
           Block block1 = world.getBlock(l, i1, j1);
           int l1 = world.getBlockMetadata(l, i1, j1);
 
-          if(!p_147447_4_ || block1.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) {
-            if(block1.canCollideCheck(l1, includeLiquids)) {
+          if (!p_147447_4_ || block1.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) {
+            if (block1.canCollideCheck(l1, includeLiquids)) {
               MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, l, i1, j1, startVec, endVec);
-              if(movingobjectposition1 != null) {
+              if (movingobjectposition1 != null) {
                 result.add(movingobjectposition1);
               }
             } else {
@@ -485,7 +484,7 @@ public class Util {
             }
           }
         }
-        if(p_147447_5_ ) {
+        if (p_147447_5_) {
           result.add(movingobjectposition2);
         } else {
           return result;
@@ -500,30 +499,30 @@ public class Util {
   }
 
   public static ForgeDirection getDirFromOffset(int xOff, int yOff, int zOff) {
-    if(xOff != 0 && yOff == 0 && zOff == 0) {
+    if (xOff != 0 && yOff == 0 && zOff == 0) {
       return xOff < 0 ? ForgeDirection.WEST : ForgeDirection.EAST;
     }
-    if(zOff != 0 && yOff == 0 && xOff == 0) {
+    if (zOff != 0 && yOff == 0 && xOff == 0) {
       return zOff < 0 ? ForgeDirection.NORTH : ForgeDirection.SOUTH;
     }
-    if(yOff != 0 && xOff == 0 && zOff == 0) {
+    if (yOff != 0 && xOff == 0 && zOff == 0) {
       return yOff < 0 ? ForgeDirection.DOWN : ForgeDirection.UP;
     }
     return ForgeDirection.UNKNOWN;
   }
-  
+
   public static int getProgressScaled(int scale, IProgressTile tile) {
     return (int) (tile.getProgress() * scale);
   }
-  
+
   // copied from WAILA source to avoid API dependency
-  public static String WailaStyle     = "\u00A4";
-  public static String WailaIcon      = "\u00A5";
-  public static String TAB         = WailaStyle + WailaStyle +"a";
-  public static String ALIGNRIGHT  = WailaStyle + WailaStyle +"b";
-  public static String ALIGNCENTER = WailaStyle + WailaStyle +"c";  
-  public static String HEART       = WailaStyle + WailaIcon  +"a";
-  public static String HHEART      = WailaStyle + WailaIcon  +"b";
-  public static String EHEART      = WailaStyle + WailaIcon  +"c";
+  public static String WailaStyle = "\u00A4";
+  public static String WailaIcon = "\u00A5";
+  public static String TAB = WailaStyle + WailaStyle + "a";
+  public static String ALIGNRIGHT = WailaStyle + WailaStyle + "b";
+  public static String ALIGNCENTER = WailaStyle + WailaStyle + "c";
+  public static String HEART = WailaStyle + WailaIcon + "a";
+  public static String HHEART = WailaStyle + WailaIcon + "b";
+  public static String EHEART = WailaStyle + WailaIcon + "c";
 
 }

@@ -21,10 +21,10 @@ public class CommonProxy {
     return null;
   }
 
-  public void throwModCompatibilityError(String ... msgs) {
+  public void throwModCompatibilityError(String... msgs) {
     StringBuilder sb = new StringBuilder();
-    for(String msg : msgs) {
-      if(sb.length() > 0) {
+    for (String msg : msgs) {
+      if (sb.length() > 0) {
         sb.append("\n");
       }
       sb.append(msg);

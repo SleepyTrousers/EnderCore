@@ -41,10 +41,10 @@ public final class ForgeDirectionOffsets {
     float ay = Math.abs(y);
     float az = Math.abs(z);
 
-    if(ax >= ay && ax >= az) {
+    if (ax >= ay && ax >= az) {
       return x > 0 ? ForgeDirection.EAST : ForgeDirection.WEST;
     }
-    if(ay >= ax && ay >= az) {
+    if (ay >= ax && ay >= az) {
       return y > 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
     }
     return z > 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;

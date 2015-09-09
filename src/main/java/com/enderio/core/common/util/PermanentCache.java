@@ -26,14 +26,14 @@ public class PermanentCache<I> extends WorldCache<I> {
     }
     return new File("saves", ident + ".dat");
   }
-  
+
   @Override
   protected void blockOldIDs() {
     if (!objToName.isEmpty()) {
       super.blockOldIDs();
     }
   }
-  
+
   @Override
   protected void mergeNewIDs() {
     if (!objToName.isEmpty()) {

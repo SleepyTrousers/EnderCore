@@ -38,7 +38,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   protected int guiTop;
 
   protected boolean drawButtons = true;
-  
+
   protected GuiScreenBase() {
   }
 
@@ -74,7 +74,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
     GL11.glDisable(GL11.GL_LIGHTING);
     GL11.glDisable(GL11.GL_DEPTH_TEST);
     GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-    if(drawButtons) {
+    if (drawButtons) {
       RenderHelper.enableGUIStandardItemLighting();
       super.drawScreen(par1, par2, par3);
     }
@@ -108,7 +108,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   @Override
   public void drawHoveringText(List par1List, int par2, int par3, FontRenderer font) {
 
-    if(!par1List.isEmpty()) {
+    if (!par1List.isEmpty()) {
 
       GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
       GL11.glPushAttrib(GL11.GL_LIGHTING_BIT);
@@ -120,13 +120,11 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
       int k = 0;
       Iterator iterator = par1List.iterator();
 
-      while (iterator.hasNext())
-      {
+      while (iterator.hasNext()) {
         String s = (String) iterator.next();
         int l = font.getStringWidth(s);
 
-        if(l > k)
-        {
+        if (l > k) {
           k = l;
         }
       }
@@ -135,18 +133,15 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
       int j1 = par3 - 12;
       int k1 = 8;
 
-      if(par1List.size() > 1)
-      {
+      if (par1List.size() > 1) {
         k1 += 2 + (par1List.size() - 1) * 10;
       }
 
-      if(i1 + k > this.width)
-      {
+      if (i1 + k > this.width) {
         i1 -= 28 + k;
       }
 
-      if(j1 + k1 + 6 > this.height)
-      {
+      if (j1 + k1 + 6 > this.height) {
         j1 = this.height - k1 - 6;
       }
 
@@ -165,13 +160,11 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
       this.drawGradientRect(i1 - 3, j1 - 3, i1 + k + 3, j1 - 3 + 1, i2, i2);
       this.drawGradientRect(i1 - 3, j1 + k1 + 2, i1 + k + 3, j1 + k1 + 3, j2, j2);
 
-      for (int k2 = 0; k2 < par1List.size(); ++k2)
-      {
+      for (int k2 = 0; k2 < par1List.size(); ++k2) {
         String s1 = (String) par1List.get(k2);
         font.drawStringWithShadow(s1, i1, j1, -1);
 
-        if(k2 == 0)
-        {
+        if (k2 == 0) {
           j1 += 2;
         }
 
@@ -218,7 +211,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
 
   @Override
   public void addButton(GuiButton button) {
-    if(!buttonList.contains(button)) {
+    if (!buttonList.contains(button)) {
       buttonList.add(button);
     }
   }
@@ -227,10 +220,10 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   public void removeButton(GuiButton button) {
     buttonList.remove(button);
   }
-  
+
   @Override
   public void doActionPerformed(GuiButton guiButton) {
-    actionPerformed(guiButton); 
+    actionPerformed(guiButton);
   }
 
   @Override

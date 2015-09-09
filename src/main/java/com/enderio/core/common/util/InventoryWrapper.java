@@ -8,10 +8,10 @@ import net.minecraft.item.ItemStack;
 public class InventoryWrapper implements ISidedInventory {
 
   public static ISidedInventory asSidedInventory(IInventory inv) {
-    if(inv == null) {
+    if (inv == null) {
       return null;
     }
-    if(inv instanceof ISidedInventory) {
+    if (inv instanceof ISidedInventory) {
       return (ISidedInventory) inv;
     }
     return new InventoryWrapper(inv);
@@ -34,7 +34,7 @@ public class InventoryWrapper implements ISidedInventory {
 
   @Override
   public ItemStack getStackInSlot(int slot) {
-    if(slot < 0 || slot >= inv.getSizeInventory()) {
+    if (slot < 0 || slot >= inv.getSizeInventory()) {
       return null;
     }
     return inv.getStackInSlot(slot);
@@ -52,7 +52,7 @@ public class InventoryWrapper implements ISidedInventory {
 
   @Override
   public void setInventorySlotContents(int slot, ItemStack itemStack) {
-    if(slot >= 0 && slot < inv.getSizeInventory()) {
+    if (slot >= 0 && slot < inv.getSizeInventory()) {
       inv.setInventorySlotContents(slot, itemStack);
     }
   }

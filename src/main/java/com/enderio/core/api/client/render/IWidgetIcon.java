@@ -2,7 +2,6 @@ package com.enderio.core.api.client.render;
 
 import javax.annotation.Nullable;
 
-
 public interface IWidgetIcon {
 
   int getX();

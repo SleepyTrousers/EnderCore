@@ -23,7 +23,7 @@ public class ColorButton extends IconButton {
   @Override
   public boolean mousePressed(Minecraft par1Minecraft, int par2, int par3) {
     boolean result = super.mousePressed(par1Minecraft, par2, par3);
-    if(result) {
+    if (result) {
       nextColor();
     }
     return result;
@@ -32,7 +32,7 @@ public class ColorButton extends IconButton {
   @Override
   public boolean mousePressedButton(Minecraft mc, int x, int y, int button) {
     boolean result = button == 1 && super.checkMousePress(mc, x, y);
-    if(result) {
+    if (result) {
       prevColor();
     }
     return result;
@@ -43,7 +43,7 @@ public class ColorButton extends IconButton {
   }
 
   public void setToolTipHeading(String tooltipPrefix) {
-    if(tooltipPrefix == null) {
+    if (tooltipPrefix == null) {
       this.tooltipPrefix = "";
     } else {
       this.tooltipPrefix = tooltipPrefix;
@@ -52,18 +52,18 @@ public class ColorButton extends IconButton {
 
   private void nextColor() {
     colorIndex++;
-    if(colorIndex >= ItemDye.field_150923_a.length) {
+    if (colorIndex >= ItemDye.field_150923_a.length) {
       colorIndex = 0;
     }
     setColorIndex(colorIndex);
   }
-  
+
   private void prevColor() {
     colorIndex--;
-    if(colorIndex < 0) {
+    if (colorIndex < 0) {
       colorIndex = ItemDye.field_150923_a.length - 1;
     }
-    setColorIndex(colorIndex);    
+    setColorIndex(colorIndex);
   }
 
   public int getColorIndex() {
@@ -73,7 +73,7 @@ public class ColorButton extends IconButton {
   public void setColorIndex(int colorIndex) {
     this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.field_150923_a.length - 1);
     String colStr = DyeColor.values()[colorIndex].getLocalisedName();
-    if(tooltipPrefix != null && tooltipPrefix.length() > 0) {
+    if (tooltipPrefix != null && tooltipPrefix.length() > 0) {
       setToolTip(tooltipPrefix, colStr);
     } else {
       setToolTip(colStr);
@@ -83,7 +83,7 @@ public class ColorButton extends IconButton {
   @Override
   public void drawButton(Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
-    if(visible) {
+    if (visible) {
       Tessellator tes = Tessellator.instance;
       tes.startDrawingQuads();
 

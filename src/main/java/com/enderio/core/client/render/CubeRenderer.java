@@ -20,15 +20,15 @@ public final class CubeRenderer {
   public static void render(Block block, int meta) {
     render(block, meta, null);
   }
-  
+
   public static void render(Block block, int meta, VertexTransform xForm) {
     IIcon[] icons = new IIcon[6];
-    for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
       icons[dir.ordinal()] = block.getIcon(dir.ordinal(), meta);
     }
     render(BoundingBox.UNIT_CUBE.translate(0, -0.1f, 0), icons, xForm, true);
   }
-  
+
   public static void render(BoundingBox bb, IIcon tex) {
     render(bb, tex, null, false);
   }
@@ -40,13 +40,13 @@ public final class CubeRenderer {
   public static void render(BoundingBox bb, IIcon tex, VertexTransform xForm) {
     render(bb, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV(), xForm, false);
   }
-  
+
   public static void render(BoundingBox bb, IIcon tex, VertexTransform xForm, float[] brightnessPerSide, boolean tintSides) {
     float minU = 0;
     float minV = 0;
     float maxU = 1;
     float maxV = 1;
-    if(tex != null) {
+    if (tex != null) {
       minU = tex.getMinU();
       minV = tex.getMinV();
       maxU = tex.getMaxU();
@@ -60,7 +60,7 @@ public final class CubeRenderer {
     float minV = 0;
     float maxU = 1;
     float maxV = 1;
-    if(tex != null) {
+    if (tex != null) {
       minU = tex.getMinU();
       minV = tex.getMinV();
       maxU = tex.getMaxU();
@@ -83,7 +83,7 @@ public final class CubeRenderer {
 
   public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm, boolean tintSides) {
     float[] brightnessPerSide = null;
-    if(tintSides) {
+    if (tintSides) {
       brightnessPerSide = new float[6];
       for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
         brightnessPerSide[dir.ordinal()] = RenderUtil.getColorMultiplierForFace(dir);
@@ -94,8 +94,8 @@ public final class CubeRenderer {
 
   public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm, float[] brightnessPerSide, boolean tintSides) {
 
-    if(tintSides) {
-      if(brightnessPerSide == null || brightnessPerSide.length != 6) {
+    if (tintSides) {
+      if (brightnessPerSide == null || brightnessPerSide.length != 6) {
         brightnessPerSide = new float[] { 1, 1, 1, 1, 1, 1 };
       }
       for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -108,7 +108,7 @@ public final class CubeRenderer {
 
   public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm, float[] brightnessPerSide) {
 
-    if(brightnessPerSide != null && brightnessPerSide.length != 6) {
+    if (brightnessPerSide != null && brightnessPerSide.length != 6) {
       brightnessPerSide = null;
     }
 
@@ -121,7 +121,7 @@ public final class CubeRenderer {
     Tessellator tessellator = Tessellator.instance;
 
     tessellator.setNormal(0, 0, -1);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.NORTH.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -131,7 +131,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[2], minU, maxV);
 
     tessellator.setNormal(0, 0, 1);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.SOUTH.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -141,7 +141,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[7], minU, maxV);
 
     tessellator.setNormal(0, 1, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.UP.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -151,7 +151,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[7], maxU, minV);
 
     tessellator.setNormal(0, -1, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.DOWN.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -161,7 +161,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[4], maxU, minV);
 
     tessellator.setNormal(1, 0, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.EAST.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -171,7 +171,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[1], minU, minV);
 
     tessellator.setNormal(-1, 0, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.WEST.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -183,19 +183,19 @@ public final class CubeRenderer {
 
   public static void render(BoundingBox bb, IIcon[] icons, boolean tintSides) {
     float[] brightnessPerSide = null;
-    if(tintSides) {
+    if (tintSides) {
       brightnessPerSide = new float[6];
       for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
         brightnessPerSide[dir.ordinal()] = RenderUtil.getColorMultiplierForFace(dir);
       }
-    } 
+    }
     render(bb, icons, null, brightnessPerSide);
-    
+
   }
-  
+
   public static void render(BoundingBox bb, IIcon[] icons, VertexTransform xForm, boolean tintSides) {
     float[] brightnessPerSide = null;
-    if(tintSides) {
+    if (tintSides) {
       brightnessPerSide = new float[6];
       for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
         brightnessPerSide[dir.ordinal()] = RenderUtil.getColorMultiplierForFace(dir);
@@ -203,7 +203,7 @@ public final class CubeRenderer {
     }
     render(bb, icons, xForm, brightnessPerSide);
   }
-  
+
   public static void render(BoundingBox bb, IIcon[] faceTextures, VertexTransform xForm, float[] brightnessPerSide) {
     setupVertices(bb, xForm);
     float minU;
@@ -212,10 +212,10 @@ public final class CubeRenderer {
     float maxV;
     IIcon tex;
 
-    Tessellator tessellator = Tessellator.instance;    
+    Tessellator tessellator = Tessellator.instance;
 
     tessellator.setNormal(0, 0, -1);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.NORTH.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -231,7 +231,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[2], minU, minV);
 
     tessellator.setNormal(0, 0, 1);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.SOUTH.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -246,7 +246,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[7], minU, minV);
 
     tessellator.setNormal(0, 1, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.UP.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -261,7 +261,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[7], maxU, minV);
 
     tessellator.setNormal(0, -1, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.DOWN.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -276,7 +276,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[4], maxU, minV);
 
     tessellator.setNormal(1, 0, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.EAST.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -291,7 +291,7 @@ public final class CubeRenderer {
     addVecWithUV(verts[1], minU, maxV);
 
     tessellator.setNormal(-1, 0, 0);
-    if(brightnessPerSide != null) {
+    if (brightnessPerSide != null) {
       float cm = brightnessPerSide[ForgeDirection.WEST.ordinal()];
       tessellator.setColorOpaque_F(cm, cm, cm);
     }
@@ -320,7 +320,7 @@ public final class CubeRenderer {
     verts[6].set(bound.maxX, bound.maxY, bound.maxZ);
     verts[7].set(bound.minX, bound.maxY, bound.maxZ);
 
-    if(xForm != null) {
+    if (xForm != null) {
       for (Vector3d vec : verts) {
         xForm.apply(vec);
       }
@@ -333,9 +333,5 @@ public final class CubeRenderer {
 
   private CubeRenderer() {
   }
-
-  
-
-  
 
 }

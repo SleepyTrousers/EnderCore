@@ -10,67 +10,54 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.event.FMLInterModComms;
 
-public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant
-{
-    public static final EnchantXPBoost INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
+public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
+  public static final EnchantXPBoost INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
 
-    private EnchantXPBoost(int id)
-    {
-        super(id, 2, EnumEnchantmentType.breakable);
-    }
+  private EnchantXPBoost(int id) {
+    super(id, 2, EnumEnchantmentType.breakable);
+  }
 
-    @Override
-    public int getMaxEnchantability(int level)
-    {
-        return super.getMaxEnchantability(level) + 30;
-    }
+  @Override
+  public int getMaxEnchantability(int level) {
+    return super.getMaxEnchantability(level) + 30;
+  }
 
-    @Override
-    public int getMinEnchantability(int level)
-    {
-        return super.getMinEnchantability(level);
-    }
+  @Override
+  public int getMinEnchantability(int level) {
+    return super.getMinEnchantability(level);
+  }
 
-    @Override
-    public int getMaxLevel()
-    {
-        return 3;
-    }
+  @Override
+  public int getMaxLevel() {
+    return 3;
+  }
 
-    @Override
-    public boolean canApply(ItemStack stack)
-    {
-        return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor);
-    }
+  @Override
+  public boolean canApply(ItemStack stack) {
+    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor);
+  }
 
-    @Override
-    public String getName()
-    {
-        return "enchantment.xpboost";
-    }
+  @Override
+  public String getName() {
+    return "enchantment.xpboost";
+  }
 
-    @Override
-    public boolean isAllowedOnBooks()
-    {
-        return ConfigHandler.allowXPBoost;
-    }
+  @Override
+  public boolean isAllowedOnBooks() {
+    return ConfigHandler.allowXPBoost;
+  }
 
-    @Override
-    public String[] getTooltipDetails(ItemStack stack)
-    {
-        return new String[] { EnderCore.lang.localize("enchantment.xpboost.tooltip", false) };
-    }
+  @Override
+  public String[] getTooltipDetails(ItemStack stack) {
+    return new String[] { EnderCore.lang.localize("enchantment.xpboost.tooltip", false) };
+  }
 
-    public void register()
-    {
-        if (ConfigHandler.allowXPBoost)
-        {
-            FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-                    "<enchantment name=\"enchantment.xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
-        }
-        else
-        {
-            Enchantment.enchantmentsList[this.effectId] = null;
-        }
+  public void register() {
+    if (ConfigHandler.allowXPBoost) {
+      FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
+          "<enchantment name=\"enchantment.xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
+    } else {
+      Enchantment.enchantmentsList[this.effectId] = null;
     }
+  }
 }

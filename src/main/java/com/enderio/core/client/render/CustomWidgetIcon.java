@@ -14,7 +14,7 @@ public class CustomWidgetIcon implements IWidgetIcon {
 
   private final int x, y, width, height;
   private final IWidgetMap map;
-  
+
   private IWidgetIcon overlay;
 
 }

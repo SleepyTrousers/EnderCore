@@ -26,7 +26,7 @@ public class CustomRenderBlocks extends RenderBlocks {
   public CustomRenderBlocks() {
     super();
   }
-  
+
   public CustomRenderBlocks(IBlockAccess par1iBlockAccess) {
     super(par1iBlockAccess);
   }
@@ -37,7 +37,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
   public void setFaceRenderers(Collection<IRenderFace> renderers) {
     renderFaceCallbacks.clear();
-    if(renderers != null) {
+    if (renderers != null) {
       renderFaceCallbacks.addAll(renderers);
     }
   }
@@ -61,13 +61,13 @@ public class CustomRenderBlocks extends RenderBlocks {
   public void setOverrideTexture(IIcon overrideTexture) {
     this.overrideTexture = overrideTexture;
   }
-  
+
   public void setShouldRenderBaseTexture(boolean val) {
     shouldRenderBaseTexture = val;
   }
 
   private void renderFace(ForgeDirection face, Block par1Block, double x, double y, double z, IIcon texture) {
-    if(renderFaceCallbacks.isEmpty()) {
+    if (renderFaceCallbacks.isEmpty()) {
       doDefaultRenderFace(face, par1Block, x, y, z, overrideTexture == null ? texture : overrideTexture);
     } else {
       List<Vertex> faceVertices = createVerticesForFace(face, par1Block, x, y, z, overrideTexture == null ? texture : overrideTexture);
@@ -156,7 +156,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
   private List<Vertex> calcFaceXNeg(Block par1Block, double par2, double par4, double par6, IIcon par8Icon) {
 
-    if(hasOverrideBlockTexture()) {
+    if (hasOverrideBlockTexture()) {
       par8Icon = this.overrideBlockTexture;
     }
 
@@ -166,18 +166,18 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d6 = par8Icon.getInterpolatedV(16.0D - this.renderMinY * 16.0D);
     double d7;
 
-    if(this.flipTexture) {
+    if (this.flipTexture) {
       d7 = d3;
       d3 = d4;
       d4 = d7;
     }
 
-    if(this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
+    if (this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
       d3 = par8Icon.getMinU();
       d4 = par8Icon.getMaxU();
     }
 
-    if(this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
+    if (this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
       d5 = par8Icon.getMinV();
       d6 = par8Icon.getMaxV();
     }
@@ -187,7 +187,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = d5;
     double d10 = d6;
 
-    if(this.uvRotateNorth == 1) {
+    if (this.uvRotateNorth == 1) {
       d3 = par8Icon.getInterpolatedU(this.renderMinY * 16.0D);
       d5 = par8Icon.getInterpolatedV(16.0D - this.renderMaxZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(this.renderMaxY * 16.0D);
@@ -198,7 +198,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = d4;
       d5 = d6;
       d6 = d9;
-    } else if(this.uvRotateNorth == 2) {
+    } else if (this.uvRotateNorth == 2) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMaxY * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMinZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMinY * 16.0D);
@@ -209,7 +209,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d4 = d8;
       d9 = d6;
       d10 = d5;
-    } else if(this.uvRotateNorth == 3) {
+    } else if (this.uvRotateNorth == 3) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMinZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMaxZ * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxY * 16.0D);
@@ -228,7 +228,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>(4);
     Vertex v;
-    if(enableAO) {
+    if (enableAO) {
       result.add(new Vertex(d11, d13, d15, d7, d9, brightnessTopLeft, colorRedTopLeft, this.colorGreenTopLeft, this.colorBlueTopLeft, 1));
       result.add(new Vertex(d11, d13, d14, d3, d5, brightnessBottomLeft, colorRedBottomLeft, this.colorGreenBottomLeft, this.colorBlueBottomLeft, 1));
       result.add(new Vertex(d11, d12, d14, d8, d10, brightnessBottomRight, colorRedBottomRight, this.colorGreenBottomRight, this.colorBlueBottomRight, 1));
@@ -244,7 +244,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
   private List<Vertex> calcFaceYPos(Block par1Block, double par2, double par4, double par6, IIcon par8Icon) {
 
-    if(this.hasOverrideBlockTexture()) {
+    if (this.hasOverrideBlockTexture()) {
       par8Icon = this.overrideBlockTexture;
     }
 
@@ -253,12 +253,12 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d5 = par8Icon.getInterpolatedV(this.renderMinZ * 16.0D);
     double d6 = par8Icon.getInterpolatedV(this.renderMaxZ * 16.0D);
 
-    if(this.renderMinX < 0.0D || this.renderMaxX > 1.0D) {
+    if (this.renderMinX < 0.0D || this.renderMaxX > 1.0D) {
       d3 = par8Icon.getMinU();
       d4 = par8Icon.getMaxU();
     }
 
-    if(this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
+    if (this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
       d5 = par8Icon.getMinV();
       d6 = par8Icon.getMaxV();
     }
@@ -268,7 +268,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = d5;
     double d10 = d6;
 
-    if(this.uvRotateTop == 1) {
+    if (this.uvRotateTop == 1) {
       d3 = par8Icon.getInterpolatedU(this.renderMinZ * 16.0D);
       d5 = par8Icon.getInterpolatedV(16.0D - this.renderMaxX * 16.0D);
       d4 = par8Icon.getInterpolatedU(this.renderMaxZ * 16.0D);
@@ -279,7 +279,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = d4;
       d5 = d6;
       d6 = d9;
-    } else if(this.uvRotateTop == 2) {
+    } else if (this.uvRotateTop == 2) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMaxZ * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMinZ * 16.0D);
@@ -290,7 +290,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d4 = d8;
       d9 = d6;
       d10 = d5;
-    } else if(this.uvRotateTop == 3) {
+    } else if (this.uvRotateTop == 3) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMaxX * 16.0D);
       d5 = par8Icon.getInterpolatedV(16.0D - this.renderMinZ * 16.0D);
@@ -309,7 +309,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>(4);
     Vertex v;
-    if(enableAO) {
+    if (enableAO) {
       v = new Vertex(d12, d13, d15, d4, d6, brightnessTopLeft, colorRedTopLeft, this.colorGreenTopLeft, this.colorBlueTopLeft, 1);
       result.add(v);
       v = new Vertex(d12, d13, d14, d7, d9, brightnessBottomLeft, colorRedBottomLeft, this.colorGreenBottomLeft, this.colorBlueBottomLeft, 1);
@@ -331,12 +331,10 @@ public class CustomRenderBlocks extends RenderBlocks {
     return result;
   }
 
-  private List<Vertex> calcFaceZPos(Block par1Block, double par2, double par4, double par6, IIcon par8Icon)
-  {
+  private List<Vertex> calcFaceZPos(Block par1Block, double par2, double par4, double par6, IIcon par8Icon) {
     Tessellator tessellator = Tessellator.instance;
 
-    if(this.hasOverrideBlockTexture())
-    {
+    if (this.hasOverrideBlockTexture()) {
       par8Icon = this.overrideBlockTexture;
     }
 
@@ -346,21 +344,18 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d6 = par8Icon.getInterpolatedV(16.0D - this.renderMinY * 16.0D);
     double d7;
 
-    if(this.flipTexture)
-    {
+    if (this.flipTexture) {
       d7 = d3;
       d3 = d4;
       d4 = d7;
     }
 
-    if(this.renderMinX < 0.0D || this.renderMaxX > 1.0D)
-    {
+    if (this.renderMinX < 0.0D || this.renderMaxX > 1.0D) {
       d3 = par8Icon.getMinU();
       d4 = par8Icon.getMaxU();
     }
 
-    if(this.renderMinY < 0.0D || this.renderMaxY > 1.0D)
-    {
+    if (this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
       d5 = par8Icon.getMinV();
       d6 = par8Icon.getMaxV();
     }
@@ -370,8 +365,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = d5;
     double d10 = d6;
 
-    if(this.uvRotateWest == 1)
-    {
+    if (this.uvRotateWest == 1) {
       d3 = par8Icon.getInterpolatedU(this.renderMinY * 16.0D);
       d6 = par8Icon.getInterpolatedV(16.0D - this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(this.renderMaxY * 16.0D);
@@ -382,9 +376,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = d4;
       d5 = d6;
       d6 = d9;
-    }
-    else if(this.uvRotateWest == 2)
-    {
+    } else if (this.uvRotateWest == 2) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMaxY * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMinY * 16.0D);
@@ -395,9 +387,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d4 = d8;
       d9 = d6;
       d10 = d5;
-    }
-    else if(this.uvRotateWest == 3)
-    {
+    } else if (this.uvRotateWest == 3) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMaxX * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxY * 16.0D);
@@ -416,7 +406,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>();
     Vertex v;
-    if(enableAO) {
+    if (enableAO) {
       result.add(new Vertex(d11, d14, d15, d3, d5, brightnessTopLeft, colorRedTopLeft, this.colorGreenTopLeft, this.colorBlueTopLeft, 1));
       result.add(new Vertex(d11, d13, d15, d8, d10, brightnessBottomLeft, this.colorRedBottomLeft, this.colorGreenBottomLeft, this.colorBlueBottomLeft, 1));
       result.add(new Vertex(d12, d13, d15, d4, d6, brightnessBottomRight, colorRedBottomRight, this.colorGreenBottomRight, this.colorBlueBottomRight, 1));
@@ -432,8 +422,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
   private List<Vertex> calcFaceZNeg(Block par1Block, double par2, double par4, double par6, IIcon par8Icon) {
 
-    if(this.hasOverrideBlockTexture())
-    {
+    if (this.hasOverrideBlockTexture()) {
       par8Icon = this.overrideBlockTexture;
     }
 
@@ -443,18 +432,18 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d6 = par8Icon.getInterpolatedV(16.0D - this.renderMinY * 16.0D);
     double d7;
 
-    if(this.flipTexture) {
+    if (this.flipTexture) {
       d7 = d3;
       d3 = d4;
       d4 = d7;
     }
 
-    if(this.renderMinX < 0.0D || this.renderMaxX > 1.0D) {
+    if (this.renderMinX < 0.0D || this.renderMaxX > 1.0D) {
       d3 = par8Icon.getMinU();
       d4 = par8Icon.getMaxU();
     }
 
-    if(this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
+    if (this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
       d5 = par8Icon.getMinV();
       d6 = par8Icon.getMaxV();
     }
@@ -464,7 +453,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = d5;
     double d10 = d6;
 
-    if(this.uvRotateEast == 2) {
+    if (this.uvRotateEast == 2) {
       d3 = par8Icon.getInterpolatedU(this.renderMinY * 16.0D);
       d5 = par8Icon.getInterpolatedV(16.0D - this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(this.renderMaxY * 16.0D);
@@ -475,7 +464,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = d4;
       d5 = d6;
       d6 = d9;
-    } else if(this.uvRotateEast == 1) {
+    } else if (this.uvRotateEast == 1) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMaxY * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMinY * 16.0D);
@@ -486,7 +475,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d4 = d8;
       d9 = d6;
       d10 = d5;
-    } else if(this.uvRotateEast == 3) {
+    } else if (this.uvRotateEast == 3) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMinX * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMaxX * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxY * 16.0D);
@@ -505,7 +494,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>();
     Vertex v;
-    if(enableAO) {
+    if (enableAO) {
       result.add(new Vertex(d11, d14, d15, d7, d9, brightnessTopLeft, colorRedTopLeft, this.colorGreenTopLeft, this.colorBlueTopLeft, 1));
       result.add(new Vertex(d12, d14, d15, d3, d5, brightnessBottomLeft, colorRedBottomLeft, this.colorGreenBottomLeft, this.colorBlueBottomLeft, 1));
       result.add(new Vertex(d12, d13, d15, d8, d10, brightnessBottomRight, colorRedBottomRight, this.colorGreenBottomRight, this.colorBlueBottomRight, 1));
@@ -519,12 +508,10 @@ public class CustomRenderBlocks extends RenderBlocks {
     return result;
   }
 
-  private List<Vertex> calcFaceXPos(Block par1Block, double par2, double par4, double par6, IIcon par8Icon)
-  {
+  private List<Vertex> calcFaceXPos(Block par1Block, double par2, double par4, double par6, IIcon par8Icon) {
     Tessellator tessellator = Tessellator.instance;
 
-    if(this.hasOverrideBlockTexture())
-    {
+    if (this.hasOverrideBlockTexture()) {
       par8Icon = this.overrideBlockTexture;
     }
 
@@ -534,21 +521,18 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d6 = par8Icon.getInterpolatedV(16.0D - this.renderMinY * 16.0D);
     double d7;
 
-    if(this.flipTexture)
-    {
+    if (this.flipTexture) {
       d7 = d3;
       d3 = d4;
       d4 = d7;
     }
 
-    if(this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D)
-    {
+    if (this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
       d3 = par8Icon.getMinU();
       d4 = par8Icon.getMaxU();
     }
 
-    if(this.renderMinY < 0.0D || this.renderMaxY > 1.0D)
-    {
+    if (this.renderMinY < 0.0D || this.renderMaxY > 1.0D) {
       d5 = par8Icon.getMinV();
       d6 = par8Icon.getMaxV();
     }
@@ -558,8 +542,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = d5;
     double d10 = d6;
 
-    if(this.uvRotateSouth == 2)
-    {
+    if (this.uvRotateSouth == 2) {
       d3 = par8Icon.getInterpolatedU(this.renderMinY * 16.0D);
       d5 = par8Icon.getInterpolatedV(16.0D - this.renderMinZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(this.renderMaxY * 16.0D);
@@ -570,9 +553,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = d4;
       d5 = d6;
       d6 = d9;
-    }
-    else if(this.uvRotateSouth == 1)
-    {
+    } else if (this.uvRotateSouth == 1) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMaxY * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMinY * 16.0D);
@@ -583,9 +564,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d4 = d8;
       d9 = d6;
       d10 = d5;
-    }
-    else if(this.uvRotateSouth == 3)
-    {
+    } else if (this.uvRotateSouth == 3) {
       d3 = par8Icon.getInterpolatedU(16.0D - this.renderMinZ * 16.0D);
       d4 = par8Icon.getInterpolatedU(16.0D - this.renderMaxZ * 16.0D);
       d5 = par8Icon.getInterpolatedV(this.renderMaxY * 16.0D);
@@ -604,7 +583,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>(4);
     Vertex v;
-    if(enableAO) {
+    if (enableAO) {
       result.add(new Vertex(d11, d12, d15, d8, d10, brightnessTopLeft, colorRedTopLeft, this.colorGreenTopLeft, this.colorBlueTopLeft, 1));
       result.add(new Vertex(d11, d12, d14, d4, d6, brightnessBottomLeft, colorRedBottomLeft, this.colorGreenBottomLeft, this.colorBlueBottomLeft, 1));
       result.add(new Vertex(d11, d13, d14, d7, d9, brightnessBottomRight, colorRedBottomRight, this.colorGreenBottomRight, this.colorBlueBottomRight, 1));
@@ -620,7 +599,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
   private List<Vertex> calcFaceYNeg(Block par1Block, double x, double y, double z, IIcon icon) {
 
-    if(hasOverrideBlockTexture()) {
+    if (hasOverrideBlockTexture()) {
       icon = this.overrideBlockTexture;
     }
 
@@ -629,12 +608,12 @@ public class CustomRenderBlocks extends RenderBlocks {
     double minV = icon.getInterpolatedV(this.renderMinZ * 16.0D);
     double maxV = icon.getInterpolatedV(this.renderMaxZ * 16.0D);
 
-    if(renderMinX < 0.0D || renderMaxX > 1.0D) {
+    if (renderMinX < 0.0D || renderMaxX > 1.0D) {
       minU = icon.getMinU();
       maxU = icon.getMaxU();
     }
 
-    if(this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
+    if (this.renderMinZ < 0.0D || this.renderMaxZ > 1.0D) {
       minV = icon.getMinV();
       maxV = icon.getMaxV();
     }
@@ -644,7 +623,7 @@ public class CustomRenderBlocks extends RenderBlocks {
     double d9 = minV;
     double d10 = maxV;
 
-    if(uvRotateBottom == 2) {
+    if (uvRotateBottom == 2) {
       minU = icon.getInterpolatedU(this.renderMinZ * 16.0D);
       minV = icon.getInterpolatedV(16.0D - this.renderMaxX * 16.0D);
       maxU = icon.getInterpolatedU(this.renderMaxZ * 16.0D);
@@ -655,7 +634,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       d8 = maxU;
       minV = maxV;
       maxV = d9;
-    } else if(uvRotateBottom == 1) {
+    } else if (uvRotateBottom == 1) {
 
       minU = icon.getInterpolatedU(16.0D - this.renderMaxZ * 16.0D);
       minV = icon.getInterpolatedV(this.renderMinX * 16.0D);
@@ -667,7 +646,7 @@ public class CustomRenderBlocks extends RenderBlocks {
       maxU = d8;
       d9 = maxV;
       d10 = minV;
-    } else if(uvRotateBottom == 3) {
+    } else if (uvRotateBottom == 3) {
       minU = icon.getInterpolatedU(16.0D - this.renderMinX * 16.0D);
       maxU = icon.getInterpolatedU(16.0D - this.renderMaxX * 16.0D);
       minV = icon.getInterpolatedV(16.0D - this.renderMinZ * 16.0D);
@@ -686,7 +665,7 @@ public class CustomRenderBlocks extends RenderBlocks {
 
     List<Vertex> result = new ArrayList<Vertex>(4);
     Vertex v;
-    if(this.enableAO) {
+    if (this.enableAO) {
       v = new Vertex(minX, minY, maxZ, d8, d10, brightnessTopLeft, colorRedTopLeft, colorGreenTopLeft, colorBlueTopLeft, 1f);
       result.add(v);
       v = new Vertex(minX, minY, minZ, minU, minV, brightnessBottomLeft, colorRedBottomLeft, colorGreenBottomLeft, colorBlueBottomLeft, 1f);

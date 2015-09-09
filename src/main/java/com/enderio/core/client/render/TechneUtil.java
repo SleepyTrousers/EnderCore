@@ -112,8 +112,7 @@ public class TechneUtil {
    *          ModelRenderer.render
    */
   @SuppressWarnings("unchecked")
-  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel, float scale, Matrix4f matrix,
-      boolean rotateYFirst) {
+  public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel, float scale, Matrix4f matrix, boolean rotateYFirst) {
 
     // Correction for the fact that TechneModel sets the texture size on the
     // ModelRenderer after the texture positions have been calculated. It also
@@ -129,13 +128,13 @@ public class TechneUtil {
     m.translate(new Vector3f(model.offsetX + model.rotationPointX * scale, model.offsetY + model.rotationPointY * scale, model.offsetZ + model.rotationPointZ
         * scale));
 
-    if(!rotateYFirst) {
+    if (!rotateYFirst) {
       m.rotate(model.rotateAngleZ, new Vector3f(0, 0, 1));
     }
     m.rotate(model.rotateAngleY, new Vector3f(0, 1, 0));
     m.rotate(model.rotateAngleX, new Vector3f(1, 0, 0));
 
-    if(rotateYFirst) {
+    if (rotateYFirst) {
       m.rotate(model.rotateAngleZ, new Vector3f(0, 0, 1));
     }
 
@@ -235,7 +234,7 @@ public class TechneUtil {
     TechneModel tm = (TechneModel) modelLoader.loadInstance(new ResourceLocation(modid.toLowerCase(Locale.US), modelPath + ".tcn"));
     return TechneUtil.bakeModel(tm, 1f / 16, new Matrix4f().scale(new Vector3f(-1, -1, 1))).values();
   }
-  
+
   public static void renderWithIcon(WavefrontObject model, IIcon icon, Tessellator tes) {
     renderWithIcon(model.groupObjects, icon, null, tes);
   }
@@ -271,12 +270,12 @@ public class TechneUtil {
       tes.setNormal(n.x, n.y, n.z);
       ForgeDirection normal = getNormalFor(n);
       ForgeDirection right = normal.getRotation(ForgeDirection.DOWN);
-      if(normal == right) {
+      if (normal == right) {
         right = ForgeDirection.EAST;
       }
       ForgeDirection down = normal.getRotation(right.getOpposite());
 
-      if(isbrh && world != null && world.getBlock(x, y, z).getLightOpacity() > 0) {
+      if (isbrh && world != null && world.getBlock(x, y, z).getLightOpacity() > 0) {
         int bx = x + normal.offsetX;
         int by = y + normal.offsetY;
         int bz = z + normal.offsetZ;
@@ -288,7 +287,7 @@ public class TechneUtil {
         Vector3d v = new Vector3d(vert);
         Vector3d tv = new Vector3d(v);
         tv.add(0.5, 0, 0.5);
-        if(vt != null) {
+        if (vt != null) {
           vt.apply(v);
           // TODO BLECH
           if (vt instanceof VertexRotationFacing) {
@@ -303,12 +302,12 @@ public class TechneUtil {
           }
         }
 
-        if(isbrh) {
+        if (isbrh) {
           int c = (int) (0xFF * RenderUtil.getColorMultiplierForFace(normal));
           tes.setColorOpaque(c, c, c);
         }
 
-        if(override != null) {
+        if (override != null) {
 
           double interpX = Math.abs(tv.x * right.offsetX + tv.y * right.offsetY + tv.z * right.offsetZ);
           double interpY = Math.abs(tv.x * down.offsetX + tv.y * down.offsetY + tv.z * down.offsetZ);
@@ -321,10 +320,10 @@ public class TechneUtil {
             interpY--;
           }
 
-          if(normal == ForgeDirection.SOUTH || normal == ForgeDirection.WEST) {
+          if (normal == ForgeDirection.SOUTH || normal == ForgeDirection.WEST) {
             interpX = 1 - interpX;
           }
-          if(normal != ForgeDirection.UP && normal != ForgeDirection.DOWN) {
+          if (normal != ForgeDirection.UP && normal != ForgeDirection.DOWN) {
             interpY = 1 - interpY;
           }
           tes.addVertexWithUV(v.x, v.y, v.z, override.getInterpolatedU(interpX * 16), override.getInterpolatedV(interpY * 16));
@@ -347,9 +346,9 @@ public class TechneUtil {
   }
 
   private static ForgeDirection getNormalFor(Vertex n) {
-    if(n.x != 0) {
+    if (n.x != 0) {
       return n.x > 0 ? ForgeDirection.EAST : ForgeDirection.WEST;
-    } else if(n.y != 0) {
+    } else if (n.y != 0) {
       return n.y > 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
     } else {
       return n.z > 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;

@@ -18,43 +18,36 @@ import com.google.common.reflect.TypeToken;
 @AllArgsConstructor
 @Getter
 @SuppressWarnings({ "serial", "unchecked" })
-public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTUAL, BASE>
-{
-    private final TypeToken<ACTUAL> actualType;
-    private final Property.Type type;
-    private final Class<?> primitiveType;
+public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTUAL, BASE> {
+  private final TypeToken<ACTUAL> actualType;
+  private final Property.Type type;
+  private final Class<?> primitiveType;
 
-    public TypeAdapterBase(TypeToken<ACTUAL> actualType, Property.Type baseType)
-    {
-        this(actualType, baseType, null);
+  public TypeAdapterBase(TypeToken<ACTUAL> actualType, Property.Type baseType) {
+    this(actualType, baseType, null);
+  }
+
+  public static final class TypeAdapterSame<TYPE> extends TypeAdapterBase<TYPE, TYPE> {
+    public TypeAdapterSame(TypeToken<TYPE> actual, Property.Type base) {
+      super(actual, base);
     }
 
-    public static final class TypeAdapterSame<TYPE> extends TypeAdapterBase<TYPE, TYPE>
-    {
-        public TypeAdapterSame(TypeToken<TYPE> actual, Property.Type base)
-        {
-            super(actual, base);
-        }
-
-        public TypeAdapterSame(TypeToken<TYPE> actual, Property.Type base, Class<?> primitiveType)
-        {
-            super(actual, base, primitiveType);
-        }
-
-        @Override
-        public TYPE createActualType(TYPE base)
-        {
-            return base;
-        }
-
-        @Override
-        public TYPE createBaseType(TYPE actual)
-        {
-            return actual;
-        }
+    public TypeAdapterSame(TypeToken<TYPE> actual, Property.Type base, Class<?> primitiveType) {
+      super(actual, base, primitiveType);
     }
 
-    // @formatter:off
+    @Override
+    public TYPE createActualType(TYPE base) {
+      return base;
+    }
+
+    @Override
+    public TYPE createBaseType(TYPE actual) {
+      return actual;
+    }
+  }
+
+  // @formatter:off
     public static final TypeAdapterSame<Integer> INTEGER = new TypeAdapterSame<Integer>(TypeToken.of(Integer.class), Type.INTEGER, int.class);
     public static final TypeAdapterSame<int[]> INTEGER_ARR = new TypeAdapterSame<int[]>(TypeToken.of(int[].class), Type.INTEGER);
     public static final TypeAdapterSame<Double> DOUBLE = new TypeAdapterSame<Double>(TypeToken.of(Double.class), Type.DOUBLE, double.class);

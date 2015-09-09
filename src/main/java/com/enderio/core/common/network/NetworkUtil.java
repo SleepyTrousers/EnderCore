@@ -14,10 +14,10 @@ import cpw.mods.fml.common.FMLCommonHandler;
  */
 public class NetworkUtil {
 
-    public static NBTTagCompound readNBTTagCompound(ByteBuf dataIn) {
+  public static NBTTagCompound readNBTTagCompound(ByteBuf dataIn) {
     try {
       short size = dataIn.readShort();
-      if(size < 0) {
+      if (size < 0) {
         return null;
       } else {
         byte[] buffer = new byte[size];
@@ -32,7 +32,7 @@ public class NetworkUtil {
 
   public static void writeNBTTagCompound(NBTTagCompound compound, ByteBuf dataout) {
     try {
-      if(compound == null) {
+      if (compound == null) {
         dataout.writeShort(-1);
       } else {
         byte[] buf = CompressedStreamTools.compress(compound);

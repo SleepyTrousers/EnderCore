@@ -9,16 +9,14 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 
-public class Tweaks
-{
-    /**
-     * As of yet unused, but might be nice in the future to have a list
-     */
-    private static final List<Tweak> tweaks = new ArrayList<Tweak>();
+public class Tweaks {
+  /**
+   * As of yet unused, but might be nice in the future to have a list
+   */
+  private static final List<Tweak> tweaks = new ArrayList<Tweak>();
 
-    public static void loadIngameTweaks()
-    {
-        // @formatter:off
+  public static void loadIngameTweaks() {
+    // @formatter:off
         tweaks.add(new Tweak("fixBedSound", "Makes the bed stepSound wool instead of stone") {
             @Override
             public void load() { Blocks.bed.setStepSound(Block.soundTypeCloth); }

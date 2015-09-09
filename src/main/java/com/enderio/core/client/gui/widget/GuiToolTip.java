@@ -17,12 +17,12 @@ public class GuiToolTip {
   private int lastMouseX = -1;
 
   private int lastMouseY = -1;
-  
+
   private boolean visible = true;
 
   public GuiToolTip(Rectangle bounds, String... lines) {
     this.bounds = bounds;
-    if(lines != null) {
+    if (lines != null) {
       text = new ArrayList<String>(lines.length);
       for (String line : lines) {
         text.add(line);
@@ -34,7 +34,7 @@ public class GuiToolTip {
 
   public GuiToolTip(Rectangle bounds, List<String> lines) {
     this.bounds = bounds;
-    if(lines == null) {
+    if (lines == null) {
       text = new ArrayList<String>();
     } else {
       text = new ArrayList<String>(lines);
@@ -58,13 +58,13 @@ public class GuiToolTip {
   }
 
   public void onTick(int mouseX, int mouseY) {
-    if(lastMouseX != mouseX || lastMouseY != mouseY) {
+    if (lastMouseX != mouseX || lastMouseY != mouseY) {
       mouseOverStart = 0;
     }
 
-    if(bounds.contains(mouseX, mouseY)) {
+    if (bounds.contains(mouseX, mouseY)) {
 
-      if(mouseOverStart == 0) {
+      if (mouseOverStart == 0) {
         mouseOverStart = System.currentTimeMillis();
       }
     } else {
@@ -75,12 +75,12 @@ public class GuiToolTip {
     lastMouseY = mouseY;
   }
 
-  public boolean shouldDraw() {    
-    if(!visible) {
+  public boolean shouldDraw() {
+    if (!visible) {
       return false;
-    }    
+    }
     updateText();
-    if(mouseOverStart == 0) {
+    if (mouseOverStart == 0) {
       return false;
     }
     return System.currentTimeMillis() - mouseOverStart >= DELAY;
@@ -91,7 +91,7 @@ public class GuiToolTip {
 
   public void setToolTipText(String... txt) {
     text.clear();
-    if(txt != null) {
+    if (txt != null) {
       for (String line : txt) {
         text.add(line);
       }

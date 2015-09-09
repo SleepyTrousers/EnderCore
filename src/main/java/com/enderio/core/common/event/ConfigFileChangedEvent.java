@@ -19,18 +19,15 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
  * <b>If <code>setSuccessful()</code> is not called, the event post will be
  * considered a failure!</b>
  */
-public class ConfigFileChangedEvent extends ConfigChangedEvent
-{
-    @Getter
-    private boolean successful;
+public class ConfigFileChangedEvent extends ConfigChangedEvent {
+  @Getter
+  private boolean successful;
 
-    public ConfigFileChangedEvent(String modID)
-    {
-        super(modID, "null", true, false);
-    }
+  public ConfigFileChangedEvent(String modID) {
+    super(modID, "null", true, false);
+  }
 
-    public void setSuccessful()
-    {
-        this.successful = true;
-    }
+  public void setSuccessful() {
+    this.successful = true;
+  }
 }

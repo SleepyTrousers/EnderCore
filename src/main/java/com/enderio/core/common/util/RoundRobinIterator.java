@@ -9,7 +9,7 @@ public class RoundRobinIterator<T> implements Iterable<T>, Iterator<T> {
   private int currentCount = 0;
   private final List<T> itOver;
 
-  public RoundRobinIterator(List<T> itOver) {    
+  public RoundRobinIterator(List<T> itOver) {
     this.itOver = itOver;
   }
 
@@ -26,19 +26,19 @@ public class RoundRobinIterator<T> implements Iterable<T>, Iterator<T> {
 
   @Override
   public T next() {
-    if(itOver.isEmpty()) {
+    if (itOver.isEmpty()) {
       return null;
     }
     currentCount++;
     index++;
-    if(index >= itOver.size()) {
+    if (index >= itOver.size()) {
       index = 0;
     }
     return itOver.get(index);
   }
 
   @Override
-  public void remove() {            
+  public void remove() {
   }
-  
+
 }

@@ -90,7 +90,7 @@ public abstract class GuiScrollableList<T> {
   }
 
   public void setSelection(int index) {
-    if(index == selectedIndex) {
+    if (index == selectedIndex) {
       return;
     }
     selectedIndex = index;
@@ -100,11 +100,11 @@ public abstract class GuiScrollableList<T> {
   }
 
   public int getIndexOf(T element) {
-    if(element == null) {
+    if (element == null) {
       return -1;
     }
     for (int i = 0; i < getNumElements(); i++) {
-      if(element.equals(getElementAt(i))) {
+      if (element.equals(getElementAt(i))) {
         return i;
       }
     }
@@ -136,13 +136,13 @@ public abstract class GuiScrollableList<T> {
 
   private void clampScrollToBounds() {
     int i = getContentOverhang();
-    if(i < 0) {
+    if (i < 0) {
       i *= -1;
     }
-    if(amountScrolled < 0.0F) {
+    if (amountScrolled < 0.0F) {
       amountScrolled = 0.0F;
     }
-    if(amountScrolled > i) {
+    if (amountScrolled > i) {
       amountScrolled = i;
     }
   }
@@ -152,12 +152,12 @@ public abstract class GuiScrollableList<T> {
   }
 
   public void actionPerformed(GuiButton b) {
-    if(b.enabled) {
-      if(b.id == scrollUpButtonID) {
+    if (b.enabled) {
+      if (b.id == scrollUpButtonID) {
         amountScrolled -= slotHeight * 2 / 3;
         initialClickY = -2.0F;
         clampScrollToBounds();
-      } else if(b.id == scrollDownButtonID) {
+      } else if (b.id == scrollDownButtonID) {
         amountScrolled += slotHeight * 2 / 3;
         initialClickY = -2.0F;
         clampScrollToBounds();
@@ -198,9 +198,9 @@ public abstract class GuiScrollableList<T> {
       int elementY = contentYOffset + i * this.slotHeight;
       int slotHeight = this.slotHeight - margin;
 
-      if(elementY <= maxY && elementY + slotHeight >= minY) {
+      if (elementY <= maxY && elementY + slotHeight >= minY) {
 
-        if(showSelectionBox && i == selectedIndex) {
+        if (showSelectionBox && i == selectedIndex) {
           GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
           GL11.glDisable(GL11.GL_TEXTURE_2D);
           tessellator.startDrawingQuads();
@@ -259,20 +259,20 @@ public abstract class GuiScrollableList<T> {
   protected void renderScrollBar(Tessellator tessellator) {
 
     int contentHeightOverBounds = getContentOverhang();
-    if(contentHeightOverBounds > 0) {
+    if (contentHeightOverBounds > 0) {
 
       int clear = (maxY - minY) * (maxY - minY) / getContentHeight();
 
-      if(clear < 32) {
+      if (clear < 32) {
         clear = 32;
       }
 
-      if(clear > maxY - minY - 8) {
+      if (clear > maxY - minY - 8) {
         clear = maxY - minY - 8;
       }
 
       int y = (int) this.amountScrolled * (maxY - minY - clear) / contentHeightOverBounds + minY;
-      if(y < minY) {
+      if (y < minY) {
         y = minY;
       }
 
@@ -305,17 +305,17 @@ public abstract class GuiScrollableList<T> {
   }
 
   private void processMouseEvents() {
-    if(Mouse.isButtonDown(0)) {
+    if (Mouse.isButtonDown(0)) {
       processMouseBown();
     } else {
       while (!mc.gameSettings.touchscreen && Mouse.next()) {
 
         int mouseWheelDelta = Mouse.getEventDWheel();
 
-        if(mouseWheelDelta != 0) {
-          if(mouseWheelDelta > 0) {
+        if (mouseWheelDelta != 0) {
+          if (mouseWheelDelta > 0) {
             mouseWheelDelta = -1;
-          } else if(mouseWheelDelta < 0) {
+          } else if (mouseWheelDelta < 0) {
             mouseWheelDelta = 1;
           }
           amountScrolled += mouseWheelDelta * slotHeight / 2;
@@ -327,42 +327,42 @@ public abstract class GuiScrollableList<T> {
 
   private void processMouseBown() {
     int contentHeightOverBounds;
-    if(initialClickY == -1.0F) {
+    if (initialClickY == -1.0F) {
 
-      if(mouseY >= minY && mouseY <= maxY && mouseX >= minX && mouseX <= maxX + 6) {
+      if (mouseY >= minY && mouseY <= maxY && mouseX >= minX && mouseX <= maxX + 6) {
 
         boolean clickInBounds = true;
 
         int y = mouseY - minY + (int) amountScrolled - margin;
         int mouseOverElement = y / slotHeight;
 
-        if(mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
+        if (mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
           boolean doubleClick = mouseOverElement == selectedIndex && Minecraft.getSystemTime() - lastClickedTime < 250L;
-          if(elementClicked(mouseOverElement, doubleClick)) {
+          if (elementClicked(mouseOverElement, doubleClick)) {
             setSelection(mouseOverElement);
           }
           lastClickedTime = Minecraft.getSystemTime();
 
-        } else if(mouseX >= minX && mouseX <= maxX && y < 0) {
+        } else if (mouseX >= minX && mouseX <= maxX && y < 0) {
           clickInBounds = false;
         }
 
         int scrollBarMinX = getScrollBarX();
         int scrollBarMaxX = scrollBarMinX + 6;
-        if(mouseX >= scrollBarMinX && mouseX <= scrollBarMaxX) {
+        if (mouseX >= scrollBarMinX && mouseX <= scrollBarMaxX) {
 
           scrollMultiplier = -1.0F;
           contentHeightOverBounds = getContentOverhang();
 
-          if(contentHeightOverBounds < 1) {
+          if (contentHeightOverBounds < 1) {
             contentHeightOverBounds = 1;
           }
 
           int empty = (int) ((float) ((maxY - minY) * (maxY - minY)) / (float) getContentHeight());
-          if(empty < 32) {
+          if (empty < 32) {
             empty = 32;
           }
-          if(empty > maxY - minY - 8) {
+          if (empty > maxY - minY - 8) {
             empty = maxY - minY - 8;
           }
           scrollMultiplier /= (float) (maxY - minY - empty) / (float) contentHeightOverBounds;
@@ -371,7 +371,7 @@ public abstract class GuiScrollableList<T> {
           scrollMultiplier = 1.0F;
         }
 
-        if(clickInBounds) {
+        if (clickInBounds) {
           initialClickY = mouseY;
         } else {
           initialClickY = -2.0F;
@@ -381,7 +381,7 @@ public abstract class GuiScrollableList<T> {
         initialClickY = -2.0F;
       }
 
-    } else if(initialClickY >= 0.0F) {
+    } else if (initialClickY >= 0.0F) {
       // Scrolling
       amountScrolled -= (mouseY - initialClickY) * scrollMultiplier;
       initialClickY = mouseY;

@@ -10,7 +10,7 @@ public class GhostSlot {
   public ItemStack stack;
 
   public boolean isMouseOver(int mx, int my) {
-    return mx >= x && mx < (x+16) && my >= y && my < (y+16);
+    return mx >= x && mx < (x + 16) && my >= y && my < (y + 16);
   }
 
   public boolean isVisible() {

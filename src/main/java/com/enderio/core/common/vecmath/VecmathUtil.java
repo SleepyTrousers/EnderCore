@@ -53,8 +53,7 @@ public class VecmathUtil {
    * @param result
    *          the result (A,B,C,D) of plane equation.
    */
-  public static void computePlaneEquation(Vector3d a, Vector3d b,
-      Vector3d c, Vector4d result) {
+  public static void computePlaneEquation(Vector3d a, Vector3d b, Vector3d c, Vector4d result) {
     Vector3d i = new Vector3d();
     Vector3d j = new Vector3d();
     Vector3d k = new Vector3d();
@@ -108,16 +107,15 @@ public class VecmathUtil {
    * @return the intersection or null if there is no intersection or the line is
    *         on the plane.
    */
-  public static Vector3d computeIntersectionBetweenPlaneAndLine(Vector4d plane,
-      Vector3d pointInLine, Vector3d lineDirection) {
+  public static Vector3d computeIntersectionBetweenPlaneAndLine(Vector4d plane, Vector3d pointInLine, Vector3d lineDirection) {
     // check for no intersection
     Vector3d planeNormal = new Vector3d(plane.x, plane.y, plane.z);
-    if(planeNormal.dot(lineDirection) == 0) {
+    if (planeNormal.dot(lineDirection) == 0) {
       // line and plane are perpendicular
       return null;
     }
     // check if line is on the plane
-    if(planeNormal.dot(pointInLine) + plane.w == 0) {
+    if (planeNormal.dot(pointInLine) + plane.w == 0) {
       return null;
     }
 
@@ -145,8 +143,7 @@ public class VecmathUtil {
    * @param normalOut
    *          the normal description the directional component of the ray.
    */
-  public static void computeRayForPixel(Rectangle vp, Matrix4d ipm, Matrix4d ivm, int x, int y,
-      Vector3d eyeOut, Vector3d normalOut) {
+  public static void computeRayForPixel(Rectangle vp, Matrix4d ipm, Matrix4d ivm, int x, int y, Vector3d eyeOut, Vector3d normalOut) {
 
     // grab the eye's position
     ivm.getTranslation(eyeOut);
@@ -333,8 +330,7 @@ public class VecmathUtil {
    * @return the matrix.
    */
 
-  public static Matrix4d createProjectionMatrixAsPerspective(double fovDegrees, double near,
-      double far, int viewportWidth, int viewportHeight) {
+  public static Matrix4d createProjectionMatrixAsPerspective(double fovDegrees, double near, double far, int viewportWidth, int viewportHeight) {
 
     Matrix4d matrix = new Matrix4d();
     // for impl details see gluPerspective doco in OpenGL reference manual
@@ -369,18 +365,15 @@ public class VecmathUtil {
    * @return the matrix.
    */
 
-  public static Matrix4d createProjectionMatrixAsPerspective(double left, double right,
-      double bottom, double top, double zNear, double zFar) {
+  public static Matrix4d createProjectionMatrixAsPerspective(double left, double right, double bottom, double top, double zNear, double zFar) {
 
     double A = (right + left) / (right - left);
     double B = (top + bottom) / (top - bottom);
     double C = (Math.abs(zFar) > Double.MAX_VALUE) ? -1. : -(zFar + zNear) / (zFar - zNear);
-    double D = (Math.abs(zFar) > Double.MAX_VALUE) ? -2. * zNear : -2.0 * zFar * zNear
-        / (zFar - zNear);
+    double D = (Math.abs(zFar) > Double.MAX_VALUE) ? -2. * zNear : -2.0 * zFar * zNear / (zFar - zNear);
 
     Matrix4d matrix = new Matrix4d();
-    matrix.set(new double[] { 2.0 * zNear / (right - left), 0.0, 0.0, 0.0, 0.0,
-        2.0 * zNear / (top - bottom), 0.0, 0.0, A, B, C, -1.0, 0.0, 0.0, D, 0.0
+    matrix.set(new double[] { 2.0 * zNear / (right - left), 0.0, 0.0, 0.0, 0.0, 2.0 * zNear / (top - bottom), 0.0, 0.0, A, B, C, -1.0, 0.0, 0.0, D, 0.0
 
     });
 
@@ -406,8 +399,7 @@ public class VecmathUtil {
    * @return the ortho matrix.
    */
 
-  public static Matrix4d createProjectionMatrixAsOrtho(double left, double right, double bottom,
-      double top, double near, double far) {
+  public static Matrix4d createProjectionMatrixAsOrtho(double left, double right, double bottom, double top, double near, double far) {
 
     Matrix4d matrix = new Matrix4d();
     // for impl details see glOrtho doco in OpenGL reference manual
@@ -415,8 +407,7 @@ public class VecmathUtil {
     double ty = -((top + bottom) / (top - bottom));
     double tz = -((far + near) / (far - near));
 
-    matrix.set(new double[] { 2d / (right - left), 0, 0, tx, 0, 2d / (top - bottom), 0, ty, 0, 0,
-        -2d / (far - near), tz, 0, 0, 0, 1 });
+    matrix.set(new double[] { 2d / (right - left), 0, 0, tx, 0, 2d / (top - bottom), 0, ty, 0, 0, -2d / (far - near), tz, 0, 0, 0, 1 });
 
     return matrix;
   }
@@ -431,15 +422,12 @@ public class VecmathUtil {
    * @param far
    *          the new far value.
    */
-  public static void setNearFarOnPerspectiveProjectionMatrix(Matrix4d projMat,
-      double near, double far) {
+  public static void setNearFarOnPerspectiveProjectionMatrix(Matrix4d projMat, double near, double far) {
 
     projMat.transpose();
 
-    double transNearPlane = (-near * projMat.getElement(2, 2) + projMat.getElement(3, 2))
-        / (-near * projMat.getElement(2, 3) + projMat.getElement(3, 3));
-    double transFarPlane = (-far * projMat.getElement(2, 2) + projMat.getElement(3, 2))
-        / (-far * projMat.getElement(2, 3) + projMat.getElement(3, 3));
+    double transNearPlane = (-near * projMat.getElement(2, 2) + projMat.getElement(3, 2)) / (-near * projMat.getElement(2, 3) + projMat.getElement(3, 3));
+    double transFarPlane = (-far * projMat.getElement(2, 2) + projMat.getElement(3, 2)) / (-far * projMat.getElement(2, 3) + projMat.getElement(3, 3));
 
     double ratio = Math.abs(2.0 / (transNearPlane - transFarPlane));
     double center = -(transNearPlane + transFarPlane) / 2.0;
@@ -466,8 +454,7 @@ public class VecmathUtil {
    * @return the look at matrix.
    */
 
-  public static Matrix4d createMatrixAsLookAt(Vector3d eyePos,
-      Vector3d lookAtPos, Vector3d upVec) {
+  public static Matrix4d createMatrixAsLookAt(Vector3d eyePos, Vector3d lookAtPos, Vector3d upVec) {
 
     Vector3d eye = new Vector3d(eyePos);
     Vector3d lookAt = new Vector3d(lookAtPos);
@@ -485,8 +472,7 @@ public class VecmathUtil {
     upVed.cross(sideVec, forwardVec);
     upVed.normalize();
 
-    Matrix4d mat = new Matrix4d(sideVec.x, sideVec.y, sideVec.z, 0, upVed.x, upVed.y, upVed.z, 0,
-        -forwardVec.x, -forwardVec.y, -forwardVec.z, 0, 0, 0, 0, 1);
+    Matrix4d mat = new Matrix4d(sideVec.x, sideVec.y, sideVec.z, 0, upVed.x, upVed.y, upVed.z, 0, -forwardVec.x, -forwardVec.y, -forwardVec.z, 0, 0, 0, 0, 1);
 
     eye.negate();
     // mat.transform(eye);
@@ -509,14 +495,10 @@ public class VecmathUtil {
   public static Vector3d preMultiply(Vector3d v, Matrix4d mat) {
     Matrix4d m = new Matrix4d(mat);
     m.transpose();
-    double d = 1.0f / (m.getElement(0, 3) * v.x + m.getElement(1, 3) * v.y + m.getElement(2, 3)
-        * v.z + m.getElement(3, 3));
-    double x = (m.getElement(0, 0) * v.x + m.getElement(1, 0) * v.y + m.getElement(2, 0) * v.z + m
-        .getElement(3, 0)) * d;
-    double y = (m.getElement(0, 1) * v.x + m.getElement(1, 1) * v.y + m.getElement(2, 1) * v.z + m
-        .getElement(3, 1)) * d;
-    double z = (m.getElement(0, 2) * v.x + m.getElement(1, 2) * v.y + m.getElement(2, 2) * v.z + m
-        .getElement(3, 2) * d);
+    double d = 1.0f / (m.getElement(0, 3) * v.x + m.getElement(1, 3) * v.y + m.getElement(2, 3) * v.z + m.getElement(3, 3));
+    double x = (m.getElement(0, 0) * v.x + m.getElement(1, 0) * v.y + m.getElement(2, 0) * v.z + m.getElement(3, 0)) * d;
+    double y = (m.getElement(0, 1) * v.x + m.getElement(1, 1) * v.y + m.getElement(2, 1) * v.z + m.getElement(3, 1)) * d;
+    double z = (m.getElement(0, 2) * v.x + m.getElement(1, 2) * v.y + m.getElement(2, 2) * v.z + m.getElement(3, 2) * d);
     return new Vector3d(x, y, z);
   }
 
@@ -535,17 +517,13 @@ public class VecmathUtil {
 
     Vector4d[] res = new Vector4d[4];
     // s plane
-    res[0] = new Vector4d(copy.getElement(0, 0), copy.getElement(1, 0), copy.getElement(2, 0),
-        copy.getElement(3, 0));
+    res[0] = new Vector4d(copy.getElement(0, 0), copy.getElement(1, 0), copy.getElement(2, 0), copy.getElement(3, 0));
     // t plane
-    res[1] = new Vector4d(copy.getElement(0, 1), copy.getElement(1, 1), copy.getElement(2, 1),
-        copy.getElement(3, 1));
+    res[1] = new Vector4d(copy.getElement(0, 1), copy.getElement(1, 1), copy.getElement(2, 1), copy.getElement(3, 1));
     // r plane
-    res[2] = new Vector4d(copy.getElement(0, 2), copy.getElement(1, 2), copy.getElement(2, 2),
-        copy.getElement(3, 2));
+    res[2] = new Vector4d(copy.getElement(0, 2), copy.getElement(1, 2), copy.getElement(2, 2), copy.getElement(3, 2));
     // q plane
-    res[3] = new Vector4d(copy.getElement(0, 3), copy.getElement(1, 3), copy.getElement(2, 3),
-        copy.getElement(3, 3));
+    res[3] = new Vector4d(copy.getElement(0, 3), copy.getElement(1, 3), copy.getElement(2, 3), copy.getElement(3, 3));
 
     return res;
   }
@@ -604,8 +582,7 @@ public class VecmathUtil {
    * @param lookVecOut
    *          the look vector.
    */
-  public static void getVectorsForMatrix(Matrix4d matrix, Vector3d upVecOut,
-      Vector3d sideVecOut, Vector3d lookVecOut) {
+  public static void getVectorsForMatrix(Matrix4d matrix, Vector3d upVecOut, Vector3d sideVecOut, Vector3d lookVecOut) {
 
     sideVecOut.set(matrix.getElement(0, 0), matrix.getElement(0, 1), matrix.getElement(0, 2));
     sideVecOut.normalize();
@@ -628,8 +605,7 @@ public class VecmathUtil {
    */
 
   public static Vector3d getUpFromMatrix(Matrix4d matrix) {
-    Vector3d res = new Vector3d(matrix.getElement(1, 0), matrix.getElement(1, 1),
-        matrix.getElement(1, 2));
+    Vector3d res = new Vector3d(matrix.getElement(1, 0), matrix.getElement(1, 1), matrix.getElement(1, 2));
     res.normalize();
     return res;
   }

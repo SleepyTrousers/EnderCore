@@ -25,65 +25,37 @@ public enum DyeColor {
   ORANGE,
   WHITE;
 
-  public static final String[] DYE_ORE_NAMES = {
-      "dyeBlack",
-      "dyeRed",
-      "dyeGreen",
-      "dyeBrown",
-      "dyeBlue",
-      "dyePurple",
-      "dyeCyan",
-      "dyeLightGray",
-      "dyeGray",
-      "dyePink",
-      "dyeLime",
-      "dyeYellow",
-      "dyeLightBlue",
-      "dyeMagenta",
-      "dyeOrange",
-      "dyeWhite"
-  };
+  public static final String[] DYE_ORE_NAMES = { "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown", "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray", "dyeGray",
+      "dyePink", "dyeLime", "dyeYellow", "dyeLightBlue", "dyeMagenta", "dyeOrange", "dyeWhite" };
 
   public static final String[] DYE_ORE_UNLOCAL_NAMES = {
 
-      "item.fireworksCharge.black",
-      "item.fireworksCharge.red",
-      "item.fireworksCharge.green",
-      "item.fireworksCharge.brown",
-      "item.fireworksCharge.blue",
-      "item.fireworksCharge.purple",
-      "item.fireworksCharge.cyan",
-      "item.fireworksCharge.silver",
-      "item.fireworksCharge.gray",
-      "item.fireworksCharge.pink",
-      "item.fireworksCharge.lime",
-      "item.fireworksCharge.yellow",
-      "item.fireworksCharge.lightBlue",
-      "item.fireworksCharge.magenta",
-      "item.fireworksCharge.orange",
-      "item.fireworksCharge.white"
+  "item.fireworksCharge.black", "item.fireworksCharge.red", "item.fireworksCharge.green", "item.fireworksCharge.brown", "item.fireworksCharge.blue",
+      "item.fireworksCharge.purple", "item.fireworksCharge.cyan", "item.fireworksCharge.silver", "item.fireworksCharge.gray", "item.fireworksCharge.pink",
+      "item.fireworksCharge.lime", "item.fireworksCharge.yellow", "item.fireworksCharge.lightBlue", "item.fireworksCharge.magenta",
+      "item.fireworksCharge.orange", "item.fireworksCharge.white"
 
   };
 
   public static DyeColor getNext(DyeColor col) {
     int ord = col.ordinal() + 1;
-    if(ord >= DyeColor.values().length) {
+    if (ord >= DyeColor.values().length) {
       ord = 0;
     }
     return DyeColor.values()[ord];
   }
 
   public static DyeColor getColorFromDye(ItemStack dye) {
-    if(dye == null) {
+    if (dye == null) {
       return null;
     }
     int oreId = OreDictionary.getOreID(dye);
-    if(oreId < 0) {
+    if (oreId < 0) {
       return null;
     }
     for (int i = 0; i < DYE_ORE_NAMES.length; i++) {
       String dyeName = DYE_ORE_NAMES[i];
-      if(OreDictionary.getOreID(dyeName) == oreId) {
+      if (OreDictionary.getOreID(dyeName) == oreId) {
         return DyeColor.values()[i];
       }
     }

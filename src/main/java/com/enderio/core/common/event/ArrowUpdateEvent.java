@@ -15,10 +15,8 @@ import cpw.mods.fml.common.eventhandler.Cancelable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public class ArrowUpdateEvent extends EntityEvent
-{
-    public ArrowUpdateEvent(Entity entity)
-    {
-        super(entity);
-    }
+public class ArrowUpdateEvent extends EntityEvent {
+  public ArrowUpdateEvent(Entity entity) {
+    super(entity);
+  }
 }

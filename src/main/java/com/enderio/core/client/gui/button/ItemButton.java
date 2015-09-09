@@ -48,12 +48,11 @@ public class ItemButton extends GuiButton {
   @SuppressWarnings("synthetic-access")
   @Override
   public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
-    if(visible) {
+    if (visible) {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width
-          && par3 < this.yPosition + height;
+      this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width && par3 < this.yPosition + height;
       int hoverState = this.getHoverState(this.field_146123_n);
 
       // x, y, u, v, width, height
@@ -70,9 +69,9 @@ public class ItemButton extends GuiButton {
 
       int l = 14737632;
 
-      if(!this.enabled) {
+      if (!this.enabled) {
         l = -6250336;
-      } else if(this.field_146123_n) {
+      } else if (this.field_146123_n) {
         l = 16777120;
       }
 
