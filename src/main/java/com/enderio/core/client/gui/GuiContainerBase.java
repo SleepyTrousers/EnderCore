@@ -13,6 +13,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Timer;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.common.ForgeHooks;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -156,7 +158,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void updateScreen() {
     super.updateScreen();
 
-    if (!inventorySlots.canInteractWith(mc.thePlayer)) {
+    if (!ForgeHooks.canInteractWith(mc.thePlayer, inventorySlots)) {
       mc.thePlayer.closeScreen();
     }
 
