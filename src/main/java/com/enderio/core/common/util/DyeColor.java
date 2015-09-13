@@ -49,14 +49,13 @@ public enum DyeColor {
     if (dye == null) {
       return null;
     }
-    int oreId = OreDictionary.getOreID(dye);
-    if (oreId < 0) {
-      return null;
-    }
+    int[] oreIDs = OreDictionary.getOreIDs(dye);
     for (int i = 0; i < DYE_ORE_NAMES.length; i++) {
-      String dyeName = DYE_ORE_NAMES[i];
-      if (OreDictionary.getOreID(dyeName) == oreId) {
-        return DyeColor.values()[i];
+      int dyeID = OreDictionary.getOreID(DYE_ORE_NAMES[i]);
+      for (int oreId : oreIDs) {
+        if (dyeID == oreId) {
+          return DyeColor.values()[i];
+        }
       }
     }
     return null;
