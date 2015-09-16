@@ -16,6 +16,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.interfaces.IComparatorOutput;
 import com.enderio.core.common.util.FluidUtil;
 import com.enderio.core.common.util.Log;
 import com.google.common.collect.Lists;
@@ -28,6 +29,7 @@ public abstract class BlockEnder extends Block {
 
   protected final Class<? extends TileEntityEnder> teClass;
   protected final String name;
+  protected final boolean hasComparatorInputOverride;
 
   protected BlockEnder(String name, Class<? extends TileEntityEnder> teClass) {
     this(name, teClass, new Material(MapColor.ironColor));
@@ -41,6 +43,7 @@ public abstract class BlockEnder extends Block {
     setBlockName(name);
     setStepSound(Block.soundTypeMetal);
     setHarvestLevel("pickaxe", 0);
+    hasComparatorInputOverride = teClass != null && IComparatorOutput.class.isAssignableFrom(teClass);
   }
 
   protected void init() {
@@ -168,6 +171,22 @@ public abstract class BlockEnder extends Block {
     }
   }
 
+  @Override
+  public boolean hasComparatorInputOverride() {
+    return hasComparatorInputOverride;
+  }
+
+  @Override
+  public int getComparatorInputOverride(World w, int x, int y, int z, int side) {
+    if (hasComparatorInputOverride) {
+      TileEntityEnder te = getTileEntityEio(w, x, y, z);
+      if (te != null) {
+        return ((IComparatorOutput) te).getComparatorOutput();
+      }
+    }
+    return 0;
+  }
+  
   //Because the vanilla method takes floats...
   public void setBlockBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
     this.minX = minX;
