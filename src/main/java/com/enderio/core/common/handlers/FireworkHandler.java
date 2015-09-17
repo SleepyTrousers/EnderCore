@@ -13,8 +13,8 @@ import net.minecraftforge.event.entity.player.AchievementEvent;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.util.BlockCoord;
-import com.enderio.core.common.util.EntityUtil;
+import com.enderio.lib.common.util.BlockCoord;
+import com.enderio.lib.common.util.EntityUtil;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;

@@ -13,7 +13,7 @@ import lombok.Value;
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.common.util.RegisterTime;
+import com.enderio.lib.common.util.RegisterTime;
 
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLStateEvent;

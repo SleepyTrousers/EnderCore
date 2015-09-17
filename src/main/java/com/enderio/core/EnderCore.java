@@ -12,10 +12,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.enderio.core.api.common.config.IConfigHandler;
 import com.enderio.core.common.CommonProxy;
 import com.enderio.core.common.Handlers;
-import com.enderio.core.common.Lang;
 import com.enderio.core.common.OreDict;
 import com.enderio.core.common.command.CommandReloadConfigs;
 import com.enderio.core.common.command.CommandScoreboardInfo;
@@ -25,9 +23,11 @@ import com.enderio.core.common.enchant.EnchantAutoSmelt;
 import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
-import com.enderio.core.common.util.EnderFileUtils;
-import com.enderio.core.common.util.PermanentCache;
 import com.enderio.core.common.util.TextureErrorRemover;
+import com.enderio.lib.api.common.config.IConfigHandler;
+import com.enderio.lib.common.Lang;
+import com.enderio.lib.common.util.EnderFileUtils;
+import com.enderio.lib.common.util.PermanentCache;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.Loader;

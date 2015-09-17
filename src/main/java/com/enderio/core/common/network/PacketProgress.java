@@ -4,7 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.util.IProgressTile;
+import com.enderio.lib.api.common.util.IProgressTile;
+import com.enderio.lib.common.network.MessageTileEntity;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;

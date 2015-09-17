@@ -14,9 +14,6 @@ endercore.enchantment.autosmelt.tooltip=Automatically smelts whatever is mined
 
 endercore.celebrate=Happy New Year!
 
-endercore.resourcepack.readme=This is the actual file used for resources in-game. 
-endercore.resourcepack.readme2=Do not edit this, it will be created/deleted by the mod.
-
 endercore.gui.normal=Normal
 endercore.gui.search=Search:
 endercore.gui.modlistinfo1=OMG everything is different!

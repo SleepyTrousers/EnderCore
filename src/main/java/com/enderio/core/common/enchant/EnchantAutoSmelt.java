@@ -1,8 +1,8 @@
 package com.enderio.core.common.enchant;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.lib.api.common.enchant.IAdvancedEnchant;
 
 import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.enchantment.Enchantment;

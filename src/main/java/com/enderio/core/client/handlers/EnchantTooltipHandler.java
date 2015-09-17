@@ -8,8 +8,8 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.Handlers.Handler;
+import com.enderio.lib.api.common.enchant.IAdvancedEnchant;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 

@@ -11,8 +11,8 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
 
-import com.enderio.core.common.Lang;
 import com.enderio.core.common.network.EnderPacketHandler;
+import com.enderio.lib.common.Lang;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;

@@ -12,7 +12,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.util.ItemUtil;
+import com.enderio.lib.common.util.ItemUtil;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;

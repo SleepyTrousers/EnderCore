@@ -1,8 +1,8 @@
 package com.enderio.core.common.enchant;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.lib.api.common.enchant.IAdvancedEnchant;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;

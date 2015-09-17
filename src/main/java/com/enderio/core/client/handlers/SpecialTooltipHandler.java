@@ -21,14 +21,13 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import org.lwjgl.input.Keyboard;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
-import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.util.ItemUtil;
+import com.enderio.lib.api.client.gui.IAdvancedTooltipProvider;
+import com.enderio.lib.api.client.gui.IResourceTooltipProvider;
+import com.enderio.lib.common.util.ItemUtil;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
 import static com.enderio.core.common.config.ConfigHandler.showDurabilityTooltips;
 
 @Handler
@@ -92,8 +91,15 @@ public class SpecialTooltipHandler {
     }
     Item item = itemStack.getItem();
     if (item instanceof ItemTool || item instanceof ItemArmor || item instanceof ItemSword || item instanceof ItemHoe || item instanceof ItemBow) {
-      toolTip.add(ItemUtil.getDurabilityString(itemStack));
+      toolTip.add(getDurabilityString(itemStack));
     }
+  }
+  
+  public static String getDurabilityString(ItemStack item) {
+    if (item == null) {
+      return null;
+    }
+    return EnderCore.lang.localize("tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
   }
 
   public void addInformation(IResourceTooltipProvider item, ItemTooltipEvent evt) {

@@ -1,9 +1,9 @@
 package com.enderio.core.common.imc.handlers;
 
-import com.enderio.core.api.common.imc.IMC;
 import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
 import com.enderio.core.common.imc.IMCRegistry.IMCBase;
+import com.enderio.lib.api.common.imc.IMC;
 
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 
