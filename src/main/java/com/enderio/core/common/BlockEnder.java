@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.enderio.core.api.common.util.ITankAccess;
@@ -141,7 +142,7 @@ public abstract class BlockEnder extends Block {
   protected void processDrop(World world, int x, int y, int z, @Nullable TileEntityEnder te, ItemStack drop) {
   }
 
-  protected TileEntityEnder getTileEntityEio(World world, int x, int y, int z) {
+  protected TileEntityEnder getTileEntityEio(IBlockAccess world, int x, int y, int z) {
     TileEntity te = world.getTileEntity(x, y, z);
     if (teClass.isInstance(te)) {
       return (TileEntityEnder) te;
