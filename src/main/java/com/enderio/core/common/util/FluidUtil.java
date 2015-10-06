@@ -386,6 +386,10 @@ public class FluidUtil {
         entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
       }
 
+      if (fill.result.itemStack == null) {
+        return true;
+      }
+      
       if (fill.result.itemStack.isStackable()) {
         for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
           ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
