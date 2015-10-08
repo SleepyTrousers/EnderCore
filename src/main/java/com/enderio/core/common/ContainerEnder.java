@@ -3,6 +3,7 @@ package com.enderio.core.common;
 import java.awt.Point;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,12 +24,20 @@ public class ContainerEnder<T extends IInventory> extends Container {
   protected final int startHotBarSlot;
   protected final int endHotBarSlot;
 
-  private T inv;
-  private InventoryPlayer playerInv;
+  private final @Nonnull T inv;
+  private final @Nonnull InventoryPlayer playerInv;
 
-  public ContainerEnder(InventoryPlayer playerInv, @Nullable T inv) {
-    this.inv = inv;
-    this.playerInv = playerInv;
+  @Nonnull
+  private static <T> T checkNotNull(T reference) {
+    if (reference == null) {
+      throw new NullPointerException();
+    }
+    return reference;
+  }
+
+  public ContainerEnder(InventoryPlayer playerInv, T inv) {
+    this.inv = checkNotNull(inv);
+    this.playerInv = checkNotNull(playerInv);
 
     addSlots(playerInv);
 
@@ -68,14 +77,14 @@ public class ContainerEnder<T extends IInventory> extends Container {
     return new Point(12, 60);
   }
 
-  @Nullable
+  @Nonnull 
   public T getInv() {
     return inv;
   }
 
   @Override
   public boolean canInteractWith(EntityPlayer player) {
-    return getInv() == null ? true : getInv().isUseableByPlayer(player);
+    return getInv().isUseableByPlayer(player);
   }
 
   @Override
