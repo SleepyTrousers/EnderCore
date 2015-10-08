@@ -110,6 +110,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 build.dependsOn sourceJar, deobfJar, apiJar, javadoc
+install.dependsOn build
 
 publishing {
     tasks.publish.dependsOn 'build'
@@ -128,6 +129,12 @@ publishing {
             maven { url mavendir }
         }
     }
+}
+
+artifacts {
+    archives sourceJar
+    archives apiJar
+    archives deobfJar
 }
 
 curse {
