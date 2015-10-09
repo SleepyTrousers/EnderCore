@@ -101,7 +101,7 @@ public class GuiEnhancedModList extends GuiModList {
   }
 
   private static Field _mods, _selected, _selectedMod;
-  private static Field _modList, _modListRight, _modListBottom, _modListMods, _listWidth;
+  private static Field _modList, _modListRight, _modListBottom, _modListMods, _listWidth, _scrollDistance;
   static {
     try {
       _mods = GuiModList.class.getDeclaredField("mods");
@@ -120,6 +120,8 @@ public class GuiEnhancedModList extends GuiModList {
       _modListMods.setAccessible(true);
       _listWidth = GuiModList.class.getDeclaredField("listWidth");
       _listWidth.setAccessible(true);
+      _scrollDistance = GuiScrollingList.class.getDeclaredField("scrollDistance");
+      _scrollDistance.setAccessible(true);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -141,6 +143,9 @@ public class GuiEnhancedModList extends GuiModList {
   @SuppressWarnings("unchecked")
   @Override
   public void initGui() {
+    // Super code reinitializes the mod list every time, need to preserve scroll state
+    float scroll = getGuiModListScroll();
+
     super.initGui();
 
     // Let's move some buttons
@@ -173,9 +178,11 @@ public class GuiEnhancedModList extends GuiModList {
     buttonList.add(new GuiButton(SortType.Z_TO_A.buttonID, x, y, width - buttonMargin, 20, "Z-A"));
 
     buttonList.add(new InfoButton());
-
+    
     reloadMods();
     disableButton();
+    
+    setGuiModListScroll(scroll);
   }
 
   @Override
@@ -311,6 +318,7 @@ public class GuiEnhancedModList extends GuiModList {
     }
 
     _mods.set(this, getMods());
+    sorted = false;
   }
 
   @SneakyThrows
@@ -331,6 +339,16 @@ public class GuiEnhancedModList extends GuiModList {
   @SneakyThrows
   private int getGuiModListBottom() {
     return _modListBottom.getInt(getGuiModList());
+  }
+  
+  @SneakyThrows
+  private float getGuiModListScroll() {
+    return _scrollDistance.getFloat(getGuiModList());
+  }
+  
+  @SneakyThrows
+  private void setGuiModListScroll(float scroll) {
+    _scrollDistance.setFloat(getGuiModList(), scroll);
   }
 
   @SuppressWarnings("unchecked")
