@@ -163,9 +163,11 @@ public class GuiEnhancedModList extends GuiModList {
     }
 
     setGuiModListBottom(getGuiModListBottom() - 25);
-    search = new GuiTextField(mc.fontRenderer, 12, getGuiModListBottom() + 17, getListWidth() - 4, 14);
-    search.setFocused(true);
-    search.setCanLoseFocus(true);
+    if (search == null) {
+      search = new GuiTextField(mc.fontRenderer, 12, getGuiModListBottom() + 17, getListWidth() - 4, 14);
+      search.setFocused(true);
+      search.setCanLoseFocus(true);
+    }
 
     int width = (getListWidth() / numButtons);
     int x = 10, y = 10;
