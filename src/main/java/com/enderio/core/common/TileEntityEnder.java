@@ -1,6 +1,7 @@
 package com.enderio.core.common;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -157,5 +158,17 @@ public abstract class TileEntityEnder extends TileEntity {
    */
   protected boolean shouldDoWorkThisTick(int interval, int offset) {
     return (worldObj.getTotalWorldTime() + checkOffset + offset) % interval == 0;
+  }
+
+  /**
+   * Called server-side when a GhostSlot is changed. Check that the given slot
+   * number really is a ghost slot before storing the given stack.
+   * 
+   * @param slot
+   *          The slot number that was given to the ghost slot
+   * @param stack
+   *          The stack that should be placed, null to clear
+   */
+  public void setGhostSlotContents(int slot, ItemStack stack) {
   }
 }

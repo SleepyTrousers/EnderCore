@@ -16,6 +16,12 @@ public interface IWidgetMap {
 
   void render(IWidgetIcon widget, double x, double y, boolean doDraw);
 
+  void render(IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY);
+
+  void render(IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw);
+
+  void render(IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY);
+
   void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw);
 
   void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY);
@@ -44,6 +50,21 @@ public interface IWidgetMap {
     @Override
     public void render(IWidgetIcon widget, double x, double y, boolean doDraw) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw);
+    }
+
+    @Override
+    public void render(IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY) {
+      render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw, flipY);
+    }
+
+    @Override
+    public void render(IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw) {
+      render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw);
+    }
+
+    @Override
+    public void render(IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY) {
+      render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw, flipY);
     }
 
     @Override

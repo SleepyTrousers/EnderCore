@@ -20,6 +20,7 @@ public class EnderPacketHandler {
     INSTANCE.registerMessage(PacketConfigSync.Handler.class, PacketConfigSync.class, 0, Side.CLIENT);
     INSTANCE.registerMessage(PacketProgress.Handler.class, PacketProgress.class, 1, Side.CLIENT);
     INSTANCE.registerMessage(PacketNoSpamChat.Handler.class, PacketNoSpamChat.class, 2, Side.CLIENT);
+    INSTANCE.registerMessage(PacketGhostSlot.Handler.class, PacketGhostSlot.class, 3, Side.SERVER);
   }
 
   public static void sendToAllAround(IMessage message, TileEntity te, int range) {
@@ -32,5 +33,9 @@ public class EnderPacketHandler {
 
   public static void sendTo(IMessage message, EntityPlayerMP player) {
     INSTANCE.sendTo(message, player);
+  }
+
+  public static void sendToServer(IMessage message) {
+    INSTANCE.sendToServer(message);
   }
 }
