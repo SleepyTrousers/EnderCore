@@ -144,7 +144,10 @@ public class GuiEnhancedModList extends GuiModList {
   @Override
   public void initGui() {
     // Super code reinitializes the mod list every time, need to preserve scroll state
-    float scroll = getGuiModListScroll();
+    float scroll = 0;
+    if (getGuiModList() != null) {
+      scroll = getGuiModListScroll();
+    }
 
     super.initGui();
 

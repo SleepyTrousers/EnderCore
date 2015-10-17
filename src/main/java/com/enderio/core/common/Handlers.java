@@ -123,7 +123,13 @@ public class Handlers {
        * The handler should be grabbed from the static {@code instance()} method
        * of the class
        */
-      METHOD;
+      METHOD,
+
+      /**
+       * Added for scala compat, not necessary to set explicitly ({@link #AUTO}
+       * will find this).
+       */
+      SCALA_OBJECT;
 
       boolean matches(Inst other) {
         return this == AUTO || other == AUTO || other == this;
@@ -276,6 +282,15 @@ public class Handlers {
         Method inst = c.getDeclaredMethod("instance");
         inst.setAccessible(true);
         return inst.invoke(null);
+      } catch (Exception e) {
+      }
+    }
+    
+    if (pref.matches(SCALA_OBJECT)) {
+      try {
+        Field inst = Class.forName(c.getName()+ "$").getDeclaredField("MODULE$");
+        inst.setAccessible(true);
+        return inst.get(null);
       } catch (Exception e) {
       }
     }
