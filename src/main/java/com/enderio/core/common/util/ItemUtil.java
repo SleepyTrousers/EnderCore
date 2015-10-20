@@ -448,7 +448,7 @@ public class ItemUtil {
    * 
    * @param s1
    * @param s2
-   * @return
+   * @return True if the two stacks are mergeable, false otherwise.
    */
   public static boolean areStackMergable(ItemStack s1, ItemStack s2) {
     if (s1 == null || s2 == null || !s1.isStackable() || !s2.isStackable()) {
@@ -465,7 +465,7 @@ public class ItemUtil {
    * 
    * @param s1
    * @param s2
-   * @return
+   * @return True if the two stacks are equal, false otherwise.
    */
   public static boolean areStacksEqual(ItemStack s1, ItemStack s2) {
     if (s1 == null || s2 == null) {

@@ -300,10 +300,8 @@ public class RenderUtil {
   }
 
   /**
-   * left, bottom, right, top
-   * 
-   * @param face
-   * @return
+   * @return The edge directions for a face, in the order left, bottom, right,
+   *         top.
    */
   public static List<ForgeDirection> getEdgesForFace(ForgeDirection face) {
     List<ForgeDirection> result = new ArrayList<ForgeDirection>(4);

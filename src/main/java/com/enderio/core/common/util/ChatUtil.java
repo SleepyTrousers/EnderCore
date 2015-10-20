@@ -174,7 +174,7 @@ public class ChatUtil {
   /**
    * Localizes the strings before sending them.
    * 
-   * @see #sendNoSpamSafe(String...)
+   * @see #sendNoSpam(EntityPlayer, String...)
    */
   public void sendNoSpamUnloc(EntityPlayer player, Lang lang, String... unlocLines) {
     sendNoSpam(player, lang.localizeAll(lang, unlocLines));
@@ -182,7 +182,7 @@ public class ChatUtil {
 
   /**
    * @see #wrap(String)
-   * @see #sendNoSpamSafe(EntityPlayer, IChatComponent...)
+   * @see #sendNoSpam(EntityPlayer, IChatComponent...)
    */
   public void sendNoSpam(EntityPlayer player, String... lines) {
     sendNoSpam(player, wrap(lines));
@@ -203,7 +203,7 @@ public class ChatUtil {
   /**
    * Localizes the strings before sending them.
    * 
-   * @see #sendNoSpam(String...)
+   * @see #sendNoSpam(EntityPlayerMP, String...)
    */
   public void sendNoSpamUnloc(EntityPlayerMP player, Lang lang, String... unlocLines) {
     sendNoSpam(player, lang.localizeAll(lang, unlocLines));

@@ -123,14 +123,15 @@ public final class BoundingBox {
   /**
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order.
-   * 
-   * @param face
-   * @return
    */
   public List<Vertex> getCornersWithUvForFace(ForgeDirection face) {
     return getCornersWithUvForFace(face, 0, 1, 0, 1);
   }
 
+  /**
+   * Returns the vertices of the corners for the specified face in counter
+   * clockwise order.
+   */
   public List<Vertex> getCornersWithUvForFace(ForgeDirection face, float minU, float maxU, float minV, float maxV) {
     List<Vertex> result = new ArrayList<Vertex>(4);
     switch (face) {
@@ -179,9 +180,6 @@ public final class BoundingBox {
   /**
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order, starting with the top left.
-   * 
-   * @param face
-   * @return
    */
   public List<Vector3f> getCornersForFace(ForgeDirection face) {
     List<Vector3f> result = new ArrayList<Vector3f>(4);
@@ -231,9 +229,6 @@ public final class BoundingBox {
   /**
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order, starting with the top left.
-   * 
-   * @param face
-   * @return
    */
   public List<Vector3d> getCornersForFaceD(ForgeDirection face) {
     List<Vector3d> result = new ArrayList<Vector3d>(4);

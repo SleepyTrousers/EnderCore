@@ -23,9 +23,11 @@ import com.google.gson.reflect.TypeToken;
  * 
  * The format of the JSON file is as follows:
  * <p>
- * {@code "data":[<br>
- * <br>
- * ]}
+ * <blockquote><code>
+ * "data":[<br/>
+ * <br/>
+ * ]
+ * </blockquote></code>
  * <p>
  * Where the objects go inbetween the brackets ( [] )
  * 
@@ -50,7 +52,11 @@ public class JsonConfigReader<T> implements Iterable<T> {
     private String assetPath;
   }
 
-  private static final String DEFAULT_KEY = "data";
+  /**
+   * The default key for the json data. This is what is used when calling
+   * {@link #getElements()}.
+   */
+  public static final String DEFAULT_KEY = "data";
   private static final JsonParser parser = new JsonParser();
 
   private final GsonBuilder builder = new GsonBuilder();

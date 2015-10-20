@@ -11,7 +11,7 @@ import cpw.mods.fml.common.eventhandler.Cancelable;
  * <br>
  * This event is not {@link Cancelable}.<br>
  * <br>
- * This event does not have a result. {@link HasResult}<br>
+ * This event does not have a result. {@link cpw.mods.fml.common.eventhandler.Event.HasResult}<br>
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/

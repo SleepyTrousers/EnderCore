@@ -49,7 +49,7 @@ public class Scheduler {
    * @param task
    *          The {@link Runnable} to be run when the delay is up
    * 
-   * @see {@link #schedule(int, Runnable, Side)} for more details.
+   * @see #schedule(int, Runnable, Side)
    */
   public void schedule(int delay, Runnable task) {
     schedule(delay, task, Side.SERVER);
@@ -81,7 +81,7 @@ public class Scheduler {
   /**
    * Returns the {@link Scheduler} instance for the current side.
    * 
-   * @see {@link Scheduler#schedule(int, Runnable)} for scheduling information.
+   * @see #schedule(int, Runnable)
    * 
    * @return The {@link Scheduler} instance.
    */
