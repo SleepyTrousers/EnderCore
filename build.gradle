@@ -40,6 +40,10 @@ repositories {
     maven { url = "http://chickenbones.net/maven/" }
 }
 
+dependencies {
+    compile "codechicken:NotEnoughItems:${minecraft_version}-${NEI_version}:dev"
+}
+
 sourceSets {
     main {
         java {
