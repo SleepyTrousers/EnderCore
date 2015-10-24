@@ -3,8 +3,6 @@ package com.enderio.core.common.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -19,7 +17,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.relauncher.Side;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommandReloadConfigs extends CommandBase {
   public static final CommandReloadConfigs SERVER = new CommandReloadConfigs(Side.SERVER);
   public static final CommandReloadConfigs CLIENT = new CommandReloadConfigs(Side.CLIENT);
@@ -39,6 +36,10 @@ public class CommandReloadConfigs extends CommandBase {
         validModIDs.add(mod.getModId());
       }
     }
+  }
+  
+  private CommandReloadConfigs(Side side) {
+    this.side = side;
   }
 
   @Override

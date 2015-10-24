@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
 import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.objectweb.asm.ClassReader;
@@ -21,14 +20,19 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.enderio.core.EnderCore;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+
 import static org.objectweb.asm.Opcodes.*;
 
 @MCVersion(value = "1.7.10")
 public class EnderCoreTransformer implements IClassTransformer {
-  @AllArgsConstructor
   protected static class ObfSafeName {
     private String deobf, srg;
 
+    public ObfSafeName(String deobf, String srg) {
+      this.deobf = deobf;
+      this.srg = srg;
+    }
+    
     public String getName() {
       return EnderCorePlugin.runtimeDeobfEnabled ? srg : deobf;
     }

@@ -3,7 +3,6 @@ package com.enderio.core.common.handlers;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import lombok.SneakyThrows;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -21,6 +20,7 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.util.Scheduler;
+import com.google.common.base.Throwables;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -81,11 +81,14 @@ public class XPBoostHandler {
     return getXPBoost(killed, player, getXPBoostLevel(player.getCurrentEquippedItem()));
   }
 
-  @SneakyThrows
   private int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
     if (level >= 0) {
-      int xp = (Integer) getExperiencePoints.invoke(killed, player);
-      return getXPBoost(xp, level);
+      try {
+        int xp = (Integer) getExperiencePoints.invoke(killed, player);
+        return getXPBoost(xp, level);
+      } catch (Exception e) {
+        Throwables.propagate(e);
+      }
     }
     return 0;
   }

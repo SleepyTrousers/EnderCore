@@ -1,6 +1,5 @@
 package com.enderio.core.common.event;
 
-import lombok.RequiredArgsConstructor;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,9 +15,12 @@ import cpw.mods.fml.common.eventhandler.Event;
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-@RequiredArgsConstructor
 public class ItemStackEvent extends Event {
   public final ItemStack item;
+
+  public ItemStackEvent(ItemStack item) {
+    this.item = item;
+  }
 
   /**
    * ItemEnchantabilityEvent is fired when calculating an Item's enchantability. <br>

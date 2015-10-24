@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import lombok.NonNull;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -213,12 +212,10 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param sectionName
    *          The name of the section
    * 
-   * @throws NullPointerException
-   *           if {@code sectionName} is null
    * @throws IllegalArgumentException
    *           if {@code sectionName} is not valid
    */
-  protected void activateSection(@NonNull String sectionName) {
+  protected void activateSection(String sectionName) {
     Section section = getSectionByName(sectionName);
     if (section == null) {
       throw new IllegalArgumentException("Section " + sectionName + " does not exist!");
@@ -231,11 +228,8 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * 
    * @param section
    *          The section to activate
-   * 
-   * @throws NullPointerException
-   *           if {@code section} is null
    */
-  protected void activateSection(@NonNull Section section) {
+  protected void activateSection(Section section) {
     activeSection = section;
   }
 
@@ -246,11 +240,8 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    *          The name of the section
    * @return A section object representing the section in your config with this
    *         name
-   * 
-   * @throws NullPointerException
-   *           if {@code sectionName} is null
    */
-  protected Section getSectionByName(@NonNull String sectionName) {
+  protected Section getSectionByName(String sectionName) {
     for (Section s : sections) {
       if (s.name.equalsIgnoreCase(sectionName)) {
         return s;

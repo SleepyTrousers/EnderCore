@@ -2,12 +2,10 @@ package com.enderio.core.common;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-import lombok.Getter;
 import net.minecraft.util.StatCollector;
 
-@Getter
+import com.google.common.collect.Lists;
+
 public class Lang {
 
   private static final String REGEX = "\\" + '|';
@@ -17,6 +15,13 @@ public class Lang {
 
   public Lang(String locKey) {
     this.prefix = locKey.concat(".");
+  }
+
+  /**
+   * @return The prefix assigned to this Lang object.
+   */
+  public String getPrefix() {
+    return this.prefix;
   }
 
   /**

@@ -1,6 +1,5 @@
 package com.enderio.core.common.transform;
 
-import lombok.experimental.UtilityClass;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.Container;
@@ -18,9 +17,8 @@ import com.enderio.core.common.event.ArrowUpdateEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
 
-@UtilityClass
 public class EnderCoreMethods {
-  public boolean hasVoidParticles(WorldType type, boolean hasSky) {
+  public static boolean hasVoidParticles(WorldType type, boolean hasSky) {
     if (ConfigHandler.disableVoidFog == 0) {
       return type != WorldType.FLAT && !hasSky;
     } else if (ConfigHandler.disableVoidFog == 1) {
@@ -30,28 +28,28 @@ public class EnderCoreMethods {
     }
   }
 
-  public int getMaxAnvilCost() {
+  public static int getMaxAnvilCost() {
     return ConfigHandler.anvilMaxLevel;
   }
 
-  public int getItemEnchantability(ItemStack stack, int base) {
+  public static int getItemEnchantability(ItemStack stack, int base) {
     ItemEnchantabilityEvent event = new ItemEnchantabilityEvent(stack, base);
     MinecraftForge.EVENT_BUS.post(event);
     return event.enchantability;
   }
 
-  public EnumRarity getItemRarity(ItemStack stack) {
+  public static EnumRarity getItemRarity(ItemStack stack) {
     ItemRarityEvent event = new ItemRarityEvent(stack, stack.getItem().getRarity(stack));
     MinecraftForge.EVENT_BUS.post(event);
     return event.rarity;
   }
 
-  public void onArrowUpdate(EntityArrow entity) {
+  public static void onArrowUpdate(EntityArrow entity) {
     MinecraftForge.EVENT_BUS.post(new ArrowUpdateEvent(entity));
   }
 
   // mostly copied from ContainerFurnace
-  public ItemStack transferStackInSlot(ContainerFurnace inv, EntityPlayer p_82846_1_, int p_82846_2_) {
+  public static ItemStack transferStackInSlot(ContainerFurnace inv, EntityPlayer p_82846_1_, int p_82846_2_) {
     ItemStack itemstack = null;
     Slot slot = (Slot) inv.inventorySlots.get(p_82846_2_);
 
@@ -109,7 +107,7 @@ public class EnderCoreMethods {
   }
 
   // copied from Container
-  private boolean mergeItemStack(Container inv, ItemStack p_75135_1_, int p_75135_2_, int p_75135_3_, boolean p_75135_4_) {
+  private static boolean mergeItemStack(Container inv, ItemStack p_75135_1_, int p_75135_2_, int p_75135_3_, boolean p_75135_4_) {
     boolean flag1 = false;
     int k = p_75135_2_;
 

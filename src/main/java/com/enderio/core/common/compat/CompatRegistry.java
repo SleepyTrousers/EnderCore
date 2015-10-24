@@ -5,10 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import javax.annotation.Generated;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -18,12 +15,12 @@ import com.enderio.core.common.util.RegisterTime;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLStateEvent;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CompatRegistry {
-  @Value
+public enum CompatRegistry {
+  INSTANCE;
+
   private static class Registration {
-    String[] modids;
-    RegisterTime[] times;
+    private final String[] modids;
+    private final RegisterTime[] times;
 
     private Registration(RegisterTime time, String... modids) {
       this.modids = modids;
@@ -34,14 +31,53 @@ public class CompatRegistry {
       this.modids = modids;
       this.times = times;
     }
+    
+    public String[] getModids() {
+      return this.modids;
+    }
+
+    public RegisterTime[] getTimes() {
+      return this.times;
+    }
+
+    @Override
+    @Generated("lombok")
+    public boolean equals(final java.lang.Object o) {
+      if (o == this) return true;
+      if (!(o instanceof CompatRegistry.Registration)) return false;
+      final Registration other = (Registration)o;
+      if (!java.util.Arrays.deepEquals(this.getModids(), other.getModids())) return false;
+      if (!java.util.Arrays.deepEquals(this.getTimes(), other.getTimes())) return false;
+      return true;
+    }
+
+    @Override
+    @Generated("lombok")
+    public int hashCode() {
+      final int PRIME = 59;
+      int result = 1;
+      result = result * PRIME + java.util.Arrays.deepHashCode(this.getModids());
+      result = result * PRIME + java.util.Arrays.deepHashCode(this.getTimes());
+      return result;
+    }
+
+    @Override
+    @Generated("lombok")
+    public java.lang.String toString() {
+      return "CompatRegistry.Registration(modids=" + java.util.Arrays.deepToString(this.getModids()) + ", times=" + java.util.Arrays.deepToString(this.getTimes()) + ")";
+    }
   }
-
-  public static final CompatRegistry INSTANCE = new CompatRegistry();
-
+  
   private Map<Registration, String> compatMap = new HashMap<Registration, String>();
 
-  @Getter
   private RegisterTime state = null;
+  
+  private CompatRegistry() {
+  }
+  
+  public RegisterTime getState() {
+    return state;
+  }
 
   public void registerCompat(RegisterTime time, String clazz, String... modids) {
     compatMap.put(new Registration(time, modids), clazz);

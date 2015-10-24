@@ -1,6 +1,5 @@
 package com.enderio.core.common.event;
 
-import lombok.Getter;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 
 /**
@@ -20,11 +19,14 @@ import cpw.mods.fml.client.event.ConfigChangedEvent;
  * considered a failure!</b>
  */
 public class ConfigFileChangedEvent extends ConfigChangedEvent {
-  @Getter
   private boolean successful;
 
   public ConfigFileChangedEvent(String modID) {
     super(modID, "null", true, false);
+  }
+  
+  public boolean isSuccessful() {
+    return this.successful;
   }
 
   public void setSuccessful() {

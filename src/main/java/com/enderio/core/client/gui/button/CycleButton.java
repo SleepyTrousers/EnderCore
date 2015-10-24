@@ -2,7 +2,6 @@ package com.enderio.core.client.gui.button;
 
 import java.util.List;
 
-import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -33,10 +32,8 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
 
   private final T[] modes;
 
-  @Getter
   private T mode;
 
-  @SuppressWarnings("unchecked")
   public CycleButton(IGuiScreen gui, int id, int x, int y, Class<T> enumClass) {
     super(gui, id, x, y, null);
     modes = enumClass.getEnumConstants();
@@ -71,6 +68,10 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
       ord = modes.length - 1;
     }
     setMode(modes[ord]);
+  }
+  
+  public T getMode() {
+    return mode;
   }
 
   public void setMode(T newMode) {

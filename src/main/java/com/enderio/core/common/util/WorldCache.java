@@ -4,12 +4,12 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import lombok.SneakyThrows;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -20,6 +20,7 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
@@ -58,21 +59,27 @@ public class WorldCache<I> {
   @SubscribeEvent
   public void onWorldSave(WorldEvent.Save event) {
     if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
-      saveData(getSaveFile());
+      try {
+        saveData(getSaveFile());
+      } catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
   }
 
   @SubscribeEvent
-  @SneakyThrows
   public void onWorldLoad(WorldEvent.Load event) {
     if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
-      loadData(getSaveFile());
+      try {
+        loadData(getSaveFile());
+      } catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
     locked = true;
   }
 
-  @SneakyThrows
-  protected void loadData(File file) {
+  protected void loadData(File file) throws IOException {
     if (!file.createNewFile()) {
       NBTTagCompound tag = null;
       try {
@@ -107,8 +114,7 @@ public class WorldCache<I> {
     generateIDs();
   }
 
-  @SneakyThrows
-  protected void saveData(File file) {
+  protected void saveData(File file) throws IOException {
     NBTTagCompound data = new NBTTagCompound();
 
     // name <-> id mappings
@@ -179,7 +185,6 @@ public class WorldCache<I> {
     usedIDs.set(id, true);
   }
 
-  @SneakyThrows
   protected File getSaveFile() {
     return new File(DimensionManager.getCurrentSaveRootDirectory(), ident + ".json");
   }

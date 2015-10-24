@@ -26,10 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
-import net.minecraft.util.StringTranslate;
+import javax.annotation.Nonnull;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -37,10 +34,9 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 
-@UtilityClass
 public class EnderFileUtils {
-  public final FileFilter pngFilter = FileFilterUtils.suffixFileFilter(".png");
-  public final FileFilter langFilter = FileFilterUtils.suffixFileFilter(".lang");
+  public static final FileFilter pngFilter = FileFilterUtils.suffixFileFilter(".png");
+  public static final FileFilter langFilter = FileFilterUtils.suffixFileFilter(".lang");
 
   /**
    * @param jarClass
@@ -51,7 +47,7 @@ public class EnderFileUtils {
    * @param to
    *          - File to copy to
    */
-  public void copyFromJar(Class<?> jarClass, String filename, File to) {
+  public static void copyFromJar(Class<?> jarClass, String filename, File to) {
     EnderCore.logger.info("Copying file " + filename + " from jar");
     URL url = jarClass.getResource("/assets/" + filename);
 
@@ -74,8 +70,8 @@ public class EnderFileUtils {
    * 
    * @return The folder extracted to
    */
-  @NonNull
-  public File extractZip(File zip) {
+  @Nonnull
+  public static File extractZip(File zip) {
     String zipPath = zip.getParent() + "/extracted";
     File temp = new File(zipPath);
     temp.mkdir();
@@ -146,7 +142,7 @@ public class EnderFileUtils {
    * @throws IOException
    */
   @SuppressWarnings("resource")
-  public void zipFolderContents(File directory, File zipfile) throws IOException {
+  public static void zipFolderContents(File directory, File zipfile) throws IOException {
     URI base = directory.toURI();
     Deque<File> queue = new LinkedList<File>();
     queue.push(directory);
@@ -176,7 +172,7 @@ public class EnderFileUtils {
   }
 
   /** @see #zipFolderContents(File, File) */
-  private void copy(InputStream in, OutputStream out) throws IOException {
+  private static void copy(InputStream in, OutputStream out) throws IOException {
     byte[] buffer = new byte[1024];
     while (true) {
       int readCount = in.read(buffer);
@@ -188,7 +184,7 @@ public class EnderFileUtils {
   }
 
   /** @see #zipFolderContents(File, File) */
-  private void copy(File file, OutputStream out) throws IOException {
+  private static void copy(File file, OutputStream out) throws IOException {
     InputStream in = new FileInputStream(file);
     try {
       copy(in, out);
@@ -197,8 +193,8 @@ public class EnderFileUtils {
     }
   }
 
-  @NonNull
-  public File writeToFile(String filepath, String json) {
+  @Nonnull
+  public static File writeToFile(String filepath, String json) {
     File file = new File(filepath);
 
     try {
@@ -213,8 +209,8 @@ public class EnderFileUtils {
     }
   }
 
-  @NonNull
-  public void safeDelete(File file) {
+  @Nonnull
+  public static void safeDelete(File file) {
     try {
       file.delete();
     } catch (Exception e) {
@@ -222,8 +218,8 @@ public class EnderFileUtils {
     }
   }
 
-  @NonNull
-  public void safeDeleteDirectory(File file) {
+  @Nonnull
+  public static void safeDeleteDirectory(File file) {
     try {
       FileUtils.deleteDirectory(file);
     } catch (Exception e) {
@@ -231,12 +227,14 @@ public class EnderFileUtils {
     }
   }
 
-  @SneakyThrows
-  @NonNull
-  public void loadLangFiles(File directory) {
-    for (File file : directory.listFiles(langFilter)) {
-      StringTranslate.inject(new FileInputStream(file));
-    }
+  /**
+   * I don't think this ever worked.
+   * 
+   * @param directory
+   */
+  @Deprecated
+  public static void loadLangFiles(File directory) {
+    // NO-OP
   }
 
   /**
@@ -255,7 +253,7 @@ public class EnderFileUtils {
    *          - The setting to change it to
    * @return whether anything changed
    */
-  public boolean manuallyChangeConfigValue(String filePathFromConfigFolder, String prefix, String from, String to) {
+  public static boolean manuallyChangeConfigValue(String filePathFromConfigFolder, String prefix, String from, String to) {
     File config = new File(ConfigHandler.configFolder.getAbsolutePath() + "/" + filePathFromConfigFolder);
     boolean found = false;
 
@@ -307,7 +305,7 @@ public class EnderFileUtils {
    *         config values, for instance using
    *         <code>Boolean.parseBoolean(String)</code>
    */
-  public String manuallyGetConfigValue(String filePathFromConfigFolder, String key) {
+  public static String manuallyGetConfigValue(String filePathFromConfigFolder, String key) {
     File config = new File(ConfigHandler.configFolder.getAbsolutePath() + "/" + filePathFromConfigFolder);
     Scanner scan = null;
 

@@ -1,10 +1,10 @@
 package com.enderio.core.common.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import lombok.SneakyThrows;
-
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -13,10 +13,13 @@ public class PermanentCache<I> extends WorldCache<I> {
 
   private static final List<PermanentCache<?>> allCaches = Lists.newArrayList();
 
-  @SneakyThrows
   public PermanentCache(String ident) {
     super(ident);
-    loadData(getSaveFile());
+    try {
+      loadData(getSaveFile());
+    } catch (IOException e) {
+      Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -49,7 +52,11 @@ public class PermanentCache<I> extends WorldCache<I> {
 
   public static void saveCaches() {
     for (PermanentCache<?> c : allCaches) {
-      c.saveData(c.getSaveFile());
+      try {
+        c.saveData(c.getSaveFile());
+      } catch (IOException e) {
+        Throwables.propagate(e);
+      }
     }
   }
 }

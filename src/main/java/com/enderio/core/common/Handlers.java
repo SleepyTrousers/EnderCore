@@ -12,9 +12,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.UtilityClass;
 import net.minecraftforge.common.MinecraftForge;
 
 import com.enderio.core.EnderCore;
@@ -33,7 +30,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 import static com.enderio.core.common.Handlers.Handler.Inst.*;
 
-@UtilityClass
 public class Handlers {
 
   /**
@@ -43,7 +39,6 @@ public class Handlers {
    * The order of the constants is the order they are tried. This is VERY
    * important!
    */
-  @RequiredArgsConstructor
   public enum HandlerType {
 
     /**
@@ -65,6 +60,11 @@ public class Handlers {
      * Represents the {@link FMLCommonHandler#bus()}
      */
     FML("cpw.mods.fml", FMLCommonHandler.instance().bus());
+
+    private HandlerType(String eventIdentifier, EventBus bus) {
+      this.eventIdentifier = eventIdentifier;
+      this.bus = bus;
+    }
 
     public final String eventIdentifier;
     public final EventBus bus;
@@ -190,14 +190,14 @@ public class Handlers {
     packageSet.add(packageName);
   }
 
-  private boolean registered = false;
+  private static boolean registered = false;
 
   /**
    * For internal use only. Do not call. Callers will be sacked.
    * 
    * @param event
    */
-  public void register(FMLInitializationEvent event) {
+  public static void register(FMLInitializationEvent event) {
     if (registered) {
       throw new IllegalStateException("I warned you!");
     }
@@ -224,7 +224,7 @@ public class Handlers {
     registered = true;
   }
 
-  private void registerHandler(Class<?> c, ASMData data, Handler handler) throws InstantiationException, IllegalAccessException {
+  private static void registerHandler(Class<?> c, ASMData data, Handler handler) throws InstantiationException, IllegalAccessException {
     EnderCore.logger.info(String.format("[Handlers] Registering handler %s to busses: %s", c.getSimpleName(), Arrays.deepToString(handler.value())));
 
     Object inst = tryInit(handler, c);
@@ -256,7 +256,7 @@ public class Handlers {
     }
   }
 
-  private Object tryInit(Handler annot, Class<?> c) {
+  private static Object tryInit(Handler annot, Class<?> c) {
     Inst pref = annot.getInstFrom();
 
     // Silence all exceptions to trickle down to next if statement.

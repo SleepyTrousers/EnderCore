@@ -7,10 +7,6 @@ buildscript {
     dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT' }
 }
 
-plugins {
-    id 'net.franz-becker.gradle-lombok' version '1.5'
-}
-
 apply plugin: 'forge'
 apply plugin: 'maven-publish'
 apply plugin: 'curseforge'
@@ -43,23 +39,6 @@ configurations {
 repositories {
     maven { url = "http://chickenbones.net/maven/" }
 }
-
-dependencies {
-    compile "codechicken:NotEnoughItems:${minecraft_version}-${NEI_version}:dev"
-}
-
-lombok {
-    version = "1.16.6"
-    sha256 = "e0a471be03e1e6b02bf019480cec7a3ac9801702bf7bf62f15d077ad4df8dd5d"
-}
-
-import net.franz_becker.gradle.lombok.task.DelombokTask
-
-task delombok(type: DelombokTask) {
-    args("src/main/java", "-d", "build/sources/delomboked/java")
-}
-
-tasks.eclipse.dependsOn installLombok
 
 sourceSets {
     main {
@@ -98,10 +77,6 @@ jar {
     }
 }
 
-javadoc {
-    source = projectDir.path + "/build/sources/delomboked/java"
-}
-
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
@@ -129,7 +104,6 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-javadoc.dependsOn delombok
 build.dependsOn sourceJar, deobfJar, apiJar, javadoc
 
 publishing {

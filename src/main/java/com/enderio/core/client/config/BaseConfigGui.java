@@ -4,16 +4,17 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.config.IConfigHandler;
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.config.AbstractConfigHandler.Section;
-
-import lombok.SneakyThrows;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Property;
+
+import com.enderio.core.EnderCore;
+import com.enderio.core.api.common.config.IConfigHandler;
+import com.enderio.core.common.config.AbstractConfigHandler.Section;
+import com.enderio.core.common.config.ConfigHandler;
+import com.google.common.base.Throwables;
+
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.IConfigElement;
 
@@ -118,9 +119,12 @@ public class BaseConfigGui extends GuiConfig {
       super(getProp(other));
     }
 
-    @SneakyThrows
     private static Property getProp(IConfigElement other) {
-      return (Property) _prop.get(other);
+      try {
+        return (Property) _prop.get(other);
+      } catch (Exception e) {
+        throw Throwables.propagate(e);
+      }
     }
 
     @Override

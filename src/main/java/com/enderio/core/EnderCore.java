@@ -1,9 +1,9 @@
 package com.enderio.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import lombok.SneakyThrows;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -28,6 +28,7 @@ import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.PermanentCache;
 import com.enderio.core.common.util.TextureErrorRemover;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.Loader;
@@ -61,7 +62,6 @@ public class EnderCore implements IEnderMod {
   public List<IConfigHandler> configs = Lists.newArrayList();
 
   @EventHandler
-  @SneakyThrows
   public void preInit(FMLPreInitializationEvent event) {
     if (Loader.isModLoaded("ttCore")) {
       proxy.throwModCompatibilityError(lang.localize("error.ttcore.1"), lang.localize("error.ttcore.2"), lang.localize("error.ttcore.3"));
@@ -76,7 +76,11 @@ public class EnderCore implements IEnderMod {
     ConfigHandler.configFile = new File(ConfigHandler.enderConfigFolder.getPath() + "/" + event.getSuggestedConfigurationFile().getName());
 
     if (!ConfigHandler.configFile.exists() && event.getSuggestedConfigurationFile().exists()) {
-      FileUtils.copyFile(event.getSuggestedConfigurationFile(), ConfigHandler.configFile);
+      try {
+        FileUtils.copyFile(event.getSuggestedConfigurationFile(), ConfigHandler.configFile);
+      } catch (IOException e) {
+        Throwables.propagate(e);
+      }
       EnderFileUtils.safeDelete(event.getSuggestedConfigurationFile());
     }
 

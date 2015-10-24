@@ -1,7 +1,5 @@
 package com.enderio.core.client.render;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
@@ -10,14 +8,22 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.obj.WavefrontObject;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
-@AllArgsConstructor
 public class SimpleModelRenderer implements ISimpleBlockRenderingHandler {
   private final Tessellator tes = Tessellator.instance;
 
   private final WavefrontObject model;
 
-  @Getter
   private final int renderId;
+  
+  public SimpleModelRenderer(WavefrontObject model, int renderId) {
+    this.model = model;
+    this.renderId = renderId;
+  }
+
+  @Override
+  public int getRenderId() {
+    return renderId;
+  }
 
   @Override
   public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {

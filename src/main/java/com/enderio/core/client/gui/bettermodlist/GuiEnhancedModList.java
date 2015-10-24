@@ -6,16 +6,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import com.enderio.core.EnderCore;
-import com.enderio.core.common.config.ConfigHandler;
-import com.google.common.collect.Lists;
-
-import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.StringUtils;
+
+import com.enderio.core.EnderCore;
+import com.enderio.core.common.config.ConfigHandler;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+
 import cpw.mods.fml.client.GuiModList;
 import cpw.mods.fml.client.GuiScrollingList;
 import cpw.mods.fml.client.GuiSlotModList;
@@ -305,75 +306,108 @@ public class GuiEnhancedModList extends GuiModList {
     }
   }
 
-  @SneakyThrows
   private void setMods() {
     List<ModContainer> mods = getMods();
 
     ModContainer sel = getSelectedMod();
     boolean found = false;
-    for (int i = 0; !found && i < mods.size(); i++) {
-      if (sel == mods.get(i)) {
-        _selected.setInt(this, i);
-        found = true;
+    try {
+      for (int i = 0; !found && i < mods.size(); i++) {
+        if (sel == mods.get(i)) {
+          _selected.setInt(this, i);
+          found = true;
+        }
       }
-    }
-    if (!found) {
-      _selected.setInt(this, -1);
-      _selectedMod.set(this, null);
-    }
+      if (!found) {
+        _selected.setInt(this, -1);
+        _selectedMod.set(this, null);
+      }
 
-    _mods.set(this, getMods());
-    sorted = false;
+      _mods.set(this, getMods());
+      sorted = false;
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private GuiSlotModList getGuiModList() {
-    return (GuiSlotModList) _modList.get(this);
+    try {
+      return (GuiSlotModList) _modList.get(this);
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private int getGuiModListRight() {
-    return _modListRight.getInt(getGuiModList());
+    try {
+      return _modListRight.getInt(getGuiModList());
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private void setGuiModListBottom(int bottom) {
-    _modListBottom.set(getGuiModList(), bottom);
+    try {
+      _modListBottom.set(getGuiModList(), bottom);
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private int getGuiModListBottom() {
-    return _modListBottom.getInt(getGuiModList());
+    try {
+      return _modListBottom.getInt(getGuiModList());
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
-  
-  @SneakyThrows
+
   private float getGuiModListScroll() {
-    return _scrollDistance.getFloat(getGuiModList());
+    try {
+      return _scrollDistance.getFloat(getGuiModList());
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
-  
-  @SneakyThrows
+
   private void setGuiModListScroll(float scroll) {
-    _scrollDistance.setFloat(getGuiModList(), scroll);
+    try {
+      _scrollDistance.setFloat(getGuiModList(), scroll);
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @SuppressWarnings("unchecked")
-  @SneakyThrows
   private List<ModContainer> getMods() {
-    return (List<ModContainer>) _modListMods.get(_modList.get(this));
+    try {
+      return (List<ModContainer>) _modListMods.get(_modList.get(this));
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private int getListWidth() {
-    return _listWidth.getInt(this);
+    try {
+      return _listWidth.getInt(this);
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private ModContainer getSelectedMod() {
-    return (ModContainer) _selectedMod.get(this);
+    try {
+      return (ModContainer) _selectedMod.get(this);
+    } catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
-  @SneakyThrows
   private void setSelectedMod(ModContainer mod) {
-    _selectedMod.set(this, mod);
+    try {
+      _selectedMod.set(this, mod);
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
   }
 }

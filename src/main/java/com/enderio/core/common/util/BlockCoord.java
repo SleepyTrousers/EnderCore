@@ -1,9 +1,9 @@
 package com.enderio.core.common.util;
 
 import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Wither;
+
+import javax.annotation.Generated;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,14 +16,18 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.base.Strings;
 
-@AllArgsConstructor
-@EqualsAndHashCode
 public class BlockCoord {
-  @Wither
+
   public final int x, y, z;
 
   public BlockCoord() {
     this(0, 0, 0);
+  }
+  
+  public BlockCoord(int x, int y, int z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 
   public BlockCoord(double x, double y, double z) {
@@ -123,5 +127,49 @@ public class BlockCoord {
   @Override
   public String toString() {
     return "X: " + x + "  Y: " + y + "  Z: " + z;
+  }
+  
+  @Override
+  @Generated("lombok")
+  public boolean equals(final Object o) {
+    if (o == this) return true;
+    if (!(o instanceof BlockCoord)) return false;
+    final BlockCoord other = (BlockCoord)o;
+    if (!other.canEqual((Object)this)) return false;
+    if (this.x != other.x) return false;
+    if (this.y != other.y) return false;
+    if (this.z != other.z) return false;
+    return true;
+  }
+
+  @Generated("lombok")
+  protected boolean canEqual(final Object other) {
+    return other instanceof BlockCoord;
+  }
+
+  @Override
+  @Generated("lombok")
+  public int hashCode() {
+    final int PRIME = 59;
+    int result = 1;
+    result = result * PRIME + this.x;
+    result = result * PRIME + this.y;
+    result = result * PRIME + this.z;
+    return result;
+  }
+
+  @Generated("lombok")
+  public BlockCoord withX(final int x) {
+    return this.x == x ? this : new BlockCoord(x, this.y, this.z);
+  }
+
+  @Generated("lombok")
+  public BlockCoord withY(final int y) {
+    return this.y == y ? this : new BlockCoord(this.x, y, this.z);
+  }
+
+  @Generated("lombok")
+  public BlockCoord withZ(final int z) {
+    return this.z == z ? this : new BlockCoord(this.x, this.y, z);
   }
 }

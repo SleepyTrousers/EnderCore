@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import com.enderio.core.common.util.EnderFileUtils;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -45,11 +42,22 @@ public class JsonConfigReader<T> implements Iterable<T> {
    * <b>assetPath</b> is the path to your default json file. This includes the
    * /modid part and whatever subfolders follow.
    */
-  @AllArgsConstructor
-  @Getter
   public static class ModToken {
     private Class<?> mainClass;
     private String assetPath;
+
+    public ModToken(Class<?> mainClass, String assetPath) {
+      this.mainClass = mainClass;
+      this.assetPath = assetPath;
+    }
+    
+    public Class<?> getMainClass() {
+      return mainClass;
+    }
+    
+    public String getAssetPath() {
+      return assetPath;
+    }
   }
 
   /**

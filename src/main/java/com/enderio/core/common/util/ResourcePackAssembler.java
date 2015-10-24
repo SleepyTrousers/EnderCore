@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import lombok.AllArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.FileResourcePack;
 import net.minecraft.client.resources.IResourcePack;
@@ -36,10 +35,14 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
  * Also, {@link #setHasPackPng(Class)} allows your resource pack to have a logo.
  */
 public class ResourcePackAssembler {
-  @AllArgsConstructor
   private class CustomFile {
     private String ext;
     private File file;
+
+    private CustomFile(String ext, File file) {
+      this.ext = ext;
+      this.file = file;
+    }
   }
 
   private List<File> icons = new ArrayList<File>();

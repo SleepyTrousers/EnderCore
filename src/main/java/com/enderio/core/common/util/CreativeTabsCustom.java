@@ -1,13 +1,11 @@
 package com.enderio.core.common.util;
 
-import lombok.NonNull;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CreativeTabsCustom extends CreativeTabs {
-  @NonNull
   private ItemStack displayStack;
 
   public CreativeTabsCustom(String unloc) {

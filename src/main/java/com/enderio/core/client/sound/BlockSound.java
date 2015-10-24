@@ -1,20 +1,24 @@
 package com.enderio.core.client.sound;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.ResourceLocation;
 
-@Accessors(chain = true)
 public class BlockSound extends PositionedSound implements ITickableSound {
-  @Getter
-  @Setter
+
   private boolean donePlaying = false;
 
   public BlockSound(ResourceLocation p_i45103_1_) {
     super(p_i45103_1_);
+  }
+
+  public boolean isDonePlaying() {
+    return this.donePlaying;
+  }
+
+  public BlockSound setDonePlaying(boolean donePlaying) {
+    this.donePlaying = donePlaying;
+    return this;
   }
 
   public BlockSound setVolume(float vol) {

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.Handlers.Handler.Inst;
@@ -23,12 +21,18 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 @Handler(getInstFrom = Inst.METHOD)
 public class Scheduler {
-  @AllArgsConstructor
+
   private static final class Task {
     private int delay;
     private Runnable toRun;
     private Side side;
 
+    private Task(int delay, Runnable toRun, Side side) {
+      this.delay = delay;
+      this.toRun = toRun;
+      this.side = side;
+    }
+    
     private boolean run() {
       if (delay <= 0) {
         toRun.run();

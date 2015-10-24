@@ -1,6 +1,5 @@
 package com.enderio.core.api.client.render;
 
-import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 
@@ -20,11 +19,15 @@ public interface IWidgetMap {
 
   void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY);
 
-  @RequiredArgsConstructor
   static class WidgetMapImpl implements IWidgetMap {
 
     private final int size;
     private final ResourceLocation res;
+    
+    public WidgetMapImpl(int size, ResourceLocation res) {
+      this.size = size;
+      this.res = res;
+    }
 
     @Override
     public int getSize() {

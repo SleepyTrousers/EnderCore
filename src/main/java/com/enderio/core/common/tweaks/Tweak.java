@@ -2,9 +2,6 @@ package com.enderio.core.common.tweaks;
 
 import com.enderio.core.common.config.ConfigHandler;
 
-import lombok.Getter;
-
-@Getter
 public abstract class Tweak {
   private String name, comment;
 
@@ -14,6 +11,14 @@ public abstract class Tweak {
     if (ConfigHandler.instance().addBooleanFor(this)) {
       load();
     }
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getComment() {
+    return comment;
   }
 
   public abstract void load();

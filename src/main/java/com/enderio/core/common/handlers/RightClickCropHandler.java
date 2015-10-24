@@ -2,7 +2,6 @@ package com.enderio.core.common.handlers;
 
 import java.util.List;
 
-import lombok.NoArgsConstructor;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -20,7 +19,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 
 @Handler
 public class RightClickCropHandler {
-  @NoArgsConstructor
   public static class PlantInfo {
     public String seed;
     public String block;
@@ -29,6 +27,9 @@ public class RightClickCropHandler {
 
     private transient ItemStack seedStack;
     private transient Block blockInst;
+    
+    public PlantInfo() {
+    }
 
     public PlantInfo(String seed, String block, int meta, int resetMeta) {
       this.seed = seed;

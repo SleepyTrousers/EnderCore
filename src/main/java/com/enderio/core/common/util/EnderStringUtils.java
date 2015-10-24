@@ -1,12 +1,10 @@
 package com.enderio.core.common.util;
 
-import lombok.experimental.UtilityClass;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
 
 import com.enderio.core.EnderCore;
 
-@UtilityClass
 public class EnderStringUtils {
   /**
    * Formats a string and number for use in GUIs and tooltips
@@ -23,7 +21,7 @@ public class EnderStringUtils {
    *          - Whether or not to format the thousands
    * @return A string numeric formatted to use SI suffixes
    */
-  public String formatString(String prefix, String suffix, long amnt, boolean useDecimals, boolean formatK) {
+  public static String formatString(String prefix, String suffix, long amnt, boolean useDecimals, boolean formatK) {
     if (formatK && Long.toString(amnt).length() < 7 && Long.toString(amnt).length() > 3) {
       return formatSmallerNumber(prefix, suffix, amnt, useDecimals);
     }
@@ -69,11 +67,11 @@ public class EnderStringUtils {
    *          - Whether or not to use decimals in the representation
    * @return A string numeric formatted to use SI suffixes
    */
-  public String formatString(String prefix, String suffix, long amnt, boolean useDecimals) {
+  public static String formatString(String prefix, String suffix, long amnt, boolean useDecimals) {
     return formatString(prefix, suffix, amnt, useDecimals, false);
   }
 
-  private String formatSmallerNumber(String prefix, String suffix, long amnt, boolean useDecimals) {
+  private static String formatSmallerNumber(String prefix, String suffix, long amnt, boolean useDecimals) {
     switch (Long.toString(amnt).length()) {
     case 4:
       prefix += Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "K" + suffix;
@@ -100,7 +98,7 @@ public class EnderStringUtils {
    *         if 10% {@literal <} num {@literal <}= 25% of max: GOLD (orange-ish)<br>
    *         if num {@literal >} 25% of max: GREEN
    */
-  public EnumChatFormatting getColorFor(double num, double max) {
+  public static EnumChatFormatting getColorFor(double num, double max) {
     if (num / max <= .1)
       return EnumChatFormatting.RED;
     else if (num / max <= .25)
@@ -109,7 +107,7 @@ public class EnderStringUtils {
       return EnumChatFormatting.GREEN;
   }
 
-  public String getEffectNameWithLevel(PotionEffect effect) {
+  public static String getEffectNameWithLevel(PotionEffect effect) {
     String name = EnderCore.lang.localize(effect.getEffectName(), false);
 
     if (effect.getAmplifier() > 0) {

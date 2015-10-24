@@ -3,8 +3,6 @@ package com.enderio.core.client.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,14 +30,12 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import static com.enderio.core.common.config.ConfigHandler.showDurabilityTooltips;
 
 @Handler
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SpecialTooltipHandler {
-
+public enum SpecialTooltipHandler {
+  INSTANCE;
+  
   public interface ITooltipCallback extends IAdvancedTooltipProvider {
     boolean shouldHandleItem(ItemStack item);
   }
-
-  public static final SpecialTooltipHandler INSTANCE = new SpecialTooltipHandler();
 
   private final List<ITooltipCallback> callbacks = Lists.newArrayList();
 

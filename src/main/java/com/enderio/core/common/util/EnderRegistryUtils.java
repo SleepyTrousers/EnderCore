@@ -3,14 +3,13 @@ package com.enderio.core.common.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 
 import org.apache.logging.log4j.Level;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ObjectArrays;
 
 import cpw.mods.fml.common.FMLLog;
@@ -25,11 +24,10 @@ import cpw.mods.fml.common.registry.GameData;
  * registering items/blocks inside Compat classes (as the active mod at that
  * time is always ttCore).
  */
-@UtilityClass
 public class EnderRegistryUtils {
-  private Method getMain;
-  private Method registerItem;
-  private Method registerBlock;
+  private static Method getMain;
+  private static Method registerItem;
+  private static Method registerBlock;
 
   static {
     try {
@@ -56,9 +54,12 @@ public class EnderRegistryUtils {
    * @param name
    *          The name of the item
    */
-  @SneakyThrows
-  public void registerItem(Item item, String modid, String name) {
-    registerItem.invoke(getMain.invoke(null), item, modid + ":" + name, -1);
+  public static void registerItem(Item item, String modid, String name) {
+    try {
+      registerItem.invoke(getMain.invoke(null), item, modid + ":" + name, -1);
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
   }
 
   /**
@@ -73,7 +74,7 @@ public class EnderRegistryUtils {
    * @param name
    *          The name of the block
    */
-  public void registerBlock(Block block, String modid, String name) {
+  public static void registerBlock(Block block, String modid, String name) {
     registerBlock(block, null, modid, name);
   }
 
@@ -93,13 +94,9 @@ public class EnderRegistryUtils {
    * @param itemCtorArgs
    *          Objects to pass as arguments to the ItemBlock.
    */
-  @SneakyThrows
-  public void registerBlock(Block block, Class<? extends ItemBlock> itemclass, String modid, String name, Object... itemCtorArgs) {
+  public static void registerBlock(Block block, Class<? extends ItemBlock> itemclass, String modid, String name, Object... itemCtorArgs) {
     if (Loader.instance().isInState(LoaderState.CONSTRUCTING)) {
-      FMLLog
-          .warning(
-              "The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.",
-              Loader.instance().activeModContainer());
+      FMLLog.warning("The mod %s is attempting to register a block whilst it it being constructed. This is bad modding practice - please use a proper mod lifecycle event.", Loader.instance().activeModContainer());
     }
     try {
       assert block != null : "registerBlock: block cannot be null";

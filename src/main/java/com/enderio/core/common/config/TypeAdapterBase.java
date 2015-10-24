@@ -4,27 +4,44 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.common.config.Property.Type;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.common.config.ConfigProcessor.ITypeAdapter;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
-@AllArgsConstructor
-@Getter
 @SuppressWarnings({ "serial", "unchecked" })
 public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTUAL, BASE> {
   private final TypeToken<ACTUAL> actualType;
   private final Property.Type type;
   private final Class<?> primitiveType;
 
+  public TypeAdapterBase(TypeToken<ACTUAL> actualType, Property.Type type, Class<?> primitiveType) {
+    this.actualType = actualType;
+    this.type = type;
+    this.primitiveType = primitiveType;
+  }
+
   public TypeAdapterBase(TypeToken<ACTUAL> actualType, Property.Type baseType) {
     this(actualType, baseType, null);
+  }
+
+  @Override
+  public TypeToken<ACTUAL> getActualType() {
+    return actualType;
+  }
+
+  @Override
+  public Property.Type getType() {
+    return type;
+  }
+
+  @Override
+  public Class<?> getPrimitiveType() {
+    return primitiveType;
   }
 
   public static final class TypeAdapterSame<TYPE> extends TypeAdapterBase<TYPE, TYPE> {
