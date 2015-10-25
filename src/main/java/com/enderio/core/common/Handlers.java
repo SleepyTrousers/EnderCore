@@ -181,7 +181,7 @@ public class Handlers {
    * @param packageName
    */
   @Deprecated
-  public void addPackage(String packageName) {
+  public static void addPackage(String packageName) {
     if (Loader.instance().hasReachedState(LoaderState.INITIALIZATION)) {
       throw new RuntimeException("This method must only be called in preinit");
     }
