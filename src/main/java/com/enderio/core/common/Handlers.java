@@ -71,18 +71,18 @@ public class Handlers {
   }
 
   /**
-   * To be put on classes that are Forge/FML event handlers. If you are using
-   * this from another mod, be sure to implement {@link IEnderMod} on your
-   * {@code @Mod} class, or call
-   * {@code Handlers.addPackage("your.base.package")} so that this class can
-   * search your classes
+   * To be put on classes that are Forge/FML event handlers. EnderCore will
+   * automatically figure out what busses it needs to be registered to.
    * <p>
-   * Class must have either:<br>
+   * It can get the instance of the handler in a few ways: <br>
    * A public no args constructor (or lombok {@link NoArgsConstructor})
    * <b>OR</b><br>
    * A static singleton object with field name {@code INSTANCE} (public or
    * private). <b>OR</b><br>
    * A static method with name <code>instance()</code> (public or private)
+   * <p>
+   * This can also be explicitly set using {@link #getInstFrom()} to avoid
+   * invoking code that may cause issues.
    */
   @Target(ElementType.TYPE)
   @Retention(RetentionPolicy.RUNTIME)
@@ -179,6 +179,7 @@ public class Handlers {
    * Not needed if your {@code @Mod} class implements {@link IEnderMod}
    * 
    * @param packageName
+   * @deprecated This is not needed, period.
    */
   @Deprecated
   public static void addPackage(String packageName) {
@@ -285,10 +286,10 @@ public class Handlers {
       } catch (Exception e) {
       }
     }
-    
+
     if (pref.matches(SCALA_OBJECT)) {
       try {
-        Field inst = Class.forName(c.getName()+ "$").getDeclaredField("MODULE$");
+        Field inst = Class.forName(c.getName() + "$").getDeclaredField("MODULE$");
         inst.setAccessible(true);
         return inst.get(null);
       } catch (Exception e) {
