@@ -390,8 +390,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   protected void drawFakeItemsStart() {
-    zLevel = 100.0F;
-    itemRender.zLevel = 100.0F;
+    zLevel = 0.0F;
+    itemRender.zLevel = -25.0F;
     GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
     GL11.glEnable(GL11.GL_LIGHTING);
     GL11.glEnable(GL12.GL_RESCALE_NORMAL);
