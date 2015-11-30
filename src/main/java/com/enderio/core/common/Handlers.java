@@ -16,18 +16,22 @@ import net.minecraftforge.common.MinecraftForge;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.IEnderMod;
+import com.enderio.core.common.Handlers.Handler.HandlerSide;
 import com.enderio.core.common.Handlers.Handler.Inst;
+import com.google.common.base.Throwables;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
+import cpw.mods.fml.common.discovery.asm.ModAnnotation.EnumHolder;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventBus;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.relauncher.Side;
 import static com.enderio.core.common.Handlers.Handler.Inst.*;
 
 public class Handlers {
@@ -136,6 +140,39 @@ public class Handlers {
       }
     }
 
+    public enum HandlerSide {
+
+      /**
+       * Whether to load this handler or not will be determined by the package
+       * name. If it contains "client" it will only load clientside. The default
+       * value.
+       */
+      AUTO,
+
+      /**
+       * Will load on both sides.
+       */
+      COMMON,
+
+      /**
+       * Will load only clientside.
+       */
+      CLIENT,
+
+      /**
+       * Will load only serverside.
+       */
+      SERVER;
+
+      public boolean equals(Side other) {
+        if (this == COMMON) {
+          return true;
+        } else {
+          return this == CLIENT ? other == Side.CLIENT : other == Side.SERVER;
+        }
+      }
+    }
+
     /**
      * Array of buses to register this handler to. Leave blank for all.
      */
@@ -147,6 +184,11 @@ public class Handlers {
      * {@link Inst#AUTO}
      */
     Inst getInstFrom() default AUTO;
+
+    /**
+     * The side to load this handler on. Defaults to {@link HandlerSide#AUTO}
+     */
+    HandlerSide side() default HandlerSide.AUTO;
   }
 
   private static final Set<String> packageSet = new HashSet<String>();
@@ -206,7 +248,7 @@ public class Handlers {
     for (ASMData data : annotations) {
       String className = data.getClassName();
       // if not client handler, or we are on client, continue
-      if (!className.contains("client") || FMLCommonHandler.instance().getEffectiveSide().isClient()) {
+      if (shouldLoad(data)) {
         try {
           Class<?> c = Class.forName(className);
           Annotation a = c.getAnnotation(Handler.class);
@@ -218,11 +260,35 @@ public class Handlers {
           t.printStackTrace();
         }
       } else {
-        EnderCore.logger.info(String.format("[Handlers] Skipping client class %s, we are on a dedicated server", className));
+        EnderCore.logger.info(String.format("[Handlers] Skipping class %s, it is not loaded on this side.", className));
       }
     }
 
     registered = true;
+  }
+
+  private static final Field _value = ReflectionHelper.findField(EnumHolder.class, "value");
+
+  private static boolean shouldLoad(ASMData data) {
+    EnumHolder holder = (EnumHolder) data.getAnnotationInfo().get("side");
+    HandlerSide side;
+    try {
+      if (holder == null) {
+        side = HandlerSide.AUTO;
+      } else {
+        side = HandlerSide.valueOf((String) _value.get(holder));
+      }
+      Side currentSide = FMLCommonHandler.instance().getEffectiveSide();
+      
+      if (side == null || side == HandlerSide.AUTO) {
+        return !data.getClassName().contains("client") || currentSide.isClient();
+      } else {
+        return side.equals(currentSide);
+      }
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
+    return false;
   }
 
   private static void registerHandler(Class<?> c, ASMData data, Handler handler) throws InstantiationException, IllegalAccessException {
