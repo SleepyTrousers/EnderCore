@@ -62,14 +62,13 @@ public class Util {
   }
 
   public static void giveExperience(EntityPlayer thePlayer, float experience) {
-    if (experience < 1.0F) {
-      int rndRound = MathHelper.floor_float(experience);
-      if (rndRound < MathHelper.ceiling_float_int(experience) && (float) Math.random() < experience) {
-        ++rndRound;
+    int intExp = (int) experience;
+    float fractional = experience - intExp;
+    if (fractional > 0.0F) {
+      if ((float) Math.random() < fractional) {
+        ++intExp;
       }
-      experience = rndRound;
     }
-    int intExp = Math.round(experience);
     while (intExp > 0) {
       int j = EntityXPOrb.getXPSplit(intExp);
       intExp -= j;
