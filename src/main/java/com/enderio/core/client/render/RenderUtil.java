@@ -575,6 +575,11 @@ public class RenderUtil {
       }
     }
 
+    double minU = icon.getMinU();
+    double maxU = icon.getMaxU();
+    double minV = icon.getMinV();
+    double maxV = icon.getMaxV();
+
     int renderAmount = (int) Math.max(Math.min(height, amount * height / capacity), 1);
     int posY = (int) (y + height - renderAmount);
 
@@ -583,28 +588,22 @@ public class RenderUtil {
     GL11.glColor3ub((byte) (color >> 16 & 0xFF), (byte) (color >> 8 & 0xFF), (byte) (color & 0xFF));
 
     GL11.glEnable(GL11.GL_BLEND);
+    Tessellator tessellator = Tessellator.instance;
+    tessellator.startDrawingQuads();
     for (int i = 0; i < width; i += 16) {
+      int drawWidth = (int) Math.min(width - i, 16);
+      int drawX = (int) (x + i);
       for (int j = 0; j < renderAmount; j += 16) {
-        int drawWidth = (int) Math.min(width - i, 16);
         int drawHeight = Math.min(renderAmount - j, 16);
-
-        int drawX = (int) (x + i);
         int drawY = posY + j;
 
-        double minU = icon.getMinU();
-        double maxU = icon.getMaxU();
-        double minV = icon.getMinV();
-        double maxV = icon.getMaxV();
-
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
         tessellator.addVertexWithUV(drawX, drawY + drawHeight, 0, minU, minV + (maxV - minV) * drawHeight / 16F);
         tessellator.addVertexWithUV(drawX + drawWidth, drawY + drawHeight, 0, minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F);
         tessellator.addVertexWithUV(drawX + drawWidth, drawY, 0, minU + (maxU - minU) * drawWidth / 16F, minV);
         tessellator.addVertexWithUV(drawX, drawY, 0, minU, minV);
-        tessellator.draw();
       }
     }
+    tessellator.draw();
     GL11.glDisable(GL11.GL_BLEND);
   }
 
