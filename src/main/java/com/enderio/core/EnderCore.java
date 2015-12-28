@@ -53,7 +53,7 @@ public class EnderCore implements IEnderMod {
   public static final Logger logger = LogManager.getLogger(NAME);
   public static final Lang lang = new Lang(MODID);
 
-  @Instance
+  @Instance(MODID)
   public static EnderCore instance;
 
   @SidedProxy(serverSide = "com.enderio.core.common.CommonProxy", clientSide = "com.enderio.core.client.ClientProxy")
