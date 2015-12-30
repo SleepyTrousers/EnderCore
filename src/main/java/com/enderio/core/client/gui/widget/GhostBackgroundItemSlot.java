@@ -60,7 +60,7 @@ public class GhostBackgroundItemSlot extends GhostSlot {
 
   @Override
   public boolean isVisible() {
-    return parent != null ? parent.xDisplayPosition >= 0 && parent.yDisplayPosition >= 0 : super.isVisible();
+    return parent != null ? parent.xDisplayPosition >= 0 && parent.yDisplayPosition >= 0 && !parent.getHasStack() && super.isVisible() : super.isVisible();
   }
 
 }
