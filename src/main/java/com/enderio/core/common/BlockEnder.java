@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -130,6 +131,16 @@ public abstract class BlockEnder extends Block {
       return super.getDrops(world, x, y, z, metadata, fortune);
     }
     return Lists.newArrayList(getNBTDrop(world, x, y, z, (TileEntityEnder) world.getTileEntity(x, y, z)));
+  }
+  
+  @Override
+  public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+    return getPickBlock(target, world, x, y, z, null);
+  }
+  
+  @Override
+  public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, @Nullable EntityPlayer player) {
+    return getNBTDrop(world, x, y, z, getTileEntityEio(world, x, y, z));
   }
 
   public ItemStack getNBTDrop(World world, int x, int y, int z, TileEntityEnder te) {
