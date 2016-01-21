@@ -1,15 +1,19 @@
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
         maven { url = "http://files.minecraftforge.net/maven" }
         maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
-    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT' }
+    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT' }
 }
 
-apply plugin: 'forge'
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.0.5"
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven-publish'
-apply plugin: 'curseforge'
 
 ext.buildnumber = 0
 if (System.getenv('BUILD_NUMBER') != null)
@@ -25,7 +29,8 @@ if (project.hasProperty('mod_appendix'))
     version += "_${project.mod_appendix}"
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}-${minecraft_version}"
+    mappings = "snapshot_nodoc_20160104"
+    version = "${minecraft_version}-${forge_version}"
     runDir = 'run'
 
     replace "@VERSION@", project.version
@@ -81,7 +86,7 @@ jar {
     }
 }
 
-task sourceJar(type: Jar) {
+task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
 }
@@ -127,20 +132,6 @@ publishing {
             maven { url mavendir }
         }
     }
-}
-
-curse {
-    dependsOn 'reobf'
-    
-    onlyIf {
-        return project.hasProperty('cp_curseforge_key') && System.getenv("CURSE") != null && System.getenv("CURSE").equalsIgnoreCase("true")
-    }
-
-    if (project.hasProperty('cp_curseforge_key')) apiKey = project.curseforge_key
-    projectId = project.curse_projectId
-    changelog = System.getenv("CHANGELOG").equals("none") ? project.changelog : System.getenv("CHANGELOG")
-    releaseType = project.hasProperty('mod_appendix') ? "${mod_appendix}".toString() : 'release'
-    additionalArtifact deobfJar, sourceJar, apiJar
 }
 
 task checkTranslations << {
