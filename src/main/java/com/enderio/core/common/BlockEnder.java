@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.enderio.core.common.util.Log;
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -18,9 +21,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-
-import com.enderio.core.common.util.Log;
-import com.google.common.collect.Lists;
 
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
