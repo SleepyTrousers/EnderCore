@@ -1,9 +1,9 @@
 package com.enderio.core.common.util;
 
+import com.enderio.core.EnderCore;
+
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumChatFormatting;
-
-import com.enderio.core.EnderCore;
 
 public class EnderStringUtils {
   /**

@@ -2,15 +2,13 @@ package com.enderio.core.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+
+import com.enderio.core.common.vecmath.Vector3d;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -19,12 +17,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-
-import com.enderio.core.common.vecmath.Vector3d;
 
 public class EntityUtil {
 
@@ -42,14 +39,14 @@ public class EntityUtil {
 
   public static EntityFireworkRocket getRandomFirework(World world, BlockCoord pos) {
     ItemStack firework = new ItemStack(Items.fireworks);
-    firework.stackTagCompound = new NBTTagCompound();
+    firework.setTagCompound(new NBTTagCompound());
     NBTTagCompound expl = new NBTTagCompound();
     expl.setBoolean("Flicker", true);
     expl.setBoolean("Trail", true);
 
     int[] colors = new int[rand.nextInt(8) + 1];
     for (int i = 0; i < colors.length; i++) {
-      colors[i] = ItemDye.field_150922_c[rand.nextInt(16)];
+      colors[i] = ItemDye.dyeColors[rand.nextInt(16)];
     }
     expl.setIntArray("Colors", colors);
     byte type = (byte) (rand.nextInt(3) + 1);
@@ -62,7 +59,7 @@ public class EntityUtil {
     NBTTagCompound fireworkTag = new NBTTagCompound();
     fireworkTag.setTag("Explosions", explosions);
     fireworkTag.setByte("Flight", (byte) 1);
-    firework.stackTagCompound.setTag("Fireworks", fireworkTag);
+    firework.getTagCompound().setTag("Fireworks", fireworkTag);
 
     EntityFireworkRocket e = new EntityFireworkRocket(world, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, firework);
     return e;
@@ -75,14 +72,14 @@ public class EntityUtil {
   public static void spawnFirework(BlockCoord block, int dimID, int range) {
     World world = DimensionManager.getWorld(dimID);
 
-    BlockCoord pos = new BlockCoord(block.x, block.y, block.z);
-
+    BlockPos pos = new BlockPos(block.x, block.y, block.z);
+    IBlockState bs = world.getBlockState(pos);
     // don't bother if there's no randomness at all
     if (range > 0) {
-      pos = new BlockCoord(moveRandomly(block.x, range), block.y, moveRandomly(block.z, range));
+      pos = new BlockPos(moveRandomly(block.x, range), block.y, moveRandomly(block.z, range));
 
       int tries = -1;
-      while (!world.isAirBlock(pos.x, pos.y, pos.z) && !world.getBlock(pos.x, pos.y, pos.z).isReplaceable(world, pos.x, pos.y, pos.z)) {
+      while (!world.isAirBlock(new BlockPos(pos)) && !bs.getBlock().isReplaceable(world, pos)) {
         tries++;
         if (tries > 100) {
           return;
@@ -90,7 +87,7 @@ public class EntityUtil {
       }
     }
 
-    world.spawnEntityInWorld(getRandomFirework(world, pos));
+    world.spawnEntityInWorld(getRandomFirework(world, new BlockCoord(pos)));
   }
 
   private static double moveRandomly(double base, double range) {
@@ -101,18 +98,19 @@ public class EntityUtil {
     return StatCollector.translateToLocal("entity." + mobName + ".name");
   }
 
-  public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
-    List<String> result = new ArrayList<String>();
-    Set<Map.Entry<Class, String>> entries = EntityList.classToStringMapping.entrySet();
-    for (Map.Entry<Class, String> entry : entries) {
-      if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-        if (!excludeBosses || !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
-          result.add(entry.getValue());
-        }
-      }
-    }
-    return result;
-  }
+  //TODO: 1.8
+//  public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
+//    List<String> result = new ArrayList<String>();
+//    Set<Map.Entry<Class, String>> entries = EntityList.classToStringMapping.entrySet();
+//    for (Map.Entry<Class, String> entry : entries) {
+//      if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
+//        if (!excludeBosses || !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+//          result.add(entry.getValue());
+//        }
+//      }
+//    }
+//    return result;
+//  }
 
   private EntityUtil() {
   }
@@ -122,8 +120,8 @@ public class EntityUtil {
   }
 
   public static List<AxisAlignedBB> getCollidingBlockGeometry(World world, Entity entity) {
-    AxisAlignedBB entityBounds = entity.boundingBox;
-    ArrayList collidingBoundingBoxes = new ArrayList();
+    AxisAlignedBB entityBounds = entity.getEntityBoundingBox();
+    ArrayList<AxisAlignedBB> collidingBoundingBoxes = new ArrayList<AxisAlignedBB>();
     int minX = MathHelper.floor_double(entityBounds.minX);
     int minY = MathHelper.floor_double(entityBounds.minY);
     int minZ = MathHelper.floor_double(entityBounds.minZ);
@@ -133,9 +131,11 @@ public class EntityUtil {
     for (int x = minX; x < maxX; x++) {
       for (int z = minZ; z < maxZ; z++) {
         for (int y = minY; y < maxY; y++) {
-          Block block = world.getBlock(x, y, z);
+          BlockPos pos = new BlockPos(x,y,z);
+          IBlockState bs = world.getBlockState(pos);
+          Block block = bs.getBlock();
           if (block != null) {
-            block.addCollisionBoxesToList(world, x, y, z, entityBounds, collidingBoundingBoxes, entity);
+            block.addCollisionBoxesToList(world, pos, bs, entityBounds, collidingBoundingBoxes, entity);
           }
         }
       }
@@ -156,7 +156,7 @@ public class EntityUtil {
   }
 
   public static void spawnItemInWorldWithRandomMotion(EntityItem entity) {
-    entity.delayBeforeCanPickup = 10;
+    entity.setDefaultPickupDelay();
 
     float f = (entity.worldObj.rand.nextFloat() * 0.1f) - 0.05f;
     float f1 = (entity.worldObj.rand.nextFloat() * 0.1f) - 0.05f;

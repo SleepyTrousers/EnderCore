@@ -6,11 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.common.config.Property.Type;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.config.IConfigHandler;
 import com.enderio.core.common.Lang;
@@ -18,9 +13,13 @@ import com.enderio.core.common.event.ConfigFileChangedEvent;
 import com.enderio.core.common.util.Bound;
 import com.google.common.collect.ImmutableList;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.common.config.Property.Type;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public abstract class AbstractConfigHandler implements IConfigHandler {
   /**
@@ -79,8 +78,8 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   private Section activeSection = null;
 
   protected AbstractConfigHandler(String modid) {
-    this.modid = modid;
-    FMLCommonHandler.instance().bus().register(this);
+    this.modid = modid;    
+    MinecraftForge.EVENT_BUS.register(this);
     EnderCore.instance.configs.add(this);
   }
 

@@ -1,46 +1,42 @@
 package com.enderio.core.client.render;
 
+import static net.minecraft.util.EnumFacing.DOWN;
+import static net.minecraft.util.EnumFacing.EAST;
+import static net.minecraft.util.EnumFacing.NORTH;
+import static net.minecraft.util.EnumFacing.SOUTH;
+import static net.minecraft.util.EnumFacing.UP;
+import static net.minecraft.util.EnumFacing.WEST;
+import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SMOOTH;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopAttrib;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushAttrib;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glShadeModel;
+
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Timer;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-
 import org.lwjgl.opengl.GL11;
 
-import com.enderio.core.api.client.render.IConnectedTextureRenderer;
 import com.enderio.core.client.handlers.ClientHandler;
-import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.util.Log;
 import com.enderio.core.common.vecmath.Matrix4d;
 import com.enderio.core.common.vecmath.VecmathUtil;
@@ -51,9 +47,36 @@ import com.enderio.core.common.vecmath.Vector4d;
 import com.enderio.core.common.vecmath.Vector4f;
 import com.enderio.core.common.vecmath.Vertex;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import static net.minecraftforge.common.util.ForgeDirection.*;
-import static org.lwjgl.opengl.GL11.*;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GLAllocation;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Timer;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class RenderUtil {
 
@@ -70,8 +93,6 @@ public class RenderUtil {
   private static final FloatBuffer MATRIX_BUFFER = GLAllocation.createDirectFloatBuffer(16);
 
   public static final ResourceLocation BLOCK_TEX = TextureMap.locationBlocksTexture;
-
-  public static final ResourceLocation ITEM_TEX = TextureMap.locationItemsTexture;
 
   public static final ResourceLocation GLINT_TEX = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 
@@ -139,14 +160,6 @@ public class RenderUtil {
     return Minecraft.getMinecraft().renderEngine;
   }
 
-  public static void bindItemTexture(ItemStack stack) {
-    engine().bindTexture(stack.getItemSpriteNumber() == 0 ? BLOCK_TEX : ITEM_TEX);
-  }
-
-  public static void bindItemTexture() {
-    engine().bindTexture(ITEM_TEX);
-  }
-
   public static void bindBlockTexture() {
     engine().bindTexture(BLOCK_TEX);
   }
@@ -164,112 +177,88 @@ public class RenderUtil {
   }
 
   public static FontRenderer fontRenderer() {
-    return Minecraft.getMinecraft().fontRenderer;
+    return Minecraft.getMinecraft().fontRendererObj;
   }
 
   public static float[] getDefaultPerSideBrightness() {
     float[] brightnessPerSide = new float[6];
-    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+    for (EnumFacing dir : EnumFacing.VALUES) {
       brightnessPerSide[dir.ordinal()] = RenderUtil.getColorMultiplierForFace(dir);
     }
     return brightnessPerSide;
   }
 
-  public static IIcon[] getBlockTextures(Block block, int meta) {
-    IIcon[] icons = new IIcon[6];
-    int i = 0;
-    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-      icons[i] = block.getIcon(dir.ordinal(), meta);
-      i++;
-    }
-    return icons;
-  }
-
-  public static IIcon[] getBlockTextures(IBlockAccess world, int x, int y, int z) {
-    Block block = world.getBlock(x, y, z);
-    IIcon[] icons = new IIcon[6];
-    int i = 0;
-    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-      icons[i] = block.getIcon(world, x, y, z, dir.ordinal());
-      i++;
-    }
-    return icons;
-  }
-
   public static float claculateTotalBrightnessForLocation(World worldObj, int xCoord, int yCoord, int zCoord) {
-    int i = worldObj.getLightBrightnessForSkyBlocks(xCoord, yCoord, zCoord, 0);
+    int i = worldObj.getLightFromNeighborsFor(EnumSkyBlock.SKY, new BlockPos(xCoord, yCoord, zCoord));
     int j = i % 65536;
     int k = i / 65536;
 
-    float minLight = 0;
-    //0.2 - 1
-    float sunBrightness = worldObj.getSunBrightness(1);
 
+    // 0.2 - 1
+    float sunBrightness = worldObj.getSunBrightness(1);
     float percentRecievedFromSun = k / 255f;
 
-    //Highest value recieved from a light
+    // Highest value recieved from a light
     float fromLights = j / 255f;
 
     // 0 - 1 for sun only, 0 - 0.6 for light only
-    float recievedPercent = worldObj.getLightBrightness(xCoord, yCoord, zCoord);
+    //float recievedPercent = worldObj.getLightBrightness(new BlockPos(xCoord, yCoord, zCoord));
     float highestValue = Math.max(fromLights, percentRecievedFromSun * sunBrightness);
     return Math.max(0.2f, highestValue);
   }
 
-  public static float getColorMultiplierForFace(ForgeDirection face) {
-    if (face == ForgeDirection.UP) {
+  public static float getColorMultiplierForFace(EnumFacing face) {
+    if (face == EnumFacing.UP) {
       return 1;
     }
-    if (face == ForgeDirection.DOWN) {
+    if (face == EnumFacing.DOWN) {
       return 0.5f;
     }
-    if (face.offsetX != 0) {
+    if (face.getFrontOffsetX() != 0) {
       return 0.6f;
     }
     return 0.8f; // z
   }
 
-  public static int setTesselatorBrightness(IBlockAccess world, int x, int y, int z) {
-    Block block = world.getBlock(x, y, z);
-    int res = block == null ? world.getLightBrightnessForSkyBlocks(x, y, z, 0) : block.getMixedBrightnessForBlock(world, x, y, z);
-    Tessellator.instance.setBrightness(res);
-    Tessellator.instance.setColorRGBA_F(1, 1, 1, 1);
-    return res;
-  }
-
   public static void renderQuad2D(double x, double y, double z, double width, double height, int colorRGB) {
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    
     GL11.glDisable(GL11.GL_TEXTURE_2D);
-    Tessellator tessellator = Tessellator.instance;
-    tessellator.startDrawingQuads();
-    tessellator.setColorOpaque_I(colorRGB);
-    tessellator.addVertex(x, y + height, z);
-    tessellator.addVertex(x + width, y + height, z);
-    tessellator.addVertex(x + width, y, z);
-    tessellator.addVertex(x, y, z);
+    Vector3f col = ColorUtil.toFloat(colorRGB);
+    GL11.glColor3f(col.x, col.y, col.z);
+    
+    Tessellator tessellator = Tessellator.getInstance();    
+    WorldRenderer tes = tessellator.getWorldRenderer();
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);    
+    tes.pos(x, y + height, z).endVertex();
+    tes.pos(x + width, y + height, z).endVertex();
+    tes.pos(x + width, y, z).endVertex();
+    tes.pos(x, y, z).endVertex();
+    
     tessellator.draw();
     GL11.glEnable(GL11.GL_TEXTURE_2D);
   }
 
   public static void renderQuad2D(double x, double y, double z, double width, double height, Vector4f colorRGBA) {
     GL11.glColor4f(colorRGBA.x, colorRGBA.y, colorRGBA.z, colorRGBA.w);
-    GL11.glDisable(GL11.GL_TEXTURE_2D);
-    Tessellator tessellator = Tessellator.instance;
-    tessellator.startDrawingQuads();
-    tessellator.addVertex(x, y + height, z);
-    tessellator.addVertex(x + width, y + height, z);
-    tessellator.addVertex(x + width, y, z);
-    tessellator.addVertex(x, y, z);
+
+    Tessellator tessellator = Tessellator.getInstance();    
+    WorldRenderer tes = tessellator.getWorldRenderer();
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+    tes.pos(x, y + height, z).endVertex();
+    tes.pos(x + width, y + height, z).endVertex();
+    tes.pos(x + width, y, z).endVertex();
+    tes.pos(x, y, z).endVertex();
     tessellator.draw();
     GL11.glEnable(GL11.GL_TEXTURE_2D);
   }
 
   public static Matrix4d createBillboardMatrix(TileEntity te, EntityLivingBase entityPlayer) {
-    return createBillboardMatrix(new Vector3d(te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord + 0.5), entityPlayer);
+    BlockPos p = te.getPos();
+    return createBillboardMatrix(new Vector3d(p.getX() + 0.5, p.getY() + 0.5, p.getZ() + 0.5), entityPlayer);
   }
 
   public static Matrix4d createBillboardMatrix(Vector3d lookAt, EntityLivingBase entityPlayer) {
-    Vector3d playerEye = new Vector3d(entityPlayer.posX, entityPlayer.posY + 1.62 - entityPlayer.yOffset, entityPlayer.posZ);
+    Vector3d playerEye = new Vector3d(entityPlayer.posX, entityPlayer.posY + 1.62 - entityPlayer.getYOffset(), entityPlayer.posZ);
     Vector3d blockOrigin = new Vector3d(lookAt.x, lookAt.y, lookAt.z);
     Matrix4d lookMat = VecmathUtil.createMatrixAsLookAt(blockOrigin, playerEye, RenderUtil.UP_V);
     lookMat.setTranslation(new Vector3d());
@@ -278,40 +267,41 @@ public class RenderUtil {
   }
 
   public static void renderBillboard(Matrix4d lookMat, float minU, float maxU, float minV, float maxV, double size, int brightness) {
-    Tessellator tes = Tessellator.instance;
-    tes.startDrawingQuads();
-    tes.setBrightness(brightness);
+    Tessellator tessellator = Tessellator.getInstance();    
+    WorldRenderer tes = tessellator.getWorldRenderer();
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
     double s = size / 2;
     Vector3d v = new Vector3d();
     v.set(-s, s, 0);
     lookMat.transform(v);
-    tes.addVertexWithUV(v.x, v.y, v.z, minU, maxV);
+    tes.pos(v.x, v.y, v.z).tex(minU, maxV).endVertex();
     v.set(s, s, 0);
     lookMat.transform(v);
-    tes.addVertexWithUV(v.x, v.y, v.z, maxU, maxV);
+    tes.pos(v.x, v.y, v.z).tex( maxU, maxV).endVertex();
     v.set(s, -s, 0);
     lookMat.transform(v);
-    tes.addVertexWithUV(v.x, v.y, v.z, maxU, minV);
+    tes.pos(v.x, v.y, v.z).tex( maxU, minV).endVertex();
     v.set(-s, -s, 0);
     lookMat.transform(v);
-    tes.addVertexWithUV(v.x, v.y, v.z, minU, minV);
-    tes.draw();
+    tes.pos(v.x, v.y, v.z).tex( minU, minV).endVertex();
+    
+    tessellator.draw();
   }
 
   /**
    * @return The edge directions for a face, in the order left, bottom, right,
    *         top.
    */
-  public static List<ForgeDirection> getEdgesForFace(ForgeDirection face) {
-    List<ForgeDirection> result = new ArrayList<ForgeDirection>(4);
-    if (face.offsetY != 0) {
+  public static List<EnumFacing> getEdgesForFace(EnumFacing face) {
+    List<EnumFacing> result = new ArrayList<EnumFacing>(4);
+    if (face.getFrontOffsetY() != 0) {
       result.add(NORTH);
       result.add(EAST);
       result.add(SOUTH);
       result.add(WEST);
 
-    } else if (face.offsetX != 0) {
+    } else if (face.getFrontOffsetX() != 0) {
       result.add(DOWN);
       result.add(SOUTH);
       result.add(UP);
@@ -325,139 +315,31 @@ public class RenderUtil {
     return result;
   }
 
-  public static void addVerticesToTesselator(List<Vertex> vertices) {
-    addVerticesToTessellator(vertices, Tessellator.instance);
-  }
-
-  public static void addVerticesToTessellator(List<Vertex> vertices, Tessellator tes) {
-    for (Vertex v : vertices) {
-      if (v.brightness != -1) {
-        tes.setBrightness(v.brightness);
-      }
-      if (v.color != null) {
-        tes.setColorRGBA_F(v.r(), v.g(), v.b(), v.a());
-      }
-      if (v.uv != null) {
-        tes.setTextureUV(v.u(), v.v());
-      }
-      if (v.normal != null) {
-        tes.setNormal(v.nx(), v.ny(), v.nz());
-      }
-      tes.addVertex(v.x(), v.y(), v.z());
-    }
-  }
-
-  public static void renderConnectedTextureFace(IBlockAccess blockAccess, Block block, int x, int y, int z, ForgeDirection face, IIcon texture,
-      boolean forceAllEdges) {
-    renderConnectedTextureFace(blockAccess, block, x, y, z, face, texture, forceAllEdges, true, true);
-  }
-
-  public static void renderConnectedTextureFace(IBlockAccess blockAccess, Block block, int x, int y, int z, ForgeDirection face, IIcon texture,
-      boolean forceAllEdges, boolean translateToXYZ, boolean applyFaceShading) {
-
-    if ((blockAccess == null && !forceAllEdges) || face == null || texture == null) {
+  public static void addVerticesToTessellator(List<Vertex> vertices, VertexFormat format) {
+    if(vertices == null || vertices.isEmpty()) {
       return;
     }
+    
+    Tessellator tessellator = Tessellator.getInstance();    
+    WorldRenderer tes = tessellator.getWorldRenderer();
+    
+    tes.begin(GL11.GL_QUADS, format);
 
-    if (!forceAllEdges) {
-      Block check = blockAccess.getBlock(x, y, z);
-      if (check == null) {
-        return;
+    for (Vertex v : vertices) {      
+      if (format.hasColor() && v.color != null) {
+        tes.color(v.r(), v.g(), v.b(), v.a());        
       }
-      if (!check.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
-        return;
+      if (format.getElements().contains(DefaultVertexFormats.TEX_2F) && v.uv != null) {
+        tes.tex(v.u(), v.v());
       }
-    }
-
-    List<ForgeDirection> edges;
-    if (forceAllEdges) {
-      edges = RenderUtil.getEdgesForFace(face);
-    } else {
-      edges = RenderUtil.getNonConectedEdgesForFace(blockAccess, x, y, z, face);
-    }
-
-    Tessellator tes = Tessellator.instance;
-    tes.setNormal(face.offsetX, face.offsetY, face.offsetZ);
-    if (applyFaceShading) {
-      float cm = RenderUtil.getColorMultiplierForFace(face);
-      tes.setColorOpaque_F(cm, cm, cm);
-    }
-
-    float scaleFactor = 15f / 16f;
-    Vector2f uv = new Vector2f();
-    for (ForgeDirection edge : edges) {
-
-      float xLen = 1 - Math.abs(edge.offsetX) * scaleFactor;
-      float yLen = 1 - Math.abs(edge.offsetY) * scaleFactor;
-      float zLen = 1 - Math.abs(edge.offsetZ) * scaleFactor;
-
-      xLen -= 2 * (1 - block.getBlockBoundsMaxX()) - block.getBlockBoundsMinX();
-      yLen -= 2 * (1 - block.getBlockBoundsMaxY()) - block.getBlockBoundsMinY();
-      zLen -= 2 * (1 - block.getBlockBoundsMaxZ()) - block.getBlockBoundsMinZ();
-
-      BoundingBox bb = BoundingBox.UNIT_CUBE.scale(xLen, yLen, zLen);
-
-      List<Vector3f> corners = bb.getCornersForFace(face);
-
-      for (Vector3f unitCorn : corners) {
-        Vector3d corner = new Vector3d(unitCorn);
-        if (translateToXYZ) {
-          corner.x += x;
-          corner.y += y;
-          corner.z += z;
-        }
-
-        corner.x += (float) (edge.offsetX * 0.5) - Math.signum(edge.offsetX) * xLen / 2f;
-        corner.y += (float) (edge.offsetY * 0.5) - Math.signum(edge.offsetY) * yLen / 2f;
-        corner.z += (float) (edge.offsetZ * 0.5) - Math.signum(edge.offsetZ) * zLen / 2f;
-
-        if (translateToXYZ) {
-          RenderUtil.getUvForCorner(uv, corner, x, y, z, face, texture);
-        } else {
-          RenderUtil.getUvForCorner(uv, corner, 0, 0, 0, face, texture);
-        }
-        tes.addVertexWithUV(corner.x, corner.y, corner.z, uv.x, uv.y);
+      if (format.hasNormal() && v.normal != null) {
+        tes.normal(v.nx(), v.ny(), v.nz());
       }
-
+      tes.pos(v.x(), v.y(), v.z()).endVertex();
     }
-
   }
 
-  public static List<ForgeDirection> getNonConectedEdgesForFace(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection face) {
-    return getNonConectedEdgesForFace(blockAccess, x, y, z, face, null);
-  }
-
-  public static List<ForgeDirection> getNonConectedEdgesForFace(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection face,
-      IConnectedTextureRenderer render) {
-
-    Block block = blockAccess.getBlock(x, y, z);
-    if (block == null) {
-      return Collections.emptyList();
-    }
-    if (!block.shouldSideBeRendered(blockAccess, x + face.offsetX, y + face.offsetY, z + face.offsetZ, face.ordinal())) {
-      return Collections.emptyList();
-    }
-    BlockCoord bc = new BlockCoord(x, y, z);
-
-    List<EdgeNeighbour> edges = new ArrayList<EdgeNeighbour>(4);
-    for (ForgeDirection dir : getEdgesForFace(face)) {
-      edges.add(new EdgeNeighbour(bc, dir));
-    }
-    List<ForgeDirection> result = new ArrayList<ForgeDirection>(4);
-    for (EdgeNeighbour edge : edges) {
-      boolean matchingNeighbour = blockAccess.getBlock(edge.bc.x, edge.bc.y, edge.bc.z) == block;
-      if (matchingNeighbour && render != null) {
-        matchingNeighbour = render.matchesMetadata(blockAccess.getBlockMetadata(x, y, z), blockAccess.getBlockMetadata(edge.bc.x, edge.bc.y, edge.bc.z));
-      }
-      if (!matchingNeighbour) {
-        result.add(edge.dir);
-      }
-
-    }
-    return result;
-  }
-
-  public static void getUvForCorner(Vector2f uv, Vector3d corner, int x, int y, int z, ForgeDirection face, IIcon icon) {
+  public static void getUvForCorner(Vector2f uv, Vector3d corner, int x, int y, int z, EnumFacing face, TextureAtlasSprite icon) {
     if (icon == null) {
       return;
     }
@@ -484,7 +366,7 @@ public class RenderUtil {
 
   }
 
-  public static Vector4d getVPlaneForFace(ForgeDirection face) {
+  public static Vector4d getVPlaneForFace(EnumFacing face) {
     switch (face) {
     case DOWN:
     case UP:
@@ -494,14 +376,13 @@ public class RenderUtil {
     case NORTH:
     case SOUTH:
       return new Vector4d(0, -1, 0, 1);
-    case UNKNOWN:
     default:
       break;
     }
     return null;
   }
 
-  public static Vector4d getUPlaneForFace(ForgeDirection face) {
+  public static Vector4d getUPlaneForFace(EnumFacing face) {
     switch (face) {
     case DOWN:
     case UP:
@@ -514,14 +395,13 @@ public class RenderUtil {
       return new Vector4d(-1, 0, 0, 1);
     case SOUTH:
       return new Vector4d(1, 0, 0, 0);
-    case UNKNOWN:
     default:
       break;
     }
     return null;
   }
 
-  public static ForgeDirection getVDirForFace(ForgeDirection face) {
+  public static EnumFacing getVDirForFace(EnumFacing face) {
     switch (face) {
     case DOWN:
     case UP:
@@ -530,19 +410,18 @@ public class RenderUtil {
     case WEST:
     case NORTH:
     case SOUTH:
-      return ForgeDirection.UP;
-    case UNKNOWN:
+      return EnumFacing.UP;
     default:
       break;
     }
     return null;
   }
 
-  public static ForgeDirection getUDirForFace(ForgeDirection face) {
+  public static EnumFacing getUDirForFace(EnumFacing face) {
     switch (face) {
     case DOWN:
     case UP:
-      return ForgeDirection.EAST;
+      return EnumFacing.EAST;
     case EAST:
       return NORTH;
     case WEST:
@@ -550,8 +429,7 @@ public class RenderUtil {
     case NORTH:
       return WEST;
     case SOUTH:
-      return ForgeDirection.EAST;
-    case UNKNOWN:
+      return EnumFacing.EAST;
     default:
       break;
     }
@@ -567,12 +445,10 @@ public class RenderUtil {
       return;
     }
 
-    IIcon icon = fluid.getFluid().getStillIcon();
+    ResourceLocation iconKey = fluid.getFluid().getStill(fluid);
+    TextureAtlasSprite icon = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(iconKey.toString());
     if (icon == null) {
-      icon = fluid.getFluid().getIcon();
-      if (icon == null) {
-        return;
-      }
+      return;
     }
 
     int renderAmount = (int) Math.max(Math.min(height, amount * height / capacity), 1);
@@ -596,12 +472,13 @@ public class RenderUtil {
         double minV = icon.getMinV();
         double maxV = icon.getMaxV();
 
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(drawX, drawY + drawHeight, 0, minU, minV + (maxV - minV) * drawHeight / 16F);
-        tessellator.addVertexWithUV(drawX + drawWidth, drawY + drawHeight, 0, minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F);
-        tessellator.addVertexWithUV(drawX + drawWidth, drawY, 0, minU + (maxU - minU) * drawWidth / 16F, minV);
-        tessellator.addVertexWithUV(drawX, drawY, 0, minU, minV);
+        Tessellator tessellator = Tessellator.getInstance();    
+        WorldRenderer tes = tessellator.getWorldRenderer();
+        tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);        
+        tes.pos(drawX, drawY + drawHeight, 0).tex(minU, minV + (maxV - minV) * drawHeight / 16F).endVertex();
+        tes.pos(drawX + drawWidth, drawY + drawHeight, 0).tex( minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F).endVertex();
+        tes.pos(drawX + drawWidth, drawY, 0).tex( minU + (maxU - minU) * drawWidth / 16F, minV).endVertex();
+        tes.pos(drawX, drawY, 0).tex( minU, minV).endVertex();
         tessellator.draw();
       }
     }
@@ -616,25 +493,27 @@ public class RenderUtil {
     drawBillboardedText(pos, text, size, DEFAULT_TXT_COL, true, DEFAULT_TEXT_SHADOW_COL, true, bgCol);
   }
 
-  public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol,
-      boolean drawBackground, Vector4f bgCol) {
+  public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol, boolean drawBackground,
+      Vector4f bgCol) {
+
     GL11.glPushMatrix();
     GL11.glTranslatef(pos.x, pos.y, pos.z);
-    glRotatef(180, 1, 0, 0);
+    GL11.glRotatef(180, 1, 0, 0);
 
-    FontRenderer fnt = Minecraft.getMinecraft().fontRenderer;
+    Minecraft mc = Minecraft.getMinecraft();
+    FontRenderer fnt = mc.fontRendererObj;
     float scale = size / fnt.FONT_HEIGHT;
     GL11.glScalef(scale, scale, scale);
-    glRotatef(RenderManager.instance.playerViewY + 180, 0.0F, 1.0F, 0.0F);
-    glRotatef(-RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+    GL11.glRotatef(mc.getRenderManager().playerViewY + 180, 0.0F, 1.0F, 0.0F);
+    GL11.glRotatef(-mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
 
-    glTranslatef(-fnt.getStringWidth(text) / 2, 0, 0);
+    GL11.glTranslatef(-fnt.getStringWidth(text) / 2, 0, 0);
     if (drawBackground) {
       renderBackground(fnt, text, bgCol);
     }
     fnt.drawString(text, 0, 0, ColorUtil.getRGBA(txtCol));
     if (drawShadow) {
-      glTranslatef(0.5f, 0.5f, 0.1f);
+      GL11.glTranslatef(0.5f, 0.5f, 0.1f);
       fnt.drawString(text, 0, 0, ColorUtil.getRGBA(shadowCol));
     }
     GL11.glPopMatrix();
@@ -651,19 +530,23 @@ public class RenderUtil {
     glDisable(GL_CULL_FACE);
     glDepthMask(false);
     RenderHelper.disableStandardItemLighting();
-    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop random disappearing
+    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop
+                                                                                     // random
+                                                                                     // disappearing
 
     float width = fnt.getStringWidth(toRender);
     float height = fnt.FONT_HEIGHT;
     float padding = 2f;
-    Tessellator tessellator = Tessellator.instance;
-    tessellator.startDrawingQuads();
-    tessellator.setColorRGBA_F(color.x, color.y, color.z, color.w);
-    tessellator.addVertex(-padding, -padding, 0);
-    tessellator.addVertex(-padding, height + padding, 0);
-    tessellator.addVertex(width + padding, height + padding, 0);
-    tessellator.addVertex(width + padding, -padding, 0);
-    tessellator.draw();
+
+    GlStateManager.color(color.x, color.y, color.z, color.w);
+
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+    tes.pos(-padding, -padding, 0).endVertex();
+    tes.pos(-padding, height + padding, 0).endVertex();
+    tes.pos(width + padding, height + padding, 0).endVertex();
+    tes.pos(width + padding, -padding, 0).endVertex();
+    Tessellator.getInstance().draw();
 
     glPopAttrib();
   }
@@ -689,7 +572,8 @@ public class RenderUtil {
     }
 
     item.hoverStart = 0.0F;
-    RenderManager.instance.renderEntityWithPosYaw(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+    //TODO: 1.8
+    //RenderManager.instance.renderEntityWithPosYaw(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
 
     glPopMatrix();
   }
@@ -704,39 +588,69 @@ public class RenderUtil {
     rotateToPlayer();
 
     glPushMatrix();
-
+    
     glRotatef(rot, 0, 0, 1);
-
-    Tessellator tessellator = Tessellator.instance;
-    tessellator.startDrawingQuads();
     glColor3f(1, 1, 1);
-    tessellator.setColorRGBA(255, 255, 255, 255);
-    tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
-    tessellator.addVertexWithUV(-scale, scale, 0, 0, 1);
-    tessellator.addVertexWithUV(scale, scale, 0, 1, 1);
-    tessellator.addVertexWithUV(scale, -scale, 0, 1, 0);
+
+    Tessellator tessellator = Tessellator.getInstance();    
+    WorldRenderer tes = tessellator.getWorldRenderer();
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+    tes.pos(-scale, -scale, 0).tex( 0, 0).endVertex();
+    tes.pos(-scale, scale, 0).tex( 0, 1).endVertex();
+    tes.pos(scale, scale, 0).tex( 1, 1).endVertex();
+    tes.pos(scale, -scale, 0).tex( 1, 0).endVertex();
     tessellator.draw();
     glPopMatrix();
     glPopMatrix();
   }
 
   public static void rotateToPlayer() {
-    glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-    glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+    RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+    glRotatef(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
+    glRotatef(rm.playerViewX, 1.0F, 0.0F, 0.0F);
   }
 
-  private static class EdgeNeighbour {
-    final ForgeDirection dir;
-    final BlockCoord bc;
+  public static TextureAtlasSprite getTexture(IBlockState state) {
+    return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);  
+  }
 
-    public EdgeNeighbour(BlockCoord bc, ForgeDirection dir) {
-      this.dir = dir;
-      this.bc = bc.getLocation(dir);
+  public static void renderBoundingBox(BoundingBox bb) {
+
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+    List<Vector3f> corners;
+    for (EnumFacing face : EnumFacing.VALUES) {
+      corners = bb.getCornersForFace(face);
+      for (Vector3f v : corners) {
+        tes.pos(v.x, v.y, v.z).endVertex();
+      }
     }
+    Tessellator.getInstance().draw();
+  }
+
+  public static void renderBoundingBox(BoundingBox bb,IBlockState state) {
+    renderBoundingBox(bb, getTexture(state));
+  }
+  
+  public static void renderBoundingBox(BoundingBox bb, TextureAtlasSprite tex) {
+
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+    List<Vertex> corners;
+    for (EnumFacing face : EnumFacing.VALUES) {
+      corners = bb.getCornersWithUvForFace(face, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV());
+      for (Vertex v : corners) {
+        tes.pos(v.x(), v.y(), v.z()).tex(v.u(), v.v()).endVertex();
+      }
+    }
+    Tessellator.getInstance().draw();
 
   }
+  
 
   public static void registerReloadListener(IResourceManagerReloadListener obj) {
     ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(obj);
   }
+  
+  
 }

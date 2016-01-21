@@ -1,8 +1,8 @@
 package com.enderio.core.common;
 
-import net.minecraft.world.World;
-
 import com.enderio.core.common.util.Scheduler;
+
+import net.minecraft.world.World;
 
 public class CommonProxy {
   private static final Scheduler scheduler = new Scheduler();

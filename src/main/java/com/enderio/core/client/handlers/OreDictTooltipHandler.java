@@ -1,18 +1,18 @@
 package com.enderio.core.client.handlers;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.Item;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.oredict.OreDictionary;
+import static com.enderio.core.common.config.ConfigHandler.showOredictTooltips;
+import static com.enderio.core.common.config.ConfigHandler.showRegistryNameTooltips;
 
 import org.lwjgl.input.Keyboard;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
-import static com.enderio.core.common.config.ConfigHandler.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.Item;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 @Handler
 public class OreDictTooltipHandler {
@@ -24,7 +24,7 @@ public class OreDictTooltipHandler {
     boolean doOredict = showOredictTooltips == 3 ? debugMode : showOredictTooltips == 2 ? shiftDown : showOredictTooltips == 1;
 
     if (doRegistry) {
-      event.toolTip.add(Item.itemRegistry.getNameForObject(event.itemStack.getItem()));
+      event.toolTip.add(Item.itemRegistry.getNameForObject(event.itemStack.getItem()).toString());
     }
 
     if (doOredict) {

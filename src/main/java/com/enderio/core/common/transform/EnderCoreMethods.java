@@ -1,5 +1,10 @@
 package com.enderio.core.common.transform;
 
+import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.event.ArrowUpdateEvent;
+import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
+import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.Container;
@@ -11,11 +16,6 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.common.MinecraftForge;
-
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.event.ArrowUpdateEvent;
-import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
-import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
 
 public class EnderCoreMethods {
   public static boolean hasVoidParticles(WorldType type, boolean hasSky) {
@@ -69,13 +69,13 @@ public class EnderCoreMethods {
           if (!mergeItemStack(inv, itemstack1, 1, 2, false)) {
             // Nest this inside so that if the above fails it will
             // attempt to do the input slot
-            if (FurnaceRecipes.smelting().getSmeltingResult(itemstack1) != null) {
+            if (FurnaceRecipes.instance().getSmeltingResult(itemstack1) != null) {
               if (!mergeItemStack(inv, itemstack1, 0, 1, false)) {
                 return null;
               }
             }
           }
-        } else if (FurnaceRecipes.smelting().getSmeltingResult(itemstack1) != null) {
+        } else if (FurnaceRecipes.instance().getSmeltingResult(itemstack1) != null) {
           if (!mergeItemStack(inv, itemstack1, 0, 1, false)) {
             return null;
           }

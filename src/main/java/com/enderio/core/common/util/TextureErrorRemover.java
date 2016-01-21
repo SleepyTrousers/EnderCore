@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import net.minecraft.client.renderer.texture.TextureMap;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Logger;
@@ -15,7 +13,8 @@ import org.apache.logging.log4j.message.Message;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class TextureErrorRemover extends Logger {
   private static TextureErrorRemover INSTANCE;

@@ -2,27 +2,23 @@ package com.enderio.core.api.client.gui;
 
 import java.awt.Rectangle;
 
-public interface IGuiOverlay {
+public interface IGuiOverlay extends IHideable {
 
-  void init(IGuiScreen screen);
+    void init(IGuiScreen screen);
 
-  Rectangle getBounds();
+    Rectangle getBounds();
 
-  void draw(int mouseX, int mouseY, float partialTick);
+    void draw(int mouseX, int mouseY, float partialTick);
 
-  //  //consume event?
-  //  boolean mouseClicked(int par1, int par2, int par3);
-  //
-  //  boolean mouseClickMove(int par1, int par2, int par3, long p_146273_4_);
-  //
-  //  boolean mouseMovedOrUp(int par1, int par2, int par3);
+    // //consume event?
+    // boolean mouseClicked(int par1, int par2, int par3);
+    //
+    // boolean mouseClickMove(int par1, int par2, int par3, long p_146273_4_);
+    //
+    // boolean mouseMovedOrUp(int par1, int par2, int par3);
 
-  void setVisible(boolean visible);
+    boolean handleMouseInput(int x, int y, int b);
 
-  boolean isVisible();
-
-  boolean handleMouseInput(int x, int y, int b);
-
-  boolean isMouseInBounds(int mouseX, int mouseY);
+    boolean isMouseInBounds(int mouseX, int mouseY);
 
 }

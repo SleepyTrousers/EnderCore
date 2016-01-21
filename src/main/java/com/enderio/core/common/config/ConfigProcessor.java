@@ -10,11 +10,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.AbstractConfigHandler.RestartReqs;
 import com.enderio.core.common.config.annot.Comment;
@@ -31,11 +26,15 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 /**
  * This class can be used to automatically process {@link Config} annotations on
@@ -173,8 +172,8 @@ public class ConfigProcessor {
     this.configFile = configFile;
     this.modid = modid;
     this.callback = callback;
-    processorMap.put(modid, this);
-    FMLCommonHandler.instance().bus().register(this);
+    processorMap.put(modid, this);    
+    MinecraftForge.EVENT_BUS.register(this);
     adapters.addAll(TypeAdapterBase.all);
   }
 

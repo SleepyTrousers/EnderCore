@@ -30,7 +30,7 @@ public enum DyeColor {
 
   public static final String[] DYE_ORE_UNLOCAL_NAMES = {
 
-  "item.fireworksCharge.black", "item.fireworksCharge.red", "item.fireworksCharge.green", "item.fireworksCharge.brown", "item.fireworksCharge.blue",
+      "item.fireworksCharge.black", "item.fireworksCharge.red", "item.fireworksCharge.green", "item.fireworksCharge.brown", "item.fireworksCharge.blue",
       "item.fireworksCharge.purple", "item.fireworksCharge.cyan", "item.fireworksCharge.silver", "item.fireworksCharge.gray", "item.fireworksCharge.pink",
       "item.fireworksCharge.lime", "item.fireworksCharge.yellow", "item.fireworksCharge.lightBlue", "item.fireworksCharge.magenta",
       "item.fireworksCharge.orange", "item.fireworksCharge.white"
@@ -69,20 +69,21 @@ public enum DyeColor {
   }
 
   public int getColor() {
-    return ItemDye.field_150922_c[ordinal()];
+    return ItemDye.dyeColors[ordinal()];
   }
-
-  public String getName() {
-    return ItemDye.field_150921_b[ordinal()];
-  }
+  // TODO: 1.8
+  // public String getName() {
+  // ItemDye.
+  // return ItemDye.field_150921_b[ordinal()];
+  // }
 
   public String getLocalisedName() {
     return EnderCore.lang.localizeExact(DYE_ORE_UNLOCAL_NAMES[ordinal()], false);
   }
 
-  @Override
-  public String toString() {
-    return getName();
-  }
+  // @Override
+  // public String toString() {
+  // return getName();
+  // }
 
 }

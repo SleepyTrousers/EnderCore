@@ -1,15 +1,15 @@
 package com.enderio.core.common.network;
 
+import com.enderio.core.common.util.Log;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-
-import com.enderio.core.common.util.Log;
-
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Created by CrazyPants on 27/02/14.
@@ -31,9 +31,9 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
 
   public MessageTileNBT(TileEntity te) {
     this.te = te;
-    x = te.xCoord;
-    y = te.yCoord;
-    z = te.zCoord;
+    x = te.getPos().getX();
+    y = te.getPos().getY();
+    z = te.getPos().getZ();
     tags = new NBTTagCompound();
     te.writeToNBT(tags);
   }
@@ -58,7 +58,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
     te = handle(ctx.getServerHandler().playerEntity.worldObj);
     if (te != null && renderOnUpdate) {
-      te.getWorldObj().markBlockForUpdate(x, y, z);
+      te.getWorld().markBlockForUpdate(new BlockPos(x, y, z));
     }
     return null;
   }
@@ -68,7 +68,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null world processing tile entity packet.");
       return null;
     }
-    TileEntity te = world.getTileEntity(x, y, z);
+    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
     if (te == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null when processing tile entity packet.");
       return null;

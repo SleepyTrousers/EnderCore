@@ -1,5 +1,6 @@
 package com.enderio.core.api.client.gui;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
@@ -9,26 +10,28 @@ import net.minecraft.client.gui.GuiButton;
 
 public interface IGuiScreen {
 
-  void addToolTip(GuiToolTip toolTip);
+    void addToolTip(GuiToolTip toolTip);
 
-  boolean removeToolTip(GuiToolTip toolTip);
+    boolean removeToolTip(GuiToolTip toolTip);
 
-  int getGuiLeft();
+    void clearToolTips();
 
-  int getGuiTop();
+    int getGuiLeft();
 
-  int getXSize();
+    int getGuiTop();
 
-  int getYSize();
+    int getXSize();
 
-  void addButton(GuiButton button);
+    int getYSize();
 
-  void removeButton(GuiButton button);
+    void addButton(GuiButton button);
 
-  int getOverlayOffsetX();
+    void removeButton(GuiButton button);
 
-  void doActionPerformed(GuiButton but);
+    int getOverlayOffsetX();
 
-  List<GhostSlot> getGhostSlots();
+    void doActionPerformed(GuiButton but) throws IOException;
+
+    List<GhostSlot> getGhostSlots();
 
 }

@@ -1,22 +1,11 @@
 package com.enderio.core.common.util;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.event.world.WorldEvent;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -25,7 +14,16 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Untested way to save arbitrary to a game save. The name to ID map will be
@@ -58,7 +56,7 @@ public class WorldCache<I> {
 
   @SubscribeEvent
   public void onWorldSave(WorldEvent.Save event) {
-    if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
+    if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
       try {
         saveData(getSaveFile());
       } catch (IOException e) {
@@ -69,7 +67,7 @@ public class WorldCache<I> {
 
   @SubscribeEvent
   public void onWorldLoad(WorldEvent.Load event) {
-    if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
+    if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
       try {
         loadData(getSaveFile());
       } catch (IOException e) {

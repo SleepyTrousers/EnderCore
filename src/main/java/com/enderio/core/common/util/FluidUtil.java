@@ -10,13 +10,12 @@ import com.enderio.core.api.common.util.ITankAccess;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -26,7 +25,7 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
 
 public class FluidUtil {
 
@@ -42,9 +41,9 @@ public class FluidUtil {
     }
   }
 
-  public static Map<ForgeDirection, IFluidHandler> getNeighbouringFluidHandlers(IBlockAccess world, BlockCoord bc) {
-    Map<ForgeDirection, IFluidHandler> res = new HashMap<ForgeDirection, IFluidHandler>();
-    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(IBlockAccess world, BlockCoord bc) {
+    Map<EnumFacing, IFluidHandler> res = new HashMap<EnumFacing, IFluidHandler>();
+    for (EnumFacing dir : EnumFacing.VALUES) {
       IFluidHandler fh = getFluidHandler(world, bc.getLocation(dir));
       if (fh != null) {
         res.put(dir, fh);
@@ -58,7 +57,7 @@ public class FluidUtil {
   }
 
   public static IFluidHandler getFluidHandler(IBlockAccess world, int x, int y, int z) {
-    TileEntity te = world.getTileEntity(x, y, z);
+    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
     return getFluidHandler(te);
   }
 
@@ -95,10 +94,10 @@ public class FluidUtil {
     return null;
   }
 
-  public static boolean doPull(IFluidHandler into, ForgeDirection fromDir, int maxVolume) {
+  public static boolean doPull(IFluidHandler into, EnumFacing fromDir, int maxVolume) {
     TileEntity te = (TileEntity) into;
     BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
-    IFluidHandler target = FluidUtil.getFluidHandler(te.getWorldObj(), loc);
+    IFluidHandler target = FluidUtil.getFluidHandler(te.getWorld(), loc);
     if (target != null) {
       FluidTankInfo[] infos = target.getTankInfo(fromDir.getOpposite());
       if (infos != null) {
@@ -124,11 +123,11 @@ public class FluidUtil {
     return false;
   }
 
-  public static boolean doPush(IFluidHandler from, ForgeDirection fromDir, int maxVolume) {
+  public static boolean doPush(IFluidHandler from, EnumFacing fromDir, int maxVolume) {
 
     TileEntity te = (TileEntity) from;
     BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
-    IFluidHandler target = getFluidHandler(te.getWorldObj(), loc);
+    IFluidHandler target = getFluidHandler(te.getWorld(), loc);
     if (target == null) {
       return false;
     }

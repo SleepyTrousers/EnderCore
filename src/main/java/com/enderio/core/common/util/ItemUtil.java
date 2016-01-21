@@ -16,14 +16,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import cofh.api.transport.IItemDuct;
-import cpw.mods.fml.common.Loader;
 
 public class ItemUtil {
 
@@ -86,7 +87,7 @@ public class ItemUtil {
       String[] info = string.split(";");
       Object temp = null;
       int damage = OreDictionary.WILDCARD_VALUE;
-      temp = Item.itemRegistry.getObject(info[0]);
+      temp = Item.itemRegistry.getObject(new ResourceLocation(info[0]));
       if (info.length > 1) {
         damage = Integer.parseInt(info[1]);
       }
@@ -169,7 +170,7 @@ public class ItemUtil {
       return null;
     }
 
-    String base = Item.itemRegistry.getNameForObject(stack.getItem());
+    String base = Item.itemRegistry.getNameForObject(stack.getItem()).toString();
 
     if (damage) {
       base += ";" + stack.getItemDamage();
@@ -236,7 +237,7 @@ public class ItemUtil {
    *          The entity to spawn.
    */
   public static void spawnItemInWorldWithRandomMotion(EntityItem entity) {
-    entity.delayBeforeCanPickup = 10;
+    entity.setDefaultPickupDelay();
 
     float f = (rand.nextFloat() * 0.1f) - 0.05f;
     float f1 = (rand.nextFloat() * 0.1f) - 0.05f;
@@ -280,9 +281,9 @@ public class ItemUtil {
    */
   public static NBTTagCompound getNBTTag(ItemStack stack) {
     if (!stack.hasTagCompound()) {
-      stack.stackTagCompound = new NBTTagCompound();
+      stack.setTagCompound(new NBTTagCompound());
     }
-    return stack.stackTagCompound;
+    return stack.getTagCompound();
   }
 
   public static String getDurabilityString(ItemStack item) {
@@ -293,13 +294,13 @@ public class ItemUtil {
   }
 
   public static NBTTagCompound getOrCreateNBT(ItemStack stack) {
-    if (stack.stackTagCompound == null) {
-      stack.stackTagCompound = new NBTTagCompound();
+    if (!stack.hasTagCompound()) {
+      stack.setTagCompound(new NBTTagCompound());
     }
-    return stack.stackTagCompound;
+    return stack.getTagCompound();
   }
 
-  public static int doInsertItem(Object into, ItemStack item, ForgeDirection side) {
+  public static int doInsertItem(Object into, ItemStack item, EnumFacing side) {
     if (into == null || item == null) {
       return 0;
     }
@@ -307,9 +308,11 @@ public class ItemUtil {
       return ItemUtil.doInsertItemInv((ISidedInventory) into, item, side, true);
     } else if (into instanceof IInventory) {
       return ItemUtil.doInsertItemInv(getInventory((IInventory) into), item, side, true);
-    } else if (into instanceof IItemDuct) {
-      return ItemUtil.doInsertItem((IItemDuct) into, item, side);
-    }
+    } 
+    //TODO: 1.8
+//    else if (into instanceof IItemDuct) {
+//      return ItemUtil.doInsertItem((IItemDuct) into, item, side);
+//    }
 
     for (IItemReceptor rec : receptors) {
       if (rec.canInsertIntoObject(into, side)) {
@@ -320,36 +323,34 @@ public class ItemUtil {
     return 0;
   }
 
-  public static int doInsertItem(IItemDuct con, ItemStack item, ForgeDirection inventorySide) {
-    int startedWith = item.stackSize;
-    ItemStack remaining = con.insertItem(inventorySide, item);
-    if (remaining == null) {
-      return startedWith;
-    }
-    return startedWith - remaining.stackSize;
-  }
+  //TODO: 1.8
+//  public static int doInsertItem(IItemDuct con, ItemStack item, ForgeDirection inventorySide) {
+//    int startedWith = item.stackSize;
+//    ItemStack remaining = con.insertItem(inventorySide, item);
+//    if (remaining == null) {
+//      return startedWith;
+//    }
+//    return startedWith - remaining.stackSize;
+//  }
 
   public static int doInsertItem(IInventory inv, int startSlot, int endSlot, ItemStack item) {
-    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, ForgeDirection.UNKNOWN, true);
+    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, null, true);
   }
 
   public static int doInsertItem(IInventory inv, int startSlot, int endSlot, ItemStack item, boolean doInsert) {
-    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, ForgeDirection.UNKNOWN, doInsert);
+    return doInsertItemInv(inv, null, invSlotter.getInstance(startSlot, endSlot), item, null, doInsert);
   }
 
   /*
    * Insert items into an IInventory or an ISidedInventory.
    */
-  private static int doInsertItemInv(IInventory inv, ItemStack item, ForgeDirection inventorySide, boolean doInsert) {
+  private static int doInsertItemInv(IInventory inv, ItemStack item, EnumFacing inventorySide, boolean doInsert) {
     final ISidedInventory sidedInv = inv instanceof ISidedInventory ? (ISidedInventory) inv : null;
     ISlotIterator slots;
 
-    if (sidedInv != null) {
-      if (inventorySide == null) {
-        inventorySide = ForgeDirection.UNKNOWN;
-      }
-      // Note: This is not thread-safe. Change to getInstance() to constructor when needed (1.8++?).
-      slots = sidedSlotter.getInstance(sidedInv.getAccessibleSlotsFromSide(inventorySide.ordinal()));
+    if (sidedInv != null) {     
+      //TODO: 1.8 Note: This is not thread-safe. Change to getInstance() to constructor when needed (1.8++?).
+      slots = sidedSlotter.getInstance(sidedInv.getSlotsForFace(inventorySide));
     } else {
       slots = invSlotter.getInstance(0, inv.getSizeInventory());
     }
@@ -357,7 +358,7 @@ public class ItemUtil {
     return doInsertItemInv(inv, sidedInv, slots, item, inventorySide, doInsert);
   }
 
-  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, ForgeDirection inventorySide,
+  private static int doInsertItemInv(IInventory inv, ISidedInventory sidedInv, ISlotIterator slots, ItemStack item, EnumFacing inventorySide,
       boolean doInsert) {
     int numInserted = 0;
     int numToInsert = item.stackSize;
@@ -366,7 +367,7 @@ public class ItemUtil {
     // PASS1: Try to add to an existing stack
     while (numToInsert > 0 && slots.hasNext()) {
       final int slot = slots.nextSlot();
-      if (sidedInv == null || sidedInv.canInsertItem(slot, item, inventorySide.ordinal())) {
+      if (sidedInv == null || sidedInv.canInsertItem(slot, item, inventorySide)) {
         final ItemStack contents = inv.getStackInSlot(slot);
         if (contents != null) {
           if (areStackMergable(contents, item)) {
@@ -436,7 +437,7 @@ public class ItemUtil {
         neighbour = chest.adjacentChestZPos;
       }
       if (neighbour != null) {
-        return new InventoryLargeChest("", inv, neighbour);
+        return new InventoryLargeChest("", (ILockableContainer)inv, (ILockableContainer)neighbour);
       }
       return inv;
     }

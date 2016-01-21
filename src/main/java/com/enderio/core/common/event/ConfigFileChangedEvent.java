@@ -1,6 +1,6 @@
 package com.enderio.core.common.event;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 
 /**
  * This event is posted to the FML bus when the /reloadConfigs command is run,

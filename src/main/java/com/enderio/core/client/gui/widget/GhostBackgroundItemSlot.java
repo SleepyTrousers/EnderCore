@@ -9,6 +9,7 @@ public class GhostBackgroundItemSlot extends GhostSlot {
 
   private final ItemStack stack;
   private final Slot parent;
+  
 
   public GhostBackgroundItemSlot(ItemStack stack, int x, int y) {
     this.stack = stack;

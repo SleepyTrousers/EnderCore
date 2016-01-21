@@ -1,14 +1,14 @@
 package com.enderio.core.client.gui.widget;
 
-import net.minecraft.item.ItemStack;
-
-import com.enderio.core.common.TileEntityEnder;
+import com.enderio.core.common.TileEntityBase;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.network.PacketGhostSlot;
 
+import net.minecraft.item.ItemStack;
+
 public abstract class GhostSlot {
 
-  public TileEntityEnder te = null;
+  public TileEntityBase te = null;
   public int slot = -1;
   public int x;
   public int y;
@@ -65,5 +65,5 @@ public abstract class GhostSlot {
   public int getStackSizeLimit() {
     return stackSizeLimit;
   }
-
 }
+

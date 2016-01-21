@@ -7,16 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.FileResourcePack;
-import net.minecraft.client.resources.IResourcePack;
-
 import org.apache.commons.io.FileUtils;
 
 import com.enderio.core.EnderCore;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.FileResourcePack;
+import net.minecraft.client.resources.IResourcePack;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 /**
  * A class that can be used to inject resources from files/folders outside your

@@ -4,6 +4,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
 
 public class InventoryWrapper implements ISidedInventory {
 
@@ -46,20 +48,10 @@ public class InventoryWrapper implements ISidedInventory {
   }
 
   @Override
-  public ItemStack getStackInSlotOnClosing(int slot) {
-    return inv.getStackInSlotOnClosing(slot);
-  }
-
-  @Override
   public void setInventorySlotContents(int slot, ItemStack itemStack) {
     if (slot >= 0 && slot < inv.getSizeInventory()) {
       inv.setInventorySlotContents(slot, itemStack);
     }
-  }
-
-  @Override
-  public String getInventoryName() {
-    return inv.getInventoryName();
   }
 
   @Override
@@ -78,22 +70,12 @@ public class InventoryWrapper implements ISidedInventory {
   }
 
   @Override
-  public void openInventory() {
-    inv.openInventory();
-  }
-
-  @Override
-  public void closeInventory() {
-    inv.closeInventory();
-  }
-
-  @Override
   public boolean isItemValidForSlot(int slot, ItemStack itemStack) {
     return slot >= 0 && slot < getSizeInventory() && inv.isItemValidForSlot(slot, itemStack);
   }
 
   @Override
-  public int[] getAccessibleSlotsFromSide(int var1) {
+  public int[] getSlotsForFace(EnumFacing side) {
     int[] slots = new int[inv.getSizeInventory()];
     for (int i = 0; i < slots.length; i++) {
       slots[i] = i;
@@ -102,17 +84,66 @@ public class InventoryWrapper implements ISidedInventory {
   }
 
   @Override
-  public boolean canInsertItem(int slot, ItemStack itemStack, int side) {
+  public boolean canInsertItem(int slot, ItemStack itemStack, EnumFacing side) {
     return isItemValidForSlot(slot, itemStack);
   }
 
   @Override
-  public boolean canExtractItem(int slot, ItemStack itemStack, int side) {
+  public boolean canExtractItem(int slot, ItemStack itemStack, EnumFacing side) {
     return slot >= 0 && slot < getSizeInventory();
   }
 
   @Override
-  public boolean hasCustomInventoryName() {
-    return false;
+  public ItemStack removeStackFromSlot(int index) {
+    return inv.removeStackFromSlot(index);
   }
+
+  @Override
+  public void openInventory(EntityPlayer player) {
+    inv.openInventory(player);
+
+  }
+
+  @Override
+  public void closeInventory(EntityPlayer player) {
+    inv.closeInventory(player);
+
+  }
+
+  @Override
+  public int getField(int id) {
+    return inv.getField(id);
+  }
+
+  @Override
+  public void setField(int id, int value) {
+    inv.setField(id, value);
+
+  }
+
+  @Override
+  public int getFieldCount() {
+    return inv.getFieldCount();
+  }
+
+  @Override
+  public void clear() {
+    inv.clear();
+  }
+
+  @Override
+  public String getName() {
+    return inv.getName();
+  }
+
+  @Override
+  public boolean hasCustomName() {
+    return inv.hasCustomName();
+  }
+
+  @Override
+  public IChatComponent getDisplayName() {
+    return inv.getDisplayName();
+  }
+
 }

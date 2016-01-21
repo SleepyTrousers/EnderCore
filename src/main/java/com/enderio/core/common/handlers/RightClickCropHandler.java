@@ -2,20 +2,19 @@ package com.enderio.core.common.handlers;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
-import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
-import net.minecraftforge.oredict.OreDictionary;
-
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 
 @Handler
 public class RightClickCropHandler {
@@ -60,25 +59,26 @@ public class RightClickCropHandler {
 
   @SubscribeEvent
   public void handleCropRightClick(PlayerInteractEvent event) {
-    int x = event.x, y = event.y, z = event.z;
-    Block block = event.world.getBlock(x, y, z);
-    int meta = event.world.getBlockMetadata(x, y, z);
-    if (ConfigHandler.allowCropRC && event.action == Action.RIGHT_CLICK_BLOCK && (event.entityPlayer.getHeldItem() == null || !event.entityPlayer.isSneaking())) {
-      for (PlantInfo info : plants) {
-        if (info.blockInst == block && meta == info.meta) {
-          if (event.world.isRemote) {
-            event.entityPlayer.swingItem();
-          } else {
-            currentPlant = info;
-            block.dropBlockAsItem(event.world, x, y, z, meta, 0);
-            currentPlant = null;
-            event.world.setBlockMetadataWithNotify(x, y, z, info.resetMeta, 3);
-            event.setCanceled(true);
-          }
-          break;
-        }
-      }
-    }
+    //TODO: 1.8
+//    int x = event.x, y = event.y, z = event.z;
+//    Block block = event.world.getBlock(x, y, z);
+//    int meta = event.world.getBlockMetadata(x, y, z);
+//    if (ConfigHandler.allowCropRC && event.action == Action.RIGHT_CLICK_BLOCK && (event.entityPlayer.getHeldItem() == null || !event.entityPlayer.isSneaking())) {
+//      for (PlantInfo info : plants) {
+//        if (info.blockInst == block && meta == info.meta) {
+//          if (event.world.isRemote) {
+//            event.entityPlayer.swingItem();
+//          } else {
+//            currentPlant = info;
+//            block.dropBlockAsItem(event.world, x, y, z, meta, 0);
+//            currentPlant = null;
+//            event.world.setBlockMetadataWithNotify(x, y, z, info.resetMeta, 3);
+//            event.setCanceled(true);
+//          }
+//          break;
+//        }
+//      }
+//    }
   }
 
   @SubscribeEvent

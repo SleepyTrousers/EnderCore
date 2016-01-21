@@ -1,6 +1,16 @@
 package com.enderio.core.common.handlers;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.MONTH;
+
 import java.util.Calendar;
+
+import com.enderio.core.EnderCore;
+import com.enderio.core.common.Handlers.Handler;
+import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.util.BlockCoord;
+import com.enderio.core.common.util.EntityUtil;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -9,24 +19,15 @@ import net.minecraft.stats.StatisticsFile;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.player.AchievementEvent;
-
-import com.enderio.core.EnderCore;
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.util.BlockCoord;
-import com.enderio.core.common.util.EntityUtil;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
-
-import static java.util.Calendar.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
 @Handler
 public class FireworkHandler {
   @SubscribeEvent
   public void onAchievement(AchievementEvent event) {
-    StatisticsFile file = ((EntityPlayerMP) event.entityPlayer).func_147099_x();
+    StatisticsFile file = ((EntityPlayerMP) event.entityPlayer).getStatFile();
     if (!event.entity.worldObj.isRemote && file.canUnlockAchievement(event.achievement) && !file.hasAchievementUnlocked(event.achievement)
         && ConfigHandler.betterAchievements) {
       event.entityPlayer.getEntityData().setInteger("fireworksLeft", 9);
@@ -56,7 +57,7 @@ public class FireworkHandler {
       if (fireworksLeft > 0 && (!player.getEntityData().getBoolean("fireworkDelay") || player.worldObj.getTotalWorldTime() % 20 == 0)) {
         BlockCoord pos = getBlockCoord(player);
         pos = pos.withY(pos.y + 2);
-        EntityUtil.spawnFirework(pos, player.worldObj.provider.dimensionId, 12);
+        EntityUtil.spawnFirework(pos, player.worldObj.provider.getDimensionId(), 12);
         player.getEntityData().setInteger("fireworksLeft", fireworksLeft - 1);
 
         if (fireworksLeft > 5) {

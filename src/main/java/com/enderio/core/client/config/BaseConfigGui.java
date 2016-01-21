@@ -4,22 +4,20 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Property;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.config.IConfigHandler;
 import com.enderio.core.common.config.AbstractConfigHandler.Section;
 import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.base.Throwables;
 
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class BaseConfigGui extends GuiConfig {
-  @SuppressWarnings("rawtypes")
+  
   public BaseConfigGui(GuiScreen parentScreen) {
     // dummy super so we can call instance methods
     super(parentScreen, new ArrayList<IConfigElement>(), null, false, false, null);
@@ -62,7 +60,6 @@ public class BaseConfigGui extends GuiConfig {
     return "config.";
   }
 
-  @SuppressWarnings("rawtypes")
   private List<IConfigElement> getConfigElements() {
     List<IConfigElement> list = new ArrayList<IConfigElement>();
     String prefix = getLangPrefix();
@@ -76,9 +73,8 @@ public class BaseConfigGui extends GuiConfig {
 
     return list;
   }
-
-  @SuppressWarnings("rawtypes")
-  private class ConfigSection extends ConfigElement<ConfigCategory> {
+  
+  private class ConfigSection extends ConfigElement {
     private Section section;
     private String prefix;
 
@@ -103,8 +99,9 @@ public class BaseConfigGui extends GuiConfig {
     }
   }
 
-  @SuppressWarnings("rawtypes")
-  private static class ConfigElementExtended<T> extends ConfigElement<T> {
+  
+  private static class ConfigElementExtended extends ConfigElement {
+    
     private static final Field _prop;
     static {
       try {

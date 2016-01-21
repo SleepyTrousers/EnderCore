@@ -3,20 +3,19 @@ package com.enderio.core.common.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-
 import org.apache.logging.log4j.Level;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ObjectArrays;
 
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.LoaderException;
-import cpw.mods.fml.common.LoaderState;
-import cpw.mods.fml.common.registry.GameData;
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderException;
+import net.minecraftforge.fml.common.LoaderState;
+import net.minecraftforge.fml.common.registry.GameData;
 
 /**
  * This class provides a few utility methods to regain the ability to register

@@ -6,8 +6,8 @@ import java.util.List;
 import com.enderio.core.common.config.AbstractConfigHandler.Section;
 
 import net.minecraftforge.common.config.ConfigCategory;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 public interface IConfigHandler {
   void initialize(File cfg);

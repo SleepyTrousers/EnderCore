@@ -1,5 +1,11 @@
 package com.enderio.core.common;
 
+import static com.enderio.core.common.Handlers.Handler.Inst.AUTO;
+import static com.enderio.core.common.Handlers.Handler.Inst.CONSTRUCTOR;
+import static com.enderio.core.common.Handlers.Handler.Inst.FIELD;
+import static com.enderio.core.common.Handlers.Handler.Inst.METHOD;
+import static com.enderio.core.common.Handlers.Handler.Inst.SCALA_OBJECT;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,27 +18,25 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraftforge.common.MinecraftForge;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.IEnderMod;
 import com.enderio.core.common.Handlers.Handler.HandlerSide;
 import com.enderio.core.common.Handlers.Handler.Inst;
 import com.google.common.base.Throwables;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.LoaderState;
-import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import cpw.mods.fml.common.discovery.asm.ModAnnotation.EnumHolder;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.eventhandler.EventBus;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import static com.enderio.core.common.Handlers.Handler.Inst.*;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.LoaderState;
+import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
+import net.minecraftforge.fml.common.discovery.asm.ModAnnotation.EnumHolder;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.EventBus;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class Handlers {
 
@@ -58,12 +62,7 @@ public class Handlers {
     /**
      * Represents the {@link MinecraftForge#EVENT_BUS}
      */
-    FORGE("net.minecraftforge", MinecraftForge.EVENT_BUS),
-
-    /**
-     * Represents the {@link FMLCommonHandler#bus()}
-     */
-    FML("cpw.mods.fml", FMLCommonHandler.instance().bus());
+    FORGE("net.minecraftforge", MinecraftForge.EVENT_BUS);
 
     private HandlerType(String eventIdentifier, EventBus bus) {
       this.eventIdentifier = eventIdentifier;

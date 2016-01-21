@@ -2,6 +2,10 @@ package com.enderio.core.common.handlers;
 
 import java.util.Map;
 
+import com.enderio.core.common.Handlers.Handler;
+import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.enchant.EnchantAutoSmelt;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityXPOrb;
@@ -9,12 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.world.BlockEvent;
-
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.enchant.EnchantAutoSmelt;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Handler
 public class AutoSmeltHandler {
@@ -32,8 +31,8 @@ public class AutoSmeltHandler {
             {
               ItemStack stack = event.drops.get(i);
               if (stack != null && !event.isSilkTouching) {
-                if (FurnaceRecipes.smelting().getSmeltingResult(stack) != null) {
-                  ItemStack furnaceStack = FurnaceRecipes.smelting().getSmeltingResult(stack).copy();
+                if (FurnaceRecipes.instance().getSmeltingResult(stack) != null) {
+                  ItemStack furnaceStack = FurnaceRecipes.instance().getSmeltingResult(stack).copy();
                   //Fortune stuffs
                   if (fortune > 0 && ConfigHandler.allowAutoSmeltWithFortune)
                     furnaceStack.stackSize *= (event.world.rand.nextInt(fortune + 1) + 1);
@@ -42,7 +41,7 @@ public class AutoSmeltHandler {
 
                   //XP (adapted vanilla code)
                   int xp = furnaceStack.stackSize;
-                  float f = FurnaceRecipes.smelting().func_151398_b(furnaceStack);
+                  float f = FurnaceRecipes.instance().getSmeltingExperience(furnaceStack);
                   int j;
 
                   if (f == 0.0F) {
@@ -60,7 +59,7 @@ public class AutoSmeltHandler {
                   while (xp > 0) {
                     j = EntityXPOrb.getXPSplit(xp);
                     xp -= j;
-                    event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.x, event.y + 0.5, event.z, j));
+                    event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.pos.getX(), event.pos.getY() + 0.5, event.pos.getZ(), j));
                   }
                 }
               }
@@ -71,7 +70,6 @@ public class AutoSmeltHandler {
     }
   }
 
-  @SuppressWarnings("unchecked")
   private int getAutoSmeltLevel(ItemStack tool) {
     if (tool == null) {
       return -1;
@@ -79,7 +77,7 @@ public class AutoSmeltHandler {
 
     Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(tool);
     for (int i : enchants.keySet()) {
-      Enchantment enchant = Enchantment.enchantmentsList[i];
+      Enchantment enchant = Enchantment.getEnchantmentById(i);
       if (enchant == EnchantAutoSmelt.INSTANCE) {
         return enchants.get(i);
       }

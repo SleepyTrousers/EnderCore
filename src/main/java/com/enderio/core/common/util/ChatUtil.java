@@ -1,5 +1,8 @@
 package com.enderio.core.common.util;
 
+import com.enderio.core.common.Lang;
+import com.enderio.core.common.network.EnderPacketHandler;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiNewChat;
@@ -8,14 +11,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IChatComponent;
-
-import com.enderio.core.common.Lang;
-import com.enderio.core.common.network.EnderPacketHandler;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ChatUtil {
 
@@ -36,7 +35,7 @@ public class ChatUtil {
     public void toBytes(ByteBuf buf) {
       buf.writeInt(chatLines.length);
       for (IChatComponent c : chatLines) {
-        ByteBufUtils.writeUTF8String(buf, IChatComponent.Serializer.func_150696_a(c));
+        ByteBufUtils.writeUTF8String(buf, IChatComponent.Serializer.componentToJson(c));
       }
     }
 
@@ -44,7 +43,7 @@ public class ChatUtil {
     public void fromBytes(ByteBuf buf) {
       chatLines = new IChatComponent[buf.readInt()];
       for (int i = 0; i < chatLines.length; i++) {
-        chatLines[i] = IChatComponent.Serializer.func_150699_a(ByteBufUtils.readUTF8String(buf));
+        chatLines[i] = IChatComponent.Serializer.jsonToComponent(ByteBufUtils.readUTF8String(buf));
       }
     }
 

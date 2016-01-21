@@ -1,6 +1,6 @@
 package com.enderio.core.common;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -57,7 +57,7 @@ public final class OreDict {
     if (!isRegistered(stack, OreDictionary.getOres(name))) OreDictionary.registerOre(name, stack);
   }
 
-  private static boolean isRegistered(ItemStack stack, ArrayList<ItemStack> toCheck) {
+  private static boolean isRegistered(ItemStack stack, List<ItemStack> toCheck) {
     for (ItemStack check : toCheck) {
       if (stack != null && stack.getItem() == check.getItem() && (stack.getItemDamage() == check.getItemDamage() || stack.getItemDamage() == OreDictionary.WILDCARD_VALUE)) {
         return true;

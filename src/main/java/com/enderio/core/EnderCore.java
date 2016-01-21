@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.client.ClientCommandHandler;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,16 +27,19 @@ import com.enderio.core.common.util.TextureErrorRemover;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import net.minecraft.command.CommandHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, dependencies = "after:ttCore", guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {

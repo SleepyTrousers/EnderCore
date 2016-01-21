@@ -3,6 +3,7 @@ package com.enderio.core.common.util;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IChatComponent;
 
 public class ArrayInventory implements IInventory {
 
@@ -32,11 +33,6 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public ItemStack getStackInSlotOnClosing(int slot) {
-    return null;
-  }
-
-  @Override
   public void setInventorySlotContents(int slot, ItemStack stack) {
     items[slot] = stack;
     markDirty();
@@ -58,27 +54,60 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public String getInventoryName() {
-    return "ArrayInventory";
-  }
-
-  @Override
-  public boolean hasCustomInventoryName() {
-    return false;
-  }
-
-  @Override
   public void markDirty() {
 
   }
 
   @Override
-  public void openInventory() {
-
+  public String getName() {
+    return "ArrayInventory";
   }
 
   @Override
-  public void closeInventory() {
+  public boolean hasCustomName() {
+    return false;
+  }
+
+  @Override
+  public IChatComponent getDisplayName() {
+    return null;
+  }
+
+  @Override
+  public ItemStack removeStackFromSlot(int index) {
+    ItemStack res = items[index];
+    items[index] = null;
+    return res;
+  }
+
+  @Override
+  public void openInventory(EntityPlayer player) {
+  }
+
+  @Override
+  public void closeInventory(EntityPlayer player) {
+  }
+
+  @Override
+  public int getField(int id) {
+    return 0;
+  }
+
+  @Override
+  public void setField(int id, int value) {
+  }
+
+  @Override
+  public int getFieldCount() {
+    return 0;
+  }
+
+  @Override
+  public void clear() {
+    for(int i=0;i<items.length;i++) {
+      items[i] = null;
+    }
 
   }
+
 }

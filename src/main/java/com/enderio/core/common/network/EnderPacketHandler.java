@@ -1,16 +1,16 @@
 package com.enderio.core.common.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.tileentity.TileEntity;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.PacketConfigSync;
 import com.enderio.core.common.util.ChatUtil.PacketNoSpamChat;
 
-import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class EnderPacketHandler {
 
@@ -24,7 +24,8 @@ public class EnderPacketHandler {
   }
 
   public static void sendToAllAround(IMessage message, TileEntity te, int range) {
-    INSTANCE.sendToAllAround(message, new TargetPoint(te.getWorldObj().provider.dimensionId, te.xCoord, te.yCoord, te.zCoord, range));
+    BlockPos p = te.getPos();
+    INSTANCE.sendToAllAround(message, new TargetPoint(te.getWorld().provider.getDimensionId(), p.getX(), p.getY(), p.getZ(), range));
   }
 
   public static void sendToAllAround(IMessage message, TileEntity te) {

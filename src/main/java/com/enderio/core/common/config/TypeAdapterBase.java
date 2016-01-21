@@ -4,14 +4,14 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.common.config.Property.Type;
-
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.common.config.ConfigProcessor.ITypeAdapter;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
+
+import net.minecraftforge.common.config.Property;
+import net.minecraftforge.common.config.Property.Type;
 
 @SuppressWarnings({ "serial", "unchecked" })
 public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTUAL, BASE> {

@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class PermanentCache<I> extends WorldCache<I> {
 

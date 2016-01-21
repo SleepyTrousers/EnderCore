@@ -1,20 +1,16 @@
 package com.enderio.core.common.network;
 
+import com.enderio.core.common.TileEntityBase;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.util.IProgressTile;
-import com.enderio.core.common.TileEntityEnder;
-import com.enderio.core.common.network.MessageTileEntity;
-
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-
-public class PacketGhostSlot extends MessageTileEntity<TileEntityEnder> {
+public class PacketGhostSlot extends MessageTileEntity<TileEntityBase> {
 
   private int slot;
   private ItemStack stack;
@@ -22,11 +18,11 @@ public class PacketGhostSlot extends MessageTileEntity<TileEntityEnder> {
   public PacketGhostSlot() {
   }
 
-  private PacketGhostSlot(TileEntityEnder tile) {
+  private PacketGhostSlot(TileEntityBase tile) {
     super(tile);
   }
 
-  public static PacketGhostSlot setGhostSlotContents(TileEntityEnder te, int slot, ItemStack stack) {
+  public static PacketGhostSlot setGhostSlotContents(TileEntityBase te, int slot, ItemStack stack) {
     PacketGhostSlot msg = new PacketGhostSlot(te);
     msg.slot = slot;
     msg.stack = stack;
@@ -51,10 +47,10 @@ public class PacketGhostSlot extends MessageTileEntity<TileEntityEnder> {
 
     @Override
     public IMessage onMessage(PacketGhostSlot msg, MessageContext ctx) {
-      TileEntityEnder te = msg.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
-      if (te != null) {
+      TileEntityBase te = msg.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
+      if (te != null) {               
         te.setGhostSlotContents(msg.slot, msg.stack);
-        te.getWorldObj().markBlockForUpdate(msg.x, msg.y, msg.z);
+        te.getWorld().markBlockForUpdate(new BlockPos(msg.x, msg.y, msg.z));
       }
       return null;
     }

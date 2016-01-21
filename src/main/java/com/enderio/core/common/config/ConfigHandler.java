@@ -3,8 +3,6 @@ package com.enderio.core.common.config;
 import java.io.File;
 import java.util.Locale;
 
-import net.minecraftforge.common.config.Configuration;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigProcessor.IReloadCallback;
 import com.enderio.core.common.config.JsonConfigReader.ModToken;
@@ -17,6 +15,8 @@ import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
 import com.enderio.core.common.tweaks.Tweak;
 import com.enderio.core.common.tweaks.Tweaks;
+
+import net.minecraftforge.common.config.Configuration;
 
 public class ConfigHandler extends AbstractConfigHandler implements ITweakConfigHandler, IReloadCallback {
   private static final String sectionGeneral = Configuration.CATEGORY_GENERAL;

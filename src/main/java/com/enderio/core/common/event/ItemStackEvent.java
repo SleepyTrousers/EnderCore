@@ -3,8 +3,7 @@ package com.enderio.core.common.event;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import cpw.mods.fml.common.eventhandler.Event;
+import net.minecraftforge.fml.common.eventhandler.Event;
 
 /**
  * ItemEvent is fired when an event involving any ItemStack occurs.<br>

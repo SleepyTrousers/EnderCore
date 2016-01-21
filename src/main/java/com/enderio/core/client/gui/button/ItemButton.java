@@ -1,19 +1,15 @@
 package com.enderio.core.client.gui.button;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.RenderUtil;
 
-public class ItemButton extends GuiButton {
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
-  public static final RenderItem ITEM_RENDERER = new RenderItem();
+public class ItemButton extends GuiButton {
 
   public static final int DEFAULT_WIDTH = 24;
   public static final int HWIDTH = DEFAULT_WIDTH / 2;
@@ -22,14 +18,11 @@ public class ItemButton extends GuiButton {
 
   private ItemStack item;
 
-  private FontRenderer fr;
-
   protected int hwidth;
   protected int hheight;
 
-  public ItemButton(FontRenderer fr, int id, int x, int y, Item item) {
-    super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
-    this.fr = fr;
+  public ItemButton(int id, int x, int y, Item item) {
+    super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");    
     this.item = new ItemStack(item, 1, 0);
     hwidth = HWIDTH;
     hheight = HHEIGHT;
@@ -52,8 +45,8 @@ public class ItemButton extends GuiButton {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width && par3 < this.yPosition + height;
-      int hoverState = this.getHoverState(this.field_146123_n);
+      this.hovered = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width && par3 < this.yPosition + height;
+      int hoverState = this.getHoverState(this.hovered);
 
       // x, y, u, v, width, height
 
@@ -67,17 +60,9 @@ public class ItemButton extends GuiButton {
 
       mouseDragged(par1Minecraft, par2, par3);
 
-      int l = 14737632;
-
-      if (!this.enabled) {
-        l = -6250336;
-      } else if (this.field_146123_n) {
-        l = 16777120;
-      }
-
       int xLoc = xPosition + hwidth - 8;
-      int yLoc = yPosition + hheight - 10;
-      ITEM_RENDERER.renderItemIntoGUI(fr, par1Minecraft.renderEngine, item, xLoc, yLoc);
+      int yLoc = yPosition + hheight - 10;      
+      par1Minecraft.getRenderItem().renderItemIntoGUI(item, xLoc, yLoc);
     }
   }
 

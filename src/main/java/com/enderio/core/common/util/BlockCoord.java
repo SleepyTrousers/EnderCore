@@ -1,20 +1,21 @@
 package com.enderio.core.common.util;
 
-import io.netty.buffer.ByteBuf;
-
 import javax.annotation.Generated;
 
+import com.google.common.base.Strings;
+
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
-
-import com.google.common.base.Strings;
 
 public class BlockCoord {
 
@@ -35,7 +36,7 @@ public class BlockCoord {
   }
 
   public BlockCoord(TileEntity tile) {
-    this(tile.xCoord, tile.yCoord, tile.zCoord);
+    this(tile.getPos());
   }
 
   public BlockCoord(Entity e) {
@@ -45,9 +46,13 @@ public class BlockCoord {
   public BlockCoord(BlockCoord bc) {
     this(bc.x, bc.y, bc.z);
   }
+  
+  public BlockCoord(BlockPos bc) {
+    this(bc.getX(), bc.getY(), bc.getZ());
+  }
 
-  public BlockCoord getLocation(ForgeDirection dir) {
-    return new BlockCoord(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+  public BlockCoord getLocation(EnumFacing dir) {
+    return new BlockCoord(x + dir.getFrontOffsetX(), y + dir.getFrontOffsetY(), z + dir.getFrontOffsetZ());
   }
 
   public BlockCoord(String x, String y, String z) {
@@ -56,19 +61,28 @@ public class BlockCoord {
   }
 
   public BlockCoord(MovingObjectPosition mop) {
-    this(mop.blockX, mop.blockY, mop.blockZ);
+    this(mop.getBlockPos());
   }
 
+  public IBlockState getBlockState(IBlockAccess world) {
+    return world.getBlockState(getBlockPos());
+  }
+  
   public Block getBlock(IBlockAccess world) {
-    return world.getBlock(x, y, z);
+    return world.getBlockState(getBlockPos()).getBlock();
   }
 
   public int getMetadata(IBlockAccess world) {
-    return world.getBlockMetadata(x, y, z);
+    IBlockState bs = world.getBlockState(getBlockPos());
+    return bs.getBlock().getMetaFromState(bs);
   }
 
   public TileEntity getTileEntity(IBlockAccess world) {
-    return world.getTileEntity(x, y, z);
+    return world.getTileEntity(getBlockPos());
+  }
+  
+  public BlockPos getBlockPos() {
+    return new BlockPos(x,y,z);
   }
 
   public int getDistSq(BlockCoord other) {

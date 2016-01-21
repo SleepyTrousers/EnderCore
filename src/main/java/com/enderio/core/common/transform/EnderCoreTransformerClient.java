@@ -1,5 +1,14 @@
 package com.enderio.core.common.transform;
 
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.ICONST_0;
+import static org.objectweb.asm.Opcodes.ICONST_1;
+import static org.objectweb.asm.Opcodes.ICONST_4;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.ISTORE;
+import static org.objectweb.asm.Opcodes.RETURN;
+
 import java.util.Iterator;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -9,8 +18,6 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-
-import static org.objectweb.asm.Opcodes.*;
 
 public class EnderCoreTransformerClient extends EnderCoreTransformer {
   private static final String scrollingListClass = "cpw.mods.fml.client.GuiScrollingList";

@@ -1,13 +1,13 @@
 package com.enderio.core.client.gui;
 
-import net.minecraft.client.gui.Gui;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.IconUtil;
 import com.enderio.core.client.render.RenderUtil;
+
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ResourceLocation;
 
 public class GuiIconRenderer extends Gui {
 
@@ -21,7 +21,7 @@ public class GuiIconRenderer extends Gui {
   protected int width = DEFAULT_WIDTH;
   protected int height = DEFAULT_HEIGHT;
 
-  protected IIcon icon;
+  protected TextureAtlasSprite icon;
   protected ResourceLocation texture;
 
   private int yPosition;
@@ -33,14 +33,14 @@ public class GuiIconRenderer extends Gui {
     xPosition = x;
     yPosition = y;
     icon = IconUtil.getIconForItem(itemId, itemMeta);
-    texture = RenderUtil.ITEM_TEX;
+    texture = RenderUtil.BLOCK_TEX;
   }
 
-  public GuiIconRenderer(int x, int y, IIcon icon, ResourceLocation texture) {
+  public GuiIconRenderer(int x, int y, TextureAtlasSprite icon, ResourceLocation texture) {
     xPosition = x;
     yPosition = y;
     this.icon = icon;
-    this.texture = texture;
+    this.texture = texture;    
   }
 
   public void setSize(int width, int height) {
@@ -58,7 +58,7 @@ public class GuiIconRenderer extends Gui {
     return height;
   }
 
-  public IIcon getIcon() {
+  public TextureAtlasSprite getIcon() {
     return icon;
   }
 
@@ -70,7 +70,7 @@ public class GuiIconRenderer extends Gui {
     this.alpha = alpha;
   }
 
-  public void setIcon(IIcon icon) {
+  public void setIcon(TextureAtlasSprite icon) {
     this.icon = icon;
   }
 
@@ -91,7 +91,7 @@ public class GuiIconRenderer extends Gui {
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
     RenderUtil.bindTexture(texture);
-    drawTexturedModelRectFromIcon(xPosition, yPosition, icon, width, height);
+    drawTexturedModalRect(xPosition, yPosition, icon, width, height);
 
     GL11.glPopAttrib();
 

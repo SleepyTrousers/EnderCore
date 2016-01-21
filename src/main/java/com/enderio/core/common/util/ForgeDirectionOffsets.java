@@ -1,34 +1,34 @@
 package com.enderio.core.common.util;
 
-import net.minecraftforge.common.util.ForgeDirection;
-
 import com.enderio.core.common.vecmath.Vector3d;
+
+import net.minecraft.util.EnumFacing;
 
 public final class ForgeDirectionOffsets {
 
-  public static final Vector3d[] OFFSETS = new Vector3d[ForgeDirection.values().length];
+  public static final Vector3d[] OFFSETS = new Vector3d[EnumFacing.values().length];
 
   static {
-    for (ForgeDirection dir : ForgeDirection.values()) {
-      OFFSETS[dir.ordinal()] = new Vector3d(dir.offsetX, dir.offsetY, dir.offsetZ);
+    for (EnumFacing dir : EnumFacing.values()) {
+      OFFSETS[dir.ordinal()] = new Vector3d(dir.getFrontOffsetX(), dir.getFrontOffsetY(), dir.getFrontOffsetZ());
     }
   }
 
-  public static Vector3d forDir(ForgeDirection dir) {
+  public static Vector3d forDir(EnumFacing dir) {
     return OFFSETS[dir.ordinal()];
   }
 
-  public static Vector3d forDirCopy(ForgeDirection dir) {
+  public static Vector3d forDirCopy(EnumFacing dir) {
     return new Vector3d(OFFSETS[dir.ordinal()]);
   }
 
-  public static Vector3d offsetScaled(ForgeDirection dir, double scale) {
+  public static Vector3d offsetScaled(EnumFacing dir, double scale) {
     Vector3d res = forDirCopy(dir);
     res.scale(scale);
     return res;
   }
 
-  public static Vector3d absolueOffset(ForgeDirection dir) {
+  public static Vector3d absolueOffset(EnumFacing dir) {
     Vector3d res = forDirCopy(dir);
     res.x = Math.abs(res.x);
     res.y = Math.abs(res.y);
@@ -36,25 +36,25 @@ public final class ForgeDirectionOffsets {
     return res;
   }
 
-  public ForgeDirection closest(float x, float y, float z) {
+  public EnumFacing closest(float x, float y, float z) {
     float ax = Math.abs(x);
     float ay = Math.abs(y);
     float az = Math.abs(z);
 
     if (ax >= ay && ax >= az) {
-      return x > 0 ? ForgeDirection.EAST : ForgeDirection.WEST;
+      return x > 0 ? EnumFacing.EAST : EnumFacing.WEST;
     }
     if (ay >= ax && ay >= az) {
-      return y > 0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+      return y > 0 ? EnumFacing.UP : EnumFacing.DOWN;
     }
-    return z > 0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+    return z > 0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
   }
 
   private ForgeDirectionOffsets() {
   }
 
-  public static boolean isPositiveOffset(ForgeDirection dir) {
-    return dir == ForgeDirection.SOUTH || dir == ForgeDirection.EAST || dir == ForgeDirection.UP;
+  public static boolean isPositiveOffset(EnumFacing dir) {
+    return dir == EnumFacing.SOUTH || dir == EnumFacing.EAST || dir == EnumFacing.UP;
   }
 
 }

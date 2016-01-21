@@ -3,7 +3,6 @@ package com.enderio.core.common.event;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent;
-import cpw.mods.fml.common.eventhandler.Cancelable;
 
 /**
  * Fires each tick that a Projectile or Arrow is updated. <br>

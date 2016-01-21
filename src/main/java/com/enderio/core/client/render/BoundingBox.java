@@ -1,10 +1,7 @@
 package com.enderio.core.client.render;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.enderio.core.api.client.render.VertexTransform;
-import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.vecmath.Vector2f;
 import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
@@ -12,7 +9,8 @@ import com.enderio.core.common.vecmath.Vertex;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public final class BoundingBox {
 
@@ -55,8 +53,8 @@ public final class BoundingBox {
     this(copy.minX, copy.minY, copy.minZ, copy.maxX, copy.maxY, copy.maxZ);
   }
 
-  public BoundingBox(BlockCoord bc) {
-    this(bc.x, bc.y, bc.z, bc.x + 1, bc.y + 1, bc.z + 1);
+  public BoundingBox(BlockPos bc) {
+    this(bc.getX(), bc.getY(), bc.getZ(), bc.getX() + 1, bc.getY() + 1, bc.getZ() + 1);
   }
 
   public BoundingBox(Block block) {
@@ -108,23 +106,22 @@ public final class BoundingBox {
     return translate(vec.x, vec.y, vec.z);
   }
 
-  public BoundingBox transform(VertexTransform iTransformation) {
-    Vector3d min = new Vector3d(minX, minY, minZ);
-    Vector3d max = new Vector3d(maxX, maxY, maxZ);
-
-    iTransformation.apply(min);
-    iTransformation.apply(max);
-
-    return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
-        min.z, max.z));
-
-  }
+//  public BoundingBox transform(VertexTransform iTransformation) {
+//    Vector3d min = new Vector3d(minX, minY, minZ);
+//    Vector3d max = new Vector3d(maxX, maxY, maxZ);
+//
+//    iTransformation.apply(min);
+//    iTransformation.apply(max);
+//
+//    return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
+//        min.z, max.z));
+//  }
 
   /**
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order.
    */
-  public List<Vertex> getCornersWithUvForFace(ForgeDirection face) {
+  public List<Vertex> getCornersWithUvForFace(EnumFacing face) {
     return getCornersWithUvForFace(face, 0, 1, 0, 1);
   }
 
@@ -132,7 +129,7 @@ public final class BoundingBox {
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order.
    */
-  public List<Vertex> getCornersWithUvForFace(ForgeDirection face, float minU, float maxU, float minV, float maxV) {
+  public List<Vertex> getCornersWithUvForFace(EnumFacing face, float minU, float maxU, float minV, float maxV) {
     List<Vertex> result = new ArrayList<Vertex>(4);
     switch (face) {
     case NORTH:
@@ -165,8 +162,7 @@ public final class BoundingBox {
       result.add(new Vertex(new Vector3d(minX, maxY, minZ), new Vector3f(0, 1, 0), new Vector2f(maxU, maxV)));
       result.add(new Vertex(new Vector3d(minX, maxY, maxZ), new Vector3f(0, 1, 0), new Vector2f(maxU, minV)));
       break;
-    case DOWN: //
-    case UNKNOWN:
+    case DOWN:    
     default:
       result.add(new Vertex(new Vector3d(minX, minY, minZ), new Vector3f(0, -1, 0), new Vector2f(maxU, maxV)));
       result.add(new Vertex(new Vector3d(maxX, minY, minZ), new Vector3f(0, -1, 0), new Vector2f(minU, maxV)));
@@ -181,7 +177,7 @@ public final class BoundingBox {
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order, starting with the top left.
    */
-  public List<Vector3f> getCornersForFace(ForgeDirection face) {
+  public List<Vector3f> getCornersForFace(EnumFacing face) {
     List<Vector3f> result = new ArrayList<Vector3f>(4);
     switch (face) {
     case NORTH:
@@ -214,8 +210,7 @@ public final class BoundingBox {
       result.add(new Vector3f(minX, maxY, minZ));
       result.add(new Vector3f(minX, maxY, maxZ));
       break;
-    case DOWN:
-    case UNKNOWN:
+    case DOWN:  
     default:
       result.add(new Vector3f(minX, minY, maxZ));
       result.add(new Vector3f(minX, minY, minZ));
@@ -230,7 +225,7 @@ public final class BoundingBox {
    * Returns the vertices of the corners for the specified face in counter
    * clockwise order, starting with the top left.
    */
-  public List<Vector3d> getCornersForFaceD(ForgeDirection face) {
+  public List<Vector3d> getCornersForFaceD(EnumFacing face) {
     List<Vector3d> result = new ArrayList<Vector3d>(4);
     switch (face) {
     case NORTH:
@@ -264,7 +259,6 @@ public final class BoundingBox {
       result.add(new Vector3d(minX, maxY, maxZ));
       break;
     case DOWN:
-    case UNKNOWN:
     default:
       result.add(new Vector3d(minX, minY, maxZ));
       result.add(new Vector3d(minX, minY, minZ));
@@ -338,7 +332,7 @@ public final class BoundingBox {
   }
 
   public AxisAlignedBB getAxisAlignedBB() {
-    return AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
   @Override
@@ -378,3 +372,4 @@ public final class BoundingBox {
     return true;
   }
 }
+

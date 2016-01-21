@@ -2,7 +2,7 @@ package com.enderio.core.common.util.blockiterators;
 
 import com.enderio.core.common.util.BlockCoord;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public class PlanarBlockIterator extends CubicBlockIterator {
   public static enum Orientation {
@@ -10,7 +10,7 @@ public class PlanarBlockIterator extends CubicBlockIterator {
     NORTH_SOUTH,
     HORIZONTAL;
 
-    public static Orientation perpendicular(ForgeDirection dir) {
+    public static Orientation perpendicular(EnumFacing dir) {
       switch (dir) {
       case DOWN:
       case UP:

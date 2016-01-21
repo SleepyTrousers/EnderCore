@@ -1,12 +1,14 @@
 package com.enderio.core.common.util;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class IBlockAccessWrapper implements IBlockAccess {
 
@@ -17,57 +19,51 @@ public class IBlockAccessWrapper implements IBlockAccess {
   }
 
   @Override
-  public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default) {
-    return wrapped.isSideSolid(x, y, z, side, _default);
+  public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+    return wrapped.isSideSolid(pos, side, _default);
   }
 
+  
   @Override
-  public int isBlockProvidingPowerTo(int var1, int var2, int var3, int var4) {
-    return wrapped.isBlockProvidingPowerTo(var1, var2, var3, var4);
-  }
-
-  @Override
-  public boolean isAirBlock(int var1, int var2, int var3) {
-    return wrapped.isAirBlock(var1, var2, var3);
-  }
-
-  @Override
-  public TileEntity getTileEntity(int var1, int var2, int var3) {
-    if (var2 >= 0 && var2 < 256) {
-      return wrapped.getTileEntity(var1, var2, var3);
+  public TileEntity getTileEntity(BlockPos pos) {
+    if (pos.getY() >= 0 && pos.getY() < 256) {
+      return wrapped.getTileEntity(pos);
     } else {
       return null;
     }
   }
 
   @Override
+  public IBlockState getBlockState(BlockPos pos) {
+    return wrapped.getBlockState(pos);
+  }
+  
+  
   @SideOnly(Side.CLIENT)
-  public int getLightBrightnessForSkyBlocks(int var1, int var2, int var3, int var4) {
+  @Override
+  public int getCombinedLight(BlockPos pos, int lightValue) {
     return 15 << 20 | 15 << 4;
   }
 
   @Override
-  @SideOnly(Side.CLIENT)
-  public int getHeight() {
-    return wrapped.getHeight();
+  public boolean isAirBlock(BlockPos pos) {
+    return wrapped.isAirBlock(pos);
   }
 
   @Override
-  public int getBlockMetadata(int var1, int var2, int var3) {
-    return wrapped.getBlockMetadata(var1, var2, var3);
+  public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+    return wrapped.getBiomeGenForCoords(pos);
   }
 
   @Override
-  public Block getBlock(int var1, int var2, int var3) {
-    return wrapped.getBlock(var1, var2, var3);
+  public int getStrongPower(BlockPos pos, EnumFacing direction) {    
+    return wrapped.getStrongPower(pos, direction);
   }
 
   @Override
-  @SideOnly(Side.CLIENT)
-  public BiomeGenBase getBiomeGenForCoords(int var1, int var2) {
-
-    return wrapped.getBiomeGenForCoords(var1, var2);
-  }
+  public WorldType getWorldType() {
+    return wrapped.getWorldType();
+  }  
 
   @Override
   @SideOnly(Side.CLIENT)

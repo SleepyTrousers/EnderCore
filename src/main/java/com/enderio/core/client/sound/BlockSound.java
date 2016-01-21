@@ -27,7 +27,7 @@ public class BlockSound extends PositionedSound implements ITickableSound {
   }
 
   public BlockSound setPitch(float pitch) {
-    this.field_147663_c = pitch;
+    this.pitch = pitch;
     return this;
   }
 

@@ -12,8 +12,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.util.RegisterTime;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLStateEvent;
 
 public enum CompatRegistry {
   INSTANCE;

@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.render.RenderUtil;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
 
 public class GhostSlotHandler {
 
@@ -169,6 +169,7 @@ public class GhostSlotHandler {
           if (stack != null) {
             gui.drawFakeItemStack(slot.x + sx, slot.y + sy, stack);
             if (slot.shouldDisplayStdOverlay()) {
+                  
               gui.drawFakeItemStackStdOverlay(slot.x + sx, slot.y + sy, stack);
             }
             if (slot.shouldGrayOut()) {

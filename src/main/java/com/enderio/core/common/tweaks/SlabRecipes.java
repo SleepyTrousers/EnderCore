@@ -3,8 +3,8 @@ package com.enderio.core.common.tweaks;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 public class SlabRecipes extends Tweak {
   private static final String[] slabEndingsWood = { "WoodOak", "WoodSpruce", "WoodBirch", "WoodJungle", "WoodAcacia", "WoodDarkOak" };

@@ -3,6 +3,11 @@ package com.enderio.core.common.handlers;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.enderio.core.common.Handlers.Handler;
+import com.enderio.core.common.enchant.EnchantXPBoost;
+import com.enderio.core.common.util.Scheduler;
+import com.google.common.base.Throwables;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -16,14 +21,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
-
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.enchant.EnchantXPBoost;
-import com.enderio.core.common.util.Scheduler;
-import com.google.common.base.Throwables;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 @Handler
 public class XPBoostHandler {
@@ -68,10 +67,10 @@ public class XPBoostHandler {
       int level = getXPBoostLevel(held);
       int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, held);
 
-      if (level >= 0) {
-        int xp = event.block.getExpDrop(event.world, event.blockMetadata, fortune);
+      if (level >= 0) {        
+        int xp = event.state.getBlock().getExpDrop(event.world, event.pos, fortune);
         if (xp > 0) {
-          event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.x + 0.5, event.y + 0.5, event.z + 0.5, getXPBoost(xp, level)));
+          event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.pos.getX() + 0.5, event.pos.getY() + 0.5, event.pos.getZ() + 0.5, getXPBoost(xp, level)));
         }
       }
     }
@@ -97,7 +96,6 @@ public class XPBoostHandler {
     return Math.round(xp * ((float) Math.log10(level + 1) * 2));
   }
 
-  @SuppressWarnings("unchecked")
   private int getXPBoostLevel(ItemStack weapon) {
     if (weapon == null) {
       return -1;
@@ -105,7 +103,7 @@ public class XPBoostHandler {
 
     Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
     for (int i : enchants.keySet()) {
-      Enchantment enchant = Enchantment.enchantmentsList[i];
+      Enchantment enchant = Enchantment.getEnchantmentById(i);
       if (enchant == EnchantXPBoost.INSTANCE) {
         return enchants.get(i);
       }

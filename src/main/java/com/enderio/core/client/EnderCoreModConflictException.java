@@ -1,14 +1,16 @@
 package com.enderio.core.client;
 
-import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraftforge.fml.client.CustomModLoadingErrorDisplayException;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EnderCoreModConflictException extends CustomModLoadingErrorDisplayException {
 
+  private static final long serialVersionUID = 1L;
+  
   private final String[] msgs;
 
   public EnderCoreModConflictException(String[] msgs) {

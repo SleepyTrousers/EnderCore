@@ -4,9 +4,10 @@ import com.google.common.reflect.TypeToken;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public abstract class MessageTileEntity<T extends TileEntity> implements IMessage {
 
@@ -18,9 +19,9 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   }
 
   protected MessageTileEntity(T tile) {
-    x = tile.xCoord;
-    y = tile.yCoord;
-    z = tile.zCoord;
+    x = tile.getPos().getX();
+    y = tile.getPos().getY();
+    z = tile.getPos().getZ();
   }
 
   public void toBytes(ByteBuf buf) {
@@ -41,7 +42,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     if (worldObj == null) {
       return null;
     }
-    TileEntity te = worldObj.getTileEntity(x, y, z);
+    TileEntity te = worldObj.getTileEntity(new BlockPos(x, y, z));
     if (te == null) {
       return null;
     }

@@ -1,13 +1,13 @@
 package com.enderio.core.common.network;
 
-import io.netty.buffer.ByteBuf;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 /**
  * Created by CrazyPants on 27/02/14.
@@ -22,7 +22,7 @@ public class NetworkUtil {
       } else {
         byte[] buffer = new byte[size];
         dataIn.readBytes(buffer);
-        return CompressedStreamTools.func_152457_a(buffer, NBTSizeTracker.field_152451_a);
+        return CompressedStreamTools.readCompressed(new ByteArrayInputStream(buffer));
       }
     } catch (IOException e) {
       FMLCommonHandler.instance().raiseException(e, "Custom Packet", true);
@@ -35,7 +35,9 @@ public class NetworkUtil {
       if (compound == null) {
         dataout.writeShort(-1);
       } else {
-        byte[] buf = CompressedStreamTools.compress(compound);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CompressedStreamTools.writeCompressed(compound, baos);
+        byte[] buf = baos.toByteArray();
         dataout.writeShort((short) buf.length);
         dataout.writeBytes(buf);
       }

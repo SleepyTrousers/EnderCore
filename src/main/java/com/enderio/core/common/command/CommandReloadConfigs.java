@@ -3,19 +3,19 @@ package com.enderio.core.common.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
-
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.event.ConfigFileChangedEvent;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class CommandReloadConfigs extends CommandBase {
   public static final CommandReloadConfigs SERVER = new CommandReloadConfigs(Side.SERVER);
@@ -29,9 +29,8 @@ public class CommandReloadConfigs extends CommandBase {
     EnderCore.logger.info("Sending dummy event to all mods");
 
     for (ModContainer mod : Loader.instance().getActiveModList()) {
-      ConfigFileChangedEvent event = new ConfigFileChangedEvent(mod.getModId());
-      FMLCommonHandler.instance().bus().post(event);
-
+      ConfigFileChangedEvent event = new ConfigFileChangedEvent(mod.getModId());      
+      MinecraftForge.EVENT_BUS.post(event);
       if (event.isSuccessful()) {
         validModIDs.add(mod.getModId());
       }
@@ -60,11 +59,10 @@ public class CommandReloadConfigs extends CommandBase {
   @Override
   public boolean canCommandSenderUseCommand(ICommandSender player) {
     return player.getEntityWorld().isRemote || super.canCommandSenderUseCommand(player);
-  }
+  } 
 
-  @SuppressWarnings("rawtypes")
   @Override
-  public List addTabCompletionOptions(ICommandSender player, String[] args) {
+  public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
     if (args.length >= 1) {
       String[] avail = validModIDs.toArray(new String[validModIDs.size()]);
 
@@ -91,7 +89,7 @@ public class CommandReloadConfigs extends CommandBase {
 
         if (validModid) {
           ConfigFileChangedEvent event = new ConfigFileChangedEvent(s);
-          FMLCommonHandler.instance().bus().post(event);
+          MinecraftForge.EVENT_BUS.post(event);
 
           if (event.isSuccessful()) {
             sendResult(player, s, "success");

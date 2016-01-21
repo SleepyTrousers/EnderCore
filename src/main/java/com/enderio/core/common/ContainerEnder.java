@@ -5,14 +5,14 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.Maps;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import com.google.common.collect.Maps;
 
 public class ContainerEnder<T extends IInventory> extends Container {
 

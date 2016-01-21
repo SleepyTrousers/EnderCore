@@ -1,9 +1,13 @@
 package com.enderio.core.api.client.render;
 
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.RenderUtil;
+
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 
 public interface IWidgetMap {
 
@@ -78,10 +82,11 @@ public interface IWidgetMap {
     @Override
     public void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
 
-      Tessellator tessellator = Tessellator.instance;
+      WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
       if (doDraw) {
         RenderUtil.bindTexture(getTexture());
-        tessellator.startDrawingQuads();
+        //tessellator.startDrawingQuads();           
+        tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
       }
       double minU = (double) widget.getX() / getSize();
       double maxU = (double) (widget.getX() + widget.getWidth()) / getSize();
@@ -89,21 +94,22 @@ public interface IWidgetMap {
       double maxV = (double) (widget.getY() + widget.getHeight()) / getSize();
 
       if (flipY) {
-        tessellator.addVertexWithUV(x, y + height, zLevel, minU, minV);
-        tessellator.addVertexWithUV(x + width, y + height, zLevel, maxU, minV);
-        tessellator.addVertexWithUV(x + width, y + 0, zLevel, maxU, maxV);
-        tessellator.addVertexWithUV(x, y + 0, zLevel, minU, maxV);
+        tes.pos(x, y + height, zLevel).tex(minU, minV).endVertex();
+        
+        tes.pos(x + width, y + height, zLevel).tex(maxU, minV);
+        tes.pos(x + width, y + 0, zLevel).tex( maxU, maxV);
+        tes.pos(x, y + 0, zLevel).tex( minU, maxV);
       } else {
-        tessellator.addVertexWithUV(x, y + height, zLevel, minU, maxV);
-        tessellator.addVertexWithUV(x + width, y + height, zLevel, maxU, maxV);
-        tessellator.addVertexWithUV(x + width, y + 0, zLevel, maxU, minV);
-        tessellator.addVertexWithUV(x, y + 0, zLevel, minU, minV);
+        tes.pos(x, y + height, zLevel).tex( minU, maxV);
+        tes.pos(x + width, y + height, zLevel).tex( maxU, maxV);
+        tes.pos(x + width, y + 0, zLevel).tex( maxU, minV);
+        tes.pos(x, y + 0, zLevel).tex( minU, minV);
       }
       if (widget.getOverlay() != null) {
         widget.getOverlay().getMap().render(widget.getOverlay(), x, y, width, height, zLevel, false, flipY);
       }
       if (doDraw) {
-        tessellator.draw();
+        Tessellator.getInstance().draw();
       }
     }
   }

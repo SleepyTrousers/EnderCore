@@ -1,27 +1,27 @@
 package com.enderio.core.client.gui.bettermodlist;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.util.StringUtils;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.client.GuiModList;
-import cpw.mods.fml.client.GuiScrollingList;
-import cpw.mods.fml.client.GuiSlotModList;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.util.StringUtils;
+import net.minecraftforge.fml.client.GuiModList;
+import net.minecraftforge.fml.client.GuiScrollingList;
+import net.minecraftforge.fml.client.GuiSlotModList;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 
 public class GuiEnhancedModList extends GuiModList {
   private enum SortType {
@@ -76,7 +76,9 @@ public class GuiEnhancedModList extends GuiModList {
 
     @Override
     public void drawButton(Minecraft p_146112_1_, int p_146112_2_, int p_146112_3_) {
-      if (this.field_146123_n) {
+       //TODO: 1.8
+      //      if (this.field_146123_n) {
+      if(false) {
         ModContainer sel = GuiEnhancedModList.this.getSelectedMod();
         if (sel != null && sel.getName().equals(EnderCore.NAME)) {
           this.displayString = EnderCore.lang.localize("gui.modlistinfo2");
@@ -84,7 +86,7 @@ public class GuiEnhancedModList extends GuiModList {
           this.displayString = EnderCore.lang.localize("gui.modlistinfo1");
         }
 
-        this.width = p_146112_1_.fontRenderer.getStringWidth(this.displayString) + 10;
+        this.width = p_146112_1_.fontRendererObj.getStringWidth(this.displayString) + 10;
         if (this.width % 2 != 0) // Fixes the button shifting to the left
         {
           this.width++;
@@ -168,7 +170,7 @@ public class GuiEnhancedModList extends GuiModList {
 
     setGuiModListBottom(getGuiModListBottom() - 25);
     if (search == null) {
-      search = new GuiTextField(mc.fontRenderer, 12, getGuiModListBottom() + 17, getListWidth() - 4, 14);
+      search = new GuiTextField(1, mc.fontRendererObj, 12, getGuiModListBottom() + 17, getListWidth() - 4, 14);
       search.setFocused(true);
       search.setCanLoseFocus(true);
     }
@@ -212,7 +214,7 @@ public class GuiEnhancedModList extends GuiModList {
   }
 
   @Override
-  protected void mouseClicked(int x, int y, int button) {
+  protected void mouseClicked(int x, int y, int button) throws IOException {
     super.mouseClicked(x, y, button);
     search.mouseClicked(x, y, button);
     if (button == 1 && x >= search.xPosition && x < search.xPosition + search.width && y >= search.yPosition && y < search.yPosition + search.height) {
@@ -221,7 +223,7 @@ public class GuiEnhancedModList extends GuiModList {
   }
 
   @Override
-  protected void keyTyped(char p_73869_1_, int p_73869_2_) {
+  protected void keyTyped(char p_73869_1_, int p_73869_2_) throws IOException {
     super.keyTyped(p_73869_1_, p_73869_2_);
     search.textboxKeyTyped(p_73869_1_, p_73869_2_);
   }
@@ -261,13 +263,13 @@ public class GuiEnhancedModList extends GuiModList {
     super.drawScreen(p_571_1_, p_571_2_, p_571_3_);
 
     String text = EnderCore.lang.localize("gui.search");
-    int x = ((10 + getGuiModListRight()) / 2) - (mc.fontRenderer.getStringWidth(text) / 2);
-    mc.fontRenderer.drawString(text, x, getGuiModListBottom() + 5, 0xFFFFFF);
+    int x = ((10 + getGuiModListRight()) / 2) - (mc.fontRendererObj.getStringWidth(text) / 2);
+    mc.fontRendererObj.drawString(text, x, getGuiModListBottom() + 5, 0xFFFFFF);
     search.drawTextBox();
   }
 
   @Override
-  protected void actionPerformed(GuiButton button) {
+  protected void actionPerformed(GuiButton button) throws IOException {
     super.actionPerformed(button);
 
     if (button.id == 30) {

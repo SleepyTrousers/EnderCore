@@ -1,214 +1,167 @@
 package com.enderio.core.common;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import com.enderio.core.api.common.util.ITankAccess;
-import com.enderio.core.common.interfaces.IComparatorOutput;
-import com.enderio.core.common.util.FluidUtil;
 import com.enderio.core.common.util.Log;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
-public abstract class BlockEnder extends Block {
+    protected final Class<? extends T> teClass;
+    protected final String name;
 
-  protected final Class<? extends TileEntityEnder> teClass;
-  protected final String name;
-  protected final boolean hasComparatorInputOverride;
+//    @Setter
+    private Class<? extends ItemBlock> itemBlockClass;
 
-  protected BlockEnder(String name, Class<? extends TileEntityEnder> teClass) {
-    this(name, teClass, new Material(MapColor.ironColor));
-  }
-
-  protected BlockEnder(String name, Class<? extends TileEntityEnder> teClass, Material mat) {
-    super(mat);
-    this.teClass = teClass;
-    this.name = name;
-    setHardness(0.5F);
-    setBlockName(name);
-    setStepSound(Block.soundTypeMetal);
-    setHarvestLevel("pickaxe", 0);
-    hasComparatorInputOverride = teClass != null && IComparatorOutput.class.isAssignableFrom(teClass);
-  }
-
-  protected void init() {
-    GameRegistry.registerBlock(this, name);
-    if (teClass != null) {
-      GameRegistry.registerTileEntity(teClass, name + "TileEntity");
-    }
-  }
-
-  @Override
-  public boolean hasTileEntity(int metadata) {
-    return teClass != null;
-  }
-
-  @Override
-  public TileEntity createTileEntity(World world, int metadata) {
-    if (teClass != null) {
-      try {
-        TileEntityEnder te = teClass.newInstance();
-        te.init();
-        return te;
-      } catch (Exception e) {
-        Log.error("Could not create tile entity for block " + name + " for class " + teClass);
-      }
-    }
-    return null;
-  }
-
-  @Override
-  @SideOnly(Side.CLIENT)
-  public void registerBlockIcons(IIconRegister iIconRegister) {
-    blockIcon = iIconRegister.registerIcon("enderio:" + name);
-  }
-
-  /* Subclass Helpers */
-
-  @Override
-  public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer entityPlayer, int side, float par7, float par8, float par9) {
-
-    TileEntity te = world.getTileEntity(x, y, z);
-
-    if (entityPlayer.isSneaking()) {
-      return false;
+    protected BlockEnder(String name, Class<? extends T> teClass) {
+        this(name, teClass, new Material(MapColor.ironColor));
     }
 
-    if (te instanceof ITankAccess) {
-      if (FluidUtil.fillInternalTankFromPlayerHandItem(world, x, y, z, entityPlayer, (ITankAccess) te)) {
+    protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
+        super(mat);
+        this.teClass = teClass;
+        this.name = name;
+        setHardness(0.5F);
+        setUnlocalizedName(name);
+        setStepSound(Block.soundTypeMetal);
+        setHarvestLevel("pickaxe", 0);
+    }
+
+    protected void init() {
+        if (itemBlockClass != null) {
+            GameRegistry.registerBlock(this, itemBlockClass, name);
+        } else {
+            GameRegistry.registerBlock(this, name);
+        }
+        if (teClass != null) {
+            GameRegistry.registerTileEntity(teClass, name + "TileEntity");
+        }
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return teClass != null;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        if (teClass != null) {
+            try {
+                T te = teClass.newInstance();
+                te.init();
+                return te;
+            } catch (Exception e) {
+                Log.error("Could not create tile entity for block " + name + " for class " + teClass);
+            }
+        }
+        return null;
+    }
+
+    /* Subclass Helpers */
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (playerIn.isSneaking()) {
+            return false;
+        }
+        return openGui(worldIn, pos, playerIn, side);
+    }
+
+    protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
+        return false;
+    }
+
+    public boolean doNormalDrops(IBlockAccess world, BlockPos pos) {
         return true;
-      }
-      if (FluidUtil.fillPlayerHandItemFromInternalTank(world, x, y, z, entityPlayer, (ITankAccess) te)) {
-        return true;
-      }
     }
 
-    return openGui(world, x, y, z, entityPlayer, side);
-  }
-
-  protected boolean shouldWrench(World world, int x, int y, int z, EntityPlayer entityPlayer, int side) {
-    return true;
-  }
-
-  protected boolean openGui(World world, int x, int y, int z, EntityPlayer entityPlayer, int side) {
-    return false;
-  }
-
-  public boolean doNormalDrops(World world, int x, int y, int z) {
-    return true;
-  }
-
-  @Override
-  public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
-    if (willHarvest) {
-      return true;
+    @Override
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+        if (willHarvest) {
+            return true;
+        }
+        return super.removedByPlayer(world, pos, player, willHarvest);
     }
-    return super.removedByPlayer(world, player, x, y, z, willHarvest);
-  }
 
-  @Override
-  public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
-    super.harvestBlock(world, player, x, y, z, meta);
-    world.setBlockToAir(x, y, z);
-  }
-
-  @Override
-  public final ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-    if (doNormalDrops(world, x, y, z)) {
-      return super.getDrops(world, x, y, z, metadata, fortune);
+    @Override
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te) {
+        super.harvestBlock(worldIn, player, pos, state, te);
+        worldIn.setBlockToAir(pos);
     }
-    return Lists.newArrayList(getNBTDrop(world, x, y, z, (TileEntityEnder) world.getTileEntity(x, y, z)));
-  }
-  
-  @Override
-  public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
-    return getPickBlock(target, world, x, y, z, null);
-  }
-  
-  @Override
-  public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, @Nullable EntityPlayer player) {
-    return getNBTDrop(world, x, y, z, getTileEntityEio(world, x, y, z));
-  }
 
-  public ItemStack getNBTDrop(World world, int x, int y, int z, TileEntityEnder te) {
-    int meta = damageDropped(te.getBlockMetadata());
-    ItemStack itemStack = new ItemStack(this, 1, meta);
-    processDrop(world, x, y, z, te, itemStack);
-    return itemStack;
-  }
-
-  protected void processDrop(World world, int x, int y, int z, @Nullable TileEntityEnder te, ItemStack drop) {
-  }
-
-  protected TileEntityEnder getTileEntityEio(IBlockAccess world, int x, int y, int z) {
-    TileEntity te = world.getTileEntity(x, y, z);
-    if (teClass.isInstance(te)) {
-      return (TileEntityEnder) te;
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        if (doNormalDrops(world, pos)) {
+            return super.getDrops(world, pos, state, fortune);
+        }
+        return Lists.newArrayList(getNBTDrop(world, pos, (T) world.getTileEntity(pos)));
     }
-    return null;
-  }
 
-  protected boolean shouldDoWorkThisTick(World world, int x, int y, int z, int interval) {
-    TileEntityEnder te = getTileEntityEio(world, x, y, z);
-    if (te == null) {
-      return world.getTotalWorldTime() % interval == 0;
-    } else {
-      return te.shouldDoWorkThisTick(interval);
+    public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, T te) {
+        int meta = damageDropped(world.getBlockState(pos));
+        ItemStack itemStack = new ItemStack(this, 1, meta);
+        processDrop(world, pos, te, itemStack);
+        return itemStack;
     }
-  }
 
-  protected boolean shouldDoWorkThisTick(World world, int x, int y, int z, int interval, int offset) {
-    TileEntityEnder te = getTileEntityEio(world, x, y, z);
-    if (te == null) {
-      return (world.getTotalWorldTime() + offset) % interval == 0;
-    } else {
-      return te.shouldDoWorkThisTick(interval, offset);
+    protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {}
+
+    @SuppressWarnings("unchecked")
+    protected T getTileEntity(World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (teClass.isInstance(te)) {
+            return (T) te;
+        }
+        return null;
     }
-  }
 
-  @Override
-  public boolean hasComparatorInputOverride() {
-    return hasComparatorInputOverride;
-  }
-
-  @Override
-  public int getComparatorInputOverride(World w, int x, int y, int z, int side) {
-    if (hasComparatorInputOverride) {
-      TileEntityEnder te = getTileEntityEio(w, x, y, z);
-      if (te != null) {
-        return ((IComparatorOutput) te).getComparatorOutput();
-      }
+    protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval) {
+        T te = getTileEntity(world, pos);
+        if (te == null) {
+            return world.getTotalWorldTime() % interval == 0;
+        } else {
+            return te.shouldDoWorkThisTick(interval);
+        }
     }
-    return 0;
-  }
-  
-  //Because the vanilla method takes floats...
-  public void setBlockBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-    this.minX = minX;
-    this.minY = minY;
-    this.minZ = minZ;
-    this.maxX = maxX;
-    this.maxY = maxY;
-    this.maxZ = maxZ;
-  }
 
-  public void setBlockBounds(AxisAlignedBB bb) {
-    setBlockBounds(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
-  }
+    protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval, int offset) {
+        T te = getTileEntity(world, pos);
+        if (te == null) {
+            return (world.getTotalWorldTime() + offset) % interval == 0;
+        } else {
+            return te.shouldDoWorkThisTick(interval, offset);
+        }
+    }
+
+    // Because the vanilla method takes floats...
+    public void setBlockBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+        this.minX = minX;
+        this.minY = minY;
+        this.minZ = minZ;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.maxZ = maxZ;
+    }
+
+    public void setBlockBounds(AxisAlignedBB bb) {
+        setBlockBounds(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+    }
 }

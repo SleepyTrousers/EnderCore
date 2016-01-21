@@ -4,17 +4,19 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
 
-import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   public static final EnchantAutoSmelt INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
 
   private EnchantAutoSmelt(int id) {
-    super(id, 2, EnumEnchantmentType.breakable);
+    //TOO: 1.8, I guessed what the resource location should be here
+    super(id, new ResourceLocation(EnderCore.MODID, "autosmelt"),2,EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -57,7 +59,8 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
           "<enchantment name=\"enchantment.autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
     } else {
-      Enchantment.enchantmentsList[this.effectId] = null;
+      //TODO: 1.8
+      //Enchantment.enchantmentsList[this.effectId] = null;
     }
   }
 

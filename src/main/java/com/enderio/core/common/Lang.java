@@ -2,9 +2,9 @@ package com.enderio.core.common;
 
 import java.util.List;
 
-import net.minecraft.util.StatCollector;
-
 import com.google.common.collect.Lists;
+
+import net.minecraft.util.StatCollector;
 
 public class Lang {
 

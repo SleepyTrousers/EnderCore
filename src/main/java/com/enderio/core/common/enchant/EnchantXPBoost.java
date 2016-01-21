@@ -8,13 +8,15 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.common.event.FMLInterModComms;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   public static final EnchantXPBoost INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
 
   private EnchantXPBoost(int id) {
-    super(id, 2, EnumEnchantmentType.breakable);
+    //TOO: 1.8, I guessed what the resource location should be here
+    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"),2,EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -57,7 +59,8 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
           "<enchantment name=\"enchantment.xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
     } else {
-      Enchantment.enchantmentsList[this.effectId] = null;
+      //TODO: 1.8
+      //Enchantment.enchantmentsList[this.effectId] = null;
     }
   }
 }

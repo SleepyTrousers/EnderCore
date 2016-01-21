@@ -1,14 +1,19 @@
 package com.enderio.core.client.gui.button;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.ItemDye;
-import net.minecraft.util.MathHelper;
-
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
+import com.enderio.core.client.render.ColorUtil;
 import com.enderio.core.common.util.DyeColor;
+import com.enderio.core.common.vecmath.Vector3f;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemDye;
+import net.minecraft.util.MathHelper;
 
 public class ColorButton extends IconButton {
 
@@ -52,7 +57,7 @@ public class ColorButton extends IconButton {
 
   private void nextColor() {
     colorIndex++;
-    if (colorIndex >= ItemDye.field_150923_a.length) {
+    if (colorIndex >= ItemDye.dyeColors.length) {
       colorIndex = 0;
     }
     setColorIndex(colorIndex);
@@ -61,7 +66,7 @@ public class ColorButton extends IconButton {
   private void prevColor() {
     colorIndex--;
     if (colorIndex < 0) {
-      colorIndex = ItemDye.field_150923_a.length - 1;
+      colorIndex = ItemDye.dyeColors.length - 1;
     }
     setColorIndex(colorIndex);
   }
@@ -71,7 +76,7 @@ public class ColorButton extends IconButton {
   }
 
   public void setColorIndex(int colorIndex) {
-    this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.field_150923_a.length - 1);
+    this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.dyeColors.length - 1);
     String colStr = DyeColor.values()[colorIndex].getLocalisedName();
     if (tooltipPrefix != null && tooltipPrefix.length() > 0) {
       setToolTip(tooltipPrefix, colStr);
@@ -84,22 +89,24 @@ public class ColorButton extends IconButton {
   public void drawButton(Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
     if (visible) {
-      Tessellator tes = Tessellator.instance;
-      tes.startDrawingQuads();
-
+      WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();                
+      tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+      
       int x = xPosition + 2;
       int y = yPosition + 2;
 
       GL11.glDisable(GL11.GL_TEXTURE_2D);
 
-      int col = ItemDye.field_150922_c[colorIndex];
-      tes.setColorOpaque_I(col);
-      tes.addVertex(x, y + height - 4, zLevel);
-      tes.addVertex(x + width - 4, y + height - 4, zLevel);
-      tes.addVertex(x + width - 4, y + 0, zLevel);
-      tes.addVertex(x, y + 0, zLevel);
+      int col = ItemDye.dyeColors[colorIndex];
+      Vector3f c = ColorUtil.toFloat(col);      
+      GlStateManager.color(c.x, c.y, c.z);
+      
+      tes.pos(x, y + height - 4, zLevel).endVertex();
+      tes.pos(x + width - 4, y + height - 4, zLevel).endVertex();
+      tes.pos(x + width - 4, y + 0, zLevel).endVertex();
+      tes.pos(x, y + 0, zLevel).endVertex();
 
-      tes.draw();
+      Tessellator.getInstance().draw();
 
       GL11.glEnable(GL11.GL_TEXTURE_2D);
 

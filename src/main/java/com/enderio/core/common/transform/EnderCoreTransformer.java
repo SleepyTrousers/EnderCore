@@ -1,10 +1,15 @@
 package com.enderio.core.common.transform;
 
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.ISTORE;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import net.minecraft.launchwrapper.IClassTransformer;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -19,9 +24,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import com.enderio.core.EnderCore;
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-
-import static org.objectweb.asm.Opcodes.*;
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 @MCVersion(value = "1.7.10")
 public class EnderCoreTransformer implements IClassTransformer {
