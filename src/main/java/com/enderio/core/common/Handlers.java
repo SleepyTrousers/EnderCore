@@ -74,7 +74,7 @@ public class Handlers {
    * automatically figure out what busses it needs to be registered to.
    * <p>
    * It can get the instance of the handler in a few ways: <br>
-   * A public no args constructor (or lombok {@link NoArgsConstructor})
+   * A public no args constructor 
    * <b>OR</b><br>
    * A static singleton object with field name {@code INSTANCE} (public or
    * private). <b>OR</b><br>
