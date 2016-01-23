@@ -1,11 +1,5 @@
 package com.enderio.core.common;
 
-import static com.enderio.core.common.Handlers.Handler.Inst.AUTO;
-import static com.enderio.core.common.Handlers.Handler.Inst.CONSTRUCTOR;
-import static com.enderio.core.common.Handlers.Handler.Inst.FIELD;
-import static com.enderio.core.common.Handlers.Handler.Inst.METHOD;
-import static com.enderio.core.common.Handlers.Handler.Inst.SCALA_OBJECT;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,12 +11,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.enderio.core.EnderCore;
-import com.enderio.core.IEnderMod;
-import com.enderio.core.common.Handlers.Handler.HandlerSide;
-import com.enderio.core.common.Handlers.Handler.Inst;
-import com.google.common.base.Throwables;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -37,6 +25,14 @@ import net.minecraftforge.fml.common.eventhandler.EventBus;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
+
+import com.enderio.core.EnderCore;
+import com.enderio.core.IEnderMod;
+import com.enderio.core.common.Handlers.Handler.HandlerSide;
+import com.enderio.core.common.Handlers.Handler.Inst;
+import com.google.common.base.Throwables;
+
+import static com.enderio.core.common.Handlers.Handler.Inst.*;
 
 public class Handlers {
 
