@@ -2,6 +2,7 @@ package com.enderio.core.common.util;
 
 import com.enderio.core.EnderCore;
 
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -71,19 +72,17 @@ public enum DyeColor {
   public int getColor() {
     return ItemDye.dyeColors[ordinal()];
   }
-  // TODO: 1.8
-  // public String getName() {
-  // ItemDye.
-  // return ItemDye.field_150921_b[ordinal()];
-  // }
+
+  public String getName() {
+    return EnumDyeColor.values()[ordinal()].getName();
+  }
 
   public String getLocalisedName() {
     return EnderCore.lang.localizeExact(DYE_ORE_UNLOCAL_NAMES[ordinal()], false);
   }
 
-  // @Override
-  // public String toString() {
-  // return getName();
-  // }
-
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

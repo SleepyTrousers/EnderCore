@@ -2,13 +2,16 @@ package com.enderio.core.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-
-import com.enderio.core.common.vecmath.Vector3d;
+import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -22,6 +25,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+
+import com.enderio.core.common.vecmath.Vector3d;
 
 public class EntityUtil {
 
@@ -98,19 +103,18 @@ public class EntityUtil {
     return StatCollector.translateToLocal("entity." + mobName + ".name");
   }
 
-  //TODO: 1.8
-//  public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
-//    List<String> result = new ArrayList<String>();
-//    Set<Map.Entry<Class, String>> entries = EntityList.classToStringMapping.entrySet();
-//    for (Map.Entry<Class, String> entry : entries) {
-//      if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-//        if (!excludeBosses || !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
-//          result.add(entry.getValue());
-//        }
-//      }
-//    }
-//    return result;
-//  }
+  public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
+    List<String> result = new ArrayList<String>();
+    Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.classToStringMapping.entrySet();
+    for (Map.Entry<Class<? extends Entity>, String> entry : entries) {
+      if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
+        if (!excludeBosses || !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+          result.add(entry.getValue());
+        }
+      }
+    }
+    return result;
+  }
 
   private EntityUtil() {
   }
