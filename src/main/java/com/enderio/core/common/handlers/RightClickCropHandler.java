@@ -8,7 +8,9 @@ import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
@@ -59,26 +61,32 @@ public class RightClickCropHandler {
 
   @SubscribeEvent
   public void handleCropRightClick(PlayerInteractEvent event) {
-    //TODO: 1.8
-//    int x = event.x, y = event.y, z = event.z;
-//    Block block = event.world.getBlock(x, y, z);
-//    int meta = event.world.getBlockMetadata(x, y, z);
-//    if (ConfigHandler.allowCropRC && event.action == Action.RIGHT_CLICK_BLOCK && (event.entityPlayer.getHeldItem() == null || !event.entityPlayer.isSneaking())) {
-//      for (PlantInfo info : plants) {
-//        if (info.blockInst == block && meta == info.meta) {
-//          if (event.world.isRemote) {
-//            event.entityPlayer.swingItem();
-//          } else {
-//            currentPlant = info;
-//            block.dropBlockAsItem(event.world, x, y, z, meta, 0);
-//            currentPlant = null;
-//            event.world.setBlockMetadataWithNotify(x, y, z, info.resetMeta, 3);
-//            event.setCanceled(true);
-//          }
-//          break;
-//        }
-//      }
-//    }
+    BlockPos pos = event.pos;
+    if(pos == null) {
+      return;
+    }
+    
+    IBlockState blockState = event.world.getBlockState(pos);
+    Block block = blockState.getBlock();
+    int meta = block.getMetaFromState(blockState);
+    if (ConfigHandler.allowCropRC && event.action == Action.RIGHT_CLICK_BLOCK
+        && (event.entityPlayer.getHeldItem() == null || !event.entityPlayer.isSneaking())) {
+      for (PlantInfo info : plants) {        
+        if (info.blockInst == block && meta == info.meta) {
+          if (event.world.isRemote) {
+            event.entityPlayer.swingItem();
+          } else {
+            currentPlant = info;
+            block.dropBlockAsItem(event.world, pos, blockState, 0);
+            currentPlant = null;
+            IBlockState newBS = block.getStateFromMeta(info.resetMeta);
+            event.world.setBlockState(pos, newBS, 3);
+            event.setCanceled(true);
+          }
+          break;
+        }
+      }
+    }
   }
 
   @SubscribeEvent

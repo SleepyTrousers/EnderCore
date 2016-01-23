@@ -13,6 +13,7 @@ import com.google.common.io.Files;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -76,47 +77,28 @@ public class Util {
     }
   }
 
-//TODO: 1.8
-//  // derived from ItemBlock.onItemUse
-//  public static BlockCoord canPlaceItem(ItemStack itemUsed, Block blockIdToBePlaced, EntityPlayer player, World world, int x, int y, int z, int side) {
-//
-//    if (blockIdToBePlaced == null) {
-//      return null;
-//    }
-//
-//    Block block = world.getBlock(x, y, z);
-//
-//    if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1) {
-//      side = 1;
-//    } else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush && (block == null || !block.isReplaceable(world, x, y, z))) {
-//
-//      if (side == 0) {
-//        --y;
-//      } else if (side == 1) {
-//        ++y;
-//      } else if (side == 2) {
-//        --z;
-//      } else if (side == 3) {
-//        ++z;
-//      } else if (side == 4) {
-//        --x;
-//      } else if (side == 5) {
-//        ++x;
-//      }
-//    }
-//
-//    if (itemUsed.stackSize == 0) {
-//      return null;
-//    } else if (!player.canPlayerEdit(x, y, z, side, itemUsed)) {
-//      return null;
-//    } else if (y == 255 && blockIdToBePlaced.getMaterial().isSolid()) {
-//      return null;
-//    } else if (world.canPlaceEntityOnSide(blockIdToBePlaced, x, y, z, false, side, player, itemUsed)) {
-//      return new BlockCoord(x, y, z);
-//    }
-//    return null;
-//
-//  }
+  public static BlockCoord canPlaceItem(ItemStack stack, Block blockToBePlaced, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+
+    if (stack == null || stack.stackSize == 0 || blockToBePlaced == null) {
+      return null;
+    }
+
+    IBlockState bs = world.getBlockState(pos);
+    Block block = bs.getBlock();
+    if (!block.isReplaceable(world, pos)) {
+      pos = pos.offset(side);
+    }
+
+    if (!player.canPlayerEdit(pos, side, stack)) {
+      return null;
+    } else if (pos.getY() == 255 && blockToBePlaced.getMaterial().isSolid()) {
+      return null;
+    }
+    if (world.canBlockBePlaced(blockToBePlaced, pos, false, side, (Entity) null, stack)) {
+      return new BlockCoord(pos);
+    }
+    return null;
+  }
 
   public static EntityItem createDrop(World world, ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
     if (stack == null || stack.stackSize <= 0) {
@@ -297,7 +279,7 @@ public class Util {
     if (player == null || player.inventory == null || player.inventory.getCurrentItem() == null) {
       return false;
     }
-    //player.inventory.getCurrentItem().getClass().getItem().isAssignableFrom(class1)
+    // player.inventory.getCurrentItem().getClass().getItem().isAssignableFrom(class1)
     return class1.isAssignableFrom(player.inventory.getCurrentItem().getItem().getClass());
   }
 
@@ -308,7 +290,8 @@ public class Util {
     return class1.isAssignableFrom(stack.getItem().getClass());
   }
 
-  //Code adapted from World.func_147447_a (rayTraceBlocks) to return all collided blocks
+  // Code adapted from World.func_147447_a (rayTraceBlocks) to return all
+  // collided blocks
   public static List<MovingObjectPosition> raytraceAll(World world, Vec3 startVec, Vec3 endVec, boolean includeLiquids) {
 
     List<MovingObjectPosition> result = new ArrayList<MovingObjectPosition>();
@@ -326,10 +309,11 @@ public class Util {
         int startZ = MathHelper.floor_double(startVec.zCoord);
         BlockPos pos = new BlockPos(startX, startY, startZ);
         IBlockState bs = world.getBlockState(pos);
-        Block block = bs.getBlock();        
+        Block block = bs.getBlock();
 
         if ((!p_147447_4_ || block.getCollisionBoundingBox(world, pos, bs) != null) && block.canCollideCheck(bs, includeLiquids)) {
-        //if ((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world, l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
+          // if ((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world,
+          // l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
           MovingObjectPosition movingobjectposition = block.collisionRayTrace(world, new BlockPos(startX, startY, startZ), startVec, endVec);
           if (movingobjectposition != null) {
             result.add(movingobjectposition);
@@ -430,9 +414,9 @@ public class Util {
           startZ = MathHelper.floor_double(startVec.zCoord) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
           pos = new BlockPos(startX, startY, startZ);
           IBlockState bs1 = world.getBlockState(pos);
-          Block block1 = bs.getBlock();        
-          
-          if (!p_147447_4_ || block1.getCollisionBoundingBox(world, new BlockPos(startX, startY, startZ),bs1) != null) {
+          Block block1 = bs.getBlock();
+
+          if (!p_147447_4_ || block1.getCollisionBoundingBox(world, new BlockPos(startX, startY, startZ), bs1) != null) {
             if (block1.canCollideCheck(bs1, includeLiquids)) {
               MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, new BlockPos(startX, startY, startZ), startVec, endVec);
               if (movingobjectposition1 != null) {
