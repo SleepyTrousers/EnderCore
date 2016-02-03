@@ -25,8 +25,8 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   }
 
   private EnchantXPBoost(int id) {
-    //TOO: 1.8, I guessed what the resource location should be here
-    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"),2,EnumEnchantmentType.BREAKABLE);
+    // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
+    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"), 2, EnumEnchantmentType.BREAKABLE);
   }
 
   @Override

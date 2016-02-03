@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id "com.matthewprenger.cursegradle" version "1.0.5"
+    id "com.matthewprenger.cursegradle" version "1.0.7"
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -25,8 +25,13 @@ group = "com.enderio.core"
 archivesBaseName = "EnderCore"
 version = "${minecraft_version}-${mod_version}.${buildnumber}"
 
-if (project.hasProperty('mod_appendix'))
-    version += "_${project.mod_appendix}"
+boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE").equalsIgnoreCase("false")
+
+def type = 'release'
+if (project.hasProperty('mod_appendix')) {
+    version += "-${project.mod_appendix}"
+	type = project.mod_appendix
+}
 
 minecraft {
     mappings = "snapshot_nodoc_20160104"
@@ -39,10 +44,6 @@ minecraft {
 
 configurations {
     compile.extendsFrom exportedCompile
-}
-
-repositories {
-    maven { url = "http://chickenbones.net/maven/" }
 }
 
 sourceSets {
@@ -82,23 +83,11 @@ jar {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
 task apiJar(type: Jar) {
     from sourceSets.main.allSource
     from sourceSets.main.output
 	include 'crazypants/enderio/api/**/*'
     classifier = 'api'
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
-    exclude 'powercrystals/**'
-    classifier = 'dev'
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -109,7 +98,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-build.dependsOn sourceJar, deobfJar, apiJar, javadoc
+build.dependsOn apiJar, javadoc
 
 publishing {
     tasks.publish.dependsOn 'build'
@@ -117,9 +106,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-            artifact sourceJar
             artifact apiJar
-            artifact deobfJar
         }
     }
 
@@ -159,5 +146,53 @@ task checkTranslations << {
 	        }
         println "Created translation report ${outfile}"
         }
+    }
+}
+
+String getChangelogText() {
+    def changelogFile = file('changelog.txt')
+    String str = ''
+    int lineCount = 0
+    boolean done = false
+    changelogFile.eachLine {
+        if (done || it == null) {
+            return
+        }
+        if (it.size() > 1) {
+            def temp = it
+            if (lineCount == 0) {
+                temp = "${archivesBaseName} ${version}"
+                temp = "<h2>$temp</h2>"
+            } else if (it.startsWith('-')) {
+                temp = "&nbsp;&nbsp;&nbsp;$temp"
+            } else {
+                temp = "<h4>$temp</h4>"
+            }
+            str += "$temp<br/>"
+            lineCount++
+            return
+        } else {
+            done = true
+        }
+    }
+    return str
+}
+
+tasks.curseforge.enabled = !dev && project.hasProperty('curseforge_key')
+    
+curseforge {
+    if (project.hasProperty('curseforge_key')) {
+        apiKey = project.curseforge_key
+    }
+
+    project {
+        id = project.projectId
+        changelog = System.getenv('CHANGELOG') == null || System.getenv('CHANGELOG').equals('none') ? getChangelogText() : System.getenv('CHANGELOG')
+        changelogType = 'html'
+        releaseType = type
+        mainArtifact(jar) {
+            displayName = "${archivesBaseName} - ${version}"
+        }
+        addArtifact(apiJar)
     }
 }
