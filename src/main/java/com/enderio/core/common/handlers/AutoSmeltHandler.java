@@ -78,7 +78,7 @@ public class AutoSmeltHandler {
     Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(tool);
     for (int i : enchants.keySet()) {
       Enchantment enchant = Enchantment.getEnchantmentById(i);
-      if (enchant == EnchantAutoSmelt.INSTANCE) {
+      if (enchant == EnchantAutoSmelt.instance()) {
         return enchants.get(i);
       }
     }

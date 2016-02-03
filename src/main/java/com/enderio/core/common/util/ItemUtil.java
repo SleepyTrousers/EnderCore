@@ -309,7 +309,7 @@ public class ItemUtil {
     } else if (into instanceof IInventory) {
       return ItemUtil.doInsertItemInv(getInventory((IInventory) into), item, side, true);
     } 
-    //TODO: 1.8
+    //TODO: 1.8 Wait for CoFH update
 //    else if (into instanceof IItemDuct) {
 //      return ItemUtil.doInsertItem((IItemDuct) into, item, side);
 //    }
@@ -323,7 +323,7 @@ public class ItemUtil {
     return 0;
   }
 
-  //TODO: 1.8
+  //TODO: 1.8 Wait for CoFH update
 //  public static int doInsertItem(IItemDuct con, ItemStack item, ForgeDirection inventorySide) {
 //    int startedWith = item.stackSize;
 //    ItemStack remaining = con.insertItem(inventorySide, item);
@@ -349,7 +349,7 @@ public class ItemUtil {
     ISlotIterator slots;
 
     if (sidedInv != null) {     
-      //TODO: 1.8 Note: This is not thread-safe. Change to getInstance() to constructor when needed (1.8++?).
+      //TODO Note: This is not thread-safe. Change to getInstance() to constructor when needed (1.9+?).
       slots = sidedSlotter.getInstance(sidedInv.getSlotsForFace(inventorySide));
     } else {
       slots = invSlotter.getInstance(0, inv.getSizeInventory());

@@ -47,7 +47,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @Handler(side = HandlerSide.COMMON)
 public class ServerListHandler {
 
-  //TODO:1.8
+  //TODO: 1.8 On Hold
   
 //  private static class TextureClockCustom extends TextureClock {
 //    private static final Field field_94239_h = ReflectionHelper.findField(TextureClock.class, "field_94239_h");

@@ -89,8 +89,8 @@ public class EnderCore implements IEnderMod {
     CompatRegistry.INSTANCE.handle(event);
     OreDict.registerVanilla();
 
-    EnchantXPBoost.INSTANCE.register();
-    EnchantAutoSmelt.INSTANCE.register();
+    EnchantXPBoost.register();
+    EnchantAutoSmelt.register();
   }
 
   @EventHandler

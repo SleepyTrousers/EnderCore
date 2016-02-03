@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class TimeServerPinger {//implements Closeable {
 
-  //TODO: 1.8
+  //TODO: 1.8 On Hold
   
 //  public static class NetHandlerTime implements INetHandlerStatusClient {
 //
