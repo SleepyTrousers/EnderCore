@@ -1,15 +1,12 @@
 package com.enderio.core.common.transform;
 
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ARETURN;
-import static org.objectweb.asm.Opcodes.ILOAD;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
-import static org.objectweb.asm.Opcodes.IRETURN;
-import static org.objectweb.asm.Opcodes.ISTORE;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -23,9 +20,10 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import com.enderio.core.EnderCore;
+import com.enderio.core.common.config.ConfigHandler;
+import com.google.common.collect.Sets;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import static org.objectweb.asm.Opcodes.*;
 
 @MCVersion(value = "1.7.10")
 public class EnderCoreTransformer implements IClassTransformer {
@@ -84,11 +82,19 @@ public class EnderCoreTransformer implements IClassTransformer {
   private static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
   private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
   private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
+  
+  private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass, itemStackClass, entityArrowClass, containerFurnaceClass);
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
+    
+    boolean doGameplayChanges = true;
+    if (transformableClasses.contains(transformedName) && ConfigHandler.invisibleMode == 1) {
+      doGameplayChanges = false;
+    }
+    
     // Void fog removal
-    if (transformedName.equals(worldTypeClass)) {
+    if (doGameplayChanges && transformedName.equals(worldTypeClass)) {
       basicClass = transform(basicClass, worldTypeClass, voidFogMethod, new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {
@@ -110,7 +116,7 @@ public class EnderCoreTransformer implements IClassTransformer {
       });
     }
     // Anvil max level
-    else if (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass)) {
+    else if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) {
       basicClass = transform(basicClass, anvilContainerClass, anvilContainerMethod, new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {
@@ -215,7 +221,7 @@ public class EnderCoreTransformer implements IClassTransformer {
       });
     }
     // Furnace Shift Click Fix
-    else if (transformedName.equals(containerFurnaceClass)) {
+    else if (doGameplayChanges && transformedName.equals(containerFurnaceClass)) {
       basicClass = transform(basicClass, containerFurnaceClass, containerFurnaceMethod, new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {

@@ -92,19 +92,19 @@ public class ConfigProcessor {
 
   static final Map<String, ConfigProcessor> processorMap = Maps.newHashMap();
 
-  private final List<ITypeAdapter<?, ?>> adapters = Lists.newArrayList();
+  protected final List<ITypeAdapter<?, ?>> adapters = Lists.newArrayList();
 
-  final String modid;
+  protected final String modid;
 
-  private final Class<?> configs;
-  private final Configuration configFile;
-  private final IReloadCallback callback;
+  protected final Class<?> configs;
+  protected final Configuration configFile;
+  protected final IReloadCallback callback;
 
-  Map<String, Object> configValues = Maps.newHashMap();
-  Map<String, Object> defaultValues = Maps.newHashMap();
-  Map<String, Object> originalValues = Maps.newHashMap();
+  protected Map<String, Object> configValues = Maps.newHashMap();
+  protected Map<String, Object> defaultValues = Maps.newHashMap();
+  protected Map<String, Object> originalValues = Maps.newHashMap();
 
-  private Set<String> sections = Sets.newHashSet();
+  protected Set<String> sections = Sets.newHashSet();
 
   /**
    * This constructor omits the callback arg.
@@ -167,7 +167,7 @@ public class ConfigProcessor {
     this(configs, handler.config, handler.modid, callback);
   }
 
-  private ConfigProcessor(Class<?> configs, Configuration configFile, String modid, IReloadCallback callback) {
+  protected ConfigProcessor(Class<?> configs, Configuration configFile, String modid, IReloadCallback callback) {
     this.configs = configs;
     this.configFile = configFile;
     this.modid = modid;
@@ -217,7 +217,7 @@ public class ConfigProcessor {
   }
 
   // returns true if the config value changed
-  private boolean processField(Field f) throws Exception {
+  protected boolean processField(Field f) throws Exception {
     Config cfg = f.getAnnotation(Config.class);
     if (cfg == null) {
       return false;
@@ -241,7 +241,7 @@ public class ConfigProcessor {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  private Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
+  protected Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
     Property prop = null;
     Object res = null;
     Bound<Double> bound = getBound(f);
@@ -300,7 +300,7 @@ public class ConfigProcessor {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  private ITypeAdapter getAdapterFor(Field f) {
+  protected ITypeAdapter getAdapterFor(Field f) {
     TypeToken<?> t = TypeToken.of(f.getGenericType());
     Class<?> c = f.getType();
     for (ITypeAdapter adapter : adapters) {
@@ -346,21 +346,21 @@ public class ConfigProcessor {
     }
   }
 
-  private String[] getComment(Field f) {
+  protected String[] getComment(Field f) {
     Comment c = f.getAnnotation(Comment.class);
     return c == null ? new String[0] : c.value();
   }
 
-  private Bound<Double> getBound(Field f) {
+  protected Bound<Double> getBound(Field f) {
     Range r = f.getAnnotation(Range.class);
     return r == null ? Bound.MAX_BOUND : Bound.of(r.min(), r.max());
   }
 
-  private boolean getNoSync(Field f) {
+  protected boolean getNoSync(Field f) {
     return f.getAnnotation(NoSync.class) != null;
   }
 
-  private RestartReqs getRestartReq(Field f) {
+  protected RestartReqs getRestartReq(Field f) {
     RestartReq r = f.getAnnotation(RestartReq.class);
     return r == null ? RestartReqs.NONE : r.value();
   }
