@@ -52,7 +52,11 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   @Config
   @Comment("The way the game should have been made (Yes this is the fireworks thing).")
-  public static boolean betterAchievements = true;
+  public static boolean betterAchievements = false;
+  
+  @Config
+  @Comment("Fireworks display on new years eve")
+  public static boolean newYearsFireworks = true;
 
   @Config
   @Comment("Disabling this option will prevent any crops added to the config json from being right clickable.")

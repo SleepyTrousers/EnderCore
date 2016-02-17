@@ -1,9 +1,5 @@
 package com.enderio.core.common.handlers;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.MONTH;
-
 import java.util.Calendar;
 
 import com.enderio.core.EnderCore;
@@ -11,6 +7,10 @@ import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.util.EntityUtil;
+
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.MONTH;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -37,6 +37,10 @@ public class FireworkHandler {
 
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
+    if(!ConfigHandler.newYearsFireworks) {
+      return;
+    }
+    
     EntityPlayer player = event.player;
 
     if (!player.worldObj.isRemote && event.phase == Phase.END) {
