@@ -1,51 +1,11 @@
 package com.enderio.core.client.render;
 
-import static net.minecraft.util.EnumFacing.DOWN;
-import static net.minecraft.util.EnumFacing.EAST;
-import static net.minecraft.util.EnumFacing.NORTH;
-import static net.minecraft.util.EnumFacing.SOUTH;
-import static net.minecraft.util.EnumFacing.UP;
-import static net.minecraft.util.EnumFacing.WEST;
-import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SMOOTH;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_ZERO;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopAttrib;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushAttrib;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glShadeModel;
-
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
-
-import org.lwjgl.opengl.GL11;
-
-import com.enderio.core.client.handlers.ClientHandler;
-import com.enderio.core.common.util.Log;
-import com.enderio.core.common.vecmath.Matrix4d;
-import com.enderio.core.common.vecmath.VecmathUtil;
-import com.enderio.core.common.vecmath.Vector2f;
-import com.enderio.core.common.vecmath.Vector3d;
-import com.enderio.core.common.vecmath.Vector3f;
-import com.enderio.core.common.vecmath.Vector4d;
-import com.enderio.core.common.vecmath.Vector4f;
-import com.enderio.core.common.vecmath.Vertex;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -77,6 +37,22 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+
+import org.lwjgl.opengl.GL11;
+
+import com.enderio.core.client.handlers.ClientHandler;
+import com.enderio.core.common.util.Log;
+import com.enderio.core.common.vecmath.Matrix4d;
+import com.enderio.core.common.vecmath.VecmathUtil;
+import com.enderio.core.common.vecmath.Vector2f;
+import com.enderio.core.common.vecmath.Vector3d;
+import com.enderio.core.common.vecmath.Vector3f;
+import com.enderio.core.common.vecmath.Vector4d;
+import com.enderio.core.common.vecmath.Vector4f;
+import com.enderio.core.common.vecmath.Vertex;
+
+import static net.minecraft.util.EnumFacing.*;
+import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtil {
 
@@ -572,8 +548,7 @@ public class RenderUtil {
     }
 
     item.hoverStart = 0.0F;
-    //TODO: 1.8
-    //RenderManager.instance.renderEntityWithPosYaw(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+    Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
 
     glPopMatrix();
   }

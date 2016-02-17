@@ -1,5 +1,7 @@
 package com.enderio.core.common.enchant;
 
+import javax.annotation.Nullable;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
@@ -12,11 +14,19 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
-  public static final EnchantXPBoost INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
+  private static EnchantXPBoost INSTANCE;
+
+  /**
+   * Can be null prior to registration, or if disabled
+   */
+  @Nullable
+  public static EnchantXPBoost instance() {
+    return INSTANCE;
+  }
 
   private EnchantXPBoost(int id) {
-    //TOO: 1.8, I guessed what the resource location should be here
-    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"),2,EnumEnchantmentType.BREAKABLE);
+    // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
+    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"), 2, EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -54,13 +64,11 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
     return new String[] { EnderCore.lang.localize("enchantment.xpboost.tooltip", false) };
   }
 
-  public void register() {
-    if (ConfigHandler.allowXPBoost) {
+  public static void register() {
+    if(ConfigHandler.allowXPBoost) {
+      INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
           "<enchantment name=\"enchantment.xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
-    } else {
-      //TODO: 1.8
-      //Enchantment.enchantmentsList[this.effectId] = null;
     }
   }
 }

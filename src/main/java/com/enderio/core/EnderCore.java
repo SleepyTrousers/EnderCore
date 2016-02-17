@@ -3,6 +3,21 @@ package com.enderio.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+
+import net.minecraft.command.CommandHandler;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
@@ -23,23 +38,10 @@ import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.PermanentCache;
-import com.enderio.core.common.util.TextureErrorRemover;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
-import net.minecraft.command.CommandHandler;
-import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import com.google.common.collect.Sets;
 
 @Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, dependencies = "after:ttCore", guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
@@ -60,21 +62,33 @@ public class EnderCore implements IEnderMod {
 
   public List<IConfigHandler> configs = Lists.newArrayList();
 
+  private Set<String> invisibleRequesters = Sets.newHashSet();
+
+  /**
+   * Call this method BEFORE preinit (construction phase) to request that
+   * EnderCore start in invisible mode. This will disable ANY gameplay features
+   * unless the user forcibly disables invisible mode in the config.
+   */
+  public void requestInvisibleMode() {
+    invisibleRequesters.add(Loader.instance().activeModContainer().getName());
+  }
+
+  public boolean invisibilityRequested() {
+    return !invisibleRequesters.isEmpty();
+  }
+
+  public Set<String> getInvisibleRequsters() {
+    return ImmutableSet.copyOf(invisibleRequesters);
+  }
+
   @EventHandler
   public void preInit(FMLPreInitializationEvent event) {
-    if (Loader.isModLoaded("ttCore")) {
-      proxy.throwModCompatibilityError(lang.localize("error.ttcore.1"), lang.localize("error.ttcore.2"), lang.localize("error.ttcore.3"));
-    }
-
-    if (event.getSide().isClient()) {
-      TextureErrorRemover.beginIntercepting();
-    }
 
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
     ConfigHandler.configFile = new File(ConfigHandler.enderConfigFolder.getPath() + "/" + event.getSuggestedConfigurationFile().getName());
 
-    if (!ConfigHandler.configFile.exists() && event.getSuggestedConfigurationFile().exists()) {
+    if(!ConfigHandler.configFile.exists() && event.getSuggestedConfigurationFile().exists()) {
       try {
         FileUtils.copyFile(event.getSuggestedConfigurationFile(), ConfigHandler.configFile);
       } catch (IOException e) {
@@ -89,8 +103,8 @@ public class EnderCore implements IEnderMod {
     CompatRegistry.INSTANCE.handle(event);
     OreDict.registerVanilla();
 
-    EnchantXPBoost.INSTANCE.register();
-    EnchantAutoSmelt.INSTANCE.register();
+    EnchantXPBoost.register();
+    EnchantAutoSmelt.register();
   }
 
   @EventHandler
@@ -104,7 +118,7 @@ public class EnderCore implements IEnderMod {
     Handlers.register(event);
     CompatRegistry.INSTANCE.handle(event);
     ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
-    if (event.getSide().isServer()) {
+    if(event.getSide().isServer()) {
       ((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
     }
 

@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import net.minecraft.server.network.NetHandlerStatusServer;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
-//TODO: 1.8
+//TODO: 1.8 On Hold
 public class PacketServerTime {//extends net.minecraft.network.Packet{
 
   private long time;

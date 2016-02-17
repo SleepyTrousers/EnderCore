@@ -1,8 +1,6 @@
 package com.enderio.core.common.enchant;
 
-import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
-import com.enderio.core.common.config.ConfigHandler;
+import javax.annotation.Nullable;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
@@ -11,12 +9,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
+import com.enderio.core.EnderCore;
+import com.enderio.core.api.common.enchant.IAdvancedEnchant;
+import com.enderio.core.common.config.ConfigHandler;
+
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
-  public static final EnchantAutoSmelt INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
+  private static EnchantAutoSmelt INSTANCE;
+
+  /**
+   * Can be null prior to registration, or if disabled
+   */
+  @Nullable
+  public static EnchantAutoSmelt instance() {
+    return INSTANCE;
+  }
 
   private EnchantAutoSmelt(int id) {
-    //TOO: 1.8, I guessed what the resource location should be here
-    super(id, new ResourceLocation(EnderCore.MODID, "autosmelt"),2,EnumEnchantmentType.BREAKABLE);
+    // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
+    super(id, new ResourceLocation(EnderCore.MODID, "autosmelt"), 2, EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -54,13 +64,11 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
     return new String[] { EnderCore.lang.localize("enchantment.autosmelt.tooltip", false) };
   }
 
-  public void register() {
+  public static void register() {
     if (ConfigHandler.allowAutoSmelt) {
+      INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
           "<enchantment name=\"enchantment.autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
-    } else {
-      //TODO: 1.8
-      //Enchantment.enchantmentsList[this.effectId] = null;
     }
   }
 

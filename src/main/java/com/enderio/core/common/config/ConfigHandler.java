@@ -1,7 +1,15 @@
 package com.enderio.core.common.config;
 
 import java.io.File;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.util.Locale;
+
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigProcessor.IReloadCallback;
@@ -16,11 +24,28 @@ import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
 import com.enderio.core.common.tweaks.Tweak;
 import com.enderio.core.common.tweaks.Tweaks;
 
-import net.minecraftforge.common.config.Configuration;
-
 public class ConfigHandler extends AbstractConfigHandler implements ITweakConfigHandler, IReloadCallback {
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(value = ElementType.FIELD)
+  private static @interface InvisibleInt {
+  }
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(value = ElementType.FIELD)
+  private static @interface InvisIgnore {
+  }
+
   private static final String sectionGeneral = Configuration.CATEGORY_GENERAL;
   private static final String sectionEnchants = "enchants";
+
+  @Config
+  @Comment({
+      "Control the behavior of invisible mode (disables all gameplay features). Having this setting be different between client and server could cause some desync, but otherwise is harmless.",
+      "0 - Default. Lets other mods request invisible mode. If none do, invisible mode is off.",
+      "-1 (or below) - Never invisible, even if mods request it.",
+      "1 (or above) - Always invisible, even if no mods request it." })
+  public static int invisibleMode = 0;
 
   @Config
   @Comment({ "Show oredictionary names of every item in its tooltip.", "0 - Off", "1 - Always on", "2 - Only with shift", "3 - Only in debug mode" })
@@ -48,6 +73,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   @Config
   @Comment("The max amount of XP levels an anvil recipe can use.")
+  @InvisIgnore
   public static int anvilMaxLevel = 40;
 
   @Config
@@ -64,19 +90,8 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   @Config
   @Comment("Prevent tick speedup (i.e. torcherino) on any TE that uses the base TE class from EnderCore")
+  @InvisIgnore
   public static boolean allowExternalTickSpeedup = false;
-
-  @Config
-  @Comment({ "0 - Do nothing", "1 - Remove stacktraces, leave 1-line missing texture errors", "2 - Remove all missing texture errors completely." })
-  @NoSync
-  @Range(min = 0, max = 2)
-  public static int textureErrorRemover = 1;
-
-  @Config
-  @Comment({ "Controls the default sorting on the mod list GUI.", "0 - Default sort (load order)", "1 - A to Z sort", "2 - Z to A sort" })
-  @NoSync
-  @Range(min = 0, max = 2)
-  public static int defaultModSort = 1;
 
   @Config(sectionEnchants)
   @Comment("Enchant ID for the XP boost enchant.")
@@ -135,7 +150,26 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     addSection(sectionGeneral);
     addSection(sectionEnchants);
     addSection("tweaks");
-    processor = new ConfigProcessor(getClass(), this, this);
+    addSection("invisibility");
+    processor = new ConfigProcessor(getClass(), this, this) {
+      
+      @Override
+      protected Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
+        Object res = super.getConfigValue(section, commentLines, f, defVal);
+        if(f.getName() == "invisibleMode") {
+          if(res.equals(0)) {
+            return EnderCore.instance.invisibilityRequested() ? 1 : -1;
+          }
+        } else if(invisibleMode == 1 && !f.isAnnotationPresent(InvisIgnore.class)) {
+          if(f.getType() == int.class) {
+            return 0;
+          } else if(f.getType() == boolean.class) {
+            return false;
+          }
+        }
+        return res;
+      }
+    };
     processor.process(true);
   }
 
@@ -157,7 +191,20 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Override
   public boolean addBooleanFor(Tweak tweak) {
     activateSection("tweaks");
-    return getValue(tweak.getName(), tweak.getComment(), true);
+    boolean ret = getValue(tweak.getName(), tweak.getComment(), true);
+    return invisibleMode == 1 ? false : ret;
+  }
+  
+  public boolean showInvisibleWarning() {
+    activateSection("invisibility");
+    ConfigCategory cat = config.getCategory("invisibility");
+    boolean ret = false;
+    if(!cat.containsKey("invisibilityWarning")) {
+      ret = true;
+    }
+    boolean val = getValue("invisibilityWarning", "If set to true, the invisibility warning will show every time the user logs in.", false);
+    saveConfigFile();
+    return ret ? ret : val;
   }
 
   public void loadRightClickCrops() {

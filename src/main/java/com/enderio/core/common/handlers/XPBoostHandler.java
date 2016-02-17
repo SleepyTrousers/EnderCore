@@ -104,7 +104,7 @@ public class XPBoostHandler {
     Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
     for (int i : enchants.keySet()) {
       Enchantment enchant = Enchantment.getEnchantmentById(i);
-      if (enchant == EnchantXPBoost.INSTANCE) {
+      if (enchant == EnchantXPBoost.instance()) {
         return enchants.get(i);
       }
     }
