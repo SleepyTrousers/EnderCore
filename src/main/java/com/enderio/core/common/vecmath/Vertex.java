@@ -44,6 +44,11 @@ public class Vertex {
     uv = new Vector2f(u, v);
   }
 
+  public Vertex(double x, double y, double z, double u, double v, float nx, float ny, float nz) {
+    this(x,y,z,u,v);
+    normal = new Vector3f(nx,ny,nz);
+  }
+
   public void setXYZ(double x, double y, double z) {
     xyz.set(x, y, z);
   }

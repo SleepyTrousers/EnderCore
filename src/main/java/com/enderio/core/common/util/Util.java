@@ -13,7 +13,6 @@ import com.google.common.io.Files;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -94,7 +93,7 @@ public class Util {
     } else if (pos.getY() == 255 && blockToBePlaced.getMaterial().isSolid()) {
       return null;
     }
-    if (world.canBlockBePlaced(blockToBePlaced, pos, false, side, (Entity) null, stack)) {
+    if (world.canBlockBePlaced(blockToBePlaced, pos, false, side, player, stack)) {      
       return new BlockCoord(pos);
     }
     return null;
@@ -122,6 +121,10 @@ public class Util {
     }
   }
 
+  public static void dropItems(World world, ItemStack stack, BlockPos pos, boolean doRandomSpread) {
+    dropItems(world,stack,pos.getX(),pos.getY(),pos.getZ(), doRandomSpread);
+  }
+  
   public static void dropItems(World world, ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
     if (stack == null || stack.stackSize <= 0) {
       return;

@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -208,6 +209,10 @@ public class ItemUtil {
     return s1.getTagCompound().equals(s2.getTagCompound());
   }
 
+  public static void spawnItemInWorldWithRandomMotion(World world, ItemStack item, BlockPos pos) {
+    spawnItemInWorldWithRandomMotion(world, item, pos.getX(), pos.getY(), pos.getZ());
+  }
+  
   /**
    * Spawns an ItemStack into the world with motion that simulates a normal
    * block drop.

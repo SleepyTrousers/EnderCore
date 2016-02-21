@@ -2,6 +2,8 @@ package com.enderio.core.client.render;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.enderio.core.api.client.render.VertexTransform;
+import com.enderio.core.common.util.BlockCoord;
 import com.enderio.core.common.vecmath.Vector2f;
 import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
@@ -53,6 +55,10 @@ public final class BoundingBox {
     this(copy.minX, copy.minY, copy.minZ, copy.maxX, copy.maxY, copy.maxZ);
   }
 
+  public BoundingBox(BlockCoord bc) {
+    this(bc.getBlockPos());
+  }
+  
   public BoundingBox(BlockPos bc) {
     this(bc.getX(), bc.getY(), bc.getZ(), bc.getX() + 1, bc.getY() + 1, bc.getZ() + 1);
   }
@@ -370,6 +376,17 @@ public final class BoundingBox {
     if (Float.floatToIntBits(minZ) != Float.floatToIntBits(other.minZ))
       return false;
     return true;
+  }
+
+  public BoundingBox transform(VertexTransform vertexTransform) {
+    Vector3d min = new Vector3d(minX, minY, minZ);
+    Vector3d max = new Vector3d(maxX, maxY, maxZ);
+
+    vertexTransform.apply(min);
+    vertexTransform.apply(max);
+
+    return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
+        min.z, max.z));
   }
 }
 

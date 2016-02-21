@@ -293,6 +293,10 @@ public class FluidUtil {
     return new FluidAndStackResult(null, null, source, null);
   }
 
+  public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, ITankAccess tank) {
+    return fillPlayerHandItemFromInternalTank(world, pos.getX(),pos.getY(),pos.getZ(), entityPlayer, tank);
+  }
+  
   /**
    * If the currently held item of the given player can be filled with the
    * liquid in the given tank's output tank, do so and put the resultant filled
@@ -366,6 +370,10 @@ public class FluidUtil {
       }
     }
     return false;
+  }
+  
+  public static boolean fillInternalTankFromPlayerHandItem(World world, BlockPos pos, EntityPlayer entityPlayer, ITankAccess tank) {
+    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(),pos.getZ(), entityPlayer, tank);
   }
 
   public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, ITankAccess tank) {

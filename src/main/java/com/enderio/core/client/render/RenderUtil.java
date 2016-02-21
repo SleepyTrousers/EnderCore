@@ -7,6 +7,47 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
+import com.enderio.core.client.handlers.ClientHandler;
+import com.enderio.core.common.util.Log;
+import com.enderio.core.common.vecmath.Matrix4d;
+import com.enderio.core.common.vecmath.VecmathUtil;
+import com.enderio.core.common.vecmath.Vector2f;
+import com.enderio.core.common.vecmath.Vector3d;
+import com.enderio.core.common.vecmath.Vector3f;
+import com.enderio.core.common.vecmath.Vector4d;
+import com.enderio.core.common.vecmath.Vector4f;
+import com.enderio.core.common.vecmath.Vertex;
+
+import static net.minecraft.util.EnumFacing.DOWN;
+import static net.minecraft.util.EnumFacing.EAST;
+import static net.minecraft.util.EnumFacing.NORTH;
+import static net.minecraft.util.EnumFacing.SOUTH;
+import static net.minecraft.util.EnumFacing.UP;
+import static net.minecraft.util.EnumFacing.WEST;
+import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SMOOTH;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopAttrib;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushAttrib;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glShadeModel;
+
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -22,6 +63,8 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.entity.EntityLivingBase;
@@ -34,25 +77,10 @@ import net.minecraft.util.Timer;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
-import org.lwjgl.opengl.GL11;
-
-import com.enderio.core.client.handlers.ClientHandler;
-import com.enderio.core.common.util.Log;
-import com.enderio.core.common.vecmath.Matrix4d;
-import com.enderio.core.common.vecmath.VecmathUtil;
-import com.enderio.core.common.vecmath.Vector2f;
-import com.enderio.core.common.vecmath.Vector3d;
-import com.enderio.core.common.vecmath.Vector3f;
-import com.enderio.core.common.vecmath.Vector4d;
-import com.enderio.core.common.vecmath.Vector4f;
-import com.enderio.core.common.vecmath.Vertex;
-
-import static net.minecraft.util.EnumFacing.*;
-import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtil {
 
@@ -164,11 +192,14 @@ public class RenderUtil {
     return brightnessPerSide;
   }
 
+  public static float claculateTotalBrightnessForLocation(World worldObj, BlockPos pos) {
+    return claculateTotalBrightnessForLocation(worldObj, pos.getX(), pos.getY(), pos.getZ());
+  }
+
   public static float claculateTotalBrightnessForLocation(World worldObj, int xCoord, int yCoord, int zCoord) {
     int i = worldObj.getLightFromNeighborsFor(EnumSkyBlock.SKY, new BlockPos(xCoord, yCoord, zCoord));
     int j = i % 65536;
     int k = i / 65536;
-
 
     // 0.2 - 1
     float sunBrightness = worldObj.getSunBrightness(1);
@@ -197,19 +228,19 @@ public class RenderUtil {
   }
 
   public static void renderQuad2D(double x, double y, double z, double width, double height, int colorRGB) {
-    
+
     GL11.glDisable(GL11.GL_TEXTURE_2D);
     Vector3f col = ColorUtil.toFloat(colorRGB);
     GL11.glColor3f(col.x, col.y, col.z);
-    
-    Tessellator tessellator = Tessellator.getInstance();    
+
+    Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
-    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);    
+    tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
     tes.pos(x + width, y + height, z).endVertex();
     tes.pos(x + width, y, z).endVertex();
     tes.pos(x, y, z).endVertex();
-    
+
     tessellator.draw();
     GL11.glEnable(GL11.GL_TEXTURE_2D);
   }
@@ -217,7 +248,7 @@ public class RenderUtil {
   public static void renderQuad2D(double x, double y, double z, double width, double height, Vector4f colorRGBA) {
     GL11.glColor4f(colorRGBA.x, colorRGBA.y, colorRGBA.z, colorRGBA.w);
 
-    Tessellator tessellator = Tessellator.getInstance();    
+    Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
@@ -243,7 +274,7 @@ public class RenderUtil {
   }
 
   public static void renderBillboard(Matrix4d lookMat, float minU, float maxU, float minV, float maxV, double size, int brightness) {
-    Tessellator tessellator = Tessellator.getInstance();    
+    Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
@@ -254,14 +285,14 @@ public class RenderUtil {
     tes.pos(v.x, v.y, v.z).tex(minU, maxV).endVertex();
     v.set(s, s, 0);
     lookMat.transform(v);
-    tes.pos(v.x, v.y, v.z).tex( maxU, maxV).endVertex();
+    tes.pos(v.x, v.y, v.z).tex(maxU, maxV).endVertex();
     v.set(s, -s, 0);
     lookMat.transform(v);
-    tes.pos(v.x, v.y, v.z).tex( maxU, minV).endVertex();
+    tes.pos(v.x, v.y, v.z).tex(maxU, minV).endVertex();
     v.set(-s, -s, 0);
     lookMat.transform(v);
-    tes.pos(v.x, v.y, v.z).tex( minU, minV).endVertex();
-    
+    tes.pos(v.x, v.y, v.z).tex(minU, minV).endVertex();
+
     tessellator.draw();
   }
 
@@ -291,27 +322,60 @@ public class RenderUtil {
     return result;
   }
 
-  public static void addVerticesToTessellator(List<Vertex> vertices, VertexFormat format) {
-    if(vertices == null || vertices.isEmpty()) {
+  public static void addVerticesToTessellator(List<Vertex> vertices, VertexFormat format, boolean doBegin) {
+    addVerticesToTessellator(vertices, null, format, doBegin);
+  }
+
+  public static void addVerticesToTessellator(List<Vertex> vertices, VertexTranslation xForm, VertexFormat format, boolean doBegin) {
+    if (vertices == null || vertices.isEmpty()) {
       return;
     }
+
+    if(xForm != null) {
+      List<Vertex> newV = new ArrayList<Vertex>(vertices.size());
+      for(Vertex v : vertices) {
+        Vertex xv = new Vertex(v);
+        xForm.apply(xv);
+        newV.add(xv);
+      }
+      vertices = newV;
+    }
     
-    Tessellator tessellator = Tessellator.getInstance();    
+    Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
-    
-    tes.begin(GL11.GL_QUADS, format);
+    if (doBegin) {
+      tes.begin(GL11.GL_QUADS, format);
+    }
 
     for (Vertex v : vertices) {      
-      if (format.hasColor() && v.color != null) {
-        tes.color(v.r(), v.g(), v.b(), v.a());        
-      }
-      if (format.getElements().contains(DefaultVertexFormats.TEX_2F) && v.uv != null) {
-        tes.tex(v.u(), v.v());
-      }
-      if (format.hasNormal() && v.normal != null) {
-        tes.normal(v.nx(), v.ny(), v.nz());
-      }
-      tes.pos(v.x(), v.y(), v.z()).endVertex();
+      for(VertexFormatElement el : format.getElements()) {
+        switch(el.getUsage()) {       
+        case COLOR:
+          if(el.getType() == EnumType.FLOAT) {
+            tes.color(v.r(), v.g(), v.b(), v.a());
+          }
+          break;        
+        case NORMAL:
+          tes.normal(v.nx(), v.ny(), v.nz());
+          break;        
+        case POSITION:
+          tes.pos(v.x(), v.y(), v.z());
+          break;
+        case UV:
+          if(el.getType() == EnumType.FLOAT && v.uv != null) {
+            tes.tex(v.u(), v.v());
+          }
+          break;
+        case GENERIC:
+          break;
+        case PADDING:
+          break;
+        default:
+          break;
+        
+        }
+      }      
+      tes.endVertex();
     }
   }
 
@@ -412,6 +476,21 @@ public class RenderUtil {
     return null;
   }
 
+  public static TextureAtlasSprite getStillTexture(FluidStack fluid) {
+    if (fluid == null || fluid.getFluid() == null) {
+      return null;
+    }
+    return getStillTexture(fluid.getFluid());
+  }
+
+  public static TextureAtlasSprite getStillTexture(Fluid fluid) {
+    ResourceLocation iconKey = fluid.getStill();
+    if (iconKey == null) {
+      return null;
+    }
+    return Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(iconKey.toString());
+  }
+
   public static void renderGuiTank(FluidTank tank, double x, double y, double zLevel, double width, double height) {
     renderGuiTank(tank.getFluid(), tank.getCapacity(), tank.getFluidAmount(), x, y, zLevel, width, height);
   }
@@ -421,8 +500,7 @@ public class RenderUtil {
       return;
     }
 
-    ResourceLocation iconKey = fluid.getFluid().getStill(fluid);
-    TextureAtlasSprite icon = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(iconKey.toString());
+    TextureAtlasSprite icon = getStillTexture(fluid);
     if (icon == null) {
       return;
     }
@@ -448,13 +526,13 @@ public class RenderUtil {
         double minV = icon.getMinV();
         double maxV = icon.getMaxV();
 
-        Tessellator tessellator = Tessellator.getInstance();    
+        Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer tes = tessellator.getWorldRenderer();
-        tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);        
+        tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         tes.pos(drawX, drawY + drawHeight, 0).tex(minU, minV + (maxV - minV) * drawHeight / 16F).endVertex();
-        tes.pos(drawX + drawWidth, drawY + drawHeight, 0).tex( minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F).endVertex();
-        tes.pos(drawX + drawWidth, drawY, 0).tex( minU + (maxU - minU) * drawWidth / 16F, minV).endVertex();
-        tes.pos(drawX, drawY, 0).tex( minU, minV).endVertex();
+        tes.pos(drawX + drawWidth, drawY + drawHeight, 0).tex(minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F).endVertex();
+        tes.pos(drawX + drawWidth, drawY, 0).tex(minU + (maxU - minU) * drawWidth / 16F, minV).endVertex();
+        tes.pos(drawX, drawY, 0).tex(minU, minV).endVertex();
         tessellator.draw();
       }
     }
@@ -563,17 +641,17 @@ public class RenderUtil {
     rotateToPlayer();
 
     glPushMatrix();
-    
+
     glRotatef(rot, 0, 0, 1);
     glColor3f(1, 1, 1);
 
-    Tessellator tessellator = Tessellator.getInstance();    
+    Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-    tes.pos(-scale, -scale, 0).tex( 0, 0).endVertex();
-    tes.pos(-scale, scale, 0).tex( 0, 1).endVertex();
-    tes.pos(scale, scale, 0).tex( 1, 1).endVertex();
-    tes.pos(scale, -scale, 0).tex( 1, 0).endVertex();
+    tes.pos(-scale, -scale, 0).tex(0, 0).endVertex();
+    tes.pos(-scale, scale, 0).tex(0, 1).endVertex();
+    tes.pos(scale, scale, 0).tex(1, 1).endVertex();
+    tes.pos(scale, -scale, 0).tex(1, 0).endVertex();
     tessellator.draw();
     glPopMatrix();
     glPopMatrix();
@@ -586,12 +664,12 @@ public class RenderUtil {
   }
 
   public static TextureAtlasSprite getTexture(IBlockState state) {
-    return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);  
+    return Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(state);
   }
 
   public static void renderBoundingBox(BoundingBox bb) {
 
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     List<Vector3f> corners;
     for (EnumFacing face : EnumFacing.VALUES) {
@@ -603,17 +681,21 @@ public class RenderUtil {
     Tessellator.getInstance().draw();
   }
 
-  public static void renderBoundingBox(BoundingBox bb,IBlockState state) {
+  public static void renderBoundingBox(BoundingBox bb, IBlockState state) {
     renderBoundingBox(bb, getTexture(state));
   }
-  
-  public static void renderBoundingBox(BoundingBox bb, TextureAtlasSprite tex) {
 
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();    
+  public static void renderBoundingBox(BoundingBox bb, TextureAtlasSprite tex) {
+    renderBoundingBox(bb, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV());
+  }
+
+  public static void renderBoundingBox(BoundingBox bb, float minU, float maxU, float minV, float maxV) {
+
+    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
     List<Vertex> corners;
     for (EnumFacing face : EnumFacing.VALUES) {
-      corners = bb.getCornersWithUvForFace(face, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV());
+      corners = bb.getCornersWithUvForFace(face, minU, maxU, minV, maxV);
       for (Vertex v : corners) {
         tes.pos(v.x(), v.y(), v.z()).tex(v.u(), v.v()).endVertex();
       }
@@ -621,11 +703,16 @@ public class RenderUtil {
     Tessellator.getInstance().draw();
 
   }
-  
 
   public static void registerReloadListener(IResourceManagerReloadListener obj) {
     ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(obj);
   }
-  
-  
+
+  public static int getTesselatorBrightness(World world, BlockPos pos) {
+    IBlockState bs = world.getBlockState(pos);
+    Block block = bs.getBlock();
+    int res = block.getMixedBrightnessForBlock(world, pos);
+    return res;
+  }
+
 }

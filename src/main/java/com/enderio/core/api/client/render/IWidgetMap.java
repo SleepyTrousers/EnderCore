@@ -85,9 +85,9 @@ public interface IWidgetMap {
       WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
       if (doDraw) {
         RenderUtil.bindTexture(getTexture());
-        //tessellator.startDrawingQuads();           
         tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
       }
+      
       double minU = (double) widget.getX() / getSize();
       double maxU = (double) (widget.getX() + widget.getWidth()) / getSize();
       double minV = (double) widget.getY() / getSize();
@@ -96,14 +96,14 @@ public interface IWidgetMap {
       if (flipY) {
         tes.pos(x, y + height, zLevel).tex(minU, minV).endVertex();
         
-        tes.pos(x + width, y + height, zLevel).tex(maxU, minV);
-        tes.pos(x + width, y + 0, zLevel).tex( maxU, maxV);
-        tes.pos(x, y + 0, zLevel).tex( minU, maxV);
+        tes.pos(x + width, y + height, zLevel).tex(maxU, minV).endVertex();
+        tes.pos(x + width, y + 0, zLevel).tex( maxU, maxV).endVertex();
+        tes.pos(x, y + 0, zLevel).tex( minU, maxV).endVertex();
       } else {
-        tes.pos(x, y + height, zLevel).tex( minU, maxV);
-        tes.pos(x + width, y + height, zLevel).tex( maxU, maxV);
-        tes.pos(x + width, y + 0, zLevel).tex( maxU, minV);
-        tes.pos(x, y + 0, zLevel).tex( minU, minV);
+        tes.pos(x, y + height, zLevel).tex( minU, maxV).endVertex();
+        tes.pos(x + width, y + height, zLevel).tex( maxU, maxV).endVertex();
+        tes.pos(x + width, y + 0, zLevel).tex( maxU, minV).endVertex();
+        tes.pos(x, y + 0, zLevel).tex( minU, minV).endVertex();
       }
       if (widget.getOverlay() != null) {
         widget.getOverlay().getMap().render(widget.getOverlay(), x, y, width, height, zLevel, false, flipY);

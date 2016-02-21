@@ -1,5 +1,6 @@
 package com.enderio.core.common.vecmath;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 
 public class Vector3d {
@@ -26,6 +27,10 @@ public class Vector3d {
 
   public Vector3d(Vector3f corner) {
     this(corner.x, corner.y, corner.z);
+  }
+
+  public Vector3d(BlockPos blockPos) {
+    this(blockPos.getX(), blockPos.getY(), blockPos.getZ());
   }
 
   public void set(double x, double y, double z) {

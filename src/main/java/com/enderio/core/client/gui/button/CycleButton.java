@@ -79,4 +79,8 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
 
         icon = mode.getIcon();
     }
+    
+    public T getMode() {
+      return mode;
+    }
 }
