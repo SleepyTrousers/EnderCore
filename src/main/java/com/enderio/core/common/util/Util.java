@@ -22,6 +22,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -461,6 +462,32 @@ public class Util {
     return (int) (tile.getProgress() * scale);
   }
 
+  public static void writeFacingToNBT(NBTTagCompound nbtRoot, String name, EnumFacing dir) {
+    if(nbtRoot == null || name == null) {
+      return;
+    }
+    short val = -1;
+    if(dir != null) {
+      val = (short)dir.ordinal();
+    }
+    nbtRoot.setShort(name, val);        
+  }
+  
+  public static EnumFacing readFacingFromNBT(NBTTagCompound nbtRoot, String name) {
+    if(nbtRoot == null || name == null) {
+      return null;
+    }
+    short val = -1;
+    if(nbtRoot.hasKey(name)) {
+      val = nbtRoot.getShort(name);
+    }
+    if(val > 0) {
+      return EnumFacing.values()[val];
+    }
+    return null;        
+  }
+  
+  
   // copied from WAILA source to avoid API dependency
   public static String WailaStyle = "\u00A4";
   public static String WailaIcon = "\u00A5";
@@ -470,5 +497,7 @@ public class Util {
   public static String HEART = WailaStyle + WailaIcon + "a";
   public static String HHEART = WailaStyle + WailaIcon + "b";
   public static String EHEART = WailaStyle + WailaIcon + "c";
+  
+  
 
 }

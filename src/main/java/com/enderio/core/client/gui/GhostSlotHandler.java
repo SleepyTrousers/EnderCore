@@ -1,7 +1,5 @@
 package com.enderio.core.client.gui;
 
-import static com.enderio.core.client.render.EnderWidget.NEUTRAL_SLOT_BACKGROUND;
-
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -10,6 +8,8 @@ import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.render.RenderUtil;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
+
+import static com.enderio.core.client.render.EnderWidget.NEUTRAL_SLOT_BACKGROUND;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -186,7 +186,7 @@ public class GhostSlotHandler {
         gui.drawFakeItemHover(hoverGhostSlot.x + sx, hoverGhostSlot.y + sy);
       }
     } finally {
-      gui.drawFakeItemsEnd();
+      //gui.drawFakeItemsEnd();
     }
   }
 

@@ -714,5 +714,23 @@ public class RenderUtil {
     int res = block.getMixedBrightnessForBlock(world, pos);
     return res;
   }
+  
+  public static void setupLightmapCoords(BlockPos pos, World world) {
+    float f = world.getLight(pos);
+    int l = RenderUtil.getLightBrightnessForSkyBlocks(world, pos, 0);
+    int l1 = l % 65536;
+    int l2 = l / 65536;
+    GlStateManager.color(f, f, f);
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, l1, l2);
+  }
+  
+  public static int getLightBrightnessForSkyBlocks(World world, BlockPos pos, int min) {
+    int i1 = world.getLightFor(EnumSkyBlock.SKY, pos);
+    int j1 = world.getLightFor(EnumSkyBlock.BLOCK, pos);
+    if (j1 < min) {
+      j1 = min;
+    }
+    return i1 << 20 | j1 << 4;
+  }
 
 }
