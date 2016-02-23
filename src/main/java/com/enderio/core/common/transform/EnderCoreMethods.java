@@ -178,4 +178,15 @@ public class EnderCoreMethods {
 
     return flag1;
   }
+
+  public static interface IOverlayRenderAware {
+    public void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition);
+  }
+
+  public static void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition) {
+    if (stack != null && stack.getItem() instanceof IOverlayRenderAware) {
+      ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
+    }
+  }
+
 }

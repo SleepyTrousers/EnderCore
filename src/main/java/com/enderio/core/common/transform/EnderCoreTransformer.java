@@ -12,6 +12,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -82,8 +83,13 @@ public class EnderCoreTransformer implements IClassTransformer {
   private static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
   private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
   private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
-  
-  private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass, itemStackClass, entityArrowClass, containerFurnaceClass);
+
+  private static final String renderItemClass = "net.minecraft.client.renderer.entity.RenderItem";
+  private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
+  private static final String renderItemOverlayIntoGUIMethodSig = "(Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V";
+
+  private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass,
+      itemStackClass, entityArrowClass, containerFurnaceClass, renderItemClass);
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
@@ -237,6 +243,33 @@ public class EnderCoreTransformer implements IClassTransformer {
                   containerFurnaceMethodSig, false));
               m.instructions.add(new InsnNode(ARETURN));
 
+              break;
+            }
+          }
+        }
+      });
+    }
+    // Item Overlay Rendering hook
+    else if (transformedName.equals(renderItemClass)) {
+      basicClass = transform(basicClass, renderItemClass, renderItemOverlayIntoGUIMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (renderItemOverlayIntoGUIMethod.equals(m.name)) {
+              for (int i = 0; i < m.instructions.size(); i++) {
+                AbstractInsnNode next = m.instructions.get(i);
+                if (next.getOpcode() == RETURN) {
+                  InsnList toAdd = new InsnList();
+                  toAdd.add(new VarInsnNode(ALOAD, 2));
+                  toAdd.add(new VarInsnNode(ILOAD, 3));
+                  toAdd.add(new VarInsnNode(ILOAD, 4));
+                  toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "renderItemOverlayIntoGUI",
+                      "(Lnet/minecraft/item/ItemStack;II)V", false));
+                  m.instructions.insertBefore(next, toAdd);
+                  break;
+                }
+              }
               break;
             }
           }
