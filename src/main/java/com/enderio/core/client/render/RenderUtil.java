@@ -51,6 +51,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -67,6 +68,7 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.tileentity.TileEntity;
@@ -501,7 +503,7 @@ public class RenderUtil {
     }
 
     TextureAtlasSprite icon = getStillTexture(fluid);
-    if (icon == null) {
+    if (icon == null) {      
       return;
     }
 
@@ -731,6 +733,34 @@ public class RenderUtil {
       j1 = min;
     }
     return i1 << 20 | j1 << 4;
+  }
+  
+  public static void renderBlockModel(World world, BlockPos pos, boolean translateToOrigin) {
+
+    WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
+    wr.begin(7, DefaultVertexFormats.BLOCK);
+
+    if (translateToOrigin) {
+      wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
+    }
+
+    for (int pass = 0; pass < 2; pass++) {
+      RenderPassHelper.setBlockRenderPass(pass);
+      RenderPassHelper.setBlockRenderPass(pass);
+
+      IBlockState state = world.getBlockState(pos);
+      BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+      IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(state, world, pos);
+      blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, state, pos, Tessellator.getInstance().getWorldRenderer());
+
+    }
+    if (translateToOrigin) {
+      wr.setTranslation(0, 0, 0);
+    }
+    Tessellator.getInstance().draw();
+
+    RenderPassHelper.clearBlockRenderPass();
+
   }
 
 }
