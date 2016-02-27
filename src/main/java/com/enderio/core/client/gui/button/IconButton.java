@@ -118,6 +118,14 @@ public class IconButton extends GuiButtonHideable {
     public GuiToolTip getToolTip() {
         return toolTip;
     }
+    
+    public void setXOrigin(int xOrigin) {
+      this.xOrigin = xOrigin;
+    }
+    
+    public void setYOrigin(int yOrigin) {
+      this.yOrigin = yOrigin;
+    }
 
     /**
      * Override this to handle mouse clicks with other buttons than the left

@@ -2,13 +2,13 @@ package com.enderio.core.client.gui.widget;
 
 import java.lang.reflect.Field;
 
-import com.enderio.core.api.client.gui.IGuiScreen;
-import com.enderio.core.api.client.gui.IHideable;
-import com.google.common.base.Strings;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
+
+import com.enderio.core.api.client.gui.IGuiScreen;
+import com.enderio.core.api.client.gui.IHideable;
+import com.google.common.base.Strings;
 
 public class TextFieldEnder extends GuiTextField implements IHideable {
 
@@ -41,8 +41,8 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
         }
     };
 
-    private final int xOrigin;
-    private final int yOrigin;
+    private int xOrigin;
+    private int yOrigin;
     private ICharFilter filter;
 
     private static Field canLoseFocus;
@@ -110,5 +110,13 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
     @Override
     public void setIsVisible(boolean visible) {
         setVisible(visible);
+    }
+    
+    public void setXOrigin(int xOrigin) {
+      this.xOrigin = xOrigin;
+    }
+    
+    public void setYOrigin(int yOrigin) {
+      this.yOrigin = yOrigin;
     }
 }
