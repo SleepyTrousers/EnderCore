@@ -616,6 +616,13 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void clearToolTips() {    
   }
 
+  @Override
+  public void onGuiClosed() {
+      for (IGuiOverlay overlay : overlays) {
+          overlay.guiClosed();
+      }
+  }
+  
 //  @Override
 //  @Optional.Method(modid = "NotEnoughItems")
 //  public VisiblityData modifyVisiblity(GuiContainer gc, VisiblityData vd) {

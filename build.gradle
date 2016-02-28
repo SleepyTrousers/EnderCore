@@ -83,6 +83,11 @@ jar {
     }
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
 task apiJar(type: Jar) {
     from sourceSets.main.allSource
     from sourceSets.main.output
@@ -106,6 +111,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
+			artifact sourceJar
             artifact apiJar
         }
     }
