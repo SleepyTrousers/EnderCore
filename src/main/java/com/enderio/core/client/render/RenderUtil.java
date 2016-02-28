@@ -3,6 +3,8 @@ package com.enderio.core.client.render;
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -58,6 +60,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -76,9 +79,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
+import net.minecraft.util.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.model.Attributes;
+import net.minecraftforge.client.model.pipeline.LightUtil;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad.Builder;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -211,7 +219,8 @@ public class RenderUtil {
     float fromLights = j / 255f;
 
     // 0 - 1 for sun only, 0 - 0.6 for light only
-    //float recievedPercent = worldObj.getLightBrightness(new BlockPos(xCoord, yCoord, zCoord));
+    // float recievedPercent = worldObj.getLightBrightness(new BlockPos(xCoord,
+    // yCoord, zCoord));
     float highestValue = Math.max(fromLights, percentRecievedFromSun * sunBrightness);
     return Math.max(0.2f, highestValue);
   }
@@ -333,38 +342,38 @@ public class RenderUtil {
       return;
     }
 
-    if(xForm != null) {
+    if (xForm != null) {
       List<Vertex> newV = new ArrayList<Vertex>(vertices.size());
-      for(Vertex v : vertices) {
+      for (Vertex v : vertices) {
         Vertex xv = new Vertex(v);
         xForm.apply(xv);
         newV.add(xv);
       }
       vertices = newV;
     }
-    
+
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
     if (doBegin) {
       tes.begin(GL11.GL_QUADS, format);
     }
 
-    for (Vertex v : vertices) {      
-      for(VertexFormatElement el : format.getElements()) {
-        switch(el.getUsage()) {       
+    for (Vertex v : vertices) {
+      for (VertexFormatElement el : format.getElements()) {
+        switch (el.getUsage()) {
         case COLOR:
-          if(el.getType() == EnumType.FLOAT) {
+          if (el.getType() == EnumType.FLOAT) {
             tes.color(v.r(), v.g(), v.b(), v.a());
           }
-          break;        
+          break;
         case NORMAL:
           tes.normal(v.nx(), v.ny(), v.nz());
-          break;        
+          break;
         case POSITION:
           tes.pos(v.x(), v.y(), v.z());
           break;
         case UV:
-          if(el.getType() == EnumType.FLOAT && v.uv != null) {
+          if (el.getType() == EnumType.FLOAT && v.uv != null) {
             tes.tex(v.u(), v.v());
           }
           break;
@@ -374,9 +383,9 @@ public class RenderUtil {
           break;
         default:
           break;
-        
+
         }
-      }      
+      }
       tes.endVertex();
     }
   }
@@ -503,7 +512,7 @@ public class RenderUtil {
     }
 
     TextureAtlasSprite icon = getStillTexture(fluid);
-    if (icon == null) {      
+    if (icon == null) {
       return;
     }
 
@@ -716,7 +725,7 @@ public class RenderUtil {
     int res = block.getMixedBrightnessForBlock(world, pos);
     return res;
   }
-  
+
   public static void setupLightmapCoords(BlockPos pos, World world) {
     float f = world.getLight(pos);
     int l = RenderUtil.getLightBrightnessForSkyBlocks(world, pos, 0);
@@ -725,7 +734,7 @@ public class RenderUtil {
     GlStateManager.color(f, f, f);
     OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, l1, l2);
   }
-  
+
   public static int getLightBrightnessForSkyBlocks(World world, BlockPos pos, int min) {
     int i1 = world.getLightFor(EnumSkyBlock.SKY, pos);
     int j1 = world.getLightFor(EnumSkyBlock.BLOCK, pos);
@@ -734,7 +743,7 @@ public class RenderUtil {
     }
     return i1 << 20 | j1 << 4;
   }
-  
+
   public static void renderBlockModel(World world, BlockPos pos, boolean translateToOrigin) {
 
     WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
@@ -761,6 +770,105 @@ public class RenderUtil {
 
     RenderPassHelper.clearBlockRenderPass();
 
+  }
+
+  public static void addBakedQuads(BoundingBox bb, TextureAtlasSprite tex, List<BakedQuad> quads) {
+    for (EnumFacing face : EnumFacing.VALUES) {
+      addBakedQuadForFace(quads, bb, tex, face);
+    }
+  }
+
+  public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face) {
+    addBakedQuadForFace(quads, bb, tex, face, false, false);
+  }
+
+  public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, boolean rotateUV, boolean flipU) {
+    addBakedQuadForFace(quads, bb, tex, face, rotateUV, flipU, null);
+  }
+
+  public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, boolean rotateUV, boolean flipU,
+      Vector4f color) {
+    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+    List<Vertex> corners = bb.getCornersWithUvForFace(face);
+    builder.setQuadOrientation(face);
+    builder.setQuadColored();
+    for (Vertex v : corners) {
+      v.color = color;
+      if (rotateUV) {
+        float u = v.uv.x;
+        v.uv.x = v.uv.y;
+        v.uv.y = u;
+      }
+      if (flipU) {
+        v.uv.x = 1 - v.uv.x;
+      }
+      putVertexData(builder, v, face.getDirectionVec(), tex);
+    }
+    quads.add(builder.build());
+  }
+
+  public static void addBakedQuads(List<BakedQuad> quads, Collection<Vertex> vertices, TextureAtlasSprite tex, Vector4f color) {
+    UnpackedBakedQuad.Builder builder = null;
+
+    Iterator<Vertex> it = vertices.iterator();
+    while (it.hasNext()) {
+      EnumFacing face = null;
+      for (int i = 0; i < 4; i++) {
+        Vertex v = it.next();        
+        if (i == 0) {
+          face = EnumFacing.getFacingFromVector(v.nx(), v.ny(), v.nz());
+          builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+          builder.setQuadOrientation(face);
+          builder.setQuadColored();
+        }
+        v.color = color;
+        putVertexData(builder, v, face.getDirectionVec(), tex);
+      }
+      quads.add(builder.build());
+    }
+
+  }
+
+  private static void putVertexData(Builder builder, Vertex v, Vec3i normal, TextureAtlasSprite sprite) {
+    if (sprite == null) {
+      sprite = IconUtil.instance.errorTexture;
+    }
+
+    VertexFormat format = builder.getVertexFormat();
+    for (int e = 0; e < format.getElementCount(); e++) {
+      switch (format.getElement(e).getUsage()) {
+      case POSITION:
+        builder.put(e, (float) v.x(), (float) v.y(), (float) v.z(), 1);
+        break;
+      case COLOR:
+        float d;
+        if (v.normal != null) {
+          d = LightUtil.diffuseLight(v.normal.x, v.normal.y, v.normal.z);
+        } else {
+          d = LightUtil.diffuseLight(normal.getX(), normal.getY(), normal.getZ());
+        }
+
+        if (v.color != null) {
+          builder.put(e, d * v.color.x, d * v.color.y, d * v.color.z, v.color.w);
+        } else {
+          builder.put(e, d, d, d, 1);
+        }
+        break;
+      case UV:
+        builder.put(e, sprite.getInterpolatedU(v.u() * 16), sprite.getInterpolatedV(v.v() * 16), 0, 1);
+
+        break;
+      case NORMAL:
+        if (v.normal != null) {
+          builder.put(e, v.nx(), v.ny(), v.nz(), 0);
+        } else {
+          builder.put(e, normal.getX(), normal.getY(), normal.getZ(), 0);
+        }
+        break;
+      default:
+        builder.put(e);
+      }
+    }
   }
 
 }

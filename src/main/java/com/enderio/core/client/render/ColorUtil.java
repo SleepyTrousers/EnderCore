@@ -20,6 +20,13 @@ public final class ColorUtil {
     int b = rgb & 255;
     return new Vector3f(r / 255F, g / 255F, b / 255F);
   }
+  
+  public static Vector4f toFloat4(int rgb) {
+    int r = rgb >> 16 & 255;
+    int g = rgb >> 8 & 255;
+    int b = rgb & 255;
+    return new Vector4f(r / 255F, g / 255F, b / 255F, 1);
+  }
 
   public static int getRGB(Color color) {
     return getRGB(color.getRed(), color.getGreen(), color.getBlue());
