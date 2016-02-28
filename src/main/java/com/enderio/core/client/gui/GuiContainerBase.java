@@ -347,14 +347,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void drawScreen(int par1, int par2, float par3) {
     int mx = realMx = par1;
     int my = realMy = par2;
-    for (IGuiOverlay overlay : overlays) {
-      if (overlay != null && overlay.isVisible() && isMouseInOverlay(par1, par2, overlay)) {
-        mx = -5000;
-        my = -5000;
-        this.drawItemStack(this.mc.thePlayer.inventory.getItemStack(), par1 - this.guiLeft - 8, par2 - this.guiTop - 8, null);
-      }
-    }
-
+    
     super.drawScreen(mx, my, par3);
 
     if (draggingScrollbar == null) {
@@ -445,12 +438,6 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   @Deprecated
   protected GhostSlot getGhostSlot(int mouseX, int mouseY) {
     return ghostSlotHandler.getGhostSlot(this, mouseX, mouseY);
-  }
-
-  private boolean isMouseInOverlay(int mouseX, int mouseY, IGuiOverlay overlay) {
-    int x = mouseX - getGuiLeft();
-    int y = mouseY - getGuiTop();
-    return overlay.getBounds().contains(x, y);
   }
 
   @Override
