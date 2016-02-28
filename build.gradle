@@ -83,11 +83,6 @@ jar {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
-
 task apiJar(type: Jar) {
     from sourceSets.main.allSource
     from sourceSets.main.output
@@ -103,7 +98,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-build.dependsOn apiJar, javadoc
+build.dependsOn apiJar, sourceJar, javadoc
 
 publishing {
     tasks.publish.dependsOn 'build'
