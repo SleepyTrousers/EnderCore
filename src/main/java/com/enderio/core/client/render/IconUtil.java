@@ -21,14 +21,29 @@ public class IconUtil {
    
   }
 
-  private static ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
-
-  public static TextureAtlasSprite whiteTexture;
-  public static TextureAtlasSprite blankTexture;
-  public static TextureAtlasSprite errorTexture;
-
-  static {
-    MinecraftForge.EVENT_BUS.register(new IconUtil());
+  public static IconUtil instance = new IconUtil();
+  
+  public static void addIconProvider(IIconProvider registrar) {
+    instance.iconProviders.add(registrar);
+  }
+  
+  private ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
+  
+  public TextureAtlasSprite whiteTexture;
+  public TextureAtlasSprite blankTexture;
+  public TextureAtlasSprite errorTexture;
+  
+  private boolean doneInit = false;
+  
+  private IconUtil() {    
+  }
+  
+  public void init() {
+    if(doneInit) {
+      return;
+    }
+    doneInit = true;
+    MinecraftForge.EVENT_BUS.register(this);
     addIconProvider(new IIconProvider() {
 
       @Override
@@ -39,10 +54,6 @@ public class IconUtil {
       }
 
     });
-  }
-
-  public static void addIconProvider(IIconProvider registrar) {
-    iconProviders.add(registrar);
   }
   
   @SubscribeEvent

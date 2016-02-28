@@ -125,7 +125,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {}
 
     @SuppressWarnings("unchecked")
-    protected T getTileEntity(World world, BlockPos pos) {
+    protected T getTileEntity(IBlockAccess world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         if (teClass.isInstance(te)) {
             return (T) te;

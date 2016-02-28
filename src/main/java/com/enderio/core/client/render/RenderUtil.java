@@ -58,6 +58,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -76,9 +77,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
+import net.minecraft.util.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.model.Attributes;
+import net.minecraftforge.client.model.pipeline.LightUtil;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
+import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad.Builder;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -761,6 +767,66 @@ public class RenderUtil {
 
     RenderPassHelper.clearBlockRenderPass();
 
+  }
+  
+  public static void addBakedQuads(BoundingBox bb, TextureAtlasSprite tex, List<BakedQuad> quads) {
+    for (EnumFacing face : EnumFacing.VALUES) {
+      addBakedQuadForFace(quads, bb, tex, face);
+    }
+  }
+
+  public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face) {
+    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+    List<Vertex> corners = bb.getCornersWithUvForFace(face);
+    builder.setQuadOrientation(face);
+    builder.setQuadColored();      
+    for (Vertex v : corners) {
+      putVertexData(builder, v, face.getDirectionVec(), tex);
+    }
+    quads.add(builder.build());
+  }
+
+  private static void putVertexData(Builder builder, Vertex v, Vec3i normal, TextureAtlasSprite sprite) {
+    if(sprite == null) {
+      sprite = IconUtil.instance.errorTexture;
+    }
+    
+    VertexFormat format = builder.getVertexFormat();
+    for (int e = 0; e < format.getElementCount(); e++) {
+      switch (format.getElement(e).getUsage()) {
+      case POSITION:
+        builder.put(e, (float) v.x(), (float) v.y(), (float) v.z(), 1);
+        break;
+      case COLOR:
+        float d;
+        if (v.normal != null) {
+          d = LightUtil.diffuseLight(v.normal.x, v.normal.y, v.normal.z);
+        } else {
+          d = LightUtil.diffuseLight(normal.getX(), normal.getY(), normal.getZ());
+        }
+
+        if (v.color != null) {
+          builder.put(e, d * v.color.x, d * v.color.y, d * v.color.z, v.color.w);
+        } else {
+          builder.put(e, d, d, d, 1);
+        }
+        break;
+      case UV:        
+          builder.put(e, sprite.getInterpolatedU(v.u() * 16),
+              sprite.getInterpolatedV(v.v() * 16), 0, 1);
+        
+        break;
+      case NORMAL:
+        if(v.normal != null) {
+          builder.put(e, v.nx(), v.ny(), v.nz(), 0);
+        } else {
+          builder.put(e, normal.getX(), normal.getY(), normal.getZ(), 0);
+        }
+        break;
+      default:
+        builder.put(e);
+      }
+    }
   }
 
 }
