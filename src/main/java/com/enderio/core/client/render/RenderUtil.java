@@ -772,9 +772,13 @@ public class RenderUtil {
 
   }
 
-  public static void addBakedQuads(BoundingBox bb, TextureAtlasSprite tex, List<BakedQuad> quads) {
+  public static void addBakedQuads(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex) {
+    addBakedQuads(quads, bb, tex, null);
+  }
+  
+  public static void addBakedQuads(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, Vector4f color) {
     for (EnumFacing face : EnumFacing.VALUES) {
-      addBakedQuadForFace(quads, bb, tex, face);
+      addBakedQuadForFace(quads, bb, tex, face, false, false, color);
     }
   }
 
