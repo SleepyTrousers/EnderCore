@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.enderio.core.api.common.config.IConfigHandler;
-import com.enderio.core.client.render.IconUtil;
 import com.enderio.core.common.CommonProxy;
 import com.enderio.core.common.Handlers;
 import com.enderio.core.common.Lang;
@@ -85,8 +84,6 @@ public class EnderCore implements IEnderMod {
   @EventHandler
   public void preInit(FMLPreInitializationEvent event) {
 
-    IconUtil.instance.init();
-    
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
     ConfigHandler.configFile = new File(ConfigHandler.enderConfigFolder.getPath() + "/" + event.getSuggestedConfigurationFile().getName());
@@ -108,6 +105,8 @@ public class EnderCore implements IEnderMod {
 
     EnchantXPBoost.register();
     EnchantAutoSmelt.register();
+    
+    proxy.onPreInit(event);
   }
 
   @EventHandler
