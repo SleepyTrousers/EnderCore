@@ -114,6 +114,8 @@ publishing {
     repositories {
         if (project.hasProperty('mavendir')) {
             maven { url mavendir }
+        } else {
+            mavenLocal()
         }
     }
 }

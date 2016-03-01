@@ -26,17 +26,24 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
     protected final Class<? extends T> teClass;
     protected final String name;
-
-//    @Setter
-    private Class<? extends ItemBlock> itemBlockClass;
+  protected final Class<? extends ItemBlock> itemBlockClass;
 
     protected BlockEnder(String name, Class<? extends T> teClass) {
-        this(name, teClass, new Material(MapColor.ironColor));
+        this(name, teClass, null, new Material(MapColor.ironColor));
     }
 
     protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
+      this(name, teClass, null, mat);
+    }
+
+  protected BlockEnder(String name, Class<? extends T> teClass, Class<? extends ItemBlock> itemBlockClass) {
+    this(name, teClass, itemBlockClass, new Material(MapColor.ironColor));
+  }
+
+  protected BlockEnder(String name, Class<? extends T> teClass, Class<? extends ItemBlock> itemBlockClass, Material mat) {
         super(mat);
         this.teClass = teClass;
+    this.itemBlockClass = itemBlockClass;
         this.name = name;
         setHardness(0.5F);
         setUnlocalizedName(name);
