@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
+import com.enderio.core.api.client.render.VertexTransform;
 import com.enderio.core.client.handlers.ClientHandler;
 import com.enderio.core.common.util.Log;
 import com.enderio.core.common.vecmath.Matrix4d;
@@ -74,6 +75,7 @@ import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -772,10 +774,19 @@ public class RenderUtil {
 
   }
 
+  public static void renderBlockModelAsItem(World world, ItemStack stack, IBlockState state) {
+
+    BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    IBakedModel model = blockrendererdispatcher.getBlockModelShapes().getModelForState(state);
+    if (model != null) {
+      Minecraft.getMinecraft().getRenderItem().renderItem(stack, model);
+    }
+  }
+
   public static void addBakedQuads(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex) {
     addBakedQuads(quads, bb, tex, null);
   }
-  
+
   public static void addBakedQuads(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, Vector4f color) {
     for (EnumFacing face : EnumFacing.VALUES) {
       addBakedQuadForFace(quads, bb, tex, face, false, false, color);
@@ -788,6 +799,20 @@ public class RenderUtil {
 
   public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, boolean rotateUV, boolean flipU) {
     addBakedQuadForFace(quads, bb, tex, face, rotateUV, flipU, null);
+  }
+
+  public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, VertexTransform xform) {
+    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+    List<Vertex> corners = bb.getCornersWithUvForFace(face);
+    builder.setQuadOrientation(face);
+    builder.setQuadColored();
+    for (Vertex v : corners) {
+      if (xform != null) {
+        xform.apply(v);
+      }
+      putVertexData(builder, v, face.getDirectionVec(), tex);
+    }
+    quads.add(builder.build());
   }
 
   public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, boolean rotateUV, boolean flipU,
@@ -818,7 +843,7 @@ public class RenderUtil {
     while (it.hasNext()) {
       EnumFacing face = null;
       for (int i = 0; i < 4; i++) {
-        Vertex v = it.next();        
+        Vertex v = it.next();
         if (i == 0) {
           face = EnumFacing.getFacingFromVector(v.nx(), v.ny(), v.nz());
           builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
