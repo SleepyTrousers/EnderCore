@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.util.FluidUtil;
 import com.enderio.core.common.util.Log;
 import com.google.common.collect.Lists;
 
@@ -88,6 +90,16 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
         if (playerIn.isSneaking()) {
             return false;
         }
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof ITankAccess) {
+          if (FluidUtil.fillInternalTankFromPlayerHandItem(worldIn, pos, playerIn, (ITankAccess) te)) {
+            return true;
+          }
+          if (FluidUtil.fillPlayerHandItemFromInternalTank(worldIn, pos, playerIn, (ITankAccess) te)) {
+            return true;
+          }
+        }
+        
         return openGui(worldIn, pos, playerIn, side);
     }
 
