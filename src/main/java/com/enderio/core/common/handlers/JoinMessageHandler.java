@@ -14,7 +14,7 @@ public class JoinMessageHandler {
 
   @SubscribeEvent
   public void onPlayerJoin(PlayerLoggedInEvent event) {
-    if(ConfigHandler.instance().showInvisibleWarning()) {
+    if(ConfigHandler.invisibleMode == 1 && ConfigHandler.instance().showInvisibleWarning()) {
       String unlocBase = "chat.invis";
       String warnBase = unlocBase + ".warn.";
       String reasonBase = unlocBase + ".reason.";
