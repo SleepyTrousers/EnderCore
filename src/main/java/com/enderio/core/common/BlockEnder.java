@@ -26,161 +26,168 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
-    protected final Class<? extends T> teClass;
-    protected final String name;
+  protected final Class<? extends T> teClass;
+  protected final String name;
   protected final Class<? extends ItemBlock> itemBlockClass;
 
-    protected BlockEnder(String name, Class<? extends T> teClass) {
-        this(name, teClass, null, new Material(MapColor.ironColor));
-    }
+  protected BlockEnder(String name, Class<? extends T> teClass) {
+    this(name, teClass, null, new Material(MapColor.ironColor));
+  }
 
-    protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
-      this(name, teClass, null, mat);
-    }
+  protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
+    this(name, teClass, null, mat);
+  }
 
   protected BlockEnder(String name, Class<? extends T> teClass, Class<? extends ItemBlock> itemBlockClass) {
     this(name, teClass, itemBlockClass, new Material(MapColor.ironColor));
   }
 
   protected BlockEnder(String name, Class<? extends T> teClass, Class<? extends ItemBlock> itemBlockClass, Material mat) {
-        super(mat);
-        this.teClass = teClass;
+    super(mat);
+    this.teClass = teClass;
     this.itemBlockClass = itemBlockClass;
-        this.name = name;
-        setHardness(0.5F);
-        setUnlocalizedName(name);
-        setStepSound(Block.soundTypeMetal);
-        setHarvestLevel("pickaxe", 0);
+    this.name = name;
+    setHardness(0.5F);
+    setUnlocalizedName(name);
+    setStepSound(Block.soundTypeMetal);
+    setHarvestLevel("pickaxe", 0);
+  }
+
+  protected void init() {
+    if (itemBlockClass != null) {
+      GameRegistry.registerBlock(this, itemBlockClass, name);
+    } else {
+      GameRegistry.registerBlock(this, name);
     }
-
-    protected void init() {
-        if (itemBlockClass != null) {
-            GameRegistry.registerBlock(this, itemBlockClass, name);
-        } else {
-            GameRegistry.registerBlock(this, name);
-        }
-        if (teClass != null) {
-            GameRegistry.registerTileEntity(teClass, name + "TileEntity");
-        }
+    if (teClass != null) {
+      GameRegistry.registerTileEntity(teClass, name + "TileEntity");
     }
+  }
 
-    @Override
-    public boolean hasTileEntity(IBlockState state) {
-        return teClass != null;
+  @Override
+  public boolean hasTileEntity(IBlockState state) {
+    return teClass != null;
+  }
+
+  @Override
+  public TileEntity createTileEntity(World world, IBlockState state) {
+    if (teClass != null) {
+      try {
+        T te = teClass.newInstance();
+        te.init();
+        return te;
+      } catch (Exception e) {
+        Log.error("Could not create tile entity for block " + name + " for class " + teClass);
+      }
     }
+    return null;
+  }
 
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
-        if (teClass != null) {
-            try {
-                T te = teClass.newInstance();
-                te.init();
-                return te;
-            } catch (Exception e) {
-                Log.error("Could not create tile entity for block " + name + " for class " + teClass);
-            }
-        }
-        return null;
+  /* Subclass Helpers */
+
+  @Override
+  public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+    if (playerIn.isSneaking()) {
+      return false;
     }
-
-    /* Subclass Helpers */
-
-    @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (playerIn.isSneaking()) {
-            return false;
-        }
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof ITankAccess) {
-          if (FluidUtil.fillInternalTankFromPlayerHandItem(worldIn, pos, playerIn, (ITankAccess) te)) {
-            return true;
-          }
-          if (FluidUtil.fillPlayerHandItemFromInternalTank(worldIn, pos, playerIn, (ITankAccess) te)) {
-            return true;
-          }
-        }
-        
-        return openGui(worldIn, pos, playerIn, side);
-    }
-
-    protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
-        return false;
-    }
-
-    public boolean doNormalDrops(IBlockAccess world, BlockPos pos) {
+    TileEntity te = worldIn.getTileEntity(pos);
+    if (te instanceof ITankAccess) {
+      if (FluidUtil.fillInternalTankFromPlayerHandItem(worldIn, pos, playerIn, (ITankAccess) te)) {
         return true;
+      }
+      if (FluidUtil.fillPlayerHandItemFromInternalTank(worldIn, pos, playerIn, (ITankAccess) te)) {
+        return true;
+      }
     }
 
-    @Override
-    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-        if (willHarvest) {
-            return true;
-        }
-        return super.removedByPlayer(world, pos, player, willHarvest);
-    }
+    return openGui(worldIn, pos, playerIn, side);
+  }
 
-    @Override
-    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te) {
-        super.harvestBlock(worldIn, player, pos, state, te);
-        worldIn.setBlockToAir(pos);
-    }
+  protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
+    return false;
+  }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        if (doNormalDrops(world, pos)) {
-            return super.getDrops(world, pos, state, fortune);
-        }
-        return Lists.newArrayList(getNBTDrop(world, pos, (T) world.getTileEntity(pos)));
-    }
+  public boolean doNormalDrops(IBlockAccess world, BlockPos pos) {
+    return true;
+  }
 
-    public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, T te) {
-        int meta = damageDropped(world.getBlockState(pos));
-        ItemStack itemStack = new ItemStack(this, 1, meta);
-        processDrop(world, pos, te, itemStack);
-        return itemStack;
+  @Override
+  public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+    if (willHarvest) {
+      return true;
     }
+    return super.removedByPlayer(world, pos, player, willHarvest);
+  }
 
-    protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {}
+  @Override
+  public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te) {
+    super.harvestBlock(worldIn, player, pos, state, te);
+    worldIn.setBlockToAir(pos);
+  }
 
-    @SuppressWarnings("unchecked")
-    protected T getTileEntity(IBlockAccess world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
-        if (teClass.isInstance(te)) {
-            return (T) te;
-        }
-        return null;
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+    if (doNormalDrops(world, pos)) {
+      return super.getDrops(world, pos, state, fortune);
     }
+    return Lists.newArrayList(getNBTDrop(world, pos, (T) world.getTileEntity(pos)));
+  }
 
-    protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval) {
-        T te = getTileEntity(world, pos);
-        if (te == null) {
-            return world.getTotalWorldTime() % interval == 0;
-        } else {
-            return te.shouldDoWorkThisTick(interval);
-        }
-    }
+  public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, T te) {
+    int meta = damageDropped(world.getBlockState(pos));
+    ItemStack itemStack = new ItemStack(this, 1, meta);
+    processDrop(world, pos, te, itemStack);
+    return itemStack;
+  }
 
-    protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval, int offset) {
-        T te = getTileEntity(world, pos);
-        if (te == null) {
-            return (world.getTotalWorldTime() + offset) % interval == 0;
-        } else {
-            return te.shouldDoWorkThisTick(interval, offset);
-        }
-    }
+  protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {
+  }
 
-    // Because the vanilla method takes floats...
-    public void setBlockBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-        this.minX = minX;
-        this.minY = minY;
-        this.minZ = minZ;
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.maxZ = maxZ;
+  @SuppressWarnings("unchecked")
+  protected T getTileEntity(IBlockAccess world, BlockPos pos) {
+    TileEntity te = world.getTileEntity(pos);
+    if (teClass.isInstance(te)) {
+      return (T) te;
     }
+    return null;
+  }
 
-    public void setBlockBounds(AxisAlignedBB bb) {
-        setBlockBounds(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+  protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval) {
+    T te = getTileEntity(world, pos);
+    if (te == null) {
+      return world.getTotalWorldTime() % interval == 0;
+    } else {
+      return te.shouldDoWorkThisTick(interval);
     }
+  }
+
+  protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval, int offset) {
+    T te = getTileEntity(world, pos);
+    if (te == null) {
+      return (world.getTotalWorldTime() + offset) % interval == 0;
+    } else {
+      return te.shouldDoWorkThisTick(interval, offset);
+    }
+  }
+
+  // Because the vanilla method takes floats...
+  public void setBlockBounds(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+    this.minX = minX;
+    this.minY = minY;
+    this.minZ = minZ;
+    this.maxX = maxX;
+    this.maxY = maxY;
+    this.maxZ = maxZ;
+  }
+
+  public void setBlockBounds(AxisAlignedBB bb) {
+    setBlockBounds(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+  }
+
+  public String getName() {
+    return name;
+  }
+  
+  
 }
