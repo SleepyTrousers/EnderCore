@@ -461,4 +461,14 @@ public class FluidUtil {
     }
   }
 
+  public static boolean areFluidsTheSame(Fluid fluid, Fluid fluid2) {
+    if(fluid == null) {
+      return fluid2 == null;
+    }
+    if(fluid2 == null) {
+      return false;
+    }
+    return fluid == fluid2 || fluid.getName().equals(fluid2.getName());
+  }
+
 }
