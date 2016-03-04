@@ -29,26 +29,12 @@ import static net.minecraft.util.EnumFacing.NORTH;
 import static net.minecraft.util.EnumFacing.SOUTH;
 import static net.minecraft.util.EnumFacing.UP;
 import static net.minecraft.util.EnumFacing.WEST;
-import static org.lwjgl.opengl.GL11.GL_ALL_ATTRIB_BITS;
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_ONE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SMOOTH;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_ZERO;
 import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopAttrib;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushAttrib;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glShadeModel;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -132,7 +118,7 @@ public class RenderUtil {
     MATRIX_BUFFER.put((float) mat.m31);
     MATRIX_BUFFER.put((float) mat.m32);
     MATRIX_BUFFER.put((float) mat.m33);
-    MATRIX_BUFFER.rewind();
+    MATRIX_BUFFER.rewind();    
     GL11.glLoadMatrix(MATRIX_BUFFER);
   }
 
@@ -242,9 +228,10 @@ public class RenderUtil {
 
   public static void renderQuad2D(double x, double y, double z, double width, double height, int colorRGB) {
 
-    GL11.glDisable(GL11.GL_TEXTURE_2D);
+    GlStateManager.disableTexture2D();
+    
     Vector3f col = ColorUtil.toFloat(colorRGB);
-    GL11.glColor3f(col.x, col.y, col.z);
+    GlStateManager.color(col.x, col.y, col.z);
 
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
@@ -255,12 +242,13 @@ public class RenderUtil {
     tes.pos(x, y, z).endVertex();
 
     tessellator.draw();
-    GL11.glEnable(GL11.GL_TEXTURE_2D);
+    GlStateManager.enableTexture2D();
   }
 
   public static void renderQuad2D(double x, double y, double z, double width, double height, Vector4f colorRGBA) {
-    GL11.glColor4f(colorRGBA.x, colorRGBA.y, colorRGBA.z, colorRGBA.w);
-
+    GlStateManager.color(colorRGBA.x, colorRGBA.y, colorRGBA.z, colorRGBA.w);
+    GlStateManager.disableTexture2D();    
+    
     Tessellator tessellator = Tessellator.getInstance();
     WorldRenderer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
@@ -269,7 +257,7 @@ public class RenderUtil {
     tes.pos(x + width, y, z).endVertex();
     tes.pos(x, y, z).endVertex();
     tessellator.draw();
-    GL11.glEnable(GL11.GL_TEXTURE_2D);
+    GlStateManager.enableTexture2D();
   }
 
   public static Matrix4d createBillboardMatrix(TileEntity te, EntityLivingBase entityPlayer) {
@@ -524,8 +512,8 @@ public class RenderUtil {
     RenderUtil.bindBlockTexture();
     int color = fluid.getFluid().getColor(fluid);
     GL11.glColor3ub((byte) (color >> 16 & 0xFF), (byte) (color >> 8 & 0xFF), (byte) (color & 0xFF));
-
-    GL11.glEnable(GL11.GL_BLEND);
+    
+    GlStateManager.enableBlend();    
     for (int i = 0; i < width; i += 16) {
       for (int j = 0; j < renderAmount; j += 16) {
         int drawWidth = (int) Math.min(width - i, 16);
@@ -549,7 +537,7 @@ public class RenderUtil {
         tessellator.draw();
       }
     }
-    GL11.glDisable(GL11.GL_BLEND);
+    GlStateManager.disableBlend();
   }
 
   public static void drawBillboardedText(Vector3f pos, String text, float size) {
@@ -563,43 +551,45 @@ public class RenderUtil {
   public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol, boolean drawBackground,
       Vector4f bgCol) {
 
-    GL11.glPushMatrix();
-    GL11.glTranslatef(pos.x, pos.y, pos.z);
-    GL11.glRotatef(180, 1, 0, 0);
+    
+    GlStateManager.pushMatrix();
+    GlStateManager.translate(pos.x, pos.y, pos.z);
+    GlStateManager.rotate(180, 1, 0, 0);
 
     Minecraft mc = Minecraft.getMinecraft();
     FontRenderer fnt = mc.fontRendererObj;
     float scale = size / fnt.FONT_HEIGHT;
-    GL11.glScalef(scale, scale, scale);
-    GL11.glRotatef(mc.getRenderManager().playerViewY + 180, 0.0F, 1.0F, 0.0F);
-    GL11.glRotatef(-mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+    GlStateManager.scale(scale, scale, scale);
+    GlStateManager.rotate(mc.getRenderManager().playerViewY + 180, 0.0F, 1.0F, 0.0F);
+    GlStateManager.rotate(-mc.getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
 
-    GL11.glTranslatef(-fnt.getStringWidth(text) / 2, 0, 0);
+    GlStateManager.translate(-fnt.getStringWidth(text) / 2, 0, 0);
     if (drawBackground) {
       renderBackground(fnt, text, bgCol);
     }
     fnt.drawString(text, 0, 0, ColorUtil.getRGBA(txtCol));
     if (drawShadow) {
-      GL11.glTranslatef(0.5f, 0.5f, 0.1f);
+      GlStateManager.translate(0.5f, 0.5f, 0.1f);
       fnt.drawString(text, 0, 0, ColorUtil.getRGBA(shadowCol));
     }
-    GL11.glPopMatrix();
+    GlStateManager.popMatrix();
 
     RenderUtil.bindBlockTexture();
   }
 
   public static void renderBackground(FontRenderer fnt, String toRender, Vector4f color) {
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glDisable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glShadeModel(GL_SMOOTH);
-    glDisable(GL_ALPHA_TEST);
-    glDisable(GL_CULL_FACE);
-    glDepthMask(false);
-    RenderHelper.disableStandardItemLighting();
-    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop
-                                                                                     // random
-                                                                                     // disappearing
+    
+    GlStateManager.disableTexture2D();
+    GlStateManager.enableBlend();
+    GlStateManager.shadeModel(GL_SMOOTH);
+    GlStateManager.disableAlpha();
+    GlStateManager.disableCull();
+    GlStateManager.depthMask(false);
+    
+    RenderHelper.disableStandardItemLighting();    
+//    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop
+//                                                                                     // random
+//                                                                                     // disappearing
 
     float width = fnt.getStringWidth(toRender);
     float height = fnt.FONT_HEIGHT;
@@ -615,7 +605,6 @@ public class RenderUtil {
     tes.pos(width + padding, -padding, 0).endVertex();
     Tessellator.getInstance().draw();
 
-    glPopAttrib();
   }
 
   /**

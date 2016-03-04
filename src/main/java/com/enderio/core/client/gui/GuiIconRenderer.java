@@ -6,6 +6,7 @@ import com.enderio.core.client.render.IconUtil;
 import com.enderio.core.client.render.RenderUtil;
 
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 
@@ -84,18 +85,17 @@ public class GuiIconRenderer extends Gui {
 
   public void draw() {
 
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, alpha);
-
-    GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-    GL11.glEnable(GL11.GL_BLEND);
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
+    GlStateManager.pushAttrib();
+    GlStateManager.enableBlend();
+    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);    
 
     RenderUtil.bindTexture(texture);
     drawTexturedModalRect(xPosition, yPosition, icon, width, height);
 
-    GL11.glPopAttrib();
+    GlStateManager.popAttrib();
 
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
   }
 
 }

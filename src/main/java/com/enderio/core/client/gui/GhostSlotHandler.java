@@ -2,8 +2,6 @@ package com.enderio.core.client.gui;
 
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.render.RenderUtil;
 import com.enderio.core.common.util.ItemUtil;
@@ -12,6 +10,7 @@ import com.google.common.collect.Lists;
 import static com.enderio.core.client.render.EnderWidget.NEUTRAL_SLOT_BACKGROUND;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
 public class GhostSlotHandler {
@@ -196,10 +195,10 @@ public class GhostSlotHandler {
    * painted with 50% transparency. (100%*a ° 100%*b ° 50%*a == 100%*a ° 50%*b)
    */
   protected void drawGhostSlotGrayout(GuiContainerBase gui, GhostSlot slot) {
-    GL11.glDisable(GL11.GL_LIGHTING);
-    GL11.glDisable(GL11.GL_DEPTH_TEST);
-    GL11.glEnable(GL11.GL_BLEND);
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
+    GlStateManager.disableLighting();
+    GlStateManager.disableDepth();
+    GlStateManager.enableBlend();    
+    GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
     String guiTexture = gui.getGuiTexture();
     if (guiTexture == null) {
       NEUTRAL_SLOT_BACKGROUND.getMap().render(NEUTRAL_SLOT_BACKGROUND, gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, gui.getZlevel(), true);
@@ -207,9 +206,9 @@ public class GhostSlotHandler {
       RenderUtil.bindTexture(guiTexture);
       gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
     }
-    GL11.glDisable(GL11.GL_BLEND);
-    GL11.glEnable(GL11.GL_DEPTH_TEST);
-    GL11.glEnable(GL11.GL_LIGHTING);
+    GlStateManager.disableBlend();
+    GlStateManager.enableDepth();
+    GlStateManager.enableLighting();    
   }
 
 

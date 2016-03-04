@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import com.enderio.core.api.client.gui.IGuiOverlay;
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -317,16 +315,16 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     Timer t = RenderUtil.getTimer();
 
     if (t != null) {
-      GL11.glPushMatrix();
-      GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      GL11.glDisable(GL11.GL_DEPTH_TEST);
+      GlStateManager.pushMatrix();
+      GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+      GlStateManager.disableDepth();      
       for (IGuiOverlay overlay : overlays) {
         if (overlay != null && overlay.isVisible()) {
           overlay.draw(realMx, realMy, t.renderPartialTicks);
         }
       }
-      GL11.glEnable(GL11.GL_DEPTH_TEST);
-      GL11.glPopMatrix();
+      GlStateManager.enableDepth();      
+      GlStateManager.popMatrix();
     }
   }
 
@@ -371,7 +369,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
           return;
       }
 
-      GL11.glTranslatef(0.0F, 0.0F, 32.0F);
+      GlStateManager.translate(0.0F, 0.0F, 32.0F);
       zLevel = 200.0F;
       itemRender.zLevel = 200.0F;
       FontRenderer font = null;
@@ -405,17 +403,17 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   protected void drawFakeItemHover(int x, int y) {
-    GL11.glDisable(GL11.GL_LIGHTING);
-    GL11.glDisable(GL11.GL_DEPTH_TEST);
-    GL11.glColorMask(true, true, true, false);
+    GlStateManager.disableLighting();    
+    GlStateManager.disableDepth();
+    GlStateManager.colorMask(true, true, true, false);    
     drawGradientRect(x, y, x + 16, y + 16, 0x80FFFFFF, 0x80FFFFFF);
-    GL11.glColorMask(true, true, true, true);
-    GL11.glEnable(GL11.GL_DEPTH_TEST);
-    GL11.glEnable(GL11.GL_LIGHTING);
+    GlStateManager.colorMask(true, true, true, true);    
+    GlStateManager.enableDepth();
+    
+    GlStateManager.enableLighting();
   }
 
-  protected void drawFakeItemsEnd() {
-    GL11.glPopAttrib();
+  protected void drawFakeItemsEnd() {    
     itemRender.zLevel = 0.0F;
     zLevel = 0.0F;
   }
@@ -467,21 +465,17 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public void drawHoveringText(List par1List, int par2, int par3, FontRenderer font) {
-    GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-    GL11.glPushAttrib(GL11.GL_LIGHTING_BIT);
-    copyOfdrawHoveringText(par1List, par2, par3, font);
-    GL11.glPopAttrib();
-    GL11.glPopAttrib();
+    copyOfdrawHoveringText(par1List, par2, par3, font);   
   }
 
   //This is a copy of the super class method due to 'Method not found' errors
   // reported with some mods installed.
   protected void copyOfdrawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font) {
-    if (!par1List.isEmpty()) {
-      GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-      RenderHelper.disableStandardItemLighting();
-      GL11.glDisable(GL11.GL_LIGHTING);
-      GL11.glDisable(GL11.GL_DEPTH_TEST);
+    
+    if (!par1List.isEmpty()) {      
+
+      GlStateManager.disableLighting();
+      GlStateManager.disableDepth();      
       int k = 0;
       Iterator<String> iterator = par1List.iterator();
 
@@ -538,10 +532,9 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
       this.zLevel = 0.0F;
       //itemRenderer.zLevel = 0.0F;
-      GL11.glEnable(GL11.GL_LIGHTING);
-      GL11.glEnable(GL11.GL_DEPTH_TEST);
-      RenderHelper.enableStandardItemLighting();
-      GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+      GlStateManager.enableLighting();
+      GlStateManager.enableDepth();      
+      
     }
   }
 
