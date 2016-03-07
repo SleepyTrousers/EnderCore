@@ -7,6 +7,7 @@ import com.enderio.core.client.render.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 
@@ -62,8 +63,8 @@ public class IIconButton extends GuiButton {
   public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY) {
     if (visible) {
 
-      RenderUtil.bindTexture("textures/gui/widgets.png");
-      GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderUtil.bindTexture("textures/gui/widgets.png");      
+      GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
       hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + width && mouseY < this.yPosition + height;
       int hoverState = getHoverState(hovered);
 
@@ -80,15 +81,18 @@ public class IIconButton extends GuiButton {
       mouseDragged(par1Minecraft, mouseX, mouseY);
 
       if (icon != null && texture != null) {
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        
+        
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         RenderUtil.bindTexture(texture);
         int xLoc = xPosition + 2;
         int yLoc = yPosition + 2;
-        drawTexturedModalRect(xLoc, yLoc, icon, width - 4, height - 4);        
-        GL11.glPopAttrib();
+        drawTexturedModalRect(xLoc, yLoc, icon, width - 4, height - 4);    
+        
+        GlStateManager.disableBlend();
+        
       }
 
     }

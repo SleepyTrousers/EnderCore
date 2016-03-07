@@ -550,8 +550,7 @@ public class RenderUtil {
 
   public static void drawBillboardedText(Vector3f pos, String text, float size, Vector4f txtCol, boolean drawShadow, Vector4f shadowCol, boolean drawBackground,
       Vector4f bgCol) {
-
-    
+   
     GlStateManager.pushMatrix();
     GlStateManager.translate(pos.x, pos.y, pos.z);
     GlStateManager.rotate(180, 1, 0, 0);
@@ -581,15 +580,13 @@ public class RenderUtil {
     
     GlStateManager.disableTexture2D();
     GlStateManager.enableBlend();
+    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     GlStateManager.shadeModel(GL_SMOOTH);
     GlStateManager.disableAlpha();
     GlStateManager.disableCull();
     GlStateManager.depthMask(false);
     
     RenderHelper.disableStandardItemLighting();    
-//    OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO); // stop
-//                                                                                     // random
-//                                                                                     // disappearing
 
     float width = fnt.getStringWidth(toRender);
     float height = fnt.FONT_HEIGHT;
@@ -604,6 +601,10 @@ public class RenderUtil {
     tes.pos(width + padding, height + padding, 0).endVertex();
     tes.pos(width + padding, -padding, 0).endVertex();
     Tessellator.getInstance().draw();
+    
+    GlStateManager.enableTexture2D();
+    GlStateManager.enableCull();
+    GlStateManager.enableAlpha();
 
   }
 
