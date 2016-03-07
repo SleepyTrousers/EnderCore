@@ -83,6 +83,12 @@ jar {
     }
 }
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
+    classifier = 'dev'
+}
+
 task apiJar(type: Jar) {
     from sourceSets.main.allSource
     from sourceSets.main.output
@@ -98,7 +104,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-build.dependsOn apiJar, sourceJar, javadoc
+build.dependsOn apiJar, sourceJar, deobfJar, javadoc
 
 publishing {
     tasks.publish.dependsOn 'build'
