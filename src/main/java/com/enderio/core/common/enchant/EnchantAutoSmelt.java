@@ -2,16 +2,16 @@ package com.enderio.core.common.enchant;
 
 import javax.annotation.Nullable;
 
+import com.enderio.core.EnderCore;
+import com.enderio.core.api.common.enchant.IAdvancedEnchant;
+import com.enderio.core.common.config.ConfigHandler;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-
-import com.enderio.core.EnderCore;
-import com.enderio.core.api.common.enchant.IAdvancedEnchant;
-import com.enderio.core.common.config.ConfigHandler;
 
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   private static EnchantAutoSmelt INSTANCE;
@@ -68,10 +68,12 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
     if (ConfigHandler.allowAutoSmelt) {
       INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"enchantment.autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+          "<enchantment name=\"" + EnderCore.MODID +  ":autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+      Enchantment.addToBookList(INSTANCE);
     }
   }
 
+  @Override
   public boolean canApplyTogether(Enchantment ench) {
     return super.canApplyTogether(ench) && ench.effectId != silkTouch.effectId
         && ((ench.effectId != fortune.effectId) || ConfigHandler.allowAutoSmeltWithFortune);
