@@ -3,6 +3,7 @@ package com.enderio.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -47,6 +48,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 public class EnderCore implements IEnderMod {
 
   public static final String MODID = "endercore";
+  public static final String DOMAIN = MODID.toLowerCase(Locale.US);
   public static final String NAME = "EnderCore";
   public static final String BASE_PACKAGE = "com.enderio";
   public static final String VERSION = "@VERSION@";

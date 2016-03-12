@@ -26,7 +26,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   private EnchantXPBoost(int id) {
     // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
-    super(id, new ResourceLocation(EnderCore.MODID, "xpboost"), 2, EnumEnchantmentType.BREAKABLE);
+    super(id, new ResourceLocation(EnderCore.DOMAIN, "xpboost"), 2, EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -68,7 +68,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
     if(ConfigHandler.allowXPBoost) {
       INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.MODID + ":xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
+          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
       Enchantment.addToBookList(INSTANCE);
     }
   }

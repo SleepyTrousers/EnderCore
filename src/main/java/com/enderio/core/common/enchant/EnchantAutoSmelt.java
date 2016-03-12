@@ -26,7 +26,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
 
   private EnchantAutoSmelt(int id) {
     // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
-    super(id, new ResourceLocation(EnderCore.MODID, "autosmelt"), 2, EnumEnchantmentType.BREAKABLE);
+    super(id, new ResourceLocation(EnderCore.DOMAIN, "autosmelt"), 2, EnumEnchantmentType.BREAKABLE);
   }
 
   @Override
@@ -68,7 +68,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
     if (ConfigHandler.allowAutoSmelt) {
       INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.MODID +  ":autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+          "<enchantment name=\"" + EnderCore.DOMAIN +  ":autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
       Enchantment.addToBookList(INSTANCE);
     }
   }
