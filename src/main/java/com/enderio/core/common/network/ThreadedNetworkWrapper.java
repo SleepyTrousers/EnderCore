@@ -22,7 +22,7 @@ public class ThreadedNetworkWrapper {
     parent = new SimpleNetworkWrapper(channelName);
   }
 
-  private static class Wrapper<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
+  private final class Wrapper<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
 
     private final IMessageHandler<REQ, REPLY> wrapped;
 
@@ -31,8 +31,8 @@ public class ThreadedNetworkWrapper {
     }
 
     @Override
-    public REPLY onMessage(REQ message, MessageContext ctx) {
-      IThreadListener target = ctx.side == Side.CLIENT ? Minecraft.getMinecraft() : MinecraftServer.getServer();
+    public REPLY onMessage(final REQ message, final MessageContext ctx) {
+      final IThreadListener target = ctx.side == Side.CLIENT ? Minecraft.getMinecraft() : MinecraftServer.getServer();
       if (target != null) {
         target.addScheduledTask(new Runner(message, ctx));
       }
@@ -58,20 +58,27 @@ public class ThreadedNetworkWrapper {
       }
     }
 
-    private class Runner implements Runnable {
-      REQ message;
-      MessageContext ctx;
+    private final class Runner implements Runnable {
+      private final REQ message;
+      private final MessageContext ctx;
 
-      public Runner(REQ message, MessageContext ctx) {
+      public Runner(final REQ message, final MessageContext ctx) {
         this.message = message;
         this.ctx = ctx;
       }
 
       @Override
       public void run() {
-        REPLY reply = wrapped.onMessage(message, ctx);
+        final REPLY reply = wrapped.onMessage(message, ctx);
         if (reply != null) {
-          throw new RuntimeException("Replies are not supported");
+          if (ctx.side == Side.CLIENT) {
+            sendToServer(reply);
+          } else {
+            final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            if (player != null) {
+              sendTo(reply, player);
+            }
+          }
         }
       }
 

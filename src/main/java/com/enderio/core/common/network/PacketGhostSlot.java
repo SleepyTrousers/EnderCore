@@ -50,7 +50,7 @@ public class PacketGhostSlot extends MessageTileEntity<TileEntityBase> {
       TileEntityBase te = msg.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
       if (te != null) {               
         te.setGhostSlotContents(msg.slot, msg.stack);
-        te.getWorld().markBlockForUpdate(new BlockPos(msg.x, msg.y, msg.z));
+        te.getWorld().markBlockForUpdate(msg.getPos());
       }
       return null;
     }

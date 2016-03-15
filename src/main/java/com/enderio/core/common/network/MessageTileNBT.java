@@ -18,9 +18,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
 
   TileEntity te;
 
-  int x;
-  int y;
-  int z;
+  long pos;
   NBTTagCompound tags;
 
   boolean renderOnUpdate = false;
@@ -31,34 +29,32 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
 
   public MessageTileNBT(TileEntity te) {
     this.te = te;
-    x = te.getPos().getX();
-    y = te.getPos().getY();
-    z = te.getPos().getZ();
+    pos = te.getPos().toLong();
     tags = new NBTTagCompound();
     te.writeToNBT(tags);
   }
 
   @Override
   public void toBytes(ByteBuf buffer) {
-    buffer.writeInt(x);
-    buffer.writeInt(y);
-    buffer.writeInt(z);
+    buffer.writeLong(pos);
     NetworkUtil.writeNBTTagCompound(tags, buffer);
   }
 
   @Override
   public void fromBytes(ByteBuf dis) {
-    x = dis.readInt();
-    y = dis.readInt();
-    z = dis.readInt();
+    pos = dis.readLong();
     tags = NetworkUtil.readNBTTagCompound(dis);
+  }
+
+  public BlockPos getPos() {
+    return BlockPos.fromLong(pos);
   }
 
   @Override
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
     te = handle(ctx.getServerHandler().playerEntity.worldObj);
     if (te != null && renderOnUpdate) {
-      te.getWorld().markBlockForUpdate(new BlockPos(x, y, z));
+      te.getWorld().markBlockForUpdate(getPos());
     }
     return null;
   }
@@ -68,7 +64,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null world processing tile entity packet.");
       return null;
     }
-    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+    TileEntity te = world.getTileEntity(getPos());
     if (te == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null when processing tile entity packet.");
       return null;

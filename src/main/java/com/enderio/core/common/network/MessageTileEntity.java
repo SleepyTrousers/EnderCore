@@ -11,30 +11,36 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public abstract class MessageTileEntity<T extends TileEntity> implements IMessage {
 
+  private long pos;
+  @Deprecated
   protected int x;
+  @Deprecated
   protected int y;
+  @Deprecated
   protected int z;
 
   protected MessageTileEntity() {
   }
 
   protected MessageTileEntity(T tile) {
-    x = tile.getPos().getX();
-    y = tile.getPos().getY();
-    z = tile.getPos().getZ();
+    pos = tile.getPos().toLong();
   }
 
   public void toBytes(ByteBuf buf) {
-    buf.writeInt(x);
-    buf.writeInt(y);
-    buf.writeInt(z);
+    buf.writeLong(pos);
   }
 
   @Override
   public void fromBytes(ByteBuf buf) {
-    x = buf.readInt();
-    y = buf.readInt();
-    z = buf.readInt();
+    pos = buf.readLong();
+    BlockPos bp = getPos();
+    x = bp.getX();
+    y = bp.getY();
+    z = bp.getZ();
+  }
+
+  public BlockPos getPos() {
+    return BlockPos.fromLong(pos);
   }
 
   @SuppressWarnings("unchecked")
@@ -42,7 +48,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     if (worldObj == null) {
       return null;
     }
-    TileEntity te = worldObj.getTileEntity(new BlockPos(x, y, z));
+    TileEntity te = worldObj.getTileEntity(getPos());
     if (te == null) {
       return null;
     }
