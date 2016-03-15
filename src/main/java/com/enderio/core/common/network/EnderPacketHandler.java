@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class EnderPacketHandler {
 
-  public static final SimpleNetworkWrapper INSTANCE = new SimpleNetworkWrapper(EnderCore.NAME);
+  public static final ThreadedNetworkWrapper INSTANCE = new ThreadedNetworkWrapper(EnderCore.NAME);
 
   public static void init() {
     INSTANCE.registerMessage(PacketConfigSync.Handler.class, PacketConfigSync.class, 0, Side.CLIENT);
