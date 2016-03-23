@@ -185,7 +185,7 @@ public class GhostSlotHandler {
         gui.drawFakeItemHover(hoverGhostSlot.x + sx, hoverGhostSlot.y + sy);
       }
     } finally {
-      //gui.drawFakeItemsEnd();
+      gui.drawFakeItemsEnd();
     }
   }
 
@@ -195,7 +195,6 @@ public class GhostSlotHandler {
    * painted with 50% transparency. (100%*a ° 100%*b ° 50%*a == 100%*a ° 50%*b)
    */
   protected void drawGhostSlotGrayout(GuiContainerBase gui, GhostSlot slot) {
-    GlStateManager.disableLighting();
     GlStateManager.disableDepth();
     GlStateManager.enableBlend();    
     GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
@@ -207,8 +206,7 @@ public class GhostSlotHandler {
       gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
     }
     GlStateManager.disableBlend();
-    GlStateManager.enableDepth();
-    GlStateManager.enableLighting();    
+    GlStateManager.enableDepth();  
   }
 
 

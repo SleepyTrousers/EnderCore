@@ -65,6 +65,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
 import net.minecraft.util.Vec3i;
@@ -123,15 +124,6 @@ public class RenderUtil {
   }
 
   private static Field timerField = initTimer();
-
-  /**
-   * Non-thread-safe holder for the current render pass. You must update this in
-   * your block's canRenderInPass method for it to work properly!
-   * 
-   * DEPRECATED - Should use {@link ForgeHooksClient#getWorldRenderPass()}
-   */
-  @Deprecated
-  public static volatile int theRenderPass = 0;
 
   private static Field initTimer() {
     Field f = null;
@@ -740,27 +732,21 @@ public class RenderUtil {
 
     WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
     wr.begin(7, DefaultVertexFormats.BLOCK);
-
     if (translateToOrigin) {
       wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
-
-    for (int pass = 0; pass < 2; pass++) {
-      RenderPassHelper.setBlockRenderPass(pass);
-      RenderPassHelper.setBlockRenderPass(pass);
-
+    //TODO: Need to setup GL state correctly for each layer    
+    for(EnumWorldBlockLayer layer : EnumWorldBlockLayer.values()) {      
+      ForgeHooksClient.setRenderLayer(layer);
       IBlockState state = world.getBlockState(pos);
       BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
       IBakedModel ibakedmodel = blockrendererdispatcher.getModelFromBlockState(state, world, pos);
       blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, state, pos, Tessellator.getInstance().getWorldRenderer());
-
     }
     if (translateToOrigin) {
       wr.setTranslation(0, 0, 0);
     }
     Tessellator.getInstance().draw();
-
-    RenderPassHelper.clearBlockRenderPass();
 
   }
 
