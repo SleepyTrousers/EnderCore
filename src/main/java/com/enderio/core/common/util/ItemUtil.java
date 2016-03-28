@@ -14,6 +14,8 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryLargeChest;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.MathHelper;
@@ -130,22 +132,38 @@ public class ItemUtil {
    */
   public static ItemStack parseStringIntoItemStack(String string) {
     int size = 1;
-    int idx = string.indexOf('#');
+    int numIdx = string.indexOf('#');
+    int nbtIdx = string.indexOf('$');
 
-    if (idx != -1) {
-      String num = string.substring(idx + 1);
+    NBTTagCompound tag = null;
+    
+    if (numIdx != -1) {
+      String num = string.substring(numIdx + 1, nbtIdx == -1 ? string.length() : nbtIdx);
 
       try {
         size = Integer.parseInt(num);
       } catch (NumberFormatException e) {
-        throw new IllegalArgumentException(num + " is not a valid stack size");
+        throw new IllegalArgumentException(num + " is not a valid stack size", e);
       }
 
-      string = string.substring(0, idx);
+      string = string.replace('#' + num, "");
+      nbtIdx -= num.length() + 1;
+    }
+    
+    if (nbtIdx != -1) {
+      String nbt = string.substring(nbtIdx + 1);
+      try {
+        tag = (NBTTagCompound) JsonToNBT.func_150315_a(nbt);
+      } catch (NBTException e) {
+        throw new IllegalArgumentException(nbt + " is not valid NBT json.", e);
+      }
+      
+      string = string.replace('$' + nbt, "");
     }
 
     ItemStack stack = (ItemStack) parseStringIntoRecipeItem(string, true);
     stack.stackSize = MathHelper.clamp_int(size, 1, stack.getMaxStackSize());
+    stack.setTagCompound(tag);
     return stack;
   }
 
