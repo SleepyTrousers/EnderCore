@@ -450,19 +450,25 @@ public class ItemUtil {
     if (inv instanceof TileEntityChest) {
       TileEntityChest chest = (TileEntityChest) inv;
       TileEntityChest neighbour = null;
+      boolean reverse = false;
       if (chest.adjacentChestXNeg != null) {
         neighbour = chest.adjacentChestXNeg;
+        reverse = true;
       } else if (chest.adjacentChestXPos != null) {
         neighbour = chest.adjacentChestXPos;
       } else if (chest.adjacentChestZNeg != null) {
         neighbour = chest.adjacentChestZNeg;
+        reverse = true;
       } else if (chest.adjacentChestZPos != null) {
         neighbour = chest.adjacentChestZPos;
       }
       if (neighbour != null) {
-        return new InventoryLargeChest("", (ILockableContainer)inv, (ILockableContainer)neighbour);
+        if (reverse) {
+          return new InventoryLargeChest("", (ILockableContainer) neighbour, (ILockableContainer) inv);
+        } else {
+          return new InventoryLargeChest("", (ILockableContainer) inv, (ILockableContainer) neighbour);
+        }
       }
-      return inv;
     }
     return inv;
   }
