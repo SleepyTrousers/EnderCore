@@ -137,7 +137,7 @@ public class ItemUtil {
 
     NBTTagCompound tag = null;
     
-    if (numIdx != -1) {
+    if (numIdx > -1) {
       String num = string.substring(numIdx + 1, nbtIdx == -1 ? string.length() : nbtIdx);
 
       try {
@@ -150,7 +150,7 @@ public class ItemUtil {
       nbtIdx -= num.length() + 1;
     }
     
-    if (nbtIdx != -1) {
+    if (nbtIdx > -1) {
       String nbt = string.substring(nbtIdx + 1);
       try {
         tag = (NBTTagCompound) JsonToNBT.func_150315_a(nbt);
