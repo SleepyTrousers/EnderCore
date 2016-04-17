@@ -39,11 +39,11 @@ public class EnderCoreTransformer implements IClassTransformer {
   // (in this case, a state event), the referenced event class is
   // loaded along with the containing class of the method.
   // Since EnderCore is referenced in the 'transform' method of this class,
-  // the aforementioned event classes are consequently referenced and classloaded too early.
+  // EnderCore and the aforementioned event classes are consequently referenced and classloaded too early.
   //
   // In order to be compatible with coremods such as Sponge, FML event
   // classes cannot be classloaded until the game is starting. Specifically,
-  // there are being loaded before FML is ready to actually start posting state events.
+  // they are being classloaded before FML is ready to actually start posting state events.
   // This is significantly earlier than certain coremods such as Sponge expect,
   // which prevents them from properly applying their own transformations.
 
