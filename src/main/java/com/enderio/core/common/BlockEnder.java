@@ -28,7 +28,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class BlockEnder extends Block {
 
-  protected final Class<? extends TileEntityEnder> teClass;
+  protected final @Nullable Class<? extends TileEntityEnder> teClass;
   protected final String name;
   protected final boolean hasComparatorInputOverride;
 
@@ -143,11 +143,11 @@ public abstract class BlockEnder extends Block {
   
   @Override
   public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, @Nullable EntityPlayer player) {
-    return getNBTDrop(world, x, y, z, getTileEntityEio(world, x, y, z));
+    return getNBTDrop(world, x, y, z, teClass != null ? getTileEntityEio(world, x, y, z) : null);
   }
 
-  public ItemStack getNBTDrop(World world, int x, int y, int z, TileEntityEnder te) {
-    int meta = damageDropped(te.getBlockMetadata());
+  public ItemStack getNBTDrop(World world, int x, int y, int z, @Nullable TileEntityEnder te) {
+    int meta = te != null ? damageDropped(te.getBlockMetadata()) : world.getBlockMetadata(x, y, z);
     ItemStack itemStack = new ItemStack(this, 1, meta);
     processDrop(world, x, y, z, te, itemStack);
     return itemStack;
@@ -156,10 +156,13 @@ public abstract class BlockEnder extends Block {
   protected void processDrop(World world, int x, int y, int z, @Nullable TileEntityEnder te, ItemStack drop) {
   }
 
-  protected TileEntityEnder getTileEntityEio(IBlockAccess world, int x, int y, int z) {
-    TileEntity te = world.getTileEntity(x, y, z);
-    if (teClass.isInstance(te)) {
-      return (TileEntityEnder) te;
+  @SuppressWarnings("null")
+  protected @Nullable TileEntityEnder getTileEntityEio(IBlockAccess world, int x, int y, int z) {
+    if (teClass != null) {
+      TileEntity te = world.getTileEntity(x, y, z);
+      if (teClass.isInstance(te)) { // no need to null-check teClass here, it was checked 2 lines above and is *final*
+        return (TileEntityEnder) te;
+      }
     }
     return null;
   }
