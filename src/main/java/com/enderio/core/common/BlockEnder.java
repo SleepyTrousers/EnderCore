@@ -131,10 +131,10 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     if (doNormalDrops(world, pos)) {
       return super.getDrops(world, pos, state, fortune);
     }
-    return Lists.newArrayList(getNBTDrop(world, pos, (T) world.getTileEntity(pos)));
+    return Lists.newArrayList(getNBTDrop(world, pos, getTileEntity(world, pos)));
   }
 
-  public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, T te) {
+  public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, @Nullable T te) {
     int meta = damageDropped(world.getBlockState(pos));
     ItemStack itemStack = new ItemStack(this, 1, meta);
     processDrop(world, pos, te, itemStack);
@@ -146,9 +146,11 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   @SuppressWarnings("unchecked")
   protected T getTileEntity(IBlockAccess world, BlockPos pos) {
-    TileEntity te = world.getTileEntity(pos);
-    if (teClass.isInstance(te)) {
-      return (T) te;
+    if (teClass != null) {
+      TileEntity te = world.getTileEntity(pos);
+      if (teClass.isInstance(te)) {
+        return (T) te;
+      }
     }
     return null;
   }
