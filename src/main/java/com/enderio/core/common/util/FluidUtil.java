@@ -251,7 +251,7 @@ public class FluidUtil {
           ItemStack resultStack = source.copy();
           resultStack.stackSize = 1;
           FluidStack resultFluid = ((IFluidContainerItem) source.getItem()).drain(resultStack, maxDrain, true);
-          if (resultFluid == null || resultFluid.amount <= 0 || (target != null && resultFluid.isFluidEqual(target))) {
+          if (resultFluid == null || resultFluid.amount <= 0 || (target != null && !resultFluid.isFluidEqual(target))) {
             return new FluidAndStackResult(null, null, source, target);
           }
           ItemStack remainderStack = source.copy();
