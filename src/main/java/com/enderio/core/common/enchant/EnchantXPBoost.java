@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
+  
   private static EnchantXPBoost INSTANCE;
 
   /**

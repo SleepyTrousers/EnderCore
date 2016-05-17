@@ -23,7 +23,7 @@ public class AutoSmeltHandler {
   public void handleBlockBreak(BlockEvent.HarvestDropsEvent event) {
     if (!event.getWorld().isRemote && event.getHarvester() != null) {
       
-      ItemStack held = event.getHarvester().getActiveItemStack();
+      ItemStack held = event.getHarvester().getHeldItemMainhand();
       if (held != null) {
         int level = getAutoSmeltLevel(held);
         int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);

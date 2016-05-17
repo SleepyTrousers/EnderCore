@@ -70,7 +70,7 @@ public class RightClickCropHandler {
     Block block = blockState.getBlock();
     int meta = block.getMetaFromState(blockState);
     if (ConfigHandler.allowCropRC 
-        && (event.getEntityPlayer().getActiveItemStack() == null || !event.getEntityPlayer().isSneaking())) {
+        && (event.getEntityPlayer().getHeldItemMainhand() == null || !event.getEntityPlayer().isSneaking())) {
       for (PlantInfo info : plants) {        
         if (info.blockInst == block && meta == info.meta) {
           if (event.getWorld().isRemote) {

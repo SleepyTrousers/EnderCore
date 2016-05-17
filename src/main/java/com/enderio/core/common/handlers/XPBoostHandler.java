@@ -56,14 +56,14 @@ public class XPBoostHandler {
     if (event.getEntity() instanceof EntityArrow) {
       EntityArrow arrow = (EntityArrow) event.getEntity();
       if (arrow.shootingEntity != null && arrow.shootingEntity instanceof EntityPlayer) {
-        arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getActiveItemStack()));
+        arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getHeldItemMainhand()));
       }
     }
   }
 
   @SubscribeEvent
   public void handleBlockBreak(BreakEvent event) {    
-    ItemStack held = event.getPlayer().getActiveItemStack();
+    ItemStack held = event.getPlayer().getHeldItemMainhand();
     if (held != null) {
       int level = getXPBoostLevel(held);
       int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);
@@ -78,7 +78,7 @@ public class XPBoostHandler {
   }
 
   private int getXPBoost(EntityLivingBase killed, EntityPlayer player) {
-    return getXPBoost(killed, player, getXPBoostLevel(player.getActiveItemStack()));
+    return getXPBoost(killed, player, getXPBoostLevel(player.getHeldItemMainhand()));
   }
 
   private int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
