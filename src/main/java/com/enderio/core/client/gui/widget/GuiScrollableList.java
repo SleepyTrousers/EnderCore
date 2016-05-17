@@ -194,7 +194,7 @@ public abstract class GuiScrollableList<T> {
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
     GL11.glScissor(sx, sy, sw, sh);
 
-    VertexBuffer renderer = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer renderer = Tessellator.getInstance().getBuffer();
     drawContainerBackground(renderer);
 
     int contentYOffset = this.minY + margin - (int) this.amountScrolled;

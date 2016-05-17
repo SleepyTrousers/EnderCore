@@ -24,16 +24,16 @@ public class OreDictTooltipHandler {
     boolean doOredict = showOredictTooltips == 3 ? debugMode : showOredictTooltips == 2 ? shiftDown : showOredictTooltips == 1;
 
     if (doRegistry) {
-      event.toolTip.add(Item.itemRegistry.getNameForObject(event.itemStack.getItem()).toString());
+      event.getToolTip().add(Item.itemRegistry.getNameForObject(event.getItemStack().getItem()).toString());
     }
 
     if (doOredict) {
-      int[] ids = OreDictionary.getOreIDs(event.itemStack);
+      int[] ids = OreDictionary.getOreIDs(event.getItemStack());
 
       if (ids.length > 0) {
-        event.toolTip.add(EnderCore.lang.localize("tooltip.oreDictNames"));
+        event.getToolTip().add(EnderCore.lang.localize("tooltip.oreDictNames"));
         for (int i : ids) {
-          event.toolTip.add("  - " + OreDictionary.getOreName(i));
+          event.getToolTip().add("  - " + OreDictionary.getOreName(i));
         }
       }
     }

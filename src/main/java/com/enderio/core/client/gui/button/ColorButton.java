@@ -89,7 +89,7 @@ public class ColorButton extends IconButton {
   public void drawButton(Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
     if (visible) {
-      VertexBuffer tes = Tessellator.getInstance().getWorldRenderer();
+      VertexBuffer tes = Tessellator.getInstance().getBuffer();
       tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
       
       int x = xPosition + 2;

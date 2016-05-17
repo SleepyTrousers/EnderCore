@@ -113,7 +113,7 @@ public class VScrollbar implements IHideable {
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glColor3f(1, 1, 1);
 
-            VertexBuffer renderer = Tessellator.getInstance().getWorldRenderer();
+            VertexBuffer renderer = Tessellator.getInstance().getBuffer();
             renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
             iconUp.getMap().render(iconUp, btnUp.x, btnUp.y, false);

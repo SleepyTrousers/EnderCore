@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.List;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
@@ -31,12 +33,13 @@ public class CommandScoreboardInfo extends CommandBase {
   }
 
   @Override
-  public boolean canCommandSenderUseCommand(ICommandSender p_71519_1_) {
+  public boolean checkPermission(MinecraftServer server, ICommandSender sender) { 
     return true;
   }
 
   @Override
-  public void processCommand(ICommandSender player, String[] args) throws WrongUsageException {
+  public void execute(MinecraftServer server, ICommandSender player, String[] args) throws CommandException {
+  
     if (args.length < 2) {
       throw new WrongUsageException("This command requires 2 args: <board> <name>");
     }
@@ -61,8 +64,10 @@ public class CommandScoreboardInfo extends CommandBase {
     player.addChatMessage(new TextComponentString("No score for " + args[1] + " on board \"" + args[0] + "\""));
   }
 
+  
+  
   @Override
-  public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {  
     if (args.length == 1) {
       List<String> boards = new ArrayList<String>();
       for (ScoreObjective obj : (Collection<ScoreObjective>) sender.getEntityWorld().getScoreboard().getScoreObjectives()) {

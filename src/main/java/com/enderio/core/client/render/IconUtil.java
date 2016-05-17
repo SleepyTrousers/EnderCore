@@ -59,7 +59,7 @@ public class IconUtil {
   @SubscribeEvent
   public void onIconLoad(TextureStitchEvent.Pre event) {
     for (IIconProvider reg : iconProviders) {
-      reg.registerIcons(event.map);      
+      reg.registerIcons(event.getMap());      
     }
   }
 

@@ -10,11 +10,12 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 
 @Handler
@@ -41,7 +42,7 @@ public class RightClickCropHandler {
     public void init() {
       seedStack = ItemUtil.parseStringIntoItemStack(seed);
       String[] blockinfo = block.split(":");      
-      blockInst = GameRegistry.findBlock(blockinfo[0], blockinfo[1]);
+      ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockinfo[0], blockinfo[1]));
     }
   }
 

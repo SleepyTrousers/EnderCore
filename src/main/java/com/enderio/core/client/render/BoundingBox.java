@@ -9,10 +9,9 @@ import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vertex;
 
-import net.minecraft.block.Block;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 public final class BoundingBox {
 
@@ -61,11 +60,6 @@ public final class BoundingBox {
   
   public BoundingBox(BlockPos bc) {
     this(bc.getX(), bc.getY(), bc.getZ(), bc.getX() + 1, bc.getY() + 1, bc.getZ() + 1);
-  }
-
-  public BoundingBox(Block block) {
-    this(block.getBlockBoundsMinX(), block.getBlockBoundsMinY(), block.getBlockBoundsMinZ(), block.getBlockBoundsMaxX(), block.getBlockBoundsMaxY(), block
-        .getBlockBoundsMaxZ());
   }
 
   public BoundingBox expandBy(BoundingBox other) {

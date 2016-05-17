@@ -7,6 +7,8 @@ import com.enderio.core.common.Handlers.Handler;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -15,16 +17,15 @@ public class EnchantTooltipHandler {
   
   @SubscribeEvent
   public void handleTooltip(ItemTooltipEvent event) {
-    if (event.itemStack.hasTagCompound()) {
-      Map<Integer, Integer> enchantments = EnchantmentHelper.getEnchantments(event.itemStack);
+    if (event.getItemStack().hasTagCompound()) {
+      Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(event.getItemStack());
 
-      for (Integer integer : enchantments.keySet()) {
-        Enchantment enchant = Enchantment.getEnchantmentById(integer);
+      for (Enchantment enchant : enchantments.keySet()) {        
         if (enchant instanceof IAdvancedEnchant) {
-          for (int i = 0; i < event.toolTip.size(); i++) {
-            if (event.toolTip.get(i).contains(StatCollector.translateToLocal(enchant.getName()))) {
-              for (String s : ((IAdvancedEnchant) enchant).getTooltipDetails(event.itemStack)) {
-                event.toolTip.add(i + 1, EnumChatFormatting.DARK_GRAY.toString() + EnumChatFormatting.ITALIC + "  - " + s);
+          for (int i = 0; i < event.getToolTip().size(); i++) {
+            if (event.getToolTip().get(i).contains(I18n.translateToLocal(enchant.getName()))) {
+              for (String s : ((IAdvancedEnchant) enchant).getTooltipDetails(event.getItemStack())) {
+                event.getToolTip().add(i + 1, TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC + "  - " + s);
                 i++;
               }
             }

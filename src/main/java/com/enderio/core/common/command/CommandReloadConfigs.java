@@ -9,7 +9,9 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.common.event.ConfigFileChangedEvent;
 
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +20,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class CommandReloadConfigs extends CommandBase {
+  
   public static final CommandReloadConfigs SERVER = new CommandReloadConfigs(Side.SERVER);
   public static final CommandReloadConfigs CLIENT = new CommandReloadConfigs(Side.CLIENT);
 
@@ -57,12 +60,7 @@ public class CommandReloadConfigs extends CommandBase {
   }
 
   @Override
-  public boolean canCommandSenderUseCommand(ICommandSender player) {
-    return player.getEntityWorld().isRemote || super.canCommandSenderUseCommand(player);
-  } 
-
-  @Override
-  public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {    
     if (args.length >= 1) {
       String[] avail = validModIDs.toArray(new String[validModIDs.size()]);
 
@@ -77,8 +75,14 @@ public class CommandReloadConfigs extends CommandBase {
   }
 
   @Override
-  public void processCommand(ICommandSender player, String[] args) {
-    if (side == Side.CLIENT == player.getEntityWorld().isRemote)
+  public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+    return sender.getEntityWorld().isRemote || super.checkPermission(server, sender);
+  }
+  
+  
+  @Override
+  public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+    if (side == Side.CLIENT == sender.getEntityWorld().isRemote)
       for (String s : args) {
         boolean validModid = false;
         for (ModContainer mod : Loader.instance().getModObjectList().keySet()) {
@@ -92,12 +96,12 @@ public class CommandReloadConfigs extends CommandBase {
           MinecraftForge.EVENT_BUS.post(event);
 
           if (event.isSuccessful()) {
-            sendResult(player, s, "success");
+            sendResult(sender, s, "success");
           } else {
-            sendResult(player, s, "fail");
+            sendResult(sender, s, "fail");
           }
         } else {
-          sendResult(player, s, "invalid");
+          sendResult(sender, s, "invalid");
         }
       }
   }
@@ -105,4 +109,5 @@ public class CommandReloadConfigs extends CommandBase {
   private void sendResult(ICommandSender player, String modid, String result) {
     player.addChatMessage(new TextComponentString(EnderCore.lang.localize("command.config.result." + result, modid)));
   }
+
 }

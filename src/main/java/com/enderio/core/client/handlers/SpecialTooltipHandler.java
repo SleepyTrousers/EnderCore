@@ -44,7 +44,7 @@ public enum SpecialTooltipHandler {
 
   @SubscribeEvent
   public void addTooltip(ItemTooltipEvent evt) {
-    if (evt.itemStack == null) {
+    if (evt.getItemStack() == null) {
       return;
     }
 
@@ -53,21 +53,21 @@ public enum SpecialTooltipHandler {
     boolean doDurability = showDurabilityTooltips == 3 ? debugMode : showDurabilityTooltips == 2 ? shiftDown : showDurabilityTooltips == 1;
 
     if (doDurability) {
-      addDurabilityTooltip(evt.toolTip, evt.itemStack);
+      addDurabilityTooltip(evt.getToolTip(), evt.getItemStack());
     }
 
-    if (evt.itemStack.getItem() instanceof IAdvancedTooltipProvider) {
-      IAdvancedTooltipProvider ttp = (IAdvancedTooltipProvider) evt.itemStack.getItem();
-      addInformation(ttp, evt.itemStack, evt.entityPlayer, evt.toolTip, false);
+    if (evt.getItemStack().getItem() instanceof IAdvancedTooltipProvider) {
+      IAdvancedTooltipProvider ttp = (IAdvancedTooltipProvider) evt.getItemStack().getItem();
+      addInformation(ttp, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
       return;
-    } else if (evt.itemStack.getItem() instanceof IResourceTooltipProvider) {
-      addInformation((IResourceTooltipProvider) evt.itemStack.getItem(), evt);
+    } else if (evt.getItemStack().getItem() instanceof IResourceTooltipProvider) {
+      addInformation((IResourceTooltipProvider) evt.getItemStack().getItem(), evt);
       return;
     }
 
-    Block blk = Block.getBlockFromItem(evt.itemStack.getItem());
+    Block blk = Block.getBlockFromItem(evt.getItemStack().getItem());
     if (blk instanceof IAdvancedTooltipProvider) {
-      addInformation((IAdvancedTooltipProvider) blk, evt.itemStack, evt.entityPlayer, evt.toolTip, false);
+      addInformation((IAdvancedTooltipProvider) blk, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
       return;
     } else if (blk instanceof IResourceTooltipProvider) {
       addInformation((IResourceTooltipProvider) blk, evt);
@@ -75,8 +75,8 @@ public enum SpecialTooltipHandler {
     }
 
     for (ITooltipCallback callback : callbacks) {
-      if (callback.shouldHandleItem(evt.itemStack)) {
-        addInformation(callback, evt.itemStack, evt.entityPlayer, evt.toolTip, false);
+      if (callback.shouldHandleItem(evt.getItemStack())) {
+        addInformation(callback, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
       }
     }
   }
@@ -92,7 +92,7 @@ public enum SpecialTooltipHandler {
   }
 
   public void addInformation(IResourceTooltipProvider item, ItemTooltipEvent evt) {
-    addInformation(item, evt.itemStack, evt.entityPlayer, evt.toolTip);
+    addInformation(item, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip());
   }
 
   public void addInformation(IResourceTooltipProvider tt, ItemStack itemstack, EntityPlayer entityplayer, List<String> list) {
