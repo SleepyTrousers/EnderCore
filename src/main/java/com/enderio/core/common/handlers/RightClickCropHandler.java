@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
@@ -42,7 +43,7 @@ public class RightClickCropHandler {
     public void init() {
       seedStack = ItemUtil.parseStringIntoItemStack(seed);
       String[] blockinfo = block.split(":");      
-      ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockinfo[0], blockinfo[1]));
+      blockInst = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockinfo[0], blockinfo[1]));
     }
   }
 
@@ -74,7 +75,7 @@ public class RightClickCropHandler {
       for (PlantInfo info : plants) {        
         if (info.blockInst == block && meta == info.meta) {
           if (event.getWorld().isRemote) {
-            event.getEntityPlayer().swingArm(event.getEntityPlayer().getActiveHand());            
+            event.getEntityPlayer().swingArm(EnumHand.MAIN_HAND);            
           } else {
             currentPlant = info;
             block.dropBlockAsItem(event.getWorld(), pos, blockState, 0);
