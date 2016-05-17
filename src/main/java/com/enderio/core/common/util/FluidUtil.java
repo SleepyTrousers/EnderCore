@@ -10,10 +10,12 @@ import com.enderio.core.api.common.util.ITankAccess;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -293,8 +295,8 @@ public class FluidUtil {
     return new FluidAndStackResult(null, null, source, null);
   }
 
-  public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, ITankAccess tank) {
-    return fillPlayerHandItemFromInternalTank(world, pos.getX(),pos.getY(),pos.getZ(), entityPlayer, tank);
+  public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
+    return fillPlayerHandItemFromInternalTank(world, pos.getX(),pos.getY(),pos.getZ(), entityPlayer, hand, tank);
   }
   
   /**
@@ -321,23 +323,26 @@ public class FluidUtil {
    * @param y
    * @param z
    * @param entityPlayer
+   * @param hand 
    * @param tank
    * @return true if a container was filled, false otherwise
    */
-  public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer, ITankAccess tank) {
+  public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
 
     for (FluidTank subTank : tank.getOutputTanks()) {
-      FluidAndStackResult fill = tryFillContainer(entityPlayer.inventory.getCurrentItem(), subTank.getFluid());
+      FluidAndStackResult fill = tryFillContainer(entityPlayer.getHeldItem(hand), subTank.getFluid());
       if (fill.result.fluidStack != null) {
 
         subTank.setFluid(fill.remainder.fluidStack);
         tank.setTanksDirty();
         if (!entityPlayer.capabilities.isCreativeMode) {
           if (fill.remainder.itemStack == null) {
-            entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.result.itemStack);
+            //entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.result.itemStack);
+            entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.result.itemStack);
             return true;
           } else {
-            entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
+//            entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
+            entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.remainder.itemStack);
           }
 
           if (fill.result.itemStack.isStackable()) {
@@ -372,12 +377,12 @@ public class FluidUtil {
     return false;
   }
   
-  public static boolean fillInternalTankFromPlayerHandItem(World world, BlockPos pos, EntityPlayer entityPlayer, ITankAccess tank) {
-    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(),pos.getZ(), entityPlayer, tank);
+  public static boolean fillInternalTankFromPlayerHandItem(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
+    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(),pos.getZ(), entityPlayer, hand, tank);
   }
 
-  public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, ITankAccess tank) {
-    FluidAndStackResult fill = tryDrainContainer(entityPlayer.inventory.getCurrentItem(), tank);
+  public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
+    FluidAndStackResult fill = tryDrainContainer(entityPlayer.getHeldItem(hand), tank);
     if (fill.result.fluidStack == null) {
       return false;
     }

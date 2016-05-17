@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -33,8 +34,8 @@ public class XPBoostHandler {
 
   @SubscribeEvent
   public void handleEntityKill(LivingDeathEvent event) {
-    EntityLivingBase entity = event.entityLiving;
-    Entity killer = event.source.getSourceOfDamage();
+    EntityLivingBase entity = event.getEntityLiving();
+    Entity killer = event.getSource().getSourceOfDamage();
 
     if (!entity.worldObj.isRemote && killer != null) {
       if (killer instanceof EntityPlayer) {
@@ -52,32 +53,32 @@ public class XPBoostHandler {
 
   @SubscribeEvent
   public void handleArrowFire(EntityJoinWorldEvent event) {
-    if (event.entity instanceof EntityArrow) {
-      EntityArrow arrow = (EntityArrow) event.entity;
+    if (event.getEntity() instanceof EntityArrow) {
+      EntityArrow arrow = (EntityArrow) event.getEntity();
       if (arrow.shootingEntity != null && arrow.shootingEntity instanceof EntityPlayer) {
-        arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getCurrentEquippedItem()));
+        arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getActiveItemStack()));
       }
     }
   }
 
   @SubscribeEvent
-  public void handleBlockBreak(BreakEvent event) {
-    ItemStack held = event.getPlayer().getCurrentEquippedItem();
+  public void handleBlockBreak(BreakEvent event) {    
+    ItemStack held = event.getPlayer().getActiveItemStack();
     if (held != null) {
       int level = getXPBoostLevel(held);
-      int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, held);
+      int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);
 
       if (level >= 0) {        
-        int xp = event.state.getBlock().getExpDrop(event.world, event.pos, fortune);
+        int xp = event.getState().getBlock().getExpDrop(event.getState(), event.getWorld(), event.getPos(), fortune);
         if (xp > 0) {
-          event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.pos.getX() + 0.5, event.pos.getY() + 0.5, event.pos.getZ() + 0.5, getXPBoost(xp, level)));
+          event.getWorld().spawnEntityInWorld(new EntityXPOrb(event.getWorld(), event.getPos().getX() + 0.5, event.getPos().getY() + 0.5, event.getPos().getZ() + 0.5, getXPBoost(xp, level)));
         }
       }
     }
   }
 
   private int getXPBoost(EntityLivingBase killed, EntityPlayer player) {
-    return getXPBoost(killed, player, getXPBoostLevel(player.getCurrentEquippedItem()));
+    return getXPBoost(killed, player, getXPBoostLevel(player.getActiveItemStack()));
   }
 
   private int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
@@ -101,10 +102,9 @@ public class XPBoostHandler {
       return -1;
     }
 
-    Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
-    for (int i : enchants.keySet()) {
-      Enchantment enchant = Enchantment.getEnchantmentById(i);
-      if (enchant == EnchantXPBoost.instance()) {
+    Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
+    for (Enchantment i : enchants.keySet()) {      
+      if (i == EnchantXPBoost.instance()) {
         return enchants.get(i);
       }
     }

@@ -3,6 +3,7 @@ package com.enderio.core.client.gui.widget;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.minecraft.client.renderer.VertexBuffer;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -17,7 +18,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public abstract class GuiScrollableList<T> {
@@ -121,7 +121,7 @@ public abstract class GuiScrollableList<T> {
 
   public abstract int getNumElements();
 
-  protected abstract void drawElement(int elementIndex, int x, int y, int height, WorldRenderer renderer);
+  protected abstract void drawElement(int elementIndex, int x, int y, int height, VertexBuffer renderer);
 
   protected boolean elementClicked(int elementIndex, boolean doubleClick) {
     return true;
@@ -194,7 +194,7 @@ public abstract class GuiScrollableList<T> {
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
     GL11.glScissor(sx, sy, sw, sh);
 
-    WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer renderer = Tessellator.getInstance().getWorldRenderer();
     drawContainerBackground(renderer);
 
     int contentYOffset = this.minY + margin - (int) this.amountScrolled;
@@ -261,7 +261,7 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.shadeModel(GL11.GL_FLAT);      
   }
 
-  protected void renderScrollBar(WorldRenderer renderer) {
+  protected void renderScrollBar(VertexBuffer renderer) {
 
     int contentHeightOverBounds = getContentOverhang();
     if (contentHeightOverBounds > 0) {
@@ -396,7 +396,7 @@ public abstract class GuiScrollableList<T> {
     return minX + width;
   }
 
-  protected void drawContainerBackground(WorldRenderer renderer) {
+  protected void drawContainerBackground(VertexBuffer renderer) {
 
     Vector3f col = ColorUtil.toFloat(2105376);
     GlStateManager.color(col.x, col.y, col.z, 1.0F);

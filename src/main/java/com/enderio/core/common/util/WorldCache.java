@@ -56,7 +56,7 @@ public class WorldCache<I> {
 
   @SubscribeEvent
   public void onWorldSave(WorldEvent.Save event) {
-    if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
+    if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0) {
       try {
         saveData(getSaveFile());
       } catch (IOException e) {
@@ -67,7 +67,7 @@ public class WorldCache<I> {
 
   @SubscribeEvent
   public void onWorldLoad(WorldEvent.Load event) {
-    if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
+    if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0) {
       try {
         loadData(getSaveFile());
       } catch (IOException e) {

@@ -16,8 +16,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.stats.StatisticsFile;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.AchievementEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -27,11 +27,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 public class FireworkHandler {
   @SubscribeEvent
   public void onAchievement(AchievementEvent event) {
-    StatisticsFile file = ((EntityPlayerMP) event.entityPlayer).getStatFile();
-    if (!event.entity.worldObj.isRemote && file.canUnlockAchievement(event.achievement) && !file.hasAchievementUnlocked(event.achievement)
+    StatisticsFile file = ((EntityPlayerMP) event.getEntityPlayer()).getStatFile();
+    if (!event.getEntity().worldObj.isRemote && file.canUnlockAchievement(event.getAchievement()) && !file.hasAchievementUnlocked(event.getAchievement())
         && ConfigHandler.betterAchievements) {
-      event.entityPlayer.getEntityData().setInteger("fireworksLeft", 9);
-      event.entityPlayer.getEntityData().setBoolean("fireworkDelay", false);
+      event.getEntityPlayer().getEntityData().setInteger("fireworksLeft", 9);
+      event.getEntityPlayer().getEntityData().setBoolean("fireworkDelay", false);
     }
   }
 
@@ -53,7 +53,7 @@ public class FireworkHandler {
           NBTTagCompound tag = player.getEntityData().getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
           tag.setBoolean("celebrated", true);
           player.getEntityData().setTag(EntityPlayer.PERSISTED_NBT_TAG, tag);
-          player.addChatMessage(new ChatComponentText(EnumChatFormatting.AQUA + EnderCore.lang.localize("celebrate")));
+          player.addChatMessage(new TextComponentString(TextFormatting.AQUA + EnderCore.lang.localize("celebrate")));
         }
       }
 
@@ -61,7 +61,7 @@ public class FireworkHandler {
       if (fireworksLeft > 0 && (!player.getEntityData().getBoolean("fireworkDelay") || player.worldObj.getTotalWorldTime() % 20 == 0)) {
         BlockCoord pos = getBlockCoord(player);
         pos = pos.withY(pos.y + 2);
-        EntityUtil.spawnFirework(pos, player.worldObj.provider.getDimensionId(), 12);
+        EntityUtil.spawnFirework(pos, player.worldObj.provider.getDimension(), 12);
         player.getEntityData().setInteger("fireworksLeft", fireworksLeft - 1);
 
         if (fireworksLeft > 5) {

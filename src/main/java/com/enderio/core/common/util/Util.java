@@ -23,11 +23,11 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -77,7 +77,7 @@ public class Util {
     }
   }
 
-  public static BlockCoord canPlaceItem(ItemStack stack, Block blockToBePlaced, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+  public static BlockCoord canPlaceItem(ItemStack stack, IBlockState blockToBePlaced, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
 
     if (stack == null || stack.stackSize == 0 || blockToBePlaced == null) {
       return null;
@@ -94,7 +94,7 @@ public class Util {
     } else if (pos.getY() == 255 && blockToBePlaced.getMaterial().isSolid()) {
       return null;
     }
-    if (world.canBlockBePlaced(blockToBePlaced, pos, false, side, player, stack)) {      
+    if (world.canBlockBePlaced(blockToBePlaced.getBlock(), pos, false, side, player, stack)) {      
       return new BlockCoord(pos);
     }
     return null;
@@ -262,10 +262,10 @@ public class Util {
     return null;
   }
 
-  public static Vec3 getEyePosition(EntityPlayer player) {
+  public static Vec3d getEyePosition(EntityPlayer player) {
     double y = player.posY;
     y += player.getEyeHeight();
-    return new Vec3(player.posX, y, player.posZ);
+    return new Vec3d(player.posX, y, player.posZ);
   }
 
   public static Vector3d getEyePositionEio(EntityPlayer player) {
@@ -275,7 +275,7 @@ public class Util {
   }
 
   public static Vector3d getLookVecEio(EntityPlayer player) {
-    Vec3 lv = player.getLookVec();
+    Vec3d lv = player.getLookVec();
     return new Vector3d(lv.xCoord, lv.yCoord, lv.zCoord);
   }
 
@@ -296,9 +296,9 @@ public class Util {
 
   // Code adapted from World.func_147447_a (rayTraceBlocks) to return all
   // collided blocks
-  public static List<MovingObjectPosition> raytraceAll(World world, Vec3 startVec, Vec3 endVec, boolean includeLiquids) {
+  public static List<RayTraceResult> raytraceAll(World world, Vec3d startVec, Vec3d endVec, boolean includeLiquids) {
 
-    List<MovingObjectPosition> result = new ArrayList<MovingObjectPosition>();
+    List<RayTraceResult> result = new ArrayList<RayTraceResult>();
     boolean p_147447_4_ = false;
     boolean p_147447_5_ = false;
 
@@ -315,16 +315,16 @@ public class Util {
         IBlockState bs = world.getBlockState(pos);
         Block block = bs.getBlock();
 
-        if ((!p_147447_4_ || block.getCollisionBoundingBox(world, pos, bs) != null) && block.canCollideCheck(bs, includeLiquids)) {
+        if ((!p_147447_4_ || block.getCollisionBoundingBox(bs, world, pos) != null) && block.canCollideCheck(bs, includeLiquids)) {
           // if ((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world,
           // l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
-          MovingObjectPosition movingobjectposition = block.collisionRayTrace(world, new BlockPos(startX, startY, startZ), startVec, endVec);
+          RayTraceResult movingobjectposition = block.collisionRayTrace(bs, world, new BlockPos(startX, startY, startZ), startVec, endVec);
           if (movingobjectposition != null) {
             result.add(movingobjectposition);
           }
         }
 
-        MovingObjectPosition movingobjectposition2 = null;
+        RayTraceResult movingobjectposition2 = null;
         int k1 = 200;
 
         while (k1-- >= 0) {
@@ -404,13 +404,13 @@ public class Util {
 
           if (d3 < d4 && d3 < d5) {
             enumfacing = endX > startX ? EnumFacing.WEST : EnumFacing.EAST;
-            startVec = new Vec3(d0, startVec.yCoord + d7 * d3, startVec.zCoord + d8 * d3);
+            startVec = new Vec3d(d0, startVec.yCoord + d7 * d3, startVec.zCoord + d8 * d3);
           } else if (d4 < d5) {
             enumfacing = endY > startY ? EnumFacing.DOWN : EnumFacing.UP;
-            startVec = new Vec3(startVec.xCoord + d6 * d4, d1, startVec.zCoord + d8 * d4);
+            startVec = new Vec3d(startVec.xCoord + d6 * d4, d1, startVec.zCoord + d8 * d4);
           } else {
             enumfacing = endZ > startZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
-            startVec = new Vec3(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);
+            startVec = new Vec3d(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);
           }
 
           startX = MathHelper.floor_double(startVec.xCoord) - (enumfacing == EnumFacing.EAST ? 1 : 0);
@@ -420,14 +420,14 @@ public class Util {
           IBlockState bs1 = world.getBlockState(pos);
           Block block1 = bs.getBlock();
 
-          if (!p_147447_4_ || block1.getCollisionBoundingBox(world, new BlockPos(startX, startY, startZ), bs1) != null) {
+          if (!p_147447_4_ || block1.getCollisionBoundingBox(bs1, world, new BlockPos(startX, startY, startZ)) != null) {
             if (block1.canCollideCheck(bs1, includeLiquids)) {
-              MovingObjectPosition movingobjectposition1 = block1.collisionRayTrace(world, new BlockPos(startX, startY, startZ), startVec, endVec);
+              RayTraceResult movingobjectposition1 = block1.collisionRayTrace(bs1, world, new BlockPos(startX, startY, startZ), startVec, endVec);
               if (movingobjectposition1 != null) {
                 result.add(movingobjectposition1);
               }
             } else {
-              movingobjectposition2 = new MovingObjectPosition(startVec, enumfacing, pos);
+              movingobjectposition2 = new RayTraceResult(startVec, enumfacing, pos);
             }
           }
         }

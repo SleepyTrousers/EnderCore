@@ -3,9 +3,10 @@ package com.enderio.core.common.network;
 import com.enderio.core.common.util.Log;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -53,8 +54,9 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
   @Override
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
     te = handle(ctx.getServerHandler().playerEntity.worldObj);
-    if (te != null && renderOnUpdate) {
-      te.getWorld().markBlockForUpdate(getPos());
+    if (te != null && renderOnUpdate) {      
+      IBlockState bs = te.getWorld().getBlockState(msg.getPos());
+      te.getWorld().notifyBlockUpdate(msg.getPos(), bs, bs, 3);
     }
     return null;
   }

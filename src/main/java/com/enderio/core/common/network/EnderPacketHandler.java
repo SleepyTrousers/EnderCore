@@ -6,10 +6,9 @@ import com.enderio.core.common.util.ChatUtil.PacketNoSpamChat;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class EnderPacketHandler {
@@ -25,7 +24,7 @@ public class EnderPacketHandler {
 
   public static void sendToAllAround(IMessage message, TileEntity te, int range) {
     BlockPos p = te.getPos();
-    INSTANCE.sendToAllAround(message, new TargetPoint(te.getWorld().provider.getDimensionId(), p.getX(), p.getY(), p.getZ(), range));
+    INSTANCE.sendToAllAround(message, new TargetPoint(te.getWorld().provider.getDimension(), p.getX(), p.getY(), p.getZ(), range));
   }
 
   public static void sendToAllAround(IMessage message, TileEntity te) {

@@ -10,8 +10,8 @@ import com.enderio.core.common.event.ConfigFileChangedEvent;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
@@ -103,6 +103,6 @@ public class CommandReloadConfigs extends CommandBase {
   }
 
   private void sendResult(ICommandSender player, String modid, String result) {
-    player.addChatMessage(new ChatComponentText(EnderCore.lang.localize("command.config.result." + result, modid)));
+    player.addChatMessage(new TextComponentString(EnderCore.lang.localize("command.config.result." + result, modid)));
   }
 }

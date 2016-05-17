@@ -10,9 +10,8 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -41,7 +40,7 @@ public class RightClickCropHandler {
 
     public void init() {
       seedStack = ItemUtil.parseStringIntoItemStack(seed);
-      String[] blockinfo = block.split(":");
+      String[] blockinfo = block.split(":");      
       blockInst = GameRegistry.findBlock(blockinfo[0], blockinfo[1]);
     }
   }
@@ -60,27 +59,27 @@ public class RightClickCropHandler {
   }
 
   @SubscribeEvent
-  public void handleCropRightClick(PlayerInteractEvent event) {
-    BlockPos pos = event.pos;
+  public void handleCropRightClick(RightClickBlock event) {
+    BlockPos pos = event.getPos();
     if(pos == null) {
       return;
     }
     
-    IBlockState blockState = event.world.getBlockState(pos);
+    IBlockState blockState = event.getWorld().getBlockState(pos);
     Block block = blockState.getBlock();
     int meta = block.getMetaFromState(blockState);
-    if (ConfigHandler.allowCropRC && event.action == Action.RIGHT_CLICK_BLOCK
-        && (event.entityPlayer.getHeldItem() == null || !event.entityPlayer.isSneaking())) {
+    if (ConfigHandler.allowCropRC 
+        && (event.getEntityPlayer().getActiveItemStack() == null || !event.getEntityPlayer().isSneaking())) {
       for (PlantInfo info : plants) {        
         if (info.blockInst == block && meta == info.meta) {
-          if (event.world.isRemote) {
-            event.entityPlayer.swingItem();
+          if (event.getWorld().isRemote) {
+            event.getEntityPlayer().swingArm(event.getEntityPlayer().getActiveHand());            
           } else {
             currentPlant = info;
-            block.dropBlockAsItem(event.world, pos, blockState, 0);
+            block.dropBlockAsItem(event.getWorld(), pos, blockState, 0);
             currentPlant = null;
             IBlockState newBS = block.getStateFromMeta(info.resetMeta);
-            event.world.setBlockState(pos, newBS, 3);
+            event.getWorld().setBlockState(pos, newBS, 3);
             event.setCanceled(true);
           }
           break;
@@ -92,11 +91,11 @@ public class RightClickCropHandler {
   @SubscribeEvent
   public void onHarvestDrop(HarvestDropsEvent event) {
     if (currentPlant != null) {
-      for (int i = 0; i < event.drops.size(); i++) {
-        ItemStack stack = event.drops.get(i);
+      for (int i = 0; i < event.getDrops().size(); i++) {
+        ItemStack stack = event.getDrops().get(i);
         if (stack.getItem() == currentPlant.seedStack.getItem()
             && (currentPlant.seedStack.getItemDamage() == OreDictionary.WILDCARD_VALUE || stack.getItemDamage() == currentPlant.seedStack.getItemDamage())) {
-          event.drops.remove(i);
+          event.getDrops().remove(i);
           break;
         }
       }

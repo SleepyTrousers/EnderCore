@@ -3,8 +3,8 @@ package com.enderio.core.common.network;
 import com.enderio.core.common.TileEntityBase;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -49,8 +49,9 @@ public class PacketGhostSlot extends MessageTileEntity<TileEntityBase> {
     public IMessage onMessage(PacketGhostSlot msg, MessageContext ctx) {
       TileEntityBase te = msg.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
       if (te != null) {               
-        te.setGhostSlotContents(msg.slot, msg.stack);
-        te.getWorld().markBlockForUpdate(msg.getPos());
+        te.setGhostSlotContents(msg.slot, msg.stack);        
+        IBlockState bs = te.getWorld().getBlockState(msg.getPos());
+        te.getWorld().notifyBlockUpdate(msg.getPos(), bs, bs, 3);
       }
       return null;
     }

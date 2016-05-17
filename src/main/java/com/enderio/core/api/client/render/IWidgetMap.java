@@ -5,7 +5,7 @@ import org.lwjgl.opengl.GL11;
 import com.enderio.core.client.render.RenderUtil;
 
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
@@ -82,7 +82,7 @@ public interface IWidgetMap {
     @Override
     public void render(IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
 
-      WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+      VertexBuffer tes = Tessellator.getInstance().getBuffer();
       if (doDraw) {
         RenderUtil.bindTexture(getTexture());
         tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);

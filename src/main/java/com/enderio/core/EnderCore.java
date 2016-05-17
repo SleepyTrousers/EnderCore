@@ -31,8 +31,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import net.minecraft.command.CommandHandler;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -122,8 +122,8 @@ public class EnderCore implements IEnderMod {
     Handlers.register(event);
     CompatRegistry.INSTANCE.handle(event);
     ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
-    if(event.getSide().isServer()) {
-      ((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
+    if(event.getSide().isServer()) {            
+      ((CommandHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
     }
 
     IMCRegistry.INSTANCE.init();

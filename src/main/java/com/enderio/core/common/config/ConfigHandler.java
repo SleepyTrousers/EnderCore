@@ -94,21 +94,9 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   public static boolean allowExternalTickSpeedup = false;
 
   @Config(sectionEnchants)
-  @Comment("Enchant ID for the XP boost enchant.")
-  @RestartReq(RestartReqs.REQUIRES_MC_RESTART)
-  @Range(min = 0, max = 255)
-  public static int enchantIDXPBoost = 45;
-
-  @Config(sectionEnchants)
   @Comment("Allow the XP Boost enchant to be registered.")
   @RestartReq(RestartReqs.REQUIRES_MC_RESTART)
   public static boolean allowXPBoost = true;
-
-  @Config(sectionEnchants)
-  @Comment("Enchant ID for the Auto Smelt enchant.")
-  @RestartReq(RestartReqs.REQUIRES_MC_RESTART)
-  @Range(min = 0, max = 255)
-  public static int enchantIDAutoSmelt = 46;
 
   @Config(sectionEnchants)
   @Comment("Allow the Auto Smelt enchant to be registered.")

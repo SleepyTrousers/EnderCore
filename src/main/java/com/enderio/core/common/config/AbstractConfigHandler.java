@@ -101,7 +101,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   @SubscribeEvent
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-    if (event.modID.equals(modid)) {
+    if (event.getModID().equals(modid)) {
       EnderCore.logger.info("Reloading all configs for modid: " + modid);
       reloadAllConfigs();
       saveConfigFile();
@@ -110,7 +110,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   @SubscribeEvent
   public void onConfigFileChanged(ConfigFileChangedEvent event) {
-    if (event.modID.equals(modid)) {
+    if (event.getModID().equals(modid)) {
       EnderCore.logger.info("Reloading ingame configs for modid: " + modid);
       loadConfigFile();
       reloadIngameConfigs();
@@ -393,7 +393,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    */
   protected <T> T getValue(String key, String comment, T defaultVal, RestartReqs req, Bound<? extends Number> bound) {
     Property prop = getProperty(key, defaultVal, req);
-    prop.comment = comment;
+    prop.setComment(comment);
 
     return getValue(prop, defaultVal, bound);
   }
@@ -540,14 +540,14 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   private static Lang fmlLang = new Lang("fml.configgui.tooltip");
 
   static void addCommentDetails(Property prop, Bound<?> bound) {
-    prop.comment += (prop.comment.isEmpty() ? "" : "\n");
+    prop.setComment(prop.getComment() + (prop.getComment().isEmpty() ? "" : "\n"));
     if (bound.equals(Bound.MAX_BOUND)) {
-      prop.comment += fmlLang.localize("default", prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault());
+      prop.setComment(prop.getComment() + fmlLang.localize("default", prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault()));
     } else {
       boolean minIsInt = bound.min.doubleValue() == bound.min.intValue();
       boolean maxIsInt = bound.max.doubleValue() == bound.max.intValue();
-      prop.comment += fmlLang.localize("defaultNumeric", minIsInt ? bound.min.intValue() : bound.min, maxIsInt ? bound.max.intValue() : bound.max,
-          prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault());
+      prop.setComment(prop.getComment() + fmlLang.localize("defaultNumeric", minIsInt ? bound.min.intValue() : bound.min, maxIsInt ? bound.max.intValue() : bound.max,
+          prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault()));
     }
   }
 

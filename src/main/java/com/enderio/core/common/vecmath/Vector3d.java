@@ -1,7 +1,7 @@
 package com.enderio.core.common.vecmath;
 
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 public class Vector3d {
 
@@ -147,7 +147,7 @@ public class Vector3d {
     z = Math.abs(z);
   }
 
-  public Vec3 getVec3() {
-    return new Vec3(x, y, z);
+  public Vec3d getVec3() {
+    return new Vec3d(x, y, z);
   }
 }

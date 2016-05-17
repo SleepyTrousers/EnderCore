@@ -8,10 +8,12 @@ import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.init.Enchantments;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   private static EnchantAutoSmelt INSTANCE;
@@ -24,9 +26,9 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
     return INSTANCE;
   }
 
-  private EnchantAutoSmelt(int id) {
-    // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
-    super(id, new ResourceLocation(EnderCore.DOMAIN, "autosmelt"), 2, EnumEnchantmentType.BREAKABLE);
+  private EnchantAutoSmelt() {
+    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND});
+    setRegistryName("autosmelt");
   }
 
   @Override
@@ -66,17 +68,17 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
 
   public static void register() {
     if (ConfigHandler.allowAutoSmelt) {
-      INSTANCE = new EnchantAutoSmelt(ConfigHandler.enchantIDAutoSmelt);
+      INSTANCE = new EnchantAutoSmelt();
+      GameRegistry.register(INSTANCE);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
           "<enchantment name=\"" + EnderCore.DOMAIN +  ":autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
-      Enchantment.addToBookList(INSTANCE);
     }
   }
 
   @Override
   public boolean canApplyTogether(Enchantment ench) {
-    return super.canApplyTogether(ench) && ench.effectId != silkTouch.effectId
-        && ((ench.effectId != fortune.effectId) || ConfigHandler.allowAutoSmeltWithFortune);
+    return super.canApplyTogether(ench) && ench!= Enchantments.silkTouch
+        && ((ench!= Enchantments.fortune) || ConfigHandler.allowAutoSmeltWithFortune);
   }
 
 }

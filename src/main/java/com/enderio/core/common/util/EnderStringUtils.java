@@ -3,7 +3,7 @@ package com.enderio.core.common.util;
 import com.enderio.core.EnderCore;
 
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 public class EnderStringUtils {
   /**
@@ -98,13 +98,13 @@ public class EnderStringUtils {
    *         if 10% {@literal <} num {@literal <}= 25% of max: GOLD (orange-ish)<br>
    *         if num {@literal >} 25% of max: GREEN
    */
-  public static EnumChatFormatting getColorFor(double num, double max) {
+  public static TextFormatting getColorFor(double num, double max) {
     if (num / max <= .1)
-      return EnumChatFormatting.RED;
+      return TextFormatting.RED;
     else if (num / max <= .25)
-      return EnumChatFormatting.GOLD;
+      return TextFormatting.GOLD;
     else
-      return EnumChatFormatting.GREEN;
+      return TextFormatting.GREEN;
   }
 
   public static String getEffectNameWithLevel(PotionEffect effect) {

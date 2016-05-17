@@ -5,6 +5,7 @@ import static com.enderio.core.common.config.ConfigHandler.showDurabilityTooltip
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.input.Keyboard;
 
 import com.enderio.core.EnderCore;
@@ -24,7 +25,6 @@ import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -137,7 +137,7 @@ public enum SpecialTooltipHandler {
   }
 
   public static void addShowDetailsTooltip(List<String> list) {
-    list.add(EnumChatFormatting.WHITE + "" + EnumChatFormatting.ITALIC + EnderCore.lang.localize("tooltip.showDetails"));
+    list.add(TextFormatting.WHITE + "" + TextFormatting.ITALIC + EnderCore.lang.localize("tooltip.showDetails"));
   }
 
   public static boolean showAdvancedTooltips() {

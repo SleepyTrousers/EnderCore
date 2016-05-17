@@ -10,8 +10,8 @@ import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vertex;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public final class BoundingBox {

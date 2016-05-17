@@ -8,10 +8,11 @@ import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   private static EnchantXPBoost INSTANCE;
@@ -24,9 +25,10 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
     return INSTANCE;
   }
 
-  private EnchantXPBoost(int id) {
+  private EnchantXPBoost() {
     // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
-    super(id, new ResourceLocation(EnderCore.DOMAIN, "xpboost"), 2, EnumEnchantmentType.BREAKABLE);
+    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE,  new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND});
+    setRegistryName("xpboost");
   }
 
   @Override
@@ -66,10 +68,10 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   public static void register() {
     if(ConfigHandler.allowXPBoost) {
-      INSTANCE = new EnchantXPBoost(ConfigHandler.enchantIDXPBoost);
+      INSTANCE = new EnchantXPBoost();
+      GameRegistry.register(INSTANCE);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
-      Enchantment.addToBookList(INSTANCE);
+          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" costPerLevel=\"4\">\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");      
     }
   }
 }

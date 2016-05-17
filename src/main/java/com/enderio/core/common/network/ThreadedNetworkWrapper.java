@@ -1,18 +1,18 @@
 package com.enderio.core.common.network;
 
+import com.google.common.base.Throwables;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IThreadListener;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-
-import com.google.common.base.Throwables;
 
 public class ThreadedNetworkWrapper {
 
@@ -32,7 +32,7 @@ public class ThreadedNetworkWrapper {
 
     @Override
     public REPLY onMessage(final REQ message, final MessageContext ctx) {
-      final IThreadListener target = ctx.side == Side.CLIENT ? Minecraft.getMinecraft() : MinecraftServer.getServer();
+      final IThreadListener target = ctx.side == Side.CLIENT ? Minecraft.getMinecraft() : FMLCommonHandler.instance().getMinecraftServerInstance();
       if (target != null) {
         target.addScheduledTask(new Runner(message, ctx));
       }
@@ -52,7 +52,7 @@ public class ThreadedNetworkWrapper {
     @Override
     public boolean equals(Object obj) {
       if (obj instanceof Wrapper) {
-        return this.wrapped.equals(((Wrapper) obj).wrapped);
+        return this.wrapped.equals(((Wrapper<?, ?>) obj).wrapped);
       } else {
         return this.wrapped.equals(obj);
       }
@@ -100,9 +100,9 @@ public class ThreadedNetworkWrapper {
     }
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(IMessageHandler<? super REQ, ? extends REPLY> messageHandler,
       Class<REQ> requestMessageType, int discriminator, Side side) {
-
     parent.registerMessage((Wrapper<REQ, REPLY>) new Wrapper(messageHandler), requestMessageType, discriminator, side);
   }
 

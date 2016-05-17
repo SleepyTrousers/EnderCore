@@ -3,7 +3,7 @@ package com.enderio.core.common.util;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IChatComponent;
+import net.minecraft.util.text.ITextComponent;
 
 public class ArrayInventory implements IInventory {
 
@@ -69,7 +69,7 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public IChatComponent getDisplayName() {
+  public ITextComponent getDisplayName() {
     return null;
   }
 

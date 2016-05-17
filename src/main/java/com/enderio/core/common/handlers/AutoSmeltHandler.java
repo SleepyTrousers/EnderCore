@@ -9,9 +9,10 @@ import com.enderio.core.common.enchant.EnchantAutoSmelt;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -20,24 +21,25 @@ public class AutoSmeltHandler {
 
   @SubscribeEvent
   public void handleBlockBreak(BlockEvent.HarvestDropsEvent event) {
-    if (!event.world.isRemote && event.harvester != null) {
-      ItemStack held = event.harvester.getCurrentEquippedItem();
+    if (!event.getWorld().isRemote && event.getHarvester() != null) {
+      
+      ItemStack held = event.getHarvester().getActiveItemStack();
       if (held != null) {
         int level = getAutoSmeltLevel(held);
-        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, held);
+        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);
 
         if (level >= 0) {
-          for (int i = 0; i < event.drops.size(); i++) {
+          for (int i = 0; i < event.getDrops().size(); i++) {
             {
-              ItemStack stack = event.drops.get(i);
-              if (stack != null && !event.isSilkTouching) {
+              ItemStack stack = event.getDrops().get(i);
+              if (stack != null && !event.isSilkTouching()) {
                 if (FurnaceRecipes.instance().getSmeltingResult(stack) != null) {
                   ItemStack furnaceStack = FurnaceRecipes.instance().getSmeltingResult(stack).copy();
                   //Fortune stuffs
                   if (fortune > 0 && ConfigHandler.allowAutoSmeltWithFortune)
-                    furnaceStack.stackSize *= (event.world.rand.nextInt(fortune + 1) + 1);
+                    furnaceStack.stackSize *= (event.getWorld().rand.nextInt(fortune + 1) + 1);
 
-                  event.drops.set(i, furnaceStack);
+                  event.getDrops().set(i, furnaceStack);
 
                   //XP (adapted vanilla code)
                   int xp = furnaceStack.stackSize;
@@ -59,7 +61,7 @@ public class AutoSmeltHandler {
                   while (xp > 0) {
                     j = EntityXPOrb.getXPSplit(xp);
                     xp -= j;
-                    event.world.spawnEntityInWorld(new EntityXPOrb(event.world, event.pos.getX(), event.pos.getY() + 0.5, event.pos.getZ(), j));
+                    event.getWorld().spawnEntityInWorld(new EntityXPOrb(event.getWorld(), event.getPos().getX(), event.getPos().getY() + 0.5, event.getPos().getZ(), j));
                   }
                 }
               }
@@ -75,11 +77,10 @@ public class AutoSmeltHandler {
       return -1;
     }
 
-    Map<Integer, Integer> enchants = EnchantmentHelper.getEnchantments(tool);
-    for (int i : enchants.keySet()) {
-      Enchantment enchant = Enchantment.getEnchantmentById(i);
+    Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(tool);
+    for (Enchantment enchant : enchants.keySet()) {      
       if (enchant == EnchantAutoSmelt.instance()) {
-        return enchants.get(i);
+        return enchants.get(enchant);
       }
     }
     return -1;

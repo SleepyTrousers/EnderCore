@@ -1,10 +1,5 @@
 package com.enderio.core.common.tweaks;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -23,14 +18,15 @@ public class InfiniBow extends Tweak {
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onArrowNock(ArrowNockEvent event) {
-    EntityPlayer player = event.entityPlayer;
-    ItemStack stack = player.getHeldItem();
-    if (player.capabilities.isCreativeMode || player.inventory.hasItem(Items.arrow)
-        || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0) {
-      player.setItemInUse(stack, stack.getItem().getMaxItemUseDuration(stack));
-    }
-
-    event.result = stack;
-    event.setCanceled(true);
+    //TODO: 1.9 
+//    EntityPlayer player = event.getEntityPlayer();
+//    ItemStack stack = player.getHeldItem();
+//    if (player.capabilities.isCreativeMode || player.inventory.hasItem(Items.arrow)
+//        || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0) {
+//      player.setItemInUse(stack, stack.getItem().getMaxItemUseDuration(stack));
+//    }
+//
+//    event.setResult(stack);
+//    event.setCanceled(true);
   }
 }

@@ -11,8 +11,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 
 public class CommandScoreboardInfo extends CommandBase {
   @Override
@@ -46,19 +46,19 @@ public class CommandScoreboardInfo extends CommandBase {
     ScoreObjective obj = board.getObjective(args[0]);
 
     if (obj == null) {
-      player.addChatMessage(new ChatComponentText("No such board " + args[0]));
+      player.addChatMessage(new TextComponentString("No such board " + args[0]));
     }
 
     Collection<Score> collection = board.getSortedScores(obj);
 
     for (Score score : collection) {
       if (score.getPlayerName().equals(args[1])) {
-        player.addChatMessage(new ChatComponentText(args[1] + "'s score on board \"" + args[0] + "\": " + score.getScorePoints()));
+        player.addChatMessage(new TextComponentString(args[1] + "'s score on board \"" + args[0] + "\": " + score.getScorePoints()));
         return;
       }
     }
 
-    player.addChatMessage(new ChatComponentText("No score for " + args[1] + " on board \"" + args[0] + "\""));
+    player.addChatMessage(new TextComponentString("No score for " + args[1] + " on board \"" + args[0] + "\""));
   }
 
   @Override

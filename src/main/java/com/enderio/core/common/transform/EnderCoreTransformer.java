@@ -5,14 +5,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -24,7 +20,16 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.collect.Sets;
 
-import static org.objectweb.asm.Opcodes.*;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.IRETURN;
+import static org.objectweb.asm.Opcodes.ISTORE;
+import static org.objectweb.asm.Opcodes.RETURN;
+
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 @MCVersion(value = "1.7.10")
 public class EnderCoreTransformer implements IClassTransformer {
@@ -86,7 +91,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
   private static final String renderItemClass = "net.minecraft.client.renderer.entity.RenderItem";
   private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
-  private static final String renderItemOverlayIntoGUIMethodSig = "(Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V";
+//  private static final String renderItemOverlayIntoGUIMethodSig = "(Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V";
 
   private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass,
       itemStackClass, entityArrowClass, containerFurnaceClass, renderItemClass);

@@ -381,14 +381,14 @@ public class ConfigProcessor {
 
   @SubscribeEvent
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-    if (event.modID.equals(modid)) {
+    if (event.getModID().equals(modid)) {
       process(false);
     }
   }
 
   @SubscribeEvent
   public void onConfigFileChanged(ConfigFileChangedEvent event) {
-    if (event.modID.equals(modid)) {
+    if (event.getModID().equals(modid)) {
       process(true);
     }
   }

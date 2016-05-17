@@ -3,7 +3,6 @@ package com.enderio.core.common.tweaks;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -19,7 +18,10 @@ public class Tweaks {
     // @formatter:off
         tweaks.add(new Tweak("fixBedSound", "Makes the bed stepSound wool instead of stone") {
             @Override
-            public void load() { Blocks.bed.setStepSound(Block.soundTypeCloth); }
+            public void load() {
+              //TODO: 1.9 this method is now private 
+              //Blocks.bed.setStepSound(SoundType.CLOTH); 
+            }
         });
         
         tweaks.add(new Tweak("changeBoatStackSize", "Makes boats stack to 16") {

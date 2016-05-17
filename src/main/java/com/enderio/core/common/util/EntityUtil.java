@@ -6,12 +6,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.enderio.core.common.vecmath.Vector3d;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.boss.IBossDisplayData;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -19,14 +20,12 @@ import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-
-import com.enderio.core.common.vecmath.Vector3d;
 
 public class EntityUtil {
 
@@ -100,17 +99,21 @@ public class EntityUtil {
   }
 
   public static String getDisplayNameForEntity(String mobName) {
-    return StatCollector.translateToLocal("entity." + mobName + ".name");
+    return I18n.translateToLocal("entity." + mobName + ".name");
   }
 
-  public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
+  
+  public static List<String> getAllRegisteredMobNames() {
+    //TODO: 1.9 taken out boss check for now as you need to create an instance of the entity to see if it is a boss
+  //public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
+       
     List<String> result = new ArrayList<String>();
     Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.classToStringMapping.entrySet();
     for (Map.Entry<Class<? extends Entity>, String> entry : entries) {
       if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-        if (!excludeBosses || !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
+//        if (!excludeBosses || !isBoss(entry)) { // !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
           result.add(entry.getValue());
-        }
+//        }
       }
     }
     return result;
@@ -139,7 +142,7 @@ public class EntityUtil {
           IBlockState bs = world.getBlockState(pos);
           Block block = bs.getBlock();
           if (block != null) {
-            block.addCollisionBoxesToList(world, pos, bs, entityBounds, collidingBoundingBoxes, entity);
+            block.addCollisionBoxToList(bs, world, pos, entityBounds, collidingBoundingBoxes, entity);
           }
         }
       }

@@ -9,6 +9,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.math.Vec3i;
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.render.VertexTransform;
@@ -40,13 +44,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -58,17 +56,14 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.vertex.VertexFormatElement.EnumType;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.client.resources.model.IBakedModel;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
-import net.minecraft.util.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -226,7 +221,7 @@ public class RenderUtil {
     GlStateManager.color(col.x, col.y, col.z);
 
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer tes = tessellator.getWorldRenderer();
+    VertexBuffer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
     tes.pos(x + width, y + height, z).endVertex();
@@ -242,7 +237,7 @@ public class RenderUtil {
     GlStateManager.disableTexture2D();    
     
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer tes = tessellator.getWorldRenderer();
+    VertexBuffer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
     tes.pos(x + width, y + height, z).endVertex();
@@ -268,7 +263,7 @@ public class RenderUtil {
 
   public static void renderBillboard(Matrix4d lookMat, float minU, float maxU, float minV, float maxV, double size, int brightness) {
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer tes = tessellator.getWorldRenderer();
+    VertexBuffer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
     double s = size / 2;
@@ -335,7 +330,7 @@ public class RenderUtil {
     }
 
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer tes = tessellator.getWorldRenderer();
+    VertexBuffer tes = tessellator.getWorldRenderer();
     if (doBegin) {
       tes.begin(GL11.GL_QUADS, format);
     }
@@ -520,7 +515,7 @@ public class RenderUtil {
         double maxV = icon.getMaxV();
 
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer tes = tessellator.getWorldRenderer();
+        VertexBuffer tes = tessellator.getWorldRenderer();
         tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         tes.pos(drawX, drawY + drawHeight, 0).tex(minU, minV + (maxV - minV) * drawHeight / 16F).endVertex();
         tes.pos(drawX + drawWidth, drawY + drawHeight, 0).tex(minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F).endVertex();
@@ -586,7 +581,7 @@ public class RenderUtil {
 
     GlStateManager.color(color.x, color.y, color.z, color.w);
 
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(-padding, -padding, 0).endVertex();
     tes.pos(-padding, height + padding, 0).endVertex();
@@ -641,7 +636,7 @@ public class RenderUtil {
     glColor3f(1, 1, 1);
 
     Tessellator tessellator = Tessellator.getInstance();
-    WorldRenderer tes = tessellator.getWorldRenderer();
+    VertexBuffer tes = tessellator.getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
     tes.pos(-scale, -scale, 0).tex(0, 0).endVertex();
     tes.pos(-scale, scale, 0).tex(0, 1).endVertex();
@@ -664,7 +659,7 @@ public class RenderUtil {
 
   public static void renderBoundingBox(BoundingBox bb) {
 
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     List<Vector3f> corners;
     for (EnumFacing face : EnumFacing.VALUES) {
@@ -686,7 +681,7 @@ public class RenderUtil {
 
   public static void renderBoundingBox(BoundingBox bb, float minU, float maxU, float minV, float maxV) {
 
-    WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer tes = Tessellator.getInstance().getWorldRenderer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
     List<Vertex> corners;
     for (EnumFacing face : EnumFacing.VALUES) {
@@ -730,13 +725,13 @@ public class RenderUtil {
 
   public static void renderBlockModel(World world, BlockPos pos, boolean translateToOrigin) {
 
-    WorldRenderer wr = Tessellator.getInstance().getWorldRenderer();
+    VertexBuffer wr = Tessellator.getInstance().getWorldRenderer();
     wr.begin(7, DefaultVertexFormats.BLOCK);
     if (translateToOrigin) {
       wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
     //TODO: Need to setup GL state correctly for each layer    
-    for(EnumWorldBlockLayer layer : EnumWorldBlockLayer.values()) {      
+    for(BlockRenderLayer layer : BlockRenderLayer.values()) {
       ForgeHooksClient.setRenderLayer(layer);
       IBlockState state = world.getBlockState(pos);
       BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();

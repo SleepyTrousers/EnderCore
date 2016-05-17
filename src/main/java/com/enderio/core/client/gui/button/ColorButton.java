@@ -10,10 +10,10 @@ import com.enderio.core.common.vecmath.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemDye;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 public class ColorButton extends IconButton {
 
@@ -89,7 +89,7 @@ public class ColorButton extends IconButton {
   public void drawButton(Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
     if (visible) {
-      WorldRenderer tes = Tessellator.getInstance().getWorldRenderer();                
+      VertexBuffer tes = Tessellator.getInstance().getWorldRenderer();
       tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
       
       int x = xPosition + 2;

@@ -10,11 +10,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 
 public class BlockCoord {
@@ -60,7 +60,7 @@ public class BlockCoord {
         .parseInt(z));
   }
 
-  public BlockCoord(MovingObjectPosition mop) {
+  public BlockCoord(RayTraceResult mop) {
     this(mop.getBlockPos());
   }
 
@@ -126,12 +126,12 @@ public class BlockCoord {
   }
 
   public String chatString() {
-    return chatString(EnumChatFormatting.WHITE);
+    return chatString(TextFormatting.WHITE);
   }
 
-  public String chatString(EnumChatFormatting defaultColor) {
-    return String.format("x%s%d%s y%s%d%s z%s%d", EnumChatFormatting.GREEN, x, defaultColor, EnumChatFormatting.GREEN, y, defaultColor,
-        EnumChatFormatting.GREEN, z);
+  public String chatString(TextFormatting defaultColor) {
+    return String.format("x%s%d%s y%s%d%s z%s%d", TextFormatting.GREEN, x, defaultColor, TextFormatting.GREEN, y, defaultColor,
+        TextFormatting.GREEN, z);
   }
 
   public boolean equals(int x, int y, int z) {
