@@ -29,24 +29,15 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   protected final Class<? extends T> teClass;
   protected final String name;
-  protected final ItemBlock itemBlock;
 
   protected BlockEnder(String name, Class<? extends T> teClass) {
-    this(name, teClass, null, new Material(MapColor.ironColor));
+    this(name, teClass, new Material(MapColor.ironColor));
   }
 
   protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
-    this(name, teClass, null, mat);
-  }
-
-  protected BlockEnder(String name, Class<? extends T> teClass, ItemBlock itemBlockClass) {
-    this(name, teClass, itemBlockClass, new Material(MapColor.ironColor));
-  }
-
-  protected BlockEnder(String name, Class<? extends T> teClass, ItemBlock itemBlock, Material mat) {
     super(mat);
     this.teClass = teClass;
-    this.itemBlock = itemBlock;
+    
     this.name = name;
     setHardness(0.5F);
     setUnlocalizedName(name);
@@ -56,15 +47,15 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   protected void init() {
-    GameRegistry.register(this);
-    if (itemBlock != null) {
-      GameRegistry.register(itemBlock, getRegistryName());
-    } else {
-      GameRegistry.register(new ItemBlock(this), getRegistryName());
-    }
+    GameRegistry.register(this);   
     if (teClass != null) {
       GameRegistry.registerTileEntity(teClass, name + "TileEntity");
     }
+    GameRegistry.register(createItemBlock());
+  }
+  
+  protected ItemBlock createItemBlock() {
+    return new ItemBlock(this);
   }
 
   @Override
