@@ -42,7 +42,7 @@ public class EntityUtil {
   }
 
   public static EntityFireworkRocket getRandomFirework(World world, BlockCoord pos) {
-    ItemStack firework = new ItemStack(Items.fireworks);
+    ItemStack firework = new ItemStack(Items.FIREWORKS);
     firework.setTagCompound(new NBTTagCompound());
     NBTTagCompound expl = new NBTTagCompound();
     expl.setBoolean("Flicker", true);
@@ -50,7 +50,7 @@ public class EntityUtil {
 
     int[] colors = new int[rand.nextInt(8) + 1];
     for (int i = 0; i < colors.length; i++) {
-      colors[i] = ItemDye.dyeColors[rand.nextInt(16)];
+      colors[i] = ItemDye.DYE_COLORS[rand.nextInt(16)];
     }
     expl.setIntArray("Colors", colors);
     byte type = (byte) (rand.nextInt(3) + 1);
@@ -108,7 +108,7 @@ public class EntityUtil {
   //public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
        
     List<String> result = new ArrayList<String>();
-    Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.classToStringMapping.entrySet();
+    Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.CLASS_TO_NAME.entrySet();
     for (Map.Entry<Class<? extends Entity>, String> entry : entries) {
       if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
 //        if (!excludeBosses || !isBoss(entry)) { // !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {

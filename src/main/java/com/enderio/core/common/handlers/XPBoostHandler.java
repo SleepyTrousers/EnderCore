@@ -66,7 +66,7 @@ public class XPBoostHandler {
     ItemStack held = event.getPlayer().getHeldItemMainhand();
     if (held != null) {
       int level = getXPBoostLevel(held);
-      int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);
+      int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
 
       if (level >= 0) {        
         int xp = event.getState().getBlock().getExpDrop(event.getState(), event.getWorld(), event.getPos(), fortune);

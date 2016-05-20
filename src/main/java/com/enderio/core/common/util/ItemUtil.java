@@ -90,7 +90,7 @@ public class ItemUtil {
       String[] info = string.split(";");
       Object temp = null;
       int damage = OreDictionary.WILDCARD_VALUE;
-      temp = Item.itemRegistry.getObject(new ResourceLocation(info[0]));
+      temp = Item.REGISTRY.getObject(new ResourceLocation(info[0]));
       if (info.length > 1) {
         damage = Integer.parseInt(info[1]);
       }
@@ -189,7 +189,7 @@ public class ItemUtil {
       return null;
     }
 
-    String base = Item.itemRegistry.getNameForObject(stack.getItem()).toString();
+    String base = Item.REGISTRY.getNameForObject(stack.getItem()).toString();
 
     if (damage) {
       base += ";" + stack.getItemDamage();

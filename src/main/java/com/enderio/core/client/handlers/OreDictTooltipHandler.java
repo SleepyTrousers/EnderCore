@@ -24,7 +24,7 @@ public class OreDictTooltipHandler {
     boolean doOredict = showOredictTooltips == 3 ? debugMode : showOredictTooltips == 2 ? shiftDown : showOredictTooltips == 1;
 
     if (doRegistry) {
-      event.getToolTip().add(Item.itemRegistry.getNameForObject(event.getItemStack().getItem()).toString());
+      event.getToolTip().add(Item.REGISTRY.getNameForObject(event.getItemStack().getItem()).toString());
     }
 
     if (doOredict) {

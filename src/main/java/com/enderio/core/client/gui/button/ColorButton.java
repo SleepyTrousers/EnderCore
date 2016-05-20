@@ -57,7 +57,7 @@ public class ColorButton extends IconButton {
 
   private void nextColor() {
     colorIndex++;
-    if (colorIndex >= ItemDye.dyeColors.length) {
+    if (colorIndex >= ItemDye.DYE_COLORS.length) {
       colorIndex = 0;
     }
     setColorIndex(colorIndex);
@@ -66,7 +66,7 @@ public class ColorButton extends IconButton {
   private void prevColor() {
     colorIndex--;
     if (colorIndex < 0) {
-      colorIndex = ItemDye.dyeColors.length - 1;
+      colorIndex = ItemDye.DYE_COLORS.length - 1;
     }
     setColorIndex(colorIndex);
   }
@@ -76,7 +76,7 @@ public class ColorButton extends IconButton {
   }
 
   public void setColorIndex(int colorIndex) {
-    this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.dyeColors.length - 1);
+    this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.DYE_COLORS.length - 1);
     String colStr = DyeColor.values()[colorIndex].getLocalisedName();
     if (tooltipPrefix != null && tooltipPrefix.length() > 0) {
       setToolTip(tooltipPrefix, colStr);
@@ -97,7 +97,7 @@ public class ColorButton extends IconButton {
 
       GL11.glDisable(GL11.GL_TEXTURE_2D);
 
-      int col = ItemDye.dyeColors[colorIndex];
+      int col = ItemDye.DYE_COLORS[colorIndex];
       Vector3f c = ColorUtil.toFloat(col);      
       GlStateManager.color(c.x, c.y, c.z);
       

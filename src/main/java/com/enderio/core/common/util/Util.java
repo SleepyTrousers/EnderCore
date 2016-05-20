@@ -44,7 +44,7 @@ public class Util {
   public static ItemStack consumeItem(ItemStack stack) {
     if (stack.getItem() instanceof ItemPotion) {
       if (stack.stackSize == 1) {
-        return new ItemStack(Items.glass_bottle);
+        return new ItemStack(Items.GLASS_BOTTLE);
       } else {
         stack.splitStack(1);
         return stack;
@@ -207,13 +207,13 @@ public class Util {
   public static boolean dumpModObjects(File file) {
 
     StringBuilder sb = new StringBuilder();
-    for (Object key : Block.blockRegistry.getKeys()) {
+    for (Object key : Block.REGISTRY.getKeys()) {
       if (key != null) {
         sb.append(key.toString());
         sb.append("\n");
       }
     }
-    for (Object key : Item.itemRegistry.getKeys()) {
+    for (Object key : Item.REGISTRY.getKeys()) {
       if (key != null) {
         sb.append(key.toString());
         sb.append("\n");

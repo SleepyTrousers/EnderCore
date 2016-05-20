@@ -26,7 +26,7 @@ public class AutoSmeltHandler {
       ItemStack held = event.getHarvester().getHeldItemMainhand();
       if (held != null) {
         int level = getAutoSmeltLevel(held);
-        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.fortune, held);
+        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
 
         if (level >= 0) {
           for (int i = 0; i < event.getDrops().size(); i++) {

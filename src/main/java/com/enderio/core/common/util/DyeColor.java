@@ -70,7 +70,7 @@ public enum DyeColor {
   }
 
   public int getColor() {
-    return ItemDye.dyeColors[ordinal()];
+    return ItemDye.DYE_COLORS[ordinal()];
   }
 
   public String getName() {

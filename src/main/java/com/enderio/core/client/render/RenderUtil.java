@@ -94,7 +94,7 @@ public class RenderUtil {
 
   private static final FloatBuffer MATRIX_BUFFER = GLAllocation.createDirectFloatBuffer(16);
 
-  public static final ResourceLocation BLOCK_TEX = TextureMap.locationBlocksTexture;
+  public static final ResourceLocation BLOCK_TEX = TextureMap.LOCATION_BLOCKS_TEXTURE;
 
   public static final ResourceLocation GLINT_TEX = new ResourceLocation("textures/misc/enchanted_item_glint.png");
 

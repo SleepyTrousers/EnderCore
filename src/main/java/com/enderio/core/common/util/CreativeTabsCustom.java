@@ -41,7 +41,7 @@ public class CreativeTabsCustom extends CreativeTabs {
 
   @Override
   public ItemStack getIconItemStack() {
-    return displayStack == null ? new ItemStack(Items.diamond) : displayStack;
+    return displayStack == null ? new ItemStack(Items.DIAMOND) : displayStack;
   }
 
   @Override

@@ -9,8 +9,8 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 public class SlabRecipes extends Tweak {
   private static final String[] slabEndingsWood = { "WoodOak", "WoodSpruce", "WoodBirch", "WoodJungle", "WoodAcacia", "WoodDarkOak" };
   private static final String[] slabEndingsStone = { "Stone", "Sandstone", "Cobblestone", "Bricks", "StoneBricks", "NetherBrick", "Quartz" };
-  private static final Block[] slabResults = { Blocks.stone, Blocks.sandstone, Blocks.cobblestone, Blocks.brick_block, Blocks.stonebrick, Blocks.nether_brick,
-      Blocks.quartz_block };
+  private static final Block[] slabResults = { Blocks.STONE, Blocks.SANDSTONE, Blocks.COBBLESTONE, Blocks.BRICK_BLOCK, Blocks.STONEBRICK, Blocks.NETHER_BRICK,
+      Blocks.QUARTZ_BLOCK };
 
   public static final SlabRecipes INSTANCE = new SlabRecipes();
 
@@ -29,7 +29,7 @@ public class SlabRecipes extends Tweak {
       Block[] results = i == 1 ? slabResults : null;
       for (int j = 0; j < arr.length; j++) {
         GameRegistry
-            .addRecipe(new ShapelessOreRecipe(i == 0 ? new ItemStack(Blocks.planks, 1, j) : new ItemStack(results[j]), "slab" + arr[j], "slab" + arr[j]));
+            .addRecipe(new ShapelessOreRecipe(i == 0 ? new ItemStack(Blocks.PLANKS, 1, j) : new ItemStack(results[j]), "slab" + arr[j], "slab" + arr[j]));
       }
     }
   }

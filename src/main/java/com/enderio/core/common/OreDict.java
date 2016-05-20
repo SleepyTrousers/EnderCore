@@ -12,37 +12,37 @@ import net.minecraftforge.oredict.OreDictionary;
 public final class OreDict {
 
   public static void registerVanilla() {
-    safeRegister("barsIron", Blocks.iron_bars);
-    safeRegister("blockHopper", Blocks.hopper);
-    safeRegister("blockObsidian", Blocks.obsidian);
-    safeRegister("itemNetherStar", Items.nether_star);
-    safeRegister("gravel", Blocks.gravel);
-    safeRegister("chestWood", Blocks.chest);
-    safeRegister("craftingTableWood", Blocks.crafting_table);
-    safeRegister("itemCoal", Items.coal);
-    safeRegister("itemCharcoal", new ItemStack(Items.coal, 1, 1));
-    safeRegister("pearlEnder", Items.ender_pearl);
-    safeRegister("pearlEnderEye", Items.ender_eye);
-    safeRegister("itemBlazeRod", Items.blaze_rod);
-    safeRegister("itemBlazePowder", Items.blaze_powder);
-    safeRegister("itemClay", Items.clay_ball);
-    safeRegister("itemFlint", Items.flint);
-    safeRegister("itemGhastTear", Items.ghast_tear);
-    safeRegister("dustGunpowder", Items.gunpowder);
-    safeRegister("itemLeather", Items.leather);
-    safeRegister("slabWoodOak", new ItemStack(Blocks.wooden_slab, 1, 0));
-    safeRegister("slabWoodSpruce", new ItemStack(Blocks.wooden_slab, 1, 1));
-    safeRegister("slabWoodBirch", new ItemStack(Blocks.wooden_slab, 1, 2));
-    safeRegister("slabWoodJungle", new ItemStack(Blocks.wooden_slab, 1, 3));
-    safeRegister("slabWoodAcacia", new ItemStack(Blocks.wooden_slab, 1, 4));
-    safeRegister("slabWoodDarkOak", new ItemStack(Blocks.wooden_slab, 1, 5));
-    safeRegister("slabStone", new ItemStack(Blocks.stone_slab, 1, 0));
-    safeRegister("slabSandstone", new ItemStack(Blocks.stone_slab, 1, 1));
-    safeRegister("slabCobblestone", new ItemStack(Blocks.stone_slab, 1, 3));
-    safeRegister("slabBricks", new ItemStack(Blocks.stone_slab, 1, 4));
-    safeRegister("slabStoneBricks", new ItemStack(Blocks.stone_slab, 1, 5));
-    safeRegister("slabNetherBrick", new ItemStack(Blocks.stone_slab, 1, 6));
-    safeRegister("slabQuartz", new ItemStack(Blocks.stone_slab, 1, 7));
+    safeRegister("barsIron", Blocks.IRON_BARS);
+    safeRegister("blockHopper", Blocks.HOPPER);
+    safeRegister("blockObsidian", Blocks.OBSIDIAN);
+    safeRegister("itemNetherStar", Items.NETHER_STAR);
+    safeRegister("gravel", Blocks.GRAVEL);
+    safeRegister("chestWood", Blocks.CHEST);
+    safeRegister("craftingTableWood", Blocks.CRAFTING_TABLE);
+    safeRegister("itemCoal", Items.COAL);
+    safeRegister("itemCharcoal", new ItemStack(Items.COAL, 1, 1));
+    safeRegister("pearlEnder", Items.ENDER_PEARL);
+    safeRegister("pearlEnderEye", Items.ENDER_EYE);
+    safeRegister("itemBlazeRod", Items.BLAZE_ROD);
+    safeRegister("itemBlazePowder", Items.BLAZE_POWDER);
+    safeRegister("itemClay", Items.CLAY_BALL);
+    safeRegister("itemFlint", Items.FLINT);
+    safeRegister("itemGhastTear", Items.GHAST_TEAR);
+    safeRegister("dustGunpowder", Items.GUNPOWDER);
+    safeRegister("itemLeather", Items.LEATHER);
+    safeRegister("slabWoodOak", new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
+    safeRegister("slabWoodSpruce", new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
+    safeRegister("slabWoodBirch", new ItemStack(Blocks.WOODEN_SLAB, 1, 2));
+    safeRegister("slabWoodJungle", new ItemStack(Blocks.WOODEN_SLAB, 1, 3));
+    safeRegister("slabWoodAcacia", new ItemStack(Blocks.WOODEN_SLAB, 1, 4));
+    safeRegister("slabWoodDarkOak", new ItemStack(Blocks.WOODEN_SLAB, 1, 5));
+    safeRegister("slabStone", new ItemStack(Blocks.STONE_SLAB, 1, 0));
+    safeRegister("slabSandstone", new ItemStack(Blocks.STONE_SLAB, 1, 1));
+    safeRegister("slabCobblestone", new ItemStack(Blocks.STONE_SLAB, 1, 3));
+    safeRegister("slabBricks", new ItemStack(Blocks.STONE_SLAB, 1, 4));
+    safeRegister("slabStoneBricks", new ItemStack(Blocks.STONE_SLAB, 1, 5));
+    safeRegister("slabNetherBrick", new ItemStack(Blocks.STONE_SLAB, 1, 6));
+    safeRegister("slabQuartz", new ItemStack(Blocks.STONE_SLAB, 1, 7));
   }
 
   public static void safeRegister(String name, Block block) {

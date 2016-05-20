@@ -31,7 +31,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   protected final String name;
 
   protected BlockEnder(String name, Class<? extends T> teClass) {
-    this(name, teClass, new Material(MapColor.ironColor));
+    this(name, teClass, new Material(MapColor.IRON));
   }
 
   protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
@@ -42,7 +42,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     setHardness(0.5F);
     setUnlocalizedName(name);
     setRegistryName(name);
-    setStepSound(SoundType.METAL);
+    setSoundType(SoundType.METAL);
     setHarvestLevel("pickaxe", 0);
   }
 

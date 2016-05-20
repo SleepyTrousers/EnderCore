@@ -26,12 +26,12 @@ public class Tweaks {
         
         tweaks.add(new Tweak("changeBoatStackSize", "Makes boats stack to 16") {
             @Override
-            public void load() { Items.boat.setMaxStackSize(16); }
+            public void load() { Items.BOAT.setMaxStackSize(16); }
         });
         
         tweaks.add(new Tweak("fixPackedIceTool", "Allows packed ice to be mined with a pickaxe") {
             @Override
-            public void load() { Blocks.packed_ice.setHarvestLevel("pickaxe", 0); }
+            public void load() { Blocks.PACKED_ICE.setHarvestLevel("pickaxe", 0); }
         });
     }
     
@@ -42,12 +42,12 @@ public class Tweaks {
 
         tweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
             @Override
-            public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.paper, 2), Items.book); }
+            public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.PAPER, 2), Items.BOOK); }
         });
         
         tweaks.add(new Tweak("shapelessPaperRecipe","Adds a shapeless recipe for paper") {
             @Override
-            public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.paper, 3), Items.reeds, Items.reeds, Items.reeds); }
+            public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS); }
         });
     }    
 }
