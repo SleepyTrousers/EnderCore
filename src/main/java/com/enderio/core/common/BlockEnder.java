@@ -55,7 +55,9 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
   
   protected ItemBlock createItemBlock() {
-    return new ItemBlock(this);
+    ItemBlock ib = new ItemBlock(this);
+    ib.setRegistryName(getName());
+    return ib;
   }
 
   @Override
