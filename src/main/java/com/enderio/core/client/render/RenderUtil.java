@@ -777,10 +777,9 @@ public class RenderUtil {
   }
 
   public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, VertexTransform xform) {
-    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);    
     List<Vertex> corners = bb.getCornersWithUvForFace(face);
     builder.setQuadOrientation(face);
-//    builder.setQuadColored();
     for (Vertex v : corners) {
       if (xform != null) {
         xform.apply(v);
@@ -792,10 +791,9 @@ public class RenderUtil {
 
   public static void addBakedQuadForFace(List<BakedQuad> quads, BoundingBox bb, TextureAtlasSprite tex, EnumFacing face, boolean rotateUV, boolean flipU,
       Vector4f color) {
-    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
+    UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
     List<Vertex> corners = bb.getCornersWithUvForFace(face);
     builder.setQuadOrientation(face);
-//    builder.setQuadColored();
     for (Vertex v : corners) {
       v.color = color;
       if (rotateUV) {
