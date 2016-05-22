@@ -2,11 +2,11 @@ package com.enderio.core.common;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
 import com.enderio.core.common.util.FluidUtil;
-import com.enderio.core.common.util.Log;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -27,14 +27,14 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
-  protected final Class<? extends T> teClass;
-  protected final String name;
+  protected final @Nullable Class<? extends T> teClass;
+  protected final @Nonnull String name;
 
-  protected BlockEnder(String name, Class<? extends T> teClass) {
+  protected BlockEnder(@Nonnull String name, @Nullable Class<? extends T> teClass) {
     this(name, teClass, new Material(MapColor.IRON));
   }
 
-  protected BlockEnder(String name, Class<? extends T> teClass, Material mat) {
+  protected BlockEnder(@Nonnull String name, @Nullable Class<? extends T> teClass, @Nonnull Material mat) {
     super(mat);
     this.teClass = teClass;
     
@@ -61,22 +61,23 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public boolean hasTileEntity(IBlockState state) {
+  public boolean hasTileEntity(@Nonnull IBlockState state) {
     return teClass != null;
   }
 
   @Override
-  public TileEntity createTileEntity(World world, IBlockState state) {
+  public @Nonnull TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
     if (teClass != null) {
       try {
         T te = teClass.newInstance();
         te.init();
         return te;
       } catch (Exception e) {
-        Log.error("Could not create tile entity for block " + name + " for class " + teClass);
+        throw new RuntimeException("Could not create tile entity for block " + name + " for class " + teClass, e);
       }
     }
-    return null;
+    throw new RuntimeException(
+        "Cannot create a TileEntity for a block that doesn't have a TileEntity. This is not a problem with EnderCore, this is caused by the caller.");
   }
 
   /* Subclass Helpers */
@@ -84,7 +85,8 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   
   
   @Override
-  public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side,
+  public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn,
+      @Nonnull EnumHand hand, @Nullable ItemStack heldItem, @Nonnull EnumFacing side,
       float hitX, float hitY, float hitZ) {
     if (playerIn.isSneaking()) {
       return false;
@@ -113,7 +115,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   
   @Override
-  public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+  public boolean removedByPlayer(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player, boolean willHarvest) {
     if (willHarvest) {
       return true;
     }
@@ -121,20 +123,21 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack) {  
+  public void harvestBlock(@Nonnull World worldIn, @Nonnull EntityPlayer player, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nullable TileEntity te,
+      @Nullable ItemStack stack) {
     super.harvestBlock(worldIn, player, pos, state, te, stack);
     worldIn.setBlockToAir(pos);
   }
 
   @Override
-  public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+  public @Nonnull List<ItemStack> getDrops(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune) {
     if (doNormalDrops(world, pos)) {
       return super.getDrops(world, pos, state, fortune);
     }
     return Lists.newArrayList(getNBTDrop(world, pos, getTileEntity(world, pos)));
   }
 
-  public ItemStack getNBTDrop(IBlockAccess world, BlockPos pos, @Nullable T te) {
+  public ItemStack getNBTDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te) {
     int meta = damageDropped(world.getBlockState(pos));
     ItemStack itemStack = new ItemStack(this, 1, meta);
     processDrop(world, pos, te, itemStack);
@@ -145,17 +148,22 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @SuppressWarnings("unchecked")
-  protected T getTileEntity(IBlockAccess world, BlockPos pos) {
+  protected @Nullable T getTileEntity(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
     if (teClass != null) {
       TileEntity te = world.getTileEntity(pos);
-      if (teClass.isInstance(te)) {
-        return (T) te;
+      final Class<? extends T> teClass2 = teClass;
+      if (teClass2 != null) {
+        if (teClass2.isInstance(te)) {
+          return (T) te;
+        }
+      } else {
+        // TODO handle null value
       }
     }
     return null;
   }
 
-  protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval) {
+  protected boolean shouldDoWorkThisTick(@Nonnull World world, @Nonnull BlockPos pos, int interval) {
     T te = getTileEntity(world, pos);
     if (te == null) {
       return world.getTotalWorldTime() % interval == 0;
@@ -164,7 +172,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     }
   }
 
-  protected boolean shouldDoWorkThisTick(World world, BlockPos pos, int interval, int offset) {
+  protected boolean shouldDoWorkThisTick(@Nonnull World world, @Nonnull BlockPos pos, int interval, int offset) {
     T te = getTileEntity(world, pos);
     if (te == null) {
       return (world.getTotalWorldTime() + offset) % interval == 0;
@@ -173,7 +181,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     }
   }
 
-  public String getName() {
+  public @Nonnull String getName() {
     return name;
   }
   
