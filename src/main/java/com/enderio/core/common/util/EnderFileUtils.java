@@ -209,7 +209,6 @@ public class EnderFileUtils {
     }
   }
 
-  @Nonnull
   public static void safeDelete(File file) {
     try {
       file.delete();
@@ -218,7 +217,6 @@ public class EnderFileUtils {
     }
   }
 
-  @Nonnull
   public static void safeDeleteDirectory(File file) {
     try {
       FileUtils.deleteDirectory(file);
