@@ -2,11 +2,11 @@ package com.enderio.core.common.util;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -51,7 +51,7 @@ public class IBlockAccessWrapper implements IBlockAccess {
   }
 
   @Override
-  public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+  public Biome getBiomeGenForCoords(BlockPos pos) {
     return wrapped.getBiomeGenForCoords(pos);
   }
 

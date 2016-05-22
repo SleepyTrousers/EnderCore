@@ -9,11 +9,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class TileEntityBase extends TileEntity implements ITickable {
@@ -76,13 +75,16 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
 
     @Override
-    public final void writeToNBT(NBTTagCompound root) {
+    public final NBTTagCompound writeToNBT(NBTTagCompound root) {
         super.writeToNBT(root);
         writeCustomNBT(root);
+        return root;
     }
 
+    
+    
     @Override
-    public Packet<?> getDescriptionPacket() {
+    public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound tag = new NBTTagCompound();
         writeCustomNBT(tag);
         return new SPacketUpdateTileEntity(getPos(), 1, tag);

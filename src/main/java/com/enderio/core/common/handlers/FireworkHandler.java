@@ -15,7 +15,7 @@ import static java.util.Calendar.MONTH;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatisticsFile;
+import net.minecraft.stats.StatisticsManagerServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.AchievementEvent;
@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 public class FireworkHandler {
   @SubscribeEvent
   public void onAchievement(AchievementEvent event) {
-    StatisticsFile file = ((EntityPlayerMP) event.getEntityPlayer()).getStatFile();
+    StatisticsManagerServer file = ((EntityPlayerMP) event.getEntityPlayer()).getStatFile();
     if (!event.getEntity().worldObj.isRemote && file.canUnlockAchievement(event.getAchievement()) && !file.hasAchievementUnlocked(event.getAchievement())
         && ConfigHandler.betterAchievements) {
       event.getEntityPlayer().getEntityData().setInteger("fireworksLeft", 9);
