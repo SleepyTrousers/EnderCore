@@ -451,7 +451,6 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     super.drawGuiContainerForegroundLayer(mouseX, mouseY);
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public void drawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font) {
     copyOfdrawHoveringText(par1List, par2, par3, font);   
