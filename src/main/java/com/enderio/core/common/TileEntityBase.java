@@ -81,7 +81,12 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
         return root;
     }
 
-    
+    @Override
+    public NBTTagCompound getUpdateTag() {
+      NBTTagCompound tag = new NBTTagCompound();
+      writeCustomNBT(tag);
+      return tag;
+    }    
     
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
