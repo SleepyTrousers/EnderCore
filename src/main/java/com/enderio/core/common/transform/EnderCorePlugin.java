@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 
-@MCVersion("1.8.9")
+@MCVersion("1.9.4")
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 // we want deobf no matter what
 public class EnderCorePlugin implements IFMLLoadingPlugin {

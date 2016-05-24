@@ -7,11 +7,14 @@ import java.util.Set;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -22,11 +25,12 @@ import com.google.common.collect.Sets;
 
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ARETURN;
+import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 import static org.objectweb.asm.Opcodes.ISTORE;
-import static org.objectweb.asm.Opcodes.RETURN;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
@@ -89,7 +93,7 @@ public class EnderCoreTransformer implements IClassTransformer {
   private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
   private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
 
-  private static final String renderItemClass = "net.minecraft.client.renderer.entity.RenderItem";
+  private static final String renderItemClass = "net.minecraft.client.renderer.RenderItem";
   private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
 //  private static final String renderItemOverlayIntoGUIMethodSig = "(Lnet/minecraft/client/gui/FontRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V";
 
@@ -106,9 +110,10 @@ public class EnderCoreTransformer implements IClassTransformer {
     
     // Void fog removal
     if (doGameplayChanges && transformedName.equals(worldTypeClass)) {
-      basicClass = transform(basicClass, worldTypeClass, voidFogMethod, new Transform() {
+      basicClass = transform(basicClass, worldTypeClass, voidFogMethod, new Transform() { // TODO 1.9 fails
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (voidFogMethod.equals(m.name)) {
@@ -120,17 +125,22 @@ public class EnderCoreTransformer implements IClassTransformer {
                   false));
               m.instructions.add(new InsnNode(IRETURN));
 
+              done = true;
               break;
             }
+          }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
           }
         }
       });
     }
     // Anvil max level
-    else if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) {
+    else if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) { // TODO 1.9 fails
       basicClass = transform(basicClass, anvilContainerClass, anvilContainerMethod, new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {
+          int done = 0;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (anvilContainerMethod.equals(m.name) || anvilGuiMethod.equals(m.name)) {
@@ -141,21 +151,26 @@ public class EnderCoreTransformer implements IClassTransformer {
                 if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
                   m.instructions.set(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I",
                       false));
+                  done++;
                 }
               }
             }
+          }
+          if (done != 2) {
+            EnderCore.logger.info("Transforming failed.");
           }
         }
       });
     }
     // Item Enchantability Event
-    else if (transformedName.equals(enchantHelperClass)) {
+    else if (transformedName.equals(enchantHelperClass)) { // TODO 1.9 applies. test it!
       final Map<String, int[]> data = new HashMap<String, int[]>();
       data.put(buildEnchantListMethod.getName(), new int[] { 1, 4 });
       data.put(calcEnchantabilityMethod.getName(), new int[] { 3, 5 });
       Transform transformer = new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (data.keySet().contains(m.name)) {
@@ -172,6 +187,7 @@ public class EnderCoreTransformer implements IClassTransformer {
                         enchantHelperMethodSig, false));
                     toAdd.add(new VarInsnNode(ISTORE, indeces[1]));
                     m.instructions.insert(next, toAdd);
+                    done = true;
                     break;
                   }
                 }
@@ -180,6 +196,9 @@ public class EnderCoreTransformer implements IClassTransformer {
               break;
             }
           }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
+          }
         }
       };
 
@@ -187,9 +206,10 @@ public class EnderCoreTransformer implements IClassTransformer {
     }
     // ItemRarity Event
     else if (transformedName.equals(itemStackClass)) {
-      basicClass = transform(basicClass, itemStackClass, itemStackMethod, new Transform() {
+      basicClass = transform(basicClass, itemStackClass, itemStackMethod, new Transform() { // TODO 1.9 applies. test it!
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (itemStackMethod.equals(m.name)) {
@@ -200,17 +220,22 @@ public class EnderCoreTransformer implements IClassTransformer {
                   false));
               m.instructions.add(new InsnNode(ARETURN));
 
+              done = true;
               break;
             }
+          }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
           }
         }
       });
     }
     // ArrowUpdate Event
     else if (transformedName.equals(entityArrowClass)) {
-      basicClass = transform(basicClass, entityArrowClass, entityArrowMethod, new Transform() {
+      basicClass = transform(basicClass, entityArrowClass, entityArrowMethod, new Transform() { // TODO 1.9 doesn't apply
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (entityArrowMethod.equals(m.name)) {
@@ -222,20 +247,25 @@ public class EnderCoreTransformer implements IClassTransformer {
                   toAdd
                       .add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "onArrowUpdate", entityArrowMethodSig, false));
                   m.instructions.insert(next, toAdd);
+                  done = true;
                   break;
                 }
               }
               break;
             }
           }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
+          }
         }
       });
     }
     // Furnace Shift Click Fix
     else if (doGameplayChanges && transformedName.equals(containerFurnaceClass)) {
-      basicClass = transform(basicClass, containerFurnaceClass, containerFurnaceMethod, new Transform() {
+      basicClass = transform(basicClass, containerFurnaceClass, containerFurnaceMethod, new Transform() { // TODO 1.9 applies. test it!
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (containerFurnaceMethod.equals(m.name)) {
@@ -248,35 +278,61 @@ public class EnderCoreTransformer implements IClassTransformer {
                   containerFurnaceMethodSig, false));
               m.instructions.add(new InsnNode(ARETURN));
 
+              done = true;
               break;
             }
+          }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
           }
         }
       });
     }
     // Item Overlay Rendering hook
     else if (transformedName.equals(renderItemClass)) {
-      basicClass = transform(basicClass, renderItemClass, renderItemOverlayIntoGUIMethod, new Transform() {
+      basicClass = transform(basicClass, renderItemClass, renderItemOverlayIntoGUIMethod, new Transform() { // 1.9.4 works
         @Override
         void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (renderItemOverlayIntoGUIMethod.equals(m.name)) {
+              boolean primed = false;
+              Label target = null;
               for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode next = m.instructions.get(i);
-                if (next.getOpcode() == RETURN) {
+
+                // (1) find "if (stack.getItem().showDurabilityBar(stack)) {"
+                if (!primed && target == null && next.getOpcode() == INVOKEVIRTUAL && next instanceof MethodInsnNode) {
+                  if ("showDurabilityBar".equals(((MethodInsnNode) next).name)) { // Forge method, never obf'ed
+                    primed = true;
+                  }
+                }
+
+                // (2) where is the matching "}"?
+                if (primed && next.getOpcode() == IFEQ && next instanceof JumpInsnNode) {
+                  target = ((JumpInsnNode) next).label.getLabel();
+                  primed = false;
+                }
+
+                // (3) insert our callback there
+                if (target != null && next instanceof LabelNode && ((LabelNode) next).getLabel() == target) {
                   InsnList toAdd = new InsnList();
                   toAdd.add(new VarInsnNode(ALOAD, 2));
                   toAdd.add(new VarInsnNode(ILOAD, 3));
                   toAdd.add(new VarInsnNode(ILOAD, 4));
                   toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "renderItemOverlayIntoGUI",
                       "(Lnet/minecraft/item/ItemStack;II)V", false));
-                  m.instructions.insertBefore(next, toAdd);
+                  m.instructions.insert(next, toAdd);
+                  done = true;
                   break;
                 }
               }
               break;
             }
+          }
+          if (!done) {
+            EnderCore.logger.info("Transforming failed.");
           }
         }
       });
