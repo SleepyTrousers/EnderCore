@@ -61,12 +61,12 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public boolean hasTileEntity(@Nonnull IBlockState state) {
+  public boolean hasTileEntity(IBlockState state) {
     return teClass != null;
   }
 
   @Override
-  public @Nonnull TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
+  public @Nonnull TileEntity createTileEntity(World world, IBlockState state) {
     if (teClass != null) {
       try {
         T te = teClass.newInstance();
@@ -85,8 +85,8 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   
   
   @Override
-  public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn,
-      @Nonnull EnumHand hand, @Nullable ItemStack heldItem, @Nonnull EnumFacing side,
+  public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem,
+      EnumFacing side,
       float hitX, float hitY, float hitZ) {
     if (playerIn.isSneaking()) {
       return false;
@@ -115,7 +115,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   
   @Override
-  public boolean removedByPlayer(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player, boolean willHarvest) {
+  public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
     if (willHarvest) {
       return true;
     }
@@ -123,14 +123,14 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public void harvestBlock(@Nonnull World worldIn, @Nonnull EntityPlayer player, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nullable TileEntity te,
+  public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te,
       @Nullable ItemStack stack) {
     super.harvestBlock(worldIn, player, pos, state, te, stack);
     worldIn.setBlockToAir(pos);
   }
 
   @Override
-  public @Nonnull List<ItemStack> getDrops(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune) {
+  public @Nonnull List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
     if (doNormalDrops(world, pos)) {
       return super.getDrops(world, pos, state, fortune);
     }

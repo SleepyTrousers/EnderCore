@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.lwjgl.input.Mouse;
 
 import com.enderio.core.api.client.gui.IGuiOverlay;
@@ -414,7 +412,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void renderToolTip(@Nonnull ItemStack p_146285_1_, int p_146285_2_, int p_146285_3_) {
+  public void renderToolTip(ItemStack p_146285_1_, int p_146285_2_, int p_146285_3_) {
     super.renderToolTip(p_146285_1_, p_146285_2_, p_146285_3_);
   }
 

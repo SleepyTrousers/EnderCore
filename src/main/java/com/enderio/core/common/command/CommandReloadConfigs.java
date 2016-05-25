@@ -3,6 +3,8 @@ package com.enderio.core.common.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.EnderCore;
@@ -60,7 +62,7 @@ public class CommandReloadConfigs extends CommandBase {
   }
 
   @Override
-  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {    
+  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
     if (args.length >= 1) {
       String[] avail = validModIDs.toArray(new String[validModIDs.size()]);
 

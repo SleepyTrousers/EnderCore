@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -67,7 +69,7 @@ public class CommandScoreboardInfo extends CommandBase {
   
   
   @Override
-  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {  
+  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
     if (args.length == 1) {
       List<String> boards = new ArrayList<String>();
       for (ScoreObjective obj : (Collection<ScoreObjective>) sender.getEntityWorld().getScoreboard().getScoreObjectives()) {

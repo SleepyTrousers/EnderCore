@@ -1,5 +1,7 @@
 package com.enderio.core.common.util;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -48,7 +50,7 @@ public class InventoryWrapper implements ISidedInventory {
   }
 
   @Override
-  public void setInventorySlotContents(int slot, ItemStack itemStack) {
+  public void setInventorySlotContents(int slot, @Nullable ItemStack itemStack) {
     if (slot >= 0 && slot < inv.getSizeInventory()) {
       inv.setInventorySlotContents(slot, itemStack);
     }

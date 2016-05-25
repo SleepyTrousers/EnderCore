@@ -1,5 +1,7 @@
 package com.enderio.core.client.gui.widget;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -25,12 +27,12 @@ public class TemplateSlot extends Slot {
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean isItemValid(@Nullable ItemStack stack) {
         return true;
     }
 
     @Override
-    public void putStack(ItemStack par1ItemStack) {
+    public void putStack(@Nullable ItemStack par1ItemStack) {
         if (par1ItemStack != null) {
             par1ItemStack.stackSize = 0;
         }
