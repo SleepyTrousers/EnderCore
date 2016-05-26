@@ -162,4 +162,16 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
      */
     public void setGhostSlotContents(int slot, ItemStack stack) {
     }
+
+  @Override
+  public void markDirty() {
+    if (worldObj != null) {
+      worldObj.markChunkDirty(pos, this);
+      IBlockState state = worldObj.getBlockState(pos);
+      if (state.hasComparatorInputOverride()) {
+        worldObj.updateComparatorOutputLevel(pos, state.getBlock());
+      }
+    }
+  }
+
 }
