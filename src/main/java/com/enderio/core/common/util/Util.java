@@ -24,10 +24,10 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -199,7 +199,7 @@ public class Util {
       ItemStack items = inventory.getStackInSlot(l);
 
       if (items != null && items.stackSize > 0) {
-        dropItems(world, inventory.getStackInSlot(l).copy(), x, y, z, doRandomSpread);
+        dropItems(world, items.copy(), x, y, z, doRandomSpread);
       }
     }
   }
