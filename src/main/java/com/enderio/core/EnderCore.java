@@ -121,9 +121,10 @@ public class EnderCore implements IEnderMod {
 
     Handlers.register(event);
     CompatRegistry.INSTANCE.handle(event);
-    ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
     if(event.getSide().isServer()) {            
       ((CommandHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
+    } else {
+      ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
     }
 
     IMCRegistry.INSTANCE.init();
