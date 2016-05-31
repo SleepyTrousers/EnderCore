@@ -13,45 +13,28 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
-public final class BoundingBox {
+public final class BoundingBox extends AxisAlignedBB {
 
   public static final BoundingBox UNIT_CUBE = new BoundingBox(0, 0, 0, 1, 1, 1);
 
-  public final float minX;
-  public final float minY;
-  public final float minZ;
-  public final float maxX;
-  public final float maxY;
-  public final float maxZ;
+  public BoundingBox(BlockPos pos1, BlockPos pos2) {
+    super(pos1, pos2);
+  }
 
   public BoundingBox(AxisAlignedBB bb) {
-    this(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+    super(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
   }
 
   public BoundingBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-    this.minX = minX;
-    this.minY = minY;
-    this.minZ = minZ;
-    this.maxX = maxX;
-    this.maxY = maxY;
-    this.maxZ = maxZ;
+    super(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
   public BoundingBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
-    this.minX = (float) minX;
-    this.minY = (float) minY;
-    this.minZ = (float) minZ;
-    this.maxX = (float) maxX;
-    this.maxY = (float) maxY;
-    this.maxZ = (float) maxZ;
+    super(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
   public BoundingBox(Vector3d min, Vector3d max) {
-    this(min.x, min.y, min.z, max.x, max.y, max.z);
-  }
-
-  public BoundingBox(BoundingBox copy) {
-    this(copy.minX, copy.minY, copy.minZ, copy.maxX, copy.maxY, copy.maxZ);
+    super(min.x, min.y, min.z, max.x, max.y, max.z);
   }
 
   public BoundingBox(BlockCoord bc) {
@@ -59,7 +42,7 @@ public final class BoundingBox {
   }
   
   public BoundingBox(BlockPos bc) {
-    this(bc.getX(), bc.getY(), bc.getZ(), bc.getX() + 1, bc.getY() + 1, bc.getZ() + 1);
+    super(bc.getX(), bc.getY(), bc.getZ(), bc.getX() + 1, bc.getY() + 1, bc.getZ() + 1);
   }
 
   public BoundingBox expandBy(BoundingBox other) {
@@ -80,17 +63,25 @@ public final class BoundingBox {
     return minX < maxX && minY < maxY && minZ < maxZ;
   }
 
-  public BoundingBox scale(double x, double y, double z) {
-    return scale((float) x, (float) y, (float) z);
+  public BoundingBox scale(float xyz) {
+    return scale((double) xyz, (double) xyz, (double) xyz);
+  }
+
+  public BoundingBox scale(double xyz) {
+    return scale(xyz, xyz, xyz);
   }
 
   public BoundingBox scale(float x, float y, float z) {
+    return scale((double) x, (double) y, (double) z);
+  }
+
+  public BoundingBox scale(double x, double y, double z) {
     x = 1 - x;
     y = 1 - y;
     z = 1 - z;
-    float w = ((maxX - minX) * x) / 2;
-    float h = ((maxY - minY) * y) / 2;
-    float d = ((maxZ - minZ) * z) / 2;
+    double w = ((maxX - minX) * x) / 2;
+    double h = ((maxY - minY) * y) / 2;
+    double d = ((maxZ - minZ) * z) / 2;
     return new BoundingBox(minX + w, minY + h, minZ + d, maxX - w, maxY - h, maxZ - d);
   }
 
@@ -105,17 +96,6 @@ public final class BoundingBox {
   public BoundingBox translate(Vector3f vec) {
     return translate(vec.x, vec.y, vec.z);
   }
-
-//  public BoundingBox transform(VertexTransform iTransformation) {
-//    Vector3d min = new Vector3d(minX, minY, minZ);
-//    Vector3d max = new Vector3d(maxX, maxY, maxZ);
-//
-//    iTransformation.apply(min);
-//    iTransformation.apply(max);
-//
-//    return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
-//        min.z, max.z));
-//  }
 
   /**
    * Returns the vertices of the corners for the specified face in counter
@@ -273,15 +253,15 @@ public final class BoundingBox {
     return new Vector3d(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2, minZ + (maxZ - minZ) / 2);
   }
 
-  public float sizeX() {
+  public double sizeX() {
     return Math.abs(maxX - minX);
   }
 
-  public float sizeY() {
+  public double sizeY() {
     return Math.abs(maxY - minY);
   }
 
-  public float sizeZ() {
+  public double sizeZ() {
     return Math.abs(maxZ - minZ);
   }
 
@@ -293,22 +273,17 @@ public final class BoundingBox {
     return new Vector3d(maxX, maxY, maxZ);
   }
 
-  public float getArea() {
+  public double getArea() {
     return sizeX() * sizeY() * sizeZ();
   }
 
-  @Override
-  public String toString() {
-    return "BoundingBox [minX=" + minX + ", minY=" + minY + ", minZ=" + minZ + ", maxX=" + maxX + ", maxY=" + maxY + ", maxZ=" + maxZ + "]";
-  }
-
   public BoundingBox fixMinMax() {
-    float mnX = minX;
-    float mnY = minY;
-    float mnZ = minZ;
-    float mxX = maxX;
-    float mxY = maxY;
-    float mxZ = maxZ;
+    double mnX = minX;
+    double mnY = minY;
+    double mnZ = minZ;
+    double mxX = maxX;
+    double mxY = maxY;
+    double mxZ = maxZ;
     boolean mod = false;
     if (minX > maxX) {
       mnX = maxX;
@@ -331,45 +306,9 @@ public final class BoundingBox {
     return new BoundingBox(mnX, mnY, mnZ, mxX, mxY, mxZ);
   }
 
+  @Deprecated
   public AxisAlignedBB getAxisAlignedBB() {
-    return new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + Float.floatToIntBits(maxX);
-    result = prime * result + Float.floatToIntBits(maxY);
-    result = prime * result + Float.floatToIntBits(maxZ);
-    result = prime * result + Float.floatToIntBits(minX);
-    result = prime * result + Float.floatToIntBits(minY);
-    result = prime * result + Float.floatToIntBits(minZ);
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    BoundingBox other = (BoundingBox) obj;
-    if (Float.floatToIntBits(maxX) != Float.floatToIntBits(other.maxX))
-      return false;
-    if (Float.floatToIntBits(maxY) != Float.floatToIntBits(other.maxY))
-      return false;
-    if (Float.floatToIntBits(maxZ) != Float.floatToIntBits(other.maxZ))
-      return false;
-    if (Float.floatToIntBits(minX) != Float.floatToIntBits(other.minX))
-      return false;
-    if (Float.floatToIntBits(minY) != Float.floatToIntBits(other.minY))
-      return false;
-    if (Float.floatToIntBits(minZ) != Float.floatToIntBits(other.minZ))
-      return false;
-    return true;
+    return this;
   }
 
   public BoundingBox transform(VertexTransform vertexTransform) {
@@ -382,5 +321,20 @@ public final class BoundingBox {
     return new BoundingBox(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.min(min.z, max.z), Math.max(min.x, max.x), Math.max(min.y, max.y), Math.max(
         min.z, max.z));
   }
+
+  @Override
+  public BoundingBox expand(double x, double y, double z) {
+    return new BoundingBox(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
+  }
+
+  @Override
+  public BoundingBox setMaxY(double y2) {
+    return new BoundingBox(this.minX, this.minY, this.minZ, this.maxX, y2, this.maxZ);
+  }
+
+  public BoundingBox expand(double xyz) {
+    return new BoundingBox(minX - xyz, minY - xyz, minZ - xyz, maxX + xyz, maxY + xyz, maxZ + xyz);
+  }
+
 }
 

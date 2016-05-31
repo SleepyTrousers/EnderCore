@@ -14,21 +14,21 @@ public final class OreDict {
   public static void registerVanilla() {
     safeRegister("barsIron", Blocks.IRON_BARS);
     safeRegister("blockHopper", Blocks.HOPPER);
-    safeRegister("blockObsidian", Blocks.OBSIDIAN);
-    safeRegister("itemNetherStar", Items.NETHER_STAR);
-    safeRegister("gravel", Blocks.GRAVEL);
-    safeRegister("chestWood", Blocks.CHEST);
-    safeRegister("craftingTableWood", Blocks.CRAFTING_TABLE);
+    safeRegister("blockObsidian", Blocks.OBSIDIAN); // Forge: obsidian
+    safeRegister("itemNetherStar", Items.NETHER_STAR); // Forge: netherStar
+    safeRegister("gravel", Blocks.GRAVEL); // Forge: gravel
+    safeRegister("chestWood", Blocks.CHEST); // Forge: chest, chestWood
+    safeRegister("craftingTableWood", Blocks.CRAFTING_TABLE); // Forge: workbench
     safeRegister("itemCoal", Items.COAL);
     safeRegister("itemCharcoal", new ItemStack(Items.COAL, 1, 1));
-    safeRegister("pearlEnder", Items.ENDER_PEARL);
+    safeRegister("pearlEnder", Items.ENDER_PEARL); // Forge: enderpearl
     safeRegister("pearlEnderEye", Items.ENDER_EYE);
     safeRegister("itemBlazeRod", Items.BLAZE_ROD);
     safeRegister("itemBlazePowder", Items.BLAZE_POWDER);
     safeRegister("itemClay", Items.CLAY_BALL);
     safeRegister("itemFlint", Items.FLINT);
     safeRegister("itemGhastTear", Items.GHAST_TEAR);
-    safeRegister("dustGunpowder", Items.GUNPOWDER);
+    safeRegister("dustGunpowder", Items.GUNPOWDER); // Forge: gunpowder
     safeRegister("itemLeather", Items.LEATHER);
     safeRegister("slabWoodOak", new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
     safeRegister("slabWoodSpruce", new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
