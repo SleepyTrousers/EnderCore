@@ -8,6 +8,18 @@ import net.minecraft.item.ItemStack;
 
 public abstract class GhostSlot {
 
+  public static interface IGhostSlotAware {
+    /**
+     * Called server-side on the container when a GhostSlot is changed. Check that the given slot number really is a ghost slot before storing the given stack.
+     * 
+     * @param slot
+     *          The slot number that was given to the ghost slot
+     * @param stack
+     *          The stack that should be placed, null to clear
+     */
+    void setGhostSlotContents(int slot, ItemStack stack);
+  }
+
   public TileEntityBase te = null;
   public int slot = -1;
   public int x;
@@ -18,6 +30,7 @@ public abstract class GhostSlot {
   public float grayOutLevel = 0.5f;
   public boolean displayStdOverlay = false;
   public int stackSizeLimit = 1;
+  public boolean updateServer = false;
 
   public boolean isMouseOver(int mx, int my) {
     return mx >= x && mx < (x + 16) && my >= y && my < (y + 16);
@@ -26,8 +39,8 @@ public abstract class GhostSlot {
   public abstract ItemStack getStack();
 
   public void putStack(ItemStack stack) {
-    if (te != null) {
-      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(te, slot, stack));
+    if (updateServer) {
+      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(slot, stack));
     }
   }
 

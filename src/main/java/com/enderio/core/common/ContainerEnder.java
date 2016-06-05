@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.enderio.core.client.gui.widget.GhostSlot;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +15,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerEnder<T extends IInventory> extends Container {
+public class ContainerEnder<T extends IInventory> extends Container implements GhostSlot.IGhostSlotAware {
 
   protected Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
 
@@ -198,5 +199,13 @@ public class ContainerEnder<T extends IInventory> extends Container {
     }
 
     return result;
+  }
+
+  @Override
+  public void setGhostSlotContents(int slot, ItemStack stack) {
+    if (inv instanceof TileEntityBase) {
+      ((TileEntityBase) inv).setGhostSlotContents(slot, stack);
+    }
+
   }
 }

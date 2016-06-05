@@ -1,44 +1,43 @@
 package com.enderio.core.common.network;
 
-import com.enderio.core.common.TileEntityBase;
+import com.enderio.core.client.gui.widget.GhostSlot;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PacketGhostSlot extends MessageTileEntity<TileEntityBase> {
+public class PacketGhostSlot implements IMessage {
 
+  private int windowId;
   private int slot;
   private ItemStack stack;
 
   public PacketGhostSlot() {
   }
 
-  private PacketGhostSlot(TileEntityBase tile) {
-    super(tile);
-  }
-
-  public static PacketGhostSlot setGhostSlotContents(TileEntityBase te, int slot, ItemStack stack) {
-    PacketGhostSlot msg = new PacketGhostSlot(te);
+  public static PacketGhostSlot setGhostSlotContents(int slot, ItemStack stack) {
+    PacketGhostSlot msg = new PacketGhostSlot();
     msg.slot = slot;
     msg.stack = stack;
+    msg.windowId = Minecraft.getMinecraft().thePlayer.openContainer.windowId;
     return msg;
   }
 
   @Override
   public void fromBytes(ByteBuf buf) {
-    super.fromBytes(buf);
+    windowId = buf.readInt();
     slot = buf.readShort();
     stack = ByteBufUtils.readItemStack(buf);
   }
 
   @Override
   public void toBytes(ByteBuf buf) {
-    super.toBytes(buf);
+    buf.writeInt(windowId);
     buf.writeShort(slot);
     ByteBufUtils.writeItemStack(buf, stack);
   }
@@ -47,11 +46,9 @@ public class PacketGhostSlot extends MessageTileEntity<TileEntityBase> {
 
     @Override
     public IMessage onMessage(PacketGhostSlot msg, MessageContext ctx) {
-      TileEntityBase te = msg.getTileEntity(ctx.getServerHandler().playerEntity.worldObj);
-      if (te != null) {               
-        te.setGhostSlotContents(msg.slot, msg.stack);        
-        IBlockState bs = te.getWorld().getBlockState(msg.getPos());
-        te.getWorld().notifyBlockUpdate(msg.getPos(), bs, bs, 3);
+      Container openContainer = ctx.getServerHandler().playerEntity.openContainer;
+      if (openContainer instanceof GhostSlot.IGhostSlotAware && openContainer.windowId == msg.windowId) {
+        ((GhostSlot.IGhostSlotAware) openContainer).setGhostSlotContents(msg.slot, msg.stack);
       }
       return null;
     }
