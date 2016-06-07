@@ -11,7 +11,10 @@ import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -27,7 +30,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   private EnchantAutoSmelt() {
-    super(Rarity.UNCOMMON, EnumEnchantmentType.DIGGER, new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND});
+    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND });
     setRegistryName("autosmelt");
   }
 
@@ -48,7 +51,13 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
 
   @Override
   public boolean canApply(ItemStack stack) {
-    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor);
+    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemSword)
+        && !(stack.getItem() instanceof ItemBow) && !(stack.getItem() instanceof ItemFishingRod);
+  }
+
+  @Override
+  public boolean canApplyAtEnchantingTable(ItemStack stack) {
+    return canApply(stack);
   }
 
   @Override

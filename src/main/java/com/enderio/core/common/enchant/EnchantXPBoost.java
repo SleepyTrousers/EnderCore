@@ -10,6 +10,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -27,7 +28,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   }
 
   private EnchantXPBoost() {
-    // The ResourceLocation is mostly irrelevant, it's just a key to retreive the enchantment with
+    // The ResourceLocation is mostly irrelevant, it's just a key to retrieve the enchantment with
     super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE,  new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND});
     setRegistryName("xpboost");
   }
@@ -49,7 +50,12 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   @Override
   public boolean canApply(ItemStack stack) {
-    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor);
+    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemFishingRod);
+  }
+
+  @Override
+  public boolean canApplyAtEnchantingTable(ItemStack stack) {
+    return canApply(stack);
   }
 
   @Override
