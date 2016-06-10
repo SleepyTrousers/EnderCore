@@ -59,8 +59,9 @@ public final class BoundingBox extends AxisAlignedBB {
         && other.minZ < this.maxZ : false) : false;
   }
 
+  @Deprecated
   public boolean isValid() {
-    return minX < maxX && minY < maxY && minZ < maxZ;
+    return true;
   }
 
   public BoundingBox scale(float xyz) {
