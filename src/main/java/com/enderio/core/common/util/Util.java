@@ -12,6 +12,7 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
@@ -294,37 +295,34 @@ public class Util {
     return class1.isAssignableFrom(stack.getItem().getClass());
   }
 
-  // Code adapted from World.func_147447_a (rayTraceBlocks) to return all
+  // Code adapted from World.rayTraceBlocks to return all
   // collided blocks
-  public static List<RayTraceResult> raytraceAll(World world, Vec3d startVec, Vec3d endVec, boolean includeLiquids) {
-
+  public static List<RayTraceResult> raytraceAll(World world, Vec3d startVec, Vec3d endVec, boolean includeLiquids) {    
+    boolean ignoreBlockWithoutBoundingBox = true;
+    
     List<RayTraceResult> result = new ArrayList<RayTraceResult>();
-    boolean p_147447_4_ = false;
-    boolean p_147447_5_ = false;
-
+    
     if (!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
       if (!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
+        int i = MathHelper.floor_double(endVec.xCoord);
+        int j = MathHelper.floor_double(endVec.yCoord);
+        int k = MathHelper.floor_double(endVec.zCoord);
+        int l = MathHelper.floor_double(startVec.xCoord);
+        int i1 = MathHelper.floor_double(startVec.yCoord);
+        int j1 = MathHelper.floor_double(startVec.zCoord);
+        BlockPos blockpos = new BlockPos(l, i1, j1);
+        IBlockState iblockstate = world.getBlockState(blockpos);
+        Block block = iblockstate.getBlock();
 
-        int endX = MathHelper.floor_double(endVec.xCoord);
-        int endY = MathHelper.floor_double(endVec.yCoord);
-        int endZ = MathHelper.floor_double(endVec.zCoord);
-        int startX = MathHelper.floor_double(startVec.xCoord);
-        int startY = MathHelper.floor_double(startVec.yCoord);
-        int startZ = MathHelper.floor_double(startVec.zCoord);
-        BlockPos pos = new BlockPos(startX, startY, startZ);
-        IBlockState bs = world.getBlockState(pos);
-        Block block = bs.getBlock();
+        if ((!ignoreBlockWithoutBoundingBox || iblockstate.getCollisionBoundingBox(world, blockpos) != Block.NULL_AABB)
+            && block.canCollideCheck(iblockstate, includeLiquids)) {
+          RayTraceResult raytraceresult = iblockstate.collisionRayTrace(world, blockpos, startVec, endVec);
 
-        if ((!p_147447_4_ || block.getCollisionBoundingBox(bs, world, pos) != null) && block.canCollideCheck(bs, includeLiquids)) {
-          // if ((!p_147447_4_ || block.getCollisionBoundingBoxFromPool(world,
-          // l, i1, j1) != null) && block.canCollideCheck(k1, includeLiquids)) {
-          RayTraceResult movingobjectposition = block.collisionRayTrace(bs, world, new BlockPos(startX, startY, startZ), startVec, endVec);
-          if (movingobjectposition != null) {
-            result.add(movingobjectposition);
+          if (raytraceresult != null) {
+            result.add(raytraceresult);
           }
         }
 
-        RayTraceResult movingobjectposition2 = null;
         int k1 = 200;
 
         while (k1-- >= 0) {
@@ -332,43 +330,39 @@ public class Util {
             return null;
           }
 
-          if (startX == endX && startY == endY && startZ == endZ) {
-            if (p_147447_5_) {
-              result.add(movingobjectposition2);
-            } else {
-              return result;
-            }
+          if (l == i && i1 == j && j1 == k) {
+            return result;
           }
 
-          boolean flag6 = true;
-          boolean flag3 = true;
-          boolean flag4 = true;
+          boolean flag2 = true;
+          boolean flag = true;
+          boolean flag1 = true;
           double d0 = 999.0D;
           double d1 = 999.0D;
           double d2 = 999.0D;
 
-          if (endX > startX) {
-            d0 = startX + 1.0D;
-          } else if (endX < startX) {
-            d0 = startX + 0.0D;
+          if (i > l) {
+            d0 = (double) l + 1.0D;
+          } else if (i < l) {
+            d0 = (double) l + 0.0D;
           } else {
-            flag6 = false;
+            flag2 = false;
           }
 
-          if (endY > startY) {
-            d1 = startY + 1.0D;
-          } else if (endY < startY) {
-            d1 = startY + 0.0D;
+          if (j > i1) {
+            d1 = (double) i1 + 1.0D;
+          } else if (j < i1) {
+            d1 = (double) i1 + 0.0D;
           } else {
-            flag3 = false;
+            flag = false;
           }
 
-          if (endZ > startZ) {
-            d2 = startZ + 1.0D;
-          } else if (endZ < startZ) {
-            d2 = startZ + 0.0D;
+          if (k > j1) {
+            d2 = (double) j1 + 1.0D;
+          } else if (k < j1) {
+            d2 = (double) j1 + 0.0D;
           } else {
-            flag4 = false;
+            flag1 = false;
           }
 
           double d3 = 999.0D;
@@ -378,13 +372,15 @@ public class Util {
           double d7 = endVec.yCoord - startVec.yCoord;
           double d8 = endVec.zCoord - startVec.zCoord;
 
-          if (flag6) {
+          if (flag2) {
             d3 = (d0 - startVec.xCoord) / d6;
           }
-          if (flag3) {
+
+          if (flag) {
             d4 = (d1 - startVec.yCoord) / d7;
           }
-          if (flag4) {
+
+          if (flag1) {
             d5 = (d2 - startVec.zCoord) / d8;
           }
 
@@ -403,47 +399,43 @@ public class Util {
           EnumFacing enumfacing;
 
           if (d3 < d4 && d3 < d5) {
-            enumfacing = endX > startX ? EnumFacing.WEST : EnumFacing.EAST;
+            enumfacing = i > l ? EnumFacing.WEST : EnumFacing.EAST;
             startVec = new Vec3d(d0, startVec.yCoord + d7 * d3, startVec.zCoord + d8 * d3);
           } else if (d4 < d5) {
-            enumfacing = endY > startY ? EnumFacing.DOWN : EnumFacing.UP;
+            enumfacing = j > i1 ? EnumFacing.DOWN : EnumFacing.UP;
             startVec = new Vec3d(startVec.xCoord + d6 * d4, d1, startVec.zCoord + d8 * d4);
           } else {
-            enumfacing = endZ > startZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
+            enumfacing = k > j1 ? EnumFacing.NORTH : EnumFacing.SOUTH;
             startVec = new Vec3d(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);
           }
 
-          startX = MathHelper.floor_double(startVec.xCoord) - (enumfacing == EnumFacing.EAST ? 1 : 0);
-          startY = MathHelper.floor_double(startVec.yCoord) - (enumfacing == EnumFacing.UP ? 1 : 0);
-          startZ = MathHelper.floor_double(startVec.zCoord) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
-          pos = new BlockPos(startX, startY, startZ);
-          IBlockState bs1 = world.getBlockState(pos);
-          Block block1 = bs.getBlock();
+          l = MathHelper.floor_double(startVec.xCoord) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+          i1 = MathHelper.floor_double(startVec.yCoord) - (enumfacing == EnumFacing.UP ? 1 : 0);
+          j1 = MathHelper.floor_double(startVec.zCoord) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+          blockpos = new BlockPos(l, i1, j1);
+          IBlockState iblockstate1 = world.getBlockState(blockpos);
+          Block block1 = iblockstate1.getBlock();
 
-          if (!p_147447_4_ || block1.getCollisionBoundingBox(bs1, world, new BlockPos(startX, startY, startZ)) != null) {
-            if (block1.canCollideCheck(bs1, includeLiquids)) {
-              RayTraceResult movingobjectposition1 = block1.collisionRayTrace(bs1, world, new BlockPos(startX, startY, startZ), startVec, endVec);
-              if (movingobjectposition1 != null) {
-                result.add(movingobjectposition1);
+          if (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL
+              || iblockstate1.getCollisionBoundingBox(world, blockpos) != Block.NULL_AABB) {
+            if (block1.canCollideCheck(iblockstate1, includeLiquids)) {
+              RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(world, blockpos, startVec, endVec);
+
+              if (raytraceresult1 != null) {
+                result.add(raytraceresult1);
               }
-            } else {
-              movingobjectposition2 = new RayTraceResult(startVec, enumfacing, pos);
-            }
+            } 
           }
         }
-        if (p_147447_5_) {
-          result.add(movingobjectposition2);
-        } else {
-          return result;
-        }
+
+        return result;
       } else {
         return result;
       }
     } else {
       return result;
     }
-    return result;
-  }
+  }  
 
   public static EnumFacing getDirFromOffset(int xOff, int yOff, int zOff) {
     if (xOff != 0 && yOff == 0 && zOff == 0) {
