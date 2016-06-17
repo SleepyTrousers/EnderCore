@@ -5,6 +5,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.minecraft.launchwrapper.Launch;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -19,7 +22,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.collect.Sets;
 
@@ -37,7 +39,52 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 @MCVersion(value = "1.7.10")
 public class EnderCoreTransformer implements IClassTransformer {
+
+  // The EnderCore class cannot be referenced from the transformer,
+  // as it improperly triggers classloading of FML event classes.
+  // This is caused by its various event handlers. Since event handlers
+  // require an event class to be referenced in the method signature
+  // (in this case, a state event), the referenced event class is
+  // loaded along with the containing class of the method.
+  // Since EnderCore is referenced in the 'transform' method of this class,
+  // EnderCore and the aforementioned event classes are consequently referenced and classloaded too early.
+  //
+  // In order to be compatible with coremods such as Sponge, FML event
+  // classes cannot be classloaded until the game is starting. Specifically,
+  // they are being classloaded before FML is ready to actually start posting state events.
+  // This is significantly earlier than certain coremods such as Sponge expect,
+  // which prevents them from properly applying their own transformations.
+
+  // The solution is to copy the logger into this class, instead of referencing
+  // the static 'logger' field from EnderCore
+  public static final Logger logger = LogManager.getLogger("EnderCore");
+
+  // These classloader exclusions ensure that this transformer is not re-entrant =
+  // that is, it does not trigger any additional class transformation while
+  // it's transforming a class. While re-entrance is technically allowed,
+  // it can cause issues with more advanced transformers such as Mixin, and should
+  // therefore be avoided when at all possible.
+
+  // It is important to note that merely using a class in any way will not necessarily
+  // cause it be classloaded at the same time as the containing class. While any classes
+  // referenced from static fields, as well as any classes referenced from
+  // the signature of a method (both static and non-static), other uses such as referencing
+  // a class from within a method will not cause the referenced class to be immediately classloaded.
+  // Thus, even though AbstractConfigHandler references EnderCore several times,
+  // it is not necessary to add a transformer exclusion for EnderCore, since the
+  // reference occurs only within method bodies.
+
+  // The config packages are excluded as they are referenced at the start of
+  // the 'transform' method, in the usage of 'ConfigHandler.invisibleMode'.
+  // The 'Lang' class is referenced from a static field in AbstractConfigHandler,
+  // (see above paragraph) so it is excluded to.
+  static {
+    Launch.classLoader.addTransformerExclusion("com.enderio.core.common.config.");
+    Launch.classLoader.addTransformerExclusion("com.enderio.core.api.common.config.");
+    Launch.classLoader.addTransformerExclusion("com.enderio.core.common.Lang");
+  }
   protected static class ObfSafeName {
+
     private String deobf, srg;
 
     public ObfSafeName(String deobf, String srg) {
@@ -130,7 +177,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -157,7 +204,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (done != 2) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -197,7 +244,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       };
@@ -225,7 +272,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -255,7 +302,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -283,7 +330,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -332,7 +379,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            EnderCore.logger.info("Transforming failed.");
+            logger.info("Transforming failed.");
           }
         }
       });
@@ -342,7 +389,7 @@ public class EnderCoreTransformer implements IClassTransformer {
   }
 
   protected final byte[] transform(byte[] classBytes, String className, ObfSafeName methodName, Transform transformer) {
-    EnderCore.logger.info("Transforming Class [" + className + "], Method [" + methodName.getName() + "]");
+    logger.info("Transforming Class [" + className + "], Method [" + methodName.getName() + "]");
 
     ClassNode classNode = new ClassNode();
     ClassReader classReader = new ClassReader(classBytes);
@@ -354,7 +401,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
     classNode.accept(cw);
-    EnderCore.logger.info("Transforming " + className + " Finished.");
+    logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
   }
 }
