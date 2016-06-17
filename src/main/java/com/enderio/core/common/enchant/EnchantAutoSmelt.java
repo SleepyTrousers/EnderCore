@@ -36,12 +36,12 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
 
   @Override
   public int getMaxEnchantability(int level) {
-    return super.getMaxEnchantability(level) + 30;
+    return 60;
   }
 
   @Override
   public int getMinEnchantability(int level) {
-    return super.getMinEnchantability(level);
+    return 15;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
       INSTANCE = new EnchantAutoSmelt();
       GameRegistry.register(INSTANCE);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN +  ":autosmelt\" costPerLevel=\"30\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+          "<enchantment name=\"" + EnderCore.DOMAIN +  ":autosmelt\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
     }
   }
 
