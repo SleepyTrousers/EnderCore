@@ -131,7 +131,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   @Override
   public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    if (doNormalDrops(world, pos) || world == null || pos == null) {
+    if (world == null || pos == null || doNormalDrops(world, pos)) {
       return super.getDrops(world, pos, state, fortune);
     }
     return Lists.newArrayList(getNBTDrop(world, pos, getTileEntity(world, pos)));
