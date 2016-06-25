@@ -155,9 +155,11 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void updateScreen() {
     super.updateScreen();
 
-    if (!ForgeHooks.canInteractWith(mc.thePlayer, inventorySlots)) {
-      mc.thePlayer.closeScreen();
-    }
+    //TODO: 1.10 Had to be removed as part of re-liscening, something will
+    //be added back
+//    if (!ForgeHooks.canInteractWith(mc.thePlayer, inventorySlots)) {
+//      mc.thePlayer.closeScreen();
+//    }
 
     for (GuiTextField f : textFields) {
       f.updateCursorCounter();
