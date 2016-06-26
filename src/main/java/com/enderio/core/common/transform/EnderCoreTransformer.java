@@ -1,20 +1,26 @@
 package com.enderio.core.common.transform;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import com.enderio.core.common.config.ConfigHandler;
+import com.google.common.collect.Sets;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.launchwrapper.Launch;
@@ -94,9 +100,9 @@ public class EnderCoreTransformer implements IClassTransformer {
 //  private static final ObfSafeName entityArrowMethod = new ObfSafeName("onUpdate", "func_70071_h_");
 //  private static final String entityArrowMethodSig = "(Lnet/minecraft/entity/projectile/EntityArrow;)V";
 //
-//  private static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
-//  private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
-//  private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
+  private static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
+  private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
+  private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
 
   private static final String renderItemClass = "net.minecraft.client.renderer.RenderItem";
   private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
@@ -105,14 +111,16 @@ public class EnderCoreTransformer implements IClassTransformer {
 //  private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass,
 //      itemStackClass, entityArrowClass, containerFurnaceClass, renderItemClass);
 
+  private static final Set<String> transformableClasses = Sets.newHashSet(containerFurnaceClass, renderItemClass);
+
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
   
     //TODO: 1.10 All these need to be checked
-//    boolean doGameplayChanges = true;
-//    if (transformableClasses.contains(transformedName) && ConfigHandler.invisibleMode == 1) {
-//      doGameplayChanges = false;
-//    }
+    boolean doGameplayChanges = true;
+    if (transformableClasses.contains(transformedName) && ConfigHandler.invisibleMode == 1) {
+      doGameplayChanges = false;
+    }
     
     // Void fog removal
 //    if (doGameplayChanges && transformedName.equals(worldTypeClass)) {
@@ -267,33 +275,34 @@ public class EnderCoreTransformer implements IClassTransformer {
 //      });
 //    }
     // Furnace Shift Click Fix
-//    else if (doGameplayChanges && transformedName.equals(containerFurnaceClass)) {
-//      basicClass = transform(basicClass, containerFurnaceClass, containerFurnaceMethod, new Transform() { // TODO 1.9 applies. test it!
-//        @Override
-//        void transform(Iterator<MethodNode> methods) {
-//          boolean done = false;
-//          while (methods.hasNext()) {
-//            MethodNode m = methods.next();
-//            if (containerFurnaceMethod.equals(m.name)) {
-//              m.instructions.clear();
-//
-//              m.instructions.add(new VarInsnNode(ALOAD, 0));
-//              m.instructions.add(new VarInsnNode(ALOAD, 1));
-//              m.instructions.add(new VarInsnNode(ILOAD, 2));
-//              m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "transferStackInSlot",
-//                  containerFurnaceMethodSig, false));
-//              m.instructions.add(new InsnNode(ARETURN));
-//
-//              done = true;
-//              break;
-//            }
-//          }
-//          if (!done) {
-//            logger.info("Transforming failed.");
-//          }
-//        }
-//      });
-//    }
+    // else
+    if (doGameplayChanges && transformedName.equals(containerFurnaceClass)) {
+      basicClass = transform(basicClass, containerFurnaceClass, containerFurnaceMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (containerFurnaceMethod.equals(m.name)) {
+              m.instructions.clear();
+
+              m.instructions.add(new VarInsnNode(ALOAD, 0));
+              m.instructions.add(new VarInsnNode(ALOAD, 1));
+              m.instructions.add(new VarInsnNode(ILOAD, 2));
+              m.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "transferStackInSlot",
+                  containerFurnaceMethodSig, false));
+              m.instructions.add(new InsnNode(Opcodes.ARETURN));
+
+              done = true;
+              break;
+            }
+          }
+          if (!done) {
+            logger.info("Transforming failed.");
+          }
+        }
+      });
+    }
     // Item Overlay Rendering hook
 //    else 
       if (transformedName.equals(renderItemClass)) {
