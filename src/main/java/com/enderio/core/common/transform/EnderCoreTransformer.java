@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -22,15 +23,15 @@ import org.objectweb.asm.tree.VarInsnNode;
 import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.collect.Sets;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 @MCVersion(value = "1.10")
 public class EnderCoreTransformer implements IClassTransformer {
@@ -81,11 +82,11 @@ public class EnderCoreTransformer implements IClassTransformer {
 //  private static final ObfSafeName voidFogMethod = new ObfSafeName("hasVoidParticles", "func_76564_j");
 //  private static final String voidFogMethodSig = "(Lnet/minecraft/world/WorldType;Z)Z";
 //
-//  private static final String anvilContainerClass = "net.minecraft.inventory.ContainerRepair";
-//  private static final ObfSafeName anvilContainerMethod = new ObfSafeName("updateRepairOutput", "func_82848_d");
-//
-//  private static final String anvilGuiClass = "net.minecraft.client.gui.GuiRepair";
-//  private static final ObfSafeName anvilGuiMethod = new ObfSafeName("drawGuiContainerForegroundLayer", "func_146979_b");
+  private static final String anvilContainerClass = "net.minecraft.inventory.ContainerRepair";
+  private static final ObfSafeName anvilContainerMethod = new ObfSafeName("updateRepairOutput", "func_82848_d");
+
+  private static final String anvilGuiClass = "net.minecraft.client.gui.GuiRepair";
+  private static final ObfSafeName anvilGuiMethod = new ObfSafeName("drawGuiContainerForegroundLayer", "func_146979_b");
 //
 //  private static final String enchantHelperClass = "net.minecraft.enchantment.EnchantmentHelper";
 //  private static final String enchantHelperMethodSig = "(Lnet/minecraft/item/ItemStack;I)I";
@@ -152,33 +153,33 @@ public class EnderCoreTransformer implements IClassTransformer {
 //    }
     // Anvil max level
     // else
-//    if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) { 
-   // TODO: 1.10 tested and doesn't work
-//      basicClass = transform(basicClass, anvilContainerClass, anvilContainerMethod, new Transform() {
-//        @Override
-//        void transform(Iterator<MethodNode> methods) {
-//          int done = 0;
-//          while (methods.hasNext()) {
-//            MethodNode m = methods.next();
-//            if (anvilContainerMethod.equals(m.name) || anvilGuiMethod.equals(m.name)) {
-//              for (int i = 0; i < m.instructions.size(); i++) {
-//                AbstractInsnNode next = m.instructions.get(i);
-//
-//                next = m.instructions.get(i);
-//                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
-//                  m.instructions.set(next,
-//                      new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I", false));
-//                  done++;
-//                }
-//              }
-//            }
-//          }
-//          if (done != 2) {
-//            logger.info("Transforming failed.");
-//          }
-//        }
-//      });
-//    }
+    if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) {
+      // 1.10 tested and works
+      basicClass = transform(basicClass, transformedName, transformedName.equals(anvilContainerClass) ? anvilContainerMethod : anvilGuiMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          int done = 0;
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (anvilContainerMethod.equals(m.name) || anvilGuiMethod.equals(m.name)) {
+              for (int i = 0; i < m.instructions.size(); i++) {
+                AbstractInsnNode next = m.instructions.get(i);
+
+                next = m.instructions.get(i);
+                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
+                  m.instructions.set(next,
+                      new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I", false));
+                  done++;
+                }
+              }
+            }
+          }
+          if (done > 2 || done < 1) {
+            logger.info("Transforming failed. (" + done + ")");
+          }
+        }
+      });
+    }
     // Item Enchantability Event
 //    else if (transformedName.equals(enchantHelperClass)) { // TODO 1.10 applies. test it!
 //      final Map<String, int[]> data = new HashMap<String, int[]>();
