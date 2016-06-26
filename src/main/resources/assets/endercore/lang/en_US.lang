@@ -23,3 +23,5 @@ endercore.chat.invis.warn.3=You can override this in the config.
 endercore.chat.invis.warn.4=This warning will only show once unless configured otherwise.
 endercore.chat.invis.reason.1=as requested by mod(s): %s
 endercore.chat.invis.reason.2=as configured
+
+endercore.config.title=Ender Core
