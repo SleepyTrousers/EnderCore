@@ -90,25 +90,23 @@ public class ColorButton extends IconButton {
     super.drawButton(mc, mouseX, mouseY);
     if (visible) {
       VertexBuffer tes = Tessellator.getInstance().getBuffer();
-      tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+      tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
       
       int x = xPosition + 2;
       int y = yPosition + 2;
 
-      GL11.glDisable(GL11.GL_TEXTURE_2D);
-
+      GlStateManager.disableTexture2D();
       int col = ItemDye.DYE_COLORS[colorIndex];
-      Vector3f c = ColorUtil.toFloat(col);      
+      Vector3f c = ColorUtil.toFloat(col);    
       GlStateManager.color(c.x, c.y, c.z);
-      
-      tes.pos(x, y + height - 4, zLevel).endVertex();
-      tes.pos(x + width - 4, y + height - 4, zLevel).endVertex();
-      tes.pos(x + width - 4, y + 0, zLevel).endVertex();
-      tes.pos(x, y + 0, zLevel).endVertex();
+            
+      tes.pos(x, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(x + width - 4, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(x + width - 4, y + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(x, y + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
 
       Tessellator.getInstance().draw();
-
-      GL11.glEnable(GL11.GL_TEXTURE_2D);
+      GlStateManager.enableTexture2D();
 
     }
   }
