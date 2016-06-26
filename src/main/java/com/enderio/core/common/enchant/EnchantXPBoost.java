@@ -8,6 +8,7 @@ import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemFishingRod;
@@ -51,6 +52,11 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   @Override
   public boolean canApply(ItemStack stack) {
     return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemFishingRod);
+  }
+  
+  @Override
+  public boolean canApplyTogether(Enchantment ench) {
+    return super.canApplyTogether(ench) && ench != Enchantments.SILK_TOUCH;
   }
 
   @Override

@@ -64,7 +64,7 @@ public class XPBoostHandler {
   @SubscribeEvent
   public void handleBlockBreak(BreakEvent event) {    
     ItemStack held = event.getPlayer().getHeldItemMainhand();
-    if (held != null) {
+    if (held != null ) {
       int level = getXPBoostLevel(held);
       int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
 
@@ -102,13 +102,17 @@ public class XPBoostHandler {
       return -1;
     }
 
+    int result = -1;
     Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
     for (Enchantment i : enchants.keySet()) {      
       if (i == EnchantXPBoost.instance()) {
-        return enchants.get(i);
+        result = enchants.get(i);
+      } else if(i == Enchantments.SILK_TOUCH) {
+        //No XP boost on silk touch
+        return -1;
       }
     }
-    return -1;
+    return result;
   }
 
   private void scheduleXP(Entity entity, int boost) {
