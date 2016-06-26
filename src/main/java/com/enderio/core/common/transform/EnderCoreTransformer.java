@@ -124,7 +124,8 @@ public class EnderCoreTransformer implements IClassTransformer {
     
     // Void fog removal
 //    if (doGameplayChanges && transformedName.equals(worldTypeClass)) {
-//      basicClass = transform(basicClass, worldTypeClass, voidFogMethod, new Transform() { // TODO 1.9 fails
+ // TODO 1.10 fails
+//      basicClass = transform(basicClass, worldTypeClass, voidFogMethod, new Transform() { 
 //        @Override
 //        void transform(Iterator<MethodNode> methods) {
 //          boolean done = false;
@@ -150,7 +151,9 @@ public class EnderCoreTransformer implements IClassTransformer {
 //      });
 //    }
     // Anvil max level
-//    else if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) { // TODO 1.9 fails
+    // else
+//    if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) { 
+   // TODO: 1.10 tested and doesn't work
 //      basicClass = transform(basicClass, anvilContainerClass, anvilContainerMethod, new Transform() {
 //        @Override
 //        void transform(Iterator<MethodNode> methods) {
@@ -163,8 +166,8 @@ public class EnderCoreTransformer implements IClassTransformer {
 //
 //                next = m.instructions.get(i);
 //                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
-//                  m.instructions.set(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I",
-//                      false));
+//                  m.instructions.set(next,
+//                      new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I", false));
 //                  done++;
 //                }
 //              }
@@ -177,7 +180,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 //      });
 //    }
     // Item Enchantability Event
-//    else if (transformedName.equals(enchantHelperClass)) { // TODO 1.9 applies. test it!
+//    else if (transformedName.equals(enchantHelperClass)) { // TODO 1.10 applies. test it!
 //      final Map<String, int[]> data = new HashMap<String, int[]>();
 //      data.put(buildEnchantListMethod.getName(), new int[] { 1, 4 });
 //      data.put(calcEnchantabilityMethod.getName(), new int[] { 3, 5 });
@@ -220,7 +223,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 //    }
     // ItemRarity Event
 //    else if (transformedName.equals(itemStackClass)) {
-//      basicClass = transform(basicClass, itemStackClass, itemStackMethod, new Transform() { // TODO 1.9 applies. test it!
+//      basicClass = transform(basicClass, itemStackClass, itemStackMethod, new Transform() { // TODO 1.10 applies. test it!
 //        @Override
 //        void transform(Iterator<MethodNode> methods) {
 //          boolean done = false;
@@ -246,7 +249,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 //    }
     // ArrowUpdate Event
 //    else if (transformedName.equals(entityArrowClass)) {
-//      basicClass = transform(basicClass, entityArrowClass, entityArrowMethod, new Transform() { // TODO 1.9 doesn't apply
+//      basicClass = transform(basicClass, entityArrowClass, entityArrowMethod, new Transform() { // TODO 1.10 doesn't apply
 //        @Override
 //        void transform(Iterator<MethodNode> methods) {
 //          boolean done = false;
