@@ -116,7 +116,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
 
     protected boolean isPoweredRedstone() {
-        return worldObj.isBlockLoaded(getPos()) ? worldObj.getStrongPower(getPos()) > 0 : false;
+    return worldObj.isBlockLoaded(getPos()) ? worldObj.isBlockIndirectlyGettingPowered(getPos()) > 0 : false;
     }
 
     /**
