@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.enderio.core.api.common.util.IFluidReceptor;
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.fluid.FluidWrapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,7 +23,6 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
@@ -98,57 +98,12 @@ public class FluidUtil {
 
   public static boolean doPull(IFluidHandler into, EnumFacing fromDir, int maxVolume) {
     TileEntity te = (TileEntity) into;
-    BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
-    IFluidHandler target = FluidUtil.getFluidHandler(te.getWorld(), loc);
-    if (target != null) {
-      FluidTankInfo[] infos = target.getTankInfo(fromDir.getOpposite());
-      if (infos != null) {
-        for (FluidTankInfo info : infos) {
-          if (info.fluid != null && info.fluid.amount > 0) {
-            if (into.canFill(fromDir, info.fluid.getFluid())) {
-              FluidStack canPull = info.fluid.copy();
-              canPull.amount = Math.min(maxVolume, canPull.amount);
-              FluidStack drained = target.drain(fromDir.getOpposite(), canPull, false);
-              if (drained != null && drained.amount > 0) {
-                int filled = into.fill(fromDir, drained, false);
-                if (filled > 0) {
-                  drained = target.drain(fromDir.getOpposite(), filled, true);
-                  into.fill(fromDir, drained, true);
-                  return true;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return false;
+    return (FluidWrapper.transfer(te.getWorld(), te.getPos().offset(fromDir), fromDir.getOpposite(), te, fromDir, maxVolume) > 0);
   }
 
   public static boolean doPush(IFluidHandler from, EnumFacing fromDir, int maxVolume) {
-
     TileEntity te = (TileEntity) from;
-    BlockCoord loc = new BlockCoord(te).getLocation(fromDir);
-    IFluidHandler target = getFluidHandler(te.getWorld(), loc);
-    if (target == null) {
-      return false;
-    }
-    FluidTankInfo[] infos = from.getTankInfo(fromDir);
-    boolean res = false;
-    if (infos != null) {
-      for (FluidTankInfo info : infos) {
-        if (info.fluid != null && info.fluid.amount > 0 && from.canDrain(fromDir, info.fluid.getFluid())) {
-          FluidStack maxDrain = new FluidStack(info.fluid, maxVolume);
-          FluidStack canDrain = from.drain(fromDir, maxDrain, false);
-          if (canDrain != null && canDrain.amount > 0) {
-            int filled = target.fill(fromDir.getOpposite(), canDrain, true);
-            from.drain(fromDir, new FluidStack(info.fluid, filled), true);
-            res |= true;
-          }
-        }
-      }
-    }
-    return res;
+    return (FluidWrapper.transfer(te, fromDir, te.getWorld(), te.getPos().offset(fromDir), fromDir.getOpposite(), maxVolume) > 0);
   }
 
   public static FluidAndStackResult tryFillContainer(ItemStack target, FluidStack source) {
