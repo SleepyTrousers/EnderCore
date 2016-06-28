@@ -20,7 +20,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 public class FluidWrapper {
 
   @CapabilityInject(IFluidHandler.class)
-  public static Capability<IFluidHandler> FLUID_HANDLER = null;
+  private static final Capability<IFluidHandler> FLUID_HANDLER = null;
 
   public static @Nullable IFluidWrapper wrap(IBlockAccess world, BlockPos pos, EnumFacing side) {
     if (world == null || pos == null) {
