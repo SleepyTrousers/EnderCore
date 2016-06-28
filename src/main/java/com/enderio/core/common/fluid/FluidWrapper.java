@@ -158,7 +158,7 @@ public class FluidWrapper {
       return 0;
     }
 
-    FluidStack drainable = from.contents();
+    FluidStack drainable = from.getAvailableFluid();
     if (drainable == null || drainable.amount <= 0) {
       return 0;
     }

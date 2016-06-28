@@ -31,7 +31,7 @@ public class FluidTankFluidWrapper implements IFluidWrapper {
 
   @Override
   @Nullable
-  public FluidStack contents() {
+  public FluidStack getAvailableFluid() {
     return fluidTank.getFluid();
   }
 

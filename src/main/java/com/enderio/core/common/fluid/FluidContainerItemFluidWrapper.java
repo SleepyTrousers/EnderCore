@@ -31,7 +31,7 @@ public class FluidContainerItemFluidWrapper implements IFluidWrapper {
   @Override
   @Nullable
   public FluidStack drain(FluidStack resource) {
-    if (resource.isFluidEqual(contents())) {
+    if (resource.isFluidEqual(getAvailableFluid())) {
       return fluidContainerItem.drain(itemStack, resource.amount, true);
     }
     return null;
@@ -39,7 +39,7 @@ public class FluidContainerItemFluidWrapper implements IFluidWrapper {
 
   @Override
   @Nullable
-  public FluidStack contents() {
+  public FluidStack getAvailableFluid() {
     return fluidContainerItem.getFluid(itemStack);
   }
 

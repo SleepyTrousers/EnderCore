@@ -31,7 +31,7 @@ public class CapabilityFluidWrapper implements IFluidWrapper {
 
   @Override
   @Nullable
-  public FluidStack contents() {
+  public FluidStack getAvailableFluid() {
     return fluidHandler.drain(Integer.MAX_VALUE, false);
   }
 

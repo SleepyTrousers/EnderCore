@@ -47,7 +47,7 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
 
   @Override
   @Nullable
-  public FluidStack contents() {
+  public FluidStack getAvailableFluid() {
     FluidTank[] outputTanks = tankAccess.getOutputTanks();
     if (outputTanks != null && outputTanks.length >= 1 && outputTanks[0] != null) {
       return outputTanks[0].getFluid();

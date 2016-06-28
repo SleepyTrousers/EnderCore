@@ -14,6 +14,6 @@ public interface IFluidWrapper {
   FluidStack drain(FluidStack resource);
 
   @Nullable
-  FluidStack contents();
+  FluidStack getAvailableFluid();
 
 }

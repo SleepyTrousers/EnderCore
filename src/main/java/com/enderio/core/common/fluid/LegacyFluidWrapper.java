@@ -34,7 +34,7 @@ public class LegacyFluidWrapper implements IFluidWrapper {
 
   @Override
   @Nullable
-  public FluidStack contents() {
+  public FluidStack getAvailableFluid() {    
     return fluidHandler.drain(side, Integer.MAX_VALUE, false);
   }
 
