@@ -1,5 +1,8 @@
 package com.enderio.core.common.fluid;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
@@ -81,6 +84,17 @@ public class FluidWrapper {
       return new FluidContainerItemFluidWrapper((IFluidContainerItem) itemStack.getItem(), itemStack);
     }
     return wrap(FluidUtil.getFluidHandler(itemStack));
+  }
+
+  public static Map<EnumFacing, IFluidWrapper> wrapNeighbours(IBlockAccess world, BlockPos pos) {
+    Map<EnumFacing, IFluidWrapper> res = new EnumMap<EnumFacing, IFluidWrapper>(EnumFacing.class);
+    for (EnumFacing dir : EnumFacing.values()) {
+      IFluidWrapper wrapper = wrap(world, pos.offset(dir), dir.getOpposite());
+      if (wrapper != null) {
+        res.put(dir, wrapper);
+      }
+    }
+    return res;
   }
 
   // Some helpers:
