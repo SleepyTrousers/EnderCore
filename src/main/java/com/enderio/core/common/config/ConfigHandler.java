@@ -8,9 +8,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigProcessor.IReloadCallback;
 import com.enderio.core.common.config.JsonConfigReader.ModToken;
@@ -23,6 +20,9 @@ import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
 import com.enderio.core.common.tweaks.Tweak;
 import com.enderio.core.common.tweaks.Tweaks;
+
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
 
 public class ConfigHandler extends AbstractConfigHandler implements ITweakConfigHandler, IReloadCallback {
 
@@ -102,10 +102,6 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Comment("Allow the Auto Smelt enchant to be registered.")
   @RestartReq(RestartReqs.REQUIRES_MC_RESTART)
   public static boolean allowAutoSmelt = true;
-
-  @Config(sectionEnchants)
-  @Comment("Allow the Auto Smelt enchant to work with Fortune.")
-  public static boolean allowAutoSmeltWithFortune = true;
 
   //    @Config("test")
   //    public static List<Integer> test1 = Lists.newArrayList(1, 2, 3);
