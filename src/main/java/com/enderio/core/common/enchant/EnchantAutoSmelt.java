@@ -86,8 +86,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
 
   @Override
   public boolean canApplyTogether(Enchantment ench) {
-    return super.canApplyTogether(ench) && ench!= Enchantments.SILK_TOUCH
-        && ((ench!= Enchantments.FORTUNE) || ConfigHandler.allowAutoSmeltWithFortune);
+    return super.canApplyTogether(ench) && ench != Enchantments.SILK_TOUCH;
   }
 
 }

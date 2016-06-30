@@ -60,6 +60,11 @@ public enum EnderWidget implements IWidgetIcon {
   X_BUT_HOVER(200, 48, 8, 8),
  X_BUT_HOVER_PRESSED(200, 56, 8, 8),
 
+  STOP_BUT(200, 64, 8, 8),
+  RETURN_BUT(200, 72, 8, 8),
+  STOP_BUT_HOVER(200, 80, 8, 8),
+  RETURN_BUT_HOVER(200, 88, 8, 8),
+
   NEUTRAL_SLOT_BACKGROUND(112, 176, 16, 16), ;
 
   public static final ResourceLocation TEXTURE = new ResourceLocation(EnderCore.MODID, "textures/gui/widgets.png");
