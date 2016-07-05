@@ -312,12 +312,16 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     if (t != null) {
       GlStateManager.pushMatrix();
       GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-      GlStateManager.disableDepth();      
+      GlStateManager.disableDepth();
+      zLevel = 300.0F;
+      itemRender.zLevel = 300.0F;
       for (IGuiOverlay overlay : overlays) {
         if (overlay != null && overlay.isVisible()) {
           overlay.draw(realMx, realMy, t.renderPartialTicks);
         }
       }
+      zLevel = 0F;
+      itemRender.zLevel = 0F;
       GlStateManager.enableDepth();      
       GlStateManager.popMatrix();
     }
