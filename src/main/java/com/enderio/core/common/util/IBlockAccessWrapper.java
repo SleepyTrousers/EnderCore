@@ -65,10 +65,4 @@ public class IBlockAccessWrapper implements IBlockAccess {
     return wrapped.getWorldType();
   }  
 
-  @Override
-  @SideOnly(Side.CLIENT)
-  public boolean extendedLevelsInChunkCache() {
-    return wrapped.extendedLevelsInChunkCache();
-  }
-
 }
