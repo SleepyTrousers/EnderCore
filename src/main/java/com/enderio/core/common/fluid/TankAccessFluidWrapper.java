@@ -1,5 +1,9 @@
 package com.enderio.core.common.fluid;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
@@ -53,6 +57,13 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
       return outputTanks[0].getFluid();
     }
     return null;
+  }
+
+  @SuppressWarnings("null")
+  @Override
+  @Nonnull
+  public List<ITankInfoWrapper> getTankInfoWrappers() {
+    return Collections.<ITankInfoWrapper> emptyList();
   }
 
 }

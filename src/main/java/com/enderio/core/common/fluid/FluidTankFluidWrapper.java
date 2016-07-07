@@ -1,9 +1,15 @@
 package com.enderio.core.common.fluid;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
 public class FluidTankFluidWrapper implements IFluidWrapper {
 
@@ -33,6 +39,60 @@ public class FluidTankFluidWrapper implements IFluidWrapper {
   @Nullable
   public FluidStack getAvailableFluid() {
     return fluidTank.getFluid();
+  }
+
+  @SuppressWarnings("null")
+  @Override
+  @Nonnull
+  public List<ITankInfoWrapper> getTankInfoWrappers() {
+    return Collections.<ITankInfoWrapper> singletonList(new InfoWrapper());
+  }
+
+  private class InfoWrapper implements ITankInfoWrapper {
+
+    @Override
+    public IFluidTankProperties getIFluidTankProperties() {
+      return new IFluidTankProperties() {
+
+        @Override
+        @Nullable
+        public FluidStack getContents() {
+          return fluidTank.getFluid();
+        }
+
+        @Override
+        public int getCapacity() {
+          return fluidTank.getCapacity();
+        }
+
+        @Override
+        public boolean canFill() {
+          return true;
+        }
+
+        @Override
+        public boolean canDrain() {
+          return true;
+        }
+
+        @Override
+        public boolean canFillFluidType(FluidStack fluidStack) {
+          return true;
+        }
+
+        @Override
+        public boolean canDrainFluidType(FluidStack fluidStack) {
+          return true;
+        }
+
+      };
+    }
+
+    @Override
+    public FluidTankInfo getFluidTankInfo() {
+      return new FluidTankInfo(fluidTank);
+    }
+
   }
 
 }
