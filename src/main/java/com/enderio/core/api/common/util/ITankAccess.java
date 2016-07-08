@@ -1,5 +1,10 @@
 package com.enderio.core.api.common.util;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 
@@ -30,4 +35,34 @@ public interface ITankAccess {
    */
   void setTanksDirty();
 
+  public static interface ITankData {
+
+    public static enum EnumTankType {
+      STORAGE,
+      INPUT,
+      OUTPUT;
+    }
+
+    @Nonnull
+    EnumTankType getTankType();
+
+    @Nullable
+    FluidStack getContent();
+
+    int getCapacity();
+  }
+
+  public static interface IExtendedTankAccess extends ITankAccess {
+
+    /**
+     * Get information on all tanks to be displayed to the user.
+     * <p>
+     * Please note that this data is read-only and not intended to be used to for interfacing with the machine.
+     * 
+     * @return A list of ITankData objects.
+     */
+    @Nonnull
+    List<ITankData> getTankDisplayData();
+
+  }
 }
