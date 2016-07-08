@@ -24,7 +24,6 @@ import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
-import com.enderio.core.common.util.Log;
 import com.enderio.core.common.util.PermanentCache;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
@@ -87,13 +86,13 @@ public class EnderCore implements IEnderMod {
   @EventHandler
   public void preInit(FMLPreInitializationEvent event) {
 
-    {
-      // force classload the classes we have transforms for so we can see the output early in the logfile
+    /*{
+      // for dev env: force classload the classes we have transforms for so we can see the output early in the logfile
       if (net.minecraft.inventory.ContainerRepair.class.equals(null) || net.minecraft.client.gui.GuiRepair.class.equals(null)
           || net.minecraft.inventory.ContainerFurnace.class.equals(null) || net.minecraft.client.renderer.RenderItem.class.equals(null)) {
         Log.warn("Elvis has entered the building.");
       }
-    }
+    }*/
 
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
