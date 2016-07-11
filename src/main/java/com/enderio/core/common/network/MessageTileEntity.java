@@ -26,6 +26,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     pos = tile.getPos().toLong();
   }
 
+  @Override
   public void toBytes(ByteBuf buf) {
     buf.writeLong(pos);
   }
