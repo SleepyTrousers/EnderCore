@@ -37,14 +37,11 @@ public class FluidWrapper {
       if (te instanceof IFluidWrapper) {
         return (IFluidWrapper) te;
       }
-      if (te instanceof ITankAccess) {
-        return wrap((ITankAccess) te);
+      if (te.hasCapability(FLUID_HANDLER, side)) {
+        return wrap(te.getCapability(FLUID_HANDLER, side));
       }
       if (te instanceof net.minecraftforge.fluids.IFluidHandler) {
         return wrap((net.minecraftforge.fluids.IFluidHandler) te, side);
-      }
-      if (te.hasCapability(FLUID_HANDLER, side)) {
-        return wrap(te.getCapability(FLUID_HANDLER, side));
       }
     }
     return null;

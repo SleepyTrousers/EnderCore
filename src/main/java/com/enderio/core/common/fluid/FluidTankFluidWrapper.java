@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
+@Deprecated
 public class FluidTankFluidWrapper implements IFluidWrapper {
 
   private final FluidTank fluidTank;
