@@ -1,6 +1,6 @@
 {"data":
 	[
-		{
+	{
             "seed":"minecraft:wheat_seeds",
             "block":"minecraft:wheat"
         },
@@ -11,6 +11,11 @@
         {
             "seed":"minecraft:potato",
             "block":"minecraft:potatoes"
+        },
+        {
+            "seed":"minecraft:beetroot_seeds",
+            "block":"minecraft:beetroots",
+            "meta":3
         },
         {
             "seed":"minecraft:nether_wart",
