@@ -21,8 +21,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
@@ -147,20 +149,60 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Tries to load this block's TileEntity if it exists. Will create the TileEntity if it doesn't yet exist.
+   * <p>
+   * <strong>This will crash if used in any other thread than the main (client or server) thread!</strong>
+   * 
+   */
+  @SuppressWarnings({ "unchecked", "null" })
   protected @Nullable T getTileEntity(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
     if (teClass != null) {
       TileEntity te = world.getTileEntity(pos);
-      final Class<? extends T> teClass2 = teClass;
-      if (teClass2 != null) {
-        if (teClass2.isInstance(te)) {
-          return (T) te;
-        }
-      } else {
-        // TODO handle null value
+      if (teClass.isInstance(te)) {
+        return (T) te;
       }
     }
     return null;
+  }
+
+  /**
+   * Tries to load this block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess.
+   * 
+   */
+  @SuppressWarnings({ "unchecked", "null" })
+  protected @Nullable T getTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
+    if (world instanceof ChunkCache) {
+      if (teClass != null) {
+        TileEntity te = ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
+        if (teClass.isInstance(te)) {
+          return (T) te;
+        }
+      }
+      return null;
+    } else {
+      return getTileEntity(world, pos);
+    }
+  }
+
+  /**
+   * Tries to load any block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess. Will not
+   * cause chunk loads.
+   * 
+   */
+  @SuppressWarnings({ "unchecked", "null" })
+  public static @Nullable TileEntity getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
+    if (world instanceof ChunkCache) {
+      return ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
+    } else if (world instanceof World) {
+      if (((World) world).isBlockLoaded(pos)) {
+        return world.getTileEntity(pos);
+      } else {
+        return null;
+      }
+    } else {
+      return world.getTileEntity(pos);
+    }
   }
 
   protected boolean shouldDoWorkThisTick(@Nonnull World world, @Nonnull BlockPos pos, int interval) {
