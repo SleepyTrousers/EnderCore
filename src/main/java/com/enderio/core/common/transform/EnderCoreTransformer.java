@@ -112,7 +112,9 @@ public class EnderCoreTransformer implements IClassTransformer {
 //  private static final Set<String> transformableClasses = Sets.newHashSet(worldTypeClass, anvilContainerClass, anvilGuiClass, enchantHelperClass,
 //      itemStackClass, entityArrowClass, containerFurnaceClass, renderItemClass);
 
-  private static final Set<String> transformableClasses = Sets.newHashSet(containerFurnaceClass, renderItemClass);
+  private static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
+
+  private static final Set<String> transformableClasses = Sets.newHashSet(containerFurnaceClass, renderItemClass, entityPlayerClass);
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
@@ -356,6 +358,45 @@ public class EnderCoreTransformer implements IClassTransformer {
           }
         }
       });
+    }
+
+    if (transformedName.equals(entityPlayerClass)) {
+      ClassNode classNode = new ClassNode();
+      ClassReader classReader = new ClassReader(basicClass);
+      classReader.accept(classNode, 0);
+
+      boolean deObf = false;
+      for (MethodNode method : classNode.methods) {
+        if ("onUpdate".equals(method.name)) {
+          deObf = true;
+        }
+      }
+
+      MethodNode n = new MethodNode(Opcodes.ASM4, Opcodes.ACC_PUBLIC, deObf ? "isElytraFlying" : "func_184613_cA", "()Z", null, null);
+
+      n.instructions = new InsnList();
+      n.instructions.add(new VarInsnNode(ALOAD, 0));
+      n.instructions
+          .add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/EntityLivingBase", deObf ? "isElytraFlying" : "func_184613_cA", "()Z", false));
+      LabelNode l1 = new LabelNode(new Label());
+      n.instructions.add(new JumpInsnNode(Opcodes.IFNE, l1));
+      n.instructions.add(new VarInsnNode(ALOAD, 0));
+      n.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "isElytraFlying",
+          "(Lnet/minecraft/entity/EntityLivingBase;)Z", false));
+      n.instructions.add(new JumpInsnNode(Opcodes.IFNE, l1));
+      n.instructions.add(new InsnNode(Opcodes.ICONST_0));
+      n.instructions.add(new InsnNode(Opcodes.IRETURN));
+      n.instructions.add(l1);
+      n.instructions.add(new InsnNode(Opcodes.ICONST_1));
+      n.instructions.add(new InsnNode(Opcodes.IRETURN));
+
+      classNode.methods.add(n);
+
+      ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+      classNode.accept(cw);
+      logger
+          .info("Transforming " + entityPlayerClass + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
+      return cw.toByteArray();
     }
 
     return basicClass;

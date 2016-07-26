@@ -5,10 +5,12 @@ import com.enderio.core.common.event.ArrowUpdateEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerFurnace;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
@@ -187,6 +189,20 @@ public class EnderCoreMethods {
     if (stack != null && stack.getItem() instanceof IOverlayRenderAware) {
       ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
     }
+  }
+
+  public static interface IElytraFlyingProvider {
+    public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack);
+  }
+
+  public static boolean isElytraFlying(EntityLivingBase entity) {
+    if (!entity.isRiding() && !entity.isInWater() && !entity.isInLava()) {
+      ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+      if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider) {
+        return ((IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack);
+      }
+    }
+    return false;
   }
 
 }
