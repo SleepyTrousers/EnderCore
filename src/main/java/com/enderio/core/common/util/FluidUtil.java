@@ -19,18 +19,24 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fluids.capability.wrappers.FluidContainerItemWrapper;
 import net.minecraftforge.fml.common.Loader;
 
 public class FluidUtil {
 
+  @CapabilityInject(net.minecraftforge.fluids.capability.IFluidHandler.class)
+  private static final Capability<net.minecraftforge.fluids.capability.IFluidHandler> FLUID_HANDLER = null;
+  
   public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
 
   static {
@@ -76,24 +82,62 @@ public class FluidUtil {
     return null;
   }
 
-  public static FluidStack getFluidFromItem(ItemStack stack) {
-    if (stack != null) {
-      FluidStack fluidStack = null;
-      if (stack.getItem() instanceof IFluidContainerItem) {
-        fluidStack = ((IFluidContainerItem) stack.getItem()).getFluid(stack);
+  public static FluidStack getFluidTypeFromItem(ItemStack stack) {
+    if (stack == null) {
+      return null;
+    }
+    
+    stack = stack.copy();
+    stack.stackSize = 1;
+    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(stack);
+    if(handler != null) {      
+      return handler.drain(Fluid.BUCKET_VOLUME, false);
+    }    
+    if (Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
+      Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(stack.getItem())).getFluid();
+      if (fluid != null) {
+        return new FluidStack(fluid, 1000);
       }
-      if (fluidStack == null) {
-        fluidStack = FluidContainerRegistry.getFluidForFilledItem(stack);
-      }
-      if (fluidStack == null && Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
-        Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(stack.getItem())).getFluid();
-        if (fluid != null) {
-          return new FluidStack(fluid, 1000);
-        }
-      }
-      return fluidStack;
     }
     return null;
+
+  }
+  
+  public static net.minecraftforge.fluids.capability.IFluidHandler getFluidHandlerCapability(ICapabilityProvider provider) {
+    if(provider.hasCapability(FLUID_HANDLER, null)) {
+      return provider.getCapability(FLUID_HANDLER, null);
+    }
+    if(provider instanceof ItemStack) {
+      ItemStack stack = (ItemStack)provider; 
+      if (stack.getItem() instanceof IFluidContainerItem) {
+        FluidContainerItemWrapper b = new FluidContainerItemWrapper((IFluidContainerItem)stack.getItem(), stack);
+        return b;
+      }
+    }
+    return null;    
+  }
+  
+  public static boolean isFluidContainer(ICapabilityProvider provider) {    
+    return getFluidHandlerCapability(provider) != null;    
+  }
+  
+  public static boolean hasEmptyCapacity(ItemStack stack) {
+    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(stack);
+    if(handler == null) {
+      return false;
+    }
+    IFluidTankProperties[] props = handler.getTankProperties();
+    if(props == null) {
+      return false;
+    }
+    for(IFluidTankProperties tank : props) {
+      int cap = tank.getCapacity();
+      FluidStack contents = tank.getContents();
+      if(cap > 0 && (contents == null || contents.amount < cap)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public static boolean doPull(IFluidHandler into, EnumFacing fromDir, int maxVolume) {
@@ -107,147 +151,100 @@ public class FluidUtil {
   }
 
   public static FluidAndStackResult tryFillContainer(ItemStack target, FluidStack source) {
-    if (target != null && target.getItem() != null && source != null && source.getFluid() != null && source.amount > 0) {
-
-      if (target.getItem() instanceof IFluidContainerItem) {
-        ItemStack resultStack = target.copy();
-        resultStack.stackSize = 1;
-        int amount = ((IFluidContainerItem) target.getItem()).fill(resultStack, source, true);
-        if (amount <= 0) {
-          return new FluidAndStackResult(null, null, target, source);
-        }
-        FluidStack resultFluid = source.copy();
-        resultFluid.amount = amount;
-        ItemStack remainderStack = target.copy();
-        remainderStack.stackSize--;
-        if (remainderStack.stackSize <= 0) {
-          remainderStack = null;
-        }
-        FluidStack remainderFluid = source.copy();
-        remainderFluid.amount -= amount;
-        if (remainderFluid.amount <= 0) {
-          remainderFluid = null;
-        }
-        return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-      }
-
-      ItemStack resultStack = FluidContainerRegistry.fillFluidContainer(source.copy(), target);
-      if (resultStack != null) {
-        FluidStack resultFluid = FluidContainerRegistry.getFluidForFilledItem(resultStack);
-        if (resultFluid != null) {
-          ItemStack remainderStack = target.copy();
-          remainderStack.stackSize--;
-          if (remainderStack.stackSize <= 0) {
-            remainderStack = null;
-          }
-          FluidStack remainderFluid = source.copy();
-          remainderFluid.amount -= resultFluid.amount;
-          if (remainderFluid.amount <= 0) {
-            remainderFluid = null;
-          }
-          return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-        }
-      }
-
+    if (target == null || target.getItem() == null || source == null || source.getFluid() == null || source.amount <= 0) {
+      return new FluidAndStackResult(null, null, target, source);
     }
-    return new FluidAndStackResult(null, null, target, source);
+
+    ItemStack filledStack = target.copy();
+    filledStack.stackSize = 1;
+    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(filledStack);
+    if (handler == null) {
+      return new FluidAndStackResult(null, null, target, source);
+    }
+
+    int filledAmount = handler.fill(source.copy(), true);
+    if (filledAmount <= 0) {
+      return new FluidAndStackResult(null, null, target, source);
+    }
+    FluidStack resultFluid = source.copy();
+    resultFluid.amount = filledAmount;
+
+    ItemStack remainderStack = target.copy();
+    remainderStack.stackSize--;
+    if (remainderStack.stackSize <= 0) {
+      remainderStack = null;
+    }
+    FluidStack remainderFluid = source.copy();
+    remainderFluid.amount -= filledAmount;
+    if (remainderFluid.amount <= 0) {
+      remainderFluid = null;
+    }
+    return new FluidAndStackResult(filledStack, resultFluid, remainderStack, remainderFluid);
+
   }
 
   public static FluidAndStackResult tryDrainContainer(ItemStack source, FluidStack target, int capacity) {
-    if (source != null && source.getItem() != null) {
-
-      int maxDrain = capacity - (target != null ? target.amount : 0);
-      if (source.getItem() instanceof IFluidContainerItem) {
-        ItemStack resultStack = source.copy();
-        resultStack.stackSize = 1;
-        FluidStack resultFluid = ((IFluidContainerItem) source.getItem()).drain(resultStack, maxDrain, true);
-        if (resultFluid == null || resultFluid.amount <= 0 || (target != null && resultFluid.getFluid() != target.getFluid())) {
-          return new FluidAndStackResult(null, null, source, target);
-        }
-        ItemStack remainderStack = source.copy();
-        remainderStack.stackSize--;
-        if (remainderStack.stackSize <= 0) {
-          remainderStack = null;
-        }
-        FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(resultFluid, 0);
-        remainderFluid.amount += resultFluid.amount;
-        return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-      }
-
-      FluidStack resultFluid = FluidContainerRegistry.getFluidForFilledItem(source);
-      if (resultFluid != null && resultFluid.amount > 0 && resultFluid.amount <= maxDrain && (target == null || resultFluid.isFluidEqual(target))) {
-        ItemStack resultStack = source.getItem().getContainerItem(source);
-        // TODO
-        //        if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
-        //            && source.stackTagCompound == null) {
-        //          resultStack = new ItemStack(Items.glass_bottle);
-        //        }
-        ItemStack remainderStack = source.copy();
-        remainderStack.stackSize--;
-        if (remainderStack.stackSize <= 0) {
-          remainderStack = null;
-        }
-        FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(resultFluid, 0);
-        remainderFluid.amount += resultFluid.amount;
-        return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-      }
-
+    if (source == null || source.getItem() == null) {
+      return new FluidAndStackResult(null, null, source, target);
     }
-    return new FluidAndStackResult(null, null, source, target);
+        
+    ItemStack emptiedStack = source.copy();
+    emptiedStack.stackSize = 1;
+    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
+    if (handler == null) {
+      return new FluidAndStackResult(null, null, target, source);
+    }        
+
+    int maxDrain = capacity - (target != null ? target.amount : 0);
+    FluidStack drained;
+    if(target != null) {
+      FluidStack available = target.copy();
+      available.amount = Math.min(maxDrain, available.amount);
+      drained = handler.drain(available, true);
+    } else {
+      drained = handler.drain(maxDrain, true);
+    }
+        
+    if(drained == null || drained.amount <= 0) {
+      return new FluidAndStackResult(null, null, source, target);
+    }
+    
+    ItemStack remainderStack = source.copy();
+    remainderStack.stackSize--;
+    if (remainderStack.stackSize <= 0) {
+      remainderStack = null;
+    }
+    FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(drained, 0);
+    remainderFluid.amount += drained.amount;
+    
+    if(emptiedStack.stackSize <= 0) {
+      emptiedStack = null;
+    }
+    return new FluidAndStackResult(emptiedStack, drained, remainderStack, remainderFluid);
   }
 
   public static FluidAndStackResult tryDrainContainer(ItemStack source, ITankAccess tank) {
-    if (source != null && source.getItem() != null) {
-
-      if (source.getItem() instanceof IFluidContainerItem) {
-        FluidStack fluid = ((IFluidContainerItem) source.getItem()).getFluid(source);
-        IFluidTank targetTank = fluid != null ? tank.getInputTank(fluid) : null;
-        if (targetTank != null) {
-          FluidStack target = targetTank.getFluid();
-          int maxDrain = targetTank.getCapacity() - (target != null ? target.amount : 0);
-          ItemStack resultStack = source.copy();
-          resultStack.stackSize = 1;
-          FluidStack resultFluid = ((IFluidContainerItem) source.getItem()).drain(resultStack, maxDrain, true);
-          if (resultFluid == null || resultFluid.amount <= 0 || (target != null && !resultFluid.isFluidEqual(target))) {
-            return new FluidAndStackResult(null, null, source, target);
-          }
-          ItemStack remainderStack = source.copy();
-          remainderStack.stackSize--;
-          if (remainderStack.stackSize <= 0) {
-            remainderStack = null;
-          }
-          FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(resultFluid, 0);
-          remainderFluid.amount += resultFluid.amount;
-          return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-        }
-      }
-
-      FluidStack resultFluid = FluidContainerRegistry.getFluidForFilledItem(source);
-      if (resultFluid != null && resultFluid.amount > 0) {
-        IFluidTank targetTank = tank.getInputTank(resultFluid);
-        if (targetTank != null) {
-          FluidStack target = targetTank.getFluid();
-          int maxDrain = targetTank.getCapacity() - (target != null ? target.amount : 0);
-          if (resultFluid.amount <= maxDrain && (target == null || resultFluid.isFluidEqual(target))) {
-            ItemStack resultStack = source.getItem().getContainerItem(source);
-            //            if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
-            //                && source.stackTagCompound == null) {
-            //              resultStack = new ItemStack(Items.glass_bottle);
-            //            }
-            ItemStack remainderStack = source.copy();
-            remainderStack.stackSize--;
-            if (remainderStack.stackSize <= 0) {
-              remainderStack = null;
-            }
-            FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(resultFluid, 0);
-            remainderFluid.amount += resultFluid.amount;
-            return new FluidAndStackResult(resultStack, resultFluid, remainderStack, remainderFluid);
-          }
-        }
-      }
-
+    FluidAndStackResult result = new FluidAndStackResult(null, null, null, source);
+    if (source == null || source.getItem() == null || tank == null) {
+      return result;
     }
-    return new FluidAndStackResult(null, null, source, null);
+    
+    ItemStack emptiedStack = source.copy();
+    emptiedStack.stackSize = 1;
+    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
+    if (handler == null) {
+      return result;
+    }    
+    FluidStack contentType = getFluidTypeFromItem(source);
+    if(contentType == null) {
+      return result;
+    }
+    FluidTank targetTank = tank.getInputTank(contentType);
+    if(targetTank == null) {
+      return result;
+    }
+    
+    return tryDrainContainer(source, targetTank.getFluid(), targetTank.getCapacity());
   }
 
   public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
@@ -430,5 +427,7 @@ public class FluidUtil {
     }
     return fluid == fluid2 || fluid.getName().equals(fluid2.getName());
   }
+
+  
 
 }
