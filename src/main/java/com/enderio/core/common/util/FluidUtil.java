@@ -1,23 +1,17 @@
 package com.enderio.core.common.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.enderio.core.api.common.util.IFluidReceptor;
 import com.enderio.core.api.common.util.ITankAccess;
-import com.enderio.core.common.fluid.FluidWrapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -27,32 +21,63 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.IFluidContainerItem;
-import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fluids.capability.wrappers.FluidContainerItemWrapper;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fluids.capability.wrappers.FluidHandlerWrapper;
 
 public class FluidUtil {
 
   @CapabilityInject(net.minecraftforge.fluids.capability.IFluidHandler.class)
   private static final Capability<net.minecraftforge.fluids.capability.IFluidHandler> FLUID_HANDLER = null;
-  
-  public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
 
-  static {
-    try {
-      Class.forName("crazypants.util.BuildcraftUtil");
-    } catch (Exception e) {
-      if (Loader.isModLoaded("BuildCraft|Transport")) {
-        Log.warn("ItemUtil: Could not register Build Craft pipe handler. Fluid conduits will show connections to all Build Craft pipes.");
-      } //Don't log if BC isn't installed, but we still check in case another mod is using their API
+  // TODO: 1.10 see if this is still needed once BC updates. Might work with
+  // caps.
+//  public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
+//
+//  static {
+//    try {
+//      Class.forName("crazypants.util.BuildcraftUtil");
+//    } catch (Exception e) {
+//      if (Loader.isModLoaded("BuildCraft|Transport")) {
+//        Log.warn("ItemUtil: Could not register Build Craft pipe handler. Fluid conduits will show connections to all Build Craft pipes.");
+//      } //Don't log if BC isn't installed, but we still check in case another mod is using their API
+//    }
+//  }
+  
+
+  @SuppressWarnings("deprecation")
+  public static IFluidHandler getFluidHandlerCapability(ICapabilityProvider provider, EnumFacing side) {
+    if (provider.hasCapability(FLUID_HANDLER, side)) {
+      return provider.getCapability(FLUID_HANDLER, side);
     }
+    return getLegacyHandler(provider, side);
   }
 
-  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(IBlockAccess world, BlockCoord bc) {
+  public static IFluidHandler getFluidHandlerCapability(ItemStack stack) {
+    return getFluidHandlerCapability(stack, null);
+  }
+
+  @Deprecated
+  private static IFluidHandler getLegacyHandler(ICapabilityProvider provider, EnumFacing side) {
+    if (provider instanceof ItemStack) {
+      ItemStack stack = (ItemStack) provider;
+      if (stack.getItem() instanceof IFluidContainerItem) {
+        FluidContainerItemWrapper b = new FluidContainerItemWrapper((IFluidContainerItem) stack.getItem(), stack);
+        return b;
+      }
+    }
+    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {
+      FluidHandlerWrapper b = new FluidHandlerWrapper((net.minecraftforge.fluids.IFluidHandler) provider, side);
+      return b;
+    }
+    return null;
+  }
+
+  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(World worldObj, BlockPos location) {
     Map<EnumFacing, IFluidHandler> res = new HashMap<EnumFacing, IFluidHandler>();
     for (EnumFacing dir : EnumFacing.VALUES) {
-      IFluidHandler fh = getFluidHandler(world, bc.getLocation(dir));
+      IFluidHandler fh = getFluidHandler(worldObj, location.offset(dir), dir.getOpposite());
       if (fh != null) {
         res.put(dir, fh);
       }
@@ -60,39 +85,21 @@ public class FluidUtil {
     return res;
   }
 
-  public static IFluidHandler getFluidHandler(IBlockAccess world, BlockCoord bc) {
-    return getFluidHandler(world, bc.x, bc.y, bc.z);
+  private static IFluidHandler getFluidHandler(World worldObj, BlockPos location, EnumFacing side) {
+    return getFluidHandlerCapability(worldObj.getTileEntity(location), side);
   }
-
-  public static IFluidHandler getFluidHandler(IBlockAccess world, int x, int y, int z) {
-    TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-    return getFluidHandler(te);
-  }
-
-  public static IFluidHandler getFluidHandler(TileEntity te) {
-    if (te instanceof IFluidHandler) {
-      IFluidHandler res = (IFluidHandler) te;
-      for (IFluidReceptor rec : fluidReceptors) {
-        if (!rec.isValidReceptor(res)) {
-          return null;
-        }
-      }
-      return res;
-    }
-    return null;
-  }
-
+  
   public static FluidStack getFluidTypeFromItem(ItemStack stack) {
     if (stack == null) {
       return null;
     }
-    
+
     stack = stack.copy();
     stack.stackSize = 1;
-    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(stack);
-    if(handler != null) {      
+    IFluidHandler handler = getFluidHandlerCapability(stack);
+    if (handler != null) {
       return handler.drain(Fluid.BUCKET_VOLUME, false);
-    }    
+    }
     if (Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
       Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(stack.getItem())).getFluid();
       if (fluid != null) {
@@ -102,52 +109,32 @@ public class FluidUtil {
     return null;
 
   }
-  
-  public static net.minecraftforge.fluids.capability.IFluidHandler getFluidHandlerCapability(ICapabilityProvider provider) {
-    if(provider.hasCapability(FLUID_HANDLER, null)) {
-      return provider.getCapability(FLUID_HANDLER, null);
-    }
-    if(provider instanceof ItemStack) {
-      ItemStack stack = (ItemStack)provider; 
-      if (stack.getItem() instanceof IFluidContainerItem) {
-        FluidContainerItemWrapper b = new FluidContainerItemWrapper((IFluidContainerItem)stack.getItem(), stack);
-        return b;
-      }
-    }
-    return null;    
+
+  public static boolean isFluidContainer(ItemStack stack) {
+    return isFluidContainer(stack, null);
   }
-  
-  public static boolean isFluidContainer(ICapabilityProvider provider) {    
-    return getFluidHandlerCapability(provider) != null;    
+
+  public static boolean isFluidContainer(ICapabilityProvider provider, EnumFacing side) {
+    return getFluidHandlerCapability(provider, side) != null;
   }
-  
+
   public static boolean hasEmptyCapacity(ItemStack stack) {
     net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(stack);
-    if(handler == null) {
+    if (handler == null) {
       return false;
     }
     IFluidTankProperties[] props = handler.getTankProperties();
-    if(props == null) {
+    if (props == null) {
       return false;
     }
-    for(IFluidTankProperties tank : props) {
+    for (IFluidTankProperties tank : props) {
       int cap = tank.getCapacity();
       FluidStack contents = tank.getContents();
-      if(cap > 0 && (contents == null || contents.amount < cap)) {
+      if (cap > 0 && (contents == null || contents.amount < cap)) {
         return true;
       }
     }
     return false;
-  }
-
-  public static boolean doPull(IFluidHandler into, EnumFacing fromDir, int maxVolume) {
-    TileEntity te = (TileEntity) into;
-    return (FluidWrapper.transfer(te.getWorld(), te.getPos().offset(fromDir), fromDir.getOpposite(), te, fromDir, maxVolume) > 0);
-  }
-
-  public static boolean doPush(IFluidHandler from, EnumFacing fromDir, int maxVolume) {
-    TileEntity te = (TileEntity) from;
-    return (FluidWrapper.transfer(te, fromDir, te.getWorld(), te.getPos().offset(fromDir), fromDir.getOpposite(), maxVolume) > 0);
   }
 
   public static FluidAndStackResult tryFillContainer(ItemStack target, FluidStack source) {
@@ -187,28 +174,28 @@ public class FluidUtil {
     if (source == null || source.getItem() == null) {
       return new FluidAndStackResult(null, null, source, target);
     }
-        
+
     ItemStack emptiedStack = source.copy();
     emptiedStack.stackSize = 1;
     net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
     if (handler == null) {
       return new FluidAndStackResult(null, null, target, source);
-    }        
+    }
 
     int maxDrain = capacity - (target != null ? target.amount : 0);
     FluidStack drained;
-    if(target != null) {
+    if (target != null) {
       FluidStack available = target.copy();
       available.amount = Math.min(maxDrain, available.amount);
       drained = handler.drain(available, true);
     } else {
       drained = handler.drain(maxDrain, true);
     }
-        
-    if(drained == null || drained.amount <= 0) {
+
+    if (drained == null || drained.amount <= 0) {
       return new FluidAndStackResult(null, null, source, target);
     }
-    
+
     ItemStack remainderStack = source.copy();
     remainderStack.stackSize--;
     if (remainderStack.stackSize <= 0) {
@@ -216,8 +203,8 @@ public class FluidUtil {
     }
     FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(drained, 0);
     remainderFluid.amount += drained.amount;
-    
-    if(emptiedStack.stackSize <= 0) {
+
+    if (emptiedStack.stackSize <= 0) {
       emptiedStack = null;
     }
     return new FluidAndStackResult(emptiedStack, drained, remainderStack, remainderFluid);
@@ -228,29 +215,29 @@ public class FluidUtil {
     if (source == null || source.getItem() == null || tank == null) {
       return result;
     }
-    
+
     ItemStack emptiedStack = source.copy();
     emptiedStack.stackSize = 1;
     net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
     if (handler == null) {
       return result;
-    }    
+    }
     FluidStack contentType = getFluidTypeFromItem(source);
-    if(contentType == null) {
+    if (contentType == null) {
       return result;
     }
     FluidTank targetTank = tank.getInputTank(contentType);
-    if(targetTank == null) {
+    if (targetTank == null) {
       return result;
     }
-    
+
     return tryDrainContainer(source, targetTank.getFluid(), targetTank.getCapacity());
   }
 
   public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
-    return fillPlayerHandItemFromInternalTank(world, pos.getX(),pos.getY(),pos.getZ(), entityPlayer, hand, tank);
+    return fillPlayerHandItemFromInternalTank(world, pos.getX(), pos.getY(), pos.getZ(), entityPlayer, hand, tank);
   }
-  
+
   /**
    * If the currently held item of the given player can be filled with the
    * liquid in the given tank's output tank, do so and put the resultant filled
@@ -275,7 +262,7 @@ public class FluidUtil {
    * @param y
    * @param z
    * @param entityPlayer
-   * @param hand 
+   * @param hand
    * @param tank
    * @return true if a container was filled, false otherwise
    */
@@ -289,11 +276,13 @@ public class FluidUtil {
         tank.setTanksDirty();
         if (!entityPlayer.capabilities.isCreativeMode) {
           if (fill.remainder.itemStack == null) {
-            //entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.result.itemStack);
+            // entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem,
+            // fill.result.itemStack);
             entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.result.itemStack);
             return true;
           } else {
-//            entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem, fill.remainder.itemStack);
+            // entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem,
+            // fill.remainder.itemStack);
             entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.remainder.itemStack);
           }
 
@@ -328,9 +317,9 @@ public class FluidUtil {
     }
     return false;
   }
-  
+
   public static boolean fillInternalTankFromPlayerHandItem(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
-    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(),pos.getZ(), entityPlayer, hand, tank);
+    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(), pos.getZ(), entityPlayer, hand, tank);
   }
 
   public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
@@ -353,7 +342,7 @@ public class FluidUtil {
       if (fill.result.itemStack == null) {
         return true;
       }
-      
+
       if (fill.result.itemStack.isStackable()) {
         for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
           ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
@@ -419,15 +408,13 @@ public class FluidUtil {
   }
 
   public static boolean areFluidsTheSame(Fluid fluid, Fluid fluid2) {
-    if(fluid == null) {
+    if (fluid == null) {
       return fluid2 == null;
     }
-    if(fluid2 == null) {
+    if (fluid2 == null) {
       return false;
     }
     return fluid == fluid2 || fluid.getName().equals(fluid2.getName());
   }
-
-  
 
 }
