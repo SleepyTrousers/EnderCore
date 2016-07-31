@@ -17,6 +17,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -24,6 +25,7 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fluids.capability.wrappers.FluidContainerItemWrapper;
+import net.minecraftforge.fluids.capability.wrappers.FluidContainerRegistryWrapper;
 import net.minecraftforge.fluids.capability.wrappers.FluidHandlerWrapper;
 
 public class FluidUtil {
@@ -62,14 +64,15 @@ public class FluidUtil {
   private static IFluidHandler getLegacyHandler(ICapabilityProvider provider, EnumFacing side) {
     if (provider instanceof ItemStack) {
       ItemStack stack = (ItemStack) provider;
-      if (stack.getItem() instanceof IFluidContainerItem) {
-        FluidContainerItemWrapper b = new FluidContainerItemWrapper((IFluidContainerItem) stack.getItem(), stack);
-        return b;
+      if (stack.getItem() instanceof IFluidContainerItem) {        
+        return new FluidContainerItemWrapper((IFluidContainerItem) stack.getItem(), stack);
+      }      
+      if(FluidContainerRegistry.isContainer(stack)) {
+        return new FluidContainerRegistryWrapper(stack); 
       }
     }
-    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {
-      FluidHandlerWrapper b = new FluidHandlerWrapper((net.minecraftforge.fluids.IFluidHandler) provider, side);
-      return b;
+    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {      
+      return new FluidHandlerWrapper((net.minecraftforge.fluids.IFluidHandler) provider, side);
     }
     return null;
   }
