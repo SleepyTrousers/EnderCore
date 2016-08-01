@@ -1,6 +1,7 @@
 package com.enderio.core.common.transform;
 
 import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.event.AnvilMaxCostEvent;
 import com.enderio.core.common.event.ArrowUpdateEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
@@ -29,9 +30,12 @@ public class EnderCoreMethods {
       return false;
     }
   }
-
-  public static int getMaxAnvilCost() {
-    return ConfigHandler.anvilMaxLevel;
+  
+  public static int getMaxAnvilCost(Object source) {
+    int maxCost = ConfigHandler.invisibleMode == 1 ? 40 : ConfigHandler.anvilMaxLevel;
+    AnvilMaxCostEvent event = new AnvilMaxCostEvent(source, maxCost);    
+    MinecraftForge.EVENT_BUS.post(event);    
+    return event.getMaxAnvilCost();    
   }
 
   public static int getItemEnchantability(ItemStack stack, int base) {
@@ -53,7 +57,7 @@ public class EnderCoreMethods {
   // mostly copied from ContainerFurnace
   public static ItemStack transferStackInSlot(ContainerFurnace inv, EntityPlayer p_82846_1_, int p_82846_2_) {
     ItemStack itemstack = null;
-    Slot slot = (Slot) inv.inventorySlots.get(p_82846_2_);
+    Slot slot = inv.inventorySlots.get(p_82846_2_);
 
     if (slot != null && slot.getHasStack()) {
       ItemStack itemstack1 = slot.getStack();
@@ -122,7 +126,7 @@ public class EnderCoreMethods {
 
     if (p_75135_1_.isStackable()) {
       while (p_75135_1_.stackSize > 0 && (!p_75135_4_ && k < p_75135_3_ || p_75135_4_ && k >= p_75135_2_)) {
-        slot = (Slot) inv.inventorySlots.get(k);
+        slot = inv.inventorySlots.get(k);
         itemstack1 = slot.getStack();
 
         if (itemstack1 != null && itemstack1.getItem() == p_75135_1_.getItem()
@@ -159,7 +163,7 @@ public class EnderCoreMethods {
       }
 
       while (!p_75135_4_ && k < p_75135_3_ || p_75135_4_ && k >= p_75135_2_) {
-        slot = (Slot) inv.inventorySlots.get(k);
+        slot = inv.inventorySlots.get(k);
         itemstack1 = slot.getStack();
 
         if (itemstack1 == null) {

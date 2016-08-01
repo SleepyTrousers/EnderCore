@@ -155,7 +155,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 //    }
     // Anvil max level
     // else
-    if (doGameplayChanges && (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass))) {
+    if (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass)) {
       // 1.10 tested and works
       basicClass = transform(basicClass, transformedName, transformedName.equals(anvilContainerClass) ? anvilContainerMethod : anvilGuiMethod, new Transform() {
         @Override
@@ -168,9 +168,11 @@ public class EnderCoreTransformer implements IClassTransformer {
                 AbstractInsnNode next = m.instructions.get(i);
 
                 next = m.instructions.get(i);
-                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
-                  m.instructions.set(next,
-                      new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost", "()I", false));
+                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {                                
+                  m.instructions.set(next, new VarInsnNode(ALOAD, 0));
+                  next = m.instructions.get(i);
+                  m.instructions.insert(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost",
+                    "(Ljava/lang/Object;)I", false));                                                  
                   done++;
                 }
               }
