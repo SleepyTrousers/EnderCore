@@ -133,7 +133,7 @@ public class FluidUtil {
     for (IFluidTankProperties tank : props) {
       int cap = tank.getCapacity();
       FluidStack contents = tank.getContents();
-      if (cap > 0 && (contents == null || contents.amount < cap)) {
+      if (cap >= 0 && (contents == null || contents.amount < cap)) {
         return true;
       }
     }
@@ -189,7 +189,7 @@ public class FluidUtil {
     FluidStack drained;
     if (target != null) {
       FluidStack available = target.copy();
-      available.amount = Math.min(maxDrain, available.amount);
+      available.amount = maxDrain;
       drained = handler.drain(available, true);
     } else {
       drained = handler.drain(maxDrain, true);
