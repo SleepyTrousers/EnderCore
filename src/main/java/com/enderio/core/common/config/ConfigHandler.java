@@ -91,7 +91,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Config
   @Comment("Prevent tick speedup (i.e. torcherino) on any TE that uses the base TE class from EnderCore")
   @InvisIgnore
-  public static boolean allowExternalTickSpeedup = false;
+  public static boolean allowExternalTickSpeedup = true;
 
   @Config(sectionEnchants)
   @Comment("Allow the XP Boost enchant to be registered.")
