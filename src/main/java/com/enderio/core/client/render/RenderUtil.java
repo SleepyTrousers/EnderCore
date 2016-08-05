@@ -780,6 +780,7 @@ public class RenderUtil {
     UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);    
     List<Vertex> corners = bb.getCornersWithUvForFace(face);
     builder.setQuadOrientation(face);
+    builder.setTexture(tex);
     for (Vertex v : corners) {
       if (xform != null) {
         xform.apply(v);
@@ -794,6 +795,7 @@ public class RenderUtil {
     UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
     List<Vertex> corners = bb.getCornersWithUvForFace(face);
     builder.setQuadOrientation(face);
+    builder.setTexture(tex);
     for (Vertex v : corners) {
       v.color = color;
       if (rotateUV) {
@@ -821,6 +823,7 @@ public class RenderUtil {
           face = EnumFacing.getFacingFromVector(v.nx(), v.ny(), v.nz());
           builder = new UnpackedBakedQuad.Builder(Attributes.DEFAULT_BAKED_FORMAT);
           builder.setQuadOrientation(face);
+          builder.setTexture(tex);
 //          builder.setQuadColored();
         }
         v.color = color;
