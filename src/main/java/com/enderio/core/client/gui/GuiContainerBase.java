@@ -76,7 +76,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     // If esc is pressed
     if (key == 1) {
       // If there is a focused text field unfocus it
-      if (focused != null && key == 1) {
+      if (focused != null) {
         focused.setFocused(false);
         focused = null;
         return;
