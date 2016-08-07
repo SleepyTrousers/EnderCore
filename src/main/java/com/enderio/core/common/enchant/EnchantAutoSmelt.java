@@ -30,7 +30,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   private EnchantAutoSmelt() {
-    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND });
+    super(Rarity.RARE, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND });
     setRegistryName("autosmelt");
   }
 
