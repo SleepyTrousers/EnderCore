@@ -11,6 +11,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -24,6 +25,7 @@ import com.enderio.core.common.config.ConfigHandler;
 import com.google.common.collect.Sets;
 
 import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.IFEQ;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
@@ -114,7 +116,10 @@ public class EnderCoreTransformer implements IClassTransformer {
 
   private static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
 
-  private static final Set<String> transformableClasses = Sets.newHashSet(containerFurnaceClass, renderItemClass, entityPlayerClass);
+  private static final String entityAICreeperSwellClass = "net.minecraft.entity.ai.EntityAICreeperSwell";
+  private static final ObfSafeName updateTaskMethod = new ObfSafeName("updateTask", "func_75246_d");
+
+  private static final Set<String> transformableClasses = Sets.newHashSet(containerFurnaceClass, renderItemClass, entityPlayerClass, entityAICreeperSwellClass);
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
@@ -401,6 +406,48 @@ public class EnderCoreTransformer implements IClassTransformer {
       return cw.toByteArray();
     }
 
+    if (transformedName.equals(entityAICreeperSwellClass)) {
+      basicClass = transform(basicClass, entityAICreeperSwellClass, updateTaskMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (updateTaskMethod.equals(m.name)) {
+              boolean deObf = updateTaskMethod.deobf.equals(m.name);
+
+              InsnList list = new InsnList();
+              list.add(new VarInsnNode(ALOAD, 0));
+              list.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/ai/EntityAICreeperSwell", deObf ? "swellingCreeper" : "field_75269_a",
+                  "Lnet/minecraft/entity/monster/EntityCreeper;"));
+              list.add(new VarInsnNode(ALOAD, 0));
+              list.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/ai/EntityAICreeperSwell", deObf ? "creeperAttackTarget" : "field_75268_b",
+                  "Lnet/minecraft/entity/EntityLivingBase;"));
+              list.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "isCreeperTarget",
+                  "(Lnet/minecraft/entity/monster/EntityCreeper;Lnet/minecraft/entity/EntityLivingBase;)Z", false));
+              LabelNode ldone = new LabelNode(new Label());
+              list.add(new JumpInsnNode(Opcodes.IFNE, ldone));
+              list.add(new VarInsnNode(ALOAD, 0));
+              list.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/ai/EntityAICreeperSwell", deObf ? "swellingCreeper" : "field_75269_a",
+                  "Lnet/minecraft/entity/monster/EntityCreeper;"));
+              list.add(new InsnNode(Opcodes.ICONST_M1));
+              list.add(
+                  new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/monster/EntityCreeper", deObf ? "setCreeperState" : "func_70829_a", "(I)V", false));
+              list.add(new InsnNode(Opcodes.RETURN));
+              list.add(ldone);
+
+              m.instructions.insert(list);
+
+              done = true;
+            }
+          }
+          if (!done) {
+            logger.info("Transforming failed.");
+          }
+        }
+      });
+    }
+
     return basicClass;
   }
 
@@ -415,7 +462,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     transformer.transform(methods);
 
-    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
     classNode.accept(cw);
     logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();

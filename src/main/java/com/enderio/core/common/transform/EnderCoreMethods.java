@@ -7,6 +7,7 @@ import com.enderio.core.common.event.ItemStackEvent.ItemEnchantabilityEvent;
 import com.enderio.core.common.event.ItemStackEvent.ItemRarityEvent;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.inventory.Container;
@@ -207,6 +208,26 @@ public class EnderCoreMethods {
       }
     }
     return false;
+  }
+
+  public static interface ICreeperTarget {
+    /**
+     * Determine if the given creeper should blow up when nearby.
+     * <p>
+     * Note that the creeper stills tracks the target, even if this returns false.
+     * 
+     * @param swellingCreeper
+     *          The creeper that wants to explode
+     * @return True if the creeper is allowed to explode, false otherwise.
+     */
+    boolean isCreeperTarget(EntityCreeper swellingCreeper);
+  }
+
+  public static boolean isCreeperTarget(EntityCreeper swellingCreeper, EntityLivingBase entitylivingbase) {
+    if (entitylivingbase instanceof ICreeperTarget) {
+      return ((ICreeperTarget) entitylivingbase).isCreeperTarget(swellingCreeper);
+    }
+    return true;
   }
 
 }
