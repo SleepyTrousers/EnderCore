@@ -13,6 +13,7 @@ public class BlockSound extends PositionedSound implements ITickableSound {
     super(p_i45103_1_, SoundCategory.BLOCKS);
   }
 
+  @Override
   public boolean isDonePlaying() {
     return this.donePlaying;
   }

@@ -66,12 +66,6 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   public static int showDurabilityTooltips = 1;
 
   @Config
-  @Comment({ "Removes all void fog.", "0 = off", "1 = DEFAULT worldtype only", "2 = all world types" })
-  @NoSync
-  @Range(min = 0, max = 2)
-  public static int disableVoidFog = 1;
-
-  @Config
   @Comment("The max amount of XP levels an anvil recipe can use.")
   @InvisIgnore
   public static int anvilMaxLevel = 40;
