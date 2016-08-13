@@ -158,7 +158,7 @@ public class RenderUtil {
   }
 
   public static void bindGlintTexture() {
-    engine().bindTexture(BLOCK_TEX);
+    engine().bindTexture(GLINT_TEX);
   }
 
   public static void bindTexture(String string) {

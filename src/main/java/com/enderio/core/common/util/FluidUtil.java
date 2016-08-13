@@ -7,6 +7,7 @@ import com.enderio.core.api.common.util.ITankAccess;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -271,21 +272,20 @@ public class FluidUtil {
    */
   public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
 
+    ItemStack heldItem = entityPlayer.getHeldItem(hand);
+    boolean doFill = !(entityPlayer.capabilities.isCreativeMode && heldItem != null && heldItem.getItem() == Items.BUCKET);
+    
     for (FluidTank subTank : tank.getOutputTanks()) {
       FluidAndStackResult fill = tryFillContainer(entityPlayer.getHeldItem(hand), subTank.getFluid());
       if (fill.result.fluidStack != null) {
 
         subTank.setFluid(fill.remainder.fluidStack);
         tank.setTanksDirty();
-        if (!entityPlayer.capabilities.isCreativeMode) {
+        if (doFill) {
           if (fill.remainder.itemStack == null) {
-            // entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem,
-            // fill.result.itemStack);
             entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.result.itemStack);
             return true;
           } else {
-            // entityPlayer.inventory.setInventorySlotContents(entityPlayer.inventory.currentItem,
-            // fill.remainder.itemStack);
             entityPlayer.setItemStackToSlot(hand == EnumHand.MAIN_HAND ? EntityEquipmentSlot.MAINHAND : EntityEquipmentSlot.OFFHAND, fill.remainder.itemStack);
           }
 
