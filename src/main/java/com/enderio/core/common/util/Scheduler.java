@@ -1,6 +1,7 @@
 package com.enderio.core.common.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Scheduler {
     }
   }
 
-  private final List<Task> tasks = new ArrayList<Task>();
+  private final List<Task> tasks = Collections.synchronizedList(new ArrayList<Task>());
 
   /**
    * Schedules a task to be called later
