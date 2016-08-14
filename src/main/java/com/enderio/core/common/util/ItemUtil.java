@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.util.IItemReceptor;
+import com.enderio.core.common.vecmath.Vector3f;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -18,10 +19,10 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
@@ -253,23 +254,41 @@ public class ItemUtil {
   }
 
   /**
-   * Spawns an EntityItem into the world with motion that simulates a normal
-   * block drop.
+   * Spawns an ItemStack into the world with motion that simulates a normal block drop.
+   * 
+   * @param world
+   *          The world object.
+   * @param item
+   *          The ItemStack to spawn.
+   * @param pos
+   *          The block location to spawn the item.
+   * @param hitX
+   *          The location within the block to spawn the item at.
+   * @param hitY
+   *          The location within the block to spawn the item at.
+   * @param hitZ
+   *          The location within the block to spawn the item at.
+   * @param scale
+   *          The factor with which to push the spawn location out.
+   */
+  public static void spawnItemInWorldWithRandomMotion(World world, ItemStack item, BlockPos pos, float hitX, float hitY, float hitZ, float scale) {
+    Vector3f v = new Vector3f((hitX - .5f), (hitY - .5f), (hitZ - .5f));
+    v.normalize();
+    v.scale(scale);
+    float x = pos.getX() + .5f + v.x;
+    float y = pos.getY() + .5f + v.y;
+    float z = pos.getZ() + .5f + v.z;
+    spawnItemInWorldWithRandomMotion(new EntityItem(world, x, y, z, item));
+  }
+
+  /**
+   * Spawns an EntityItem into the world with motion that simulates a normal block drop.
    * 
    * @param entity
    *          The entity to spawn.
    */
   public static void spawnItemInWorldWithRandomMotion(EntityItem entity) {
     entity.setDefaultPickupDelay();
-
-    float f = (rand.nextFloat() * 0.1f) - 0.05f;
-    float f1 = (rand.nextFloat() * 0.1f) - 0.05f;
-    float f2 = (rand.nextFloat() * 0.1f) - 0.05f;
-
-    entity.motionX += f;
-    entity.motionY += f1;
-    entity.motionZ += f2;
-
     entity.worldObj.spawnEntityInWorld(entity);
   }
 
