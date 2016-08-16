@@ -1,15 +1,16 @@
 package com.enderio.core.common.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.Handlers.Handler.Inst;
 
+import net.minecraft.client.Minecraft;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -22,37 +23,62 @@ import cpw.mods.fml.relauncher.SideOnly;
 @Handler(getInstFrom = Inst.METHOD)
 public class Scheduler {
 
-  private static final class Task {
+  /**
+   * A task to be executed later.
+   *
+   */
+  public static interface ITask {
+    /**
+     * This method will be called at the next post tick event. It can return a new task (or itself) to be enqueued again.
+     *
+     * @return null or a task to be enqueued
+     */
+    ITask run();
+  }
+
+  private static final class Task implements ITask {
     private int delay;
     private Runnable toRun;
-    private Side side;
 
-    private Task(int delay, Runnable toRun, Side side) {
+    private Task(int delay, Runnable toRun) {
       this.delay = delay;
       this.toRun = toRun;
-      this.side = side;
     }
-    
-    private boolean run() {
+
+    @Override
+    public ITask run() {
       if (delay <= 0) {
         toRun.run();
-        return true;
+        return null;
+      } else {
+        delay--;
+        return this;
       }
-      delay--;
-      return false;
     }
   }
 
-  private final List<Task> tasks = new ArrayList<Task>();
+  private final Queue<ITask> clientQueue;
+  private final Queue<ITask> serverQueue = new ConcurrentLinkedQueue<ITask>();
+
+  /**
+   * Please use the single instance available from instance().
+   */
+  public Scheduler(boolean isServer) {
+    if (isServer) {
+      clientQueue = null;
+    } else {
+      clientQueue = new ConcurrentLinkedQueue<ITask>();
+    }
+  }
 
   /**
    * Schedules a task to be called later
-   * 
+   *
    * @param delay
    *          The amount of ticks to delay the call
    * @param task
    *          The {@link Runnable} to be run when the delay is up
-   * 
+   *
    * @see #schedule(int, Runnable, Side)
    */
   public void schedule(int delay, Runnable task) {
@@ -61,7 +87,7 @@ public class Scheduler {
 
   /**
    * Schedules a task to be called later
-   * 
+   *
    * @param delay
    *          The amount of ticks to delay the call
    * @param task
@@ -69,24 +95,38 @@ public class Scheduler {
    * @param side
    *          The side to schedule the task on.
    *          <p>
-   *          You will get a different {@link TickEvent} depending on the side.
-   *          <br>
-   *          {@link Side#CLIENT} will be passed a {@link ClientTickEvent} <br>
-   *          {@link Side#SERVER} will be passed a {@link ServerTickEvent}
-   *          <p>
    *          Note: passing in {@link Side#CLIENT} on a dedicated server will
    *          work, but your task will never be called. Please avoid doing this
    *          to save processing.
    */
   public void schedule(int delay, Runnable task, Side side) {
-    tasks.add(new Task(delay, task, side));
+    schedule(new Task(delay, task), side);
+  }
+
+  /**
+   * Schedules a task to be called later
+   *
+   * @param task
+   *          The {@link ITask} to be run at the next tick
+   * @param side
+   *          The side to schedule the task on.
+   *          <p>
+   *          Note: passing in {@link Side#CLIENT} on a dedicated server will work, but your task will never be called. Please avoid doing this to save
+   *          processing.
+   */
+  public void schedule(ITask task, Side side) {
+    if (side == Side.SERVER) {
+      serverQueue.add(task);
+    } else if (clientQueue != null) {
+      clientQueue.add(task);
+    }
   }
 
   /**
    * Returns the {@link Scheduler} instance for the current side.
-   * 
+   *
    * @see #schedule(int, Runnable)
-   * 
+   *
    * @return The {@link Scheduler} instance.
    */
   public static Scheduler instance() {
@@ -99,7 +139,7 @@ public class Scheduler {
   @SubscribeEvent
   public void onServerTick(ServerTickEvent event) {
     if (event.phase == Phase.END) {
-      runTasks(Side.SERVER);
+      runTasks(serverQueue);
     }
   }
 
@@ -110,17 +150,29 @@ public class Scheduler {
   @SubscribeEvent
   public void onClientTick(ClientTickEvent event) {
     if (event.phase == Phase.END) {
-      runTasks(Side.CLIENT);
-    }
-  }
-
-  private void runTasks(Side side) {
-    Iterator<Task> iter = tasks.iterator();
-    while (iter.hasNext()) {
-      Task next = iter.next();
-      if (next.side == side && next.run()) {
-        iter.remove();
+      runTasks(clientQueue);
+      if (!serverQueue.isEmpty() && !Minecraft.getMinecraft().isIntegratedServerRunning()) {
+        serverQueue.clear();
       }
     }
   }
+
+  private void runTasks(Queue<ITask> queue) {
+    if (!queue.isEmpty()) {
+      List<ITask> newtasks = new ArrayList<ITask>(queue.size());
+      while (!queue.isEmpty()) {
+        ITask task = queue.poll();
+        if (task != null) {
+          task = task.run();
+          if (task != null) {
+            newtasks.add(task);
+          }
+        }
+      }
+      for (ITask task : newtasks) {
+        queue.add(task);
+      }
+    }
+  }
+
 }

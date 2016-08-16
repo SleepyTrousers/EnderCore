@@ -7,10 +7,12 @@ import com.enderio.core.common.CommonProxy;
 import com.enderio.core.common.util.Scheduler;
 
 public class ClientProxy extends CommonProxy {
-  private static final Scheduler scheduler = new Scheduler();
 
   @Override
   public Scheduler getScheduler() {
+    if (scheduler == null) {
+      scheduler = new Scheduler(false);
+    }
     return scheduler;
   }
 
