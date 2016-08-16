@@ -5,7 +5,7 @@ import net.minecraft.world.World;
 import com.enderio.core.common.util.Scheduler;
 
 public class CommonProxy {
-  private static final Scheduler scheduler = new Scheduler();
+  protected Scheduler scheduler;
 
   /**
    * Returns a scheduler for the current side
@@ -14,6 +14,9 @@ public class CommonProxy {
    * an {@link Scheduler} instance.
    */
   public Scheduler getScheduler() {
+    if (scheduler == null) {
+      scheduler = new Scheduler(true);
+    }
     return scheduler;
   }
 
