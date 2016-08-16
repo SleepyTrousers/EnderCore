@@ -9,10 +9,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
-  private static final Scheduler scheduler = new Scheduler();
 
   @Override
   public Scheduler getScheduler() {
+    if (scheduler == null) {
+      scheduler = new Scheduler(false);
+    }
     return scheduler;
   }
 
