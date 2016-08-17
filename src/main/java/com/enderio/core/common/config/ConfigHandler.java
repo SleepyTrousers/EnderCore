@@ -83,7 +83,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   public static boolean allowCropRC = true;
 
   @Config
-  @Comment("Prevent tick speedup (i.e. torcherino) on any TE that uses the base TE class from EnderCore")
+  @Comment("Disabling this option will prevent tick speedup (i.e. torcherino) on any TE that uses the base TE class from EnderCore")
   @InvisIgnore
   public static boolean allowExternalTickSpeedup = true;
 
