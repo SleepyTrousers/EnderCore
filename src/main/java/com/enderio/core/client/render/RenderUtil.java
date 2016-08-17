@@ -562,15 +562,17 @@ public class RenderUtil {
       GlStateManager.translate(0.5f, 0.5f, 0.1f);
       fnt.drawString(text, 0, 0, ColorUtil.getRGBA(shadowCol));
     }
+    GlStateManager.enableAlpha();
     GlStateManager.popMatrix();
 
     RenderUtil.bindBlockTexture();
   }
 
   public static void renderBackground(FontRenderer fnt, String toRender, Vector4f color) {
-    
+
+    GlStateManager.enableBlend(); // blend comes in as on or off depending on the player's view vector
+
     GlStateManager.disableTexture2D();
-    GlStateManager.enableBlend();
     GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     GlStateManager.shadeModel(GL_SMOOTH);
     GlStateManager.disableAlpha();
@@ -596,7 +598,8 @@ public class RenderUtil {
     GlStateManager.enableTexture2D();
     GlStateManager.enableCull();
     GlStateManager.enableAlpha();
-
+    RenderHelper.enableStandardItemLighting();
+    GlStateManager.disableLighting();
   }
 
   /**
