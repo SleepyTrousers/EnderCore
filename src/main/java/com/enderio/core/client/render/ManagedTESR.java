@@ -3,6 +3,8 @@ package com.enderio.core.client.render;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+
 import com.enderio.core.common.TileEntityBase;
 
 import net.minecraft.block.Block;
@@ -26,16 +28,21 @@ public abstract class ManagedTESR<T extends TileEntityBase> extends TileEntitySp
       final IBlockState blockState = te.getWorld().getBlockState(te.getPos());
       final int renderPass = MinecraftForgeClient.getRenderPass();
       if (blockState != null && (block == null || block == blockState.getBlock()) && shouldRender(te, blockState, renderPass)) {
+        GlStateManager.disableLighting();
         if (renderPass == 0) {
-          TESRState.setBlockMode();
+          GlStateManager.disableBlend();    
+          GlStateManager.depthMask(true);
         } else {
-          TESRState.reset();
+          GlStateManager.enableBlend();
+          GlStateManager.depthMask(false);
+          GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         }
+        
+        RenderUtil.bindBlockTexture();
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
         renderTileEntity(te, blockState, partialTicks, destroyStage);
         GlStateManager.popMatrix();
-        TESRState.reset();
       }
     } else if (te == null) {
       renderItem();
