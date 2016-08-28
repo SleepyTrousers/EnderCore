@@ -14,6 +14,7 @@ import com.google.common.io.Files;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -342,25 +343,25 @@ public class Util {
           double d2 = 999.0D;
 
           if (i > l) {
-            d0 = (double) l + 1.0D;
+            d0 = l + 1.0D;
           } else if (i < l) {
-            d0 = (double) l + 0.0D;
+            d0 = l + 0.0D;
           } else {
             flag2 = false;
           }
 
           if (j > i1) {
-            d1 = (double) i1 + 1.0D;
+            d1 = i1 + 1.0D;
           } else if (j < i1) {
-            d1 = (double) i1 + 0.0D;
+            d1 = i1 + 0.0D;
           } else {
             flag = false;
           }
 
           if (k > j1) {
-            d2 = (double) j1 + 1.0D;
+            d2 = j1 + 1.0D;
           } else if (k < j1) {
-            d2 = (double) j1 + 0.0D;
+            d2 = j1 + 0.0D;
           } else {
             flag1 = false;
           }
@@ -450,6 +451,23 @@ public class Util {
     return null;
   }
 
+  public static EnumFacing getFacingFromEntity(EntityLivingBase entity) {  
+    int heading = MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+    switch (heading) {
+    case 0:
+      return EnumFacing.NORTH;
+    case 1:
+      return EnumFacing.EAST;
+    case 2:
+      return EnumFacing.SOUTH;
+    case 3:
+    default:
+      return EnumFacing.WEST;
+    }
+    
+  }
+  
+  
   public static int getProgressScaled(int scale, IProgressTile tile) {
     return (int) (tile.getProgress() * scale);
   }
