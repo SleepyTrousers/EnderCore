@@ -3,7 +3,6 @@ package com.enderio.core.client.gui.widget;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.minecraft.client.renderer.VertexBuffer;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -18,6 +17,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public abstract class GuiScrollableList<T> {
@@ -55,7 +55,7 @@ public abstract class GuiScrollableList<T> {
 
   private boolean showSelectionBox = true;
 
-  protected int margin = 4;
+  protected int margin = 2;
 
   protected List<ListSelectionListener<T>> listeners = new CopyOnWriteArrayList<ListSelectionListener<T>>();
 
@@ -123,7 +123,7 @@ public abstract class GuiScrollableList<T> {
 
   protected abstract void drawElement(int elementIndex, int x, int y, int height, VertexBuffer renderer);
 
-  protected boolean elementClicked(int elementIndex, boolean doubleClick) {
+  protected boolean elementClicked(int elementIndex, boolean doubleClick, int elementX, int elementY) {
     return true;
   }
 
@@ -170,6 +170,17 @@ public abstract class GuiScrollableList<T> {
       }
     }
   }
+  
+  public T getElementAt(int mouseX, int mnouseY) {
+    if (mouseY >= minY && mouseY <= maxY && mouseX >= minX && mouseX <= maxX + 6) {
+      int y = mouseY - minY + (int) amountScrolled - margin;
+      int mouseOverElement = y / slotHeight;
+      if (mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {       
+        return getElementAt(mouseOverElement);  
+      }
+    }
+    return null;    
+  }
 
   /**
    * draws the slot to the screen, pass in mouse's current x and y and partial
@@ -178,8 +189,10 @@ public abstract class GuiScrollableList<T> {
   public void drawScreen(int mX, int mY, float partialTick) {
     this.mouseX = mX;
     this.mouseY = mY;
-
-    processMouseEvents();
+    
+    if(mX >= minY && mY <= maxY) {
+      processMouseEvents();
+    }
 
     clampScrollToBounds();
 
@@ -242,17 +255,19 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.shadeModel(GL11.GL_SMOOTH);
     GlStateManager.disableTexture2D();
 
-    renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-    
-    renderer.pos(this.minX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(0.0D, 1.0D).endVertex();
-    renderer.pos(this.maxX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(1.0D, 1.0D).endVertex();    
-    renderer.pos(this.maxX, this.minY, 0.0D).tex(1.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
-    renderer.pos(this.minX, this.minY, 0.0D).tex(0.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();       
-    renderer.pos(this.minX, this.maxY, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
-    renderer.pos(this.maxX, this.maxY, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();    
-    renderer.pos(this.maxX, this.maxY - margin, 0.0D).tex(1.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
-    renderer.pos(this.minX, this.maxY - margin, 0.0D).tex(0.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
-    Tessellator.getInstance().draw();
+    boolean renderBorder = true;
+    if(renderBorder) {
+      renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+      renderer.pos(this.minX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(0.0D, 1.0D).endVertex();
+      renderer.pos(this.maxX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(1.0D, 1.0D).endVertex();
+      renderer.pos(this.maxX, this.minY, 0.0D).tex(1.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
+      renderer.pos(this.minX, this.minY, 0.0D).tex(0.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
+      renderer.pos(this.minX, this.maxY, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
+      renderer.pos(this.maxX, this.maxY, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
+      renderer.pos(this.maxX, this.maxY - margin + 1, 0.0D).tex(1.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
+      renderer.pos(this.minX, this.maxY - margin + 1, 0.0D).tex(0.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
+      Tessellator.getInstance().draw();
+    }
 
     renderScrollBar(renderer);
     GlStateManager.enableTexture2D();
@@ -342,7 +357,7 @@ public abstract class GuiScrollableList<T> {
 
         if (mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
           boolean doubleClick = mouseOverElement == selectedIndex && Minecraft.getSystemTime() - lastClickedTime < 250L;
-          if (elementClicked(mouseOverElement, doubleClick)) {
+          if (elementClicked(mouseOverElement, doubleClick, mouseX, y%slotHeight)) {
             setSelection(mouseOverElement);
           }
           lastClickedTime = Minecraft.getSystemTime();
@@ -393,7 +408,7 @@ public abstract class GuiScrollableList<T> {
   }
 
   protected int getScrollBarX() {
-    return minX + width;
+    return minX + width - 6;
   }
 
   protected void drawContainerBackground(VertexBuffer renderer) {
@@ -403,8 +418,8 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.disableTexture2D();
 
     renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-    renderer.pos(minX, maxY, 0.0D).endVertex();
-    renderer.pos(maxX, maxY, 0.0D).endVertex();
+    renderer.pos(minX, maxY + margin + 10, 0.0D).endVertex();
+    renderer.pos(maxX, maxY + margin + 10, 0.0D).endVertex();
     renderer.pos(maxX, minY, 0.0D).endVertex();
     renderer.pos(minX, minY, 0.0D).endVertex();
     Tessellator.getInstance().draw();

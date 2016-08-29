@@ -90,6 +90,22 @@ public class GuiToolTip implements com.enderio.core.api.client.gui.IHideable {
 
     protected void updateText() {}
 
+    public int getLastMouseX() {
+      return lastMouseX;
+    }
+
+    public void setLastMouseX(int lastMouseX) {
+      this.lastMouseX = lastMouseX;
+    }
+
+    public int getLastMouseY() {
+      return lastMouseY;
+    }
+
+    public void setLastMouseY(int lastMouseY) {
+      this.lastMouseY = lastMouseY;
+    }
+
     public void setToolTipText(String... txt) {
         text.clear();
         if (txt != null) {
