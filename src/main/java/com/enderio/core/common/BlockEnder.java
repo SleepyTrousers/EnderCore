@@ -39,7 +39,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   protected BlockEnder(@Nonnull String name, @Nullable Class<? extends T> teClass, @Nonnull Material mat) {
     super(mat);
     this.teClass = teClass;
-    
+
     this.name = name;
     setHardness(0.5F);
     setUnlocalizedName(name);
@@ -49,13 +49,13 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   protected void init() {
-    GameRegistry.register(this);   
+    GameRegistry.register(this);
     if (teClass != null) {
       GameRegistry.registerTileEntity(teClass, name + "TileEntity");
     }
     GameRegistry.register(createItemBlock());
   }
-  
+
   protected ItemBlock createItemBlock() {
     ItemBlock ib = new ItemBlock(this);
     ib.setRegistryName(getName());
@@ -105,7 +105,6 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
     return openGui(worldIn, pos, playerIn, side);
   }
-
 
   protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
     return false;
@@ -192,17 +191,36 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
    */
   @SuppressWarnings({ "unchecked", "null" })
   public static @Nullable TileEntity getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
+    return getAnyTileEntitySafe(world, pos, TileEntity.class);
+  }
+  
+  /**
+   * Tries to load any block's TileEntity if it exists. Will not create the
+   * TileEntity when used in a render thread with the correct IBlockAccess. Will
+   * not cause chunk loads.
+   * 
+   */
+  @SuppressWarnings({ "unchecked", "null" })
+  public static @Nullable <Q extends TileEntity> Q getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, Class<Q> teClass) {
+    TileEntity te = null;
     if (world instanceof ChunkCache) {
-      return ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
+      te = ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
     } else if (world instanceof World) {
       if (((World) world).isBlockLoaded(pos)) {
-        return world.getTileEntity(pos);
+        te = world.getTileEntity(pos);
       } else {
-        return null;
+        te = null;
       }
     } else {
-      return world.getTileEntity(pos);
+      te = world.getTileEntity(pos);
     }
+    if (teClass == null) {
+      return (Q) te;
+    }
+    if (teClass.isInstance(te)) {
+      return (Q) te;
+    }
+    return null;
   }
 
   protected boolean shouldDoWorkThisTick(@Nonnull World world, @Nonnull BlockPos pos, int interval) {
@@ -226,6 +244,5 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   public @Nonnull String getName() {
     return name;
   }
-  
-  
+
 }
