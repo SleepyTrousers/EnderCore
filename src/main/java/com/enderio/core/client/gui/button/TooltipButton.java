@@ -29,6 +29,7 @@ public class TooltipButton extends GuiButtonHideable {
       toolTip.setToolTipText(tooltipText);
     }
     this.toolTipText = tooltipText;
+    updateTooltipBounds();
   }
 
   protected void setToolTip(GuiToolTip newToolTip) {
@@ -40,9 +41,10 @@ public class TooltipButton extends GuiButtonHideable {
     if (addTooltip && toolTip != null) {
       gui.addToolTip(toolTip);
     }
+    updateTooltipBounds();
   }
 
-  public final Rectangle getBounds() {
+  public final Rectangle getBounds() {    
     return new Rectangle(xOrigin, yOrigin, getWidth(), getHeight());
   }
 
