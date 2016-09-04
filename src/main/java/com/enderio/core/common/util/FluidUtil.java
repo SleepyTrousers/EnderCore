@@ -3,6 +3,8 @@ package com.enderio.core.common.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.enderio.core.api.common.util.ITankAccess;
 
 import net.minecraft.block.Block;
@@ -50,8 +52,8 @@ public class FluidUtil {
   
 
   @SuppressWarnings("deprecation")
-  public static IFluidHandler getFluidHandlerCapability(ICapabilityProvider provider, EnumFacing side) {
-    if (provider.hasCapability(FLUID_HANDLER, side)) {
+  public static IFluidHandler getFluidHandlerCapability(@Nullable ICapabilityProvider provider, EnumFacing side) {
+    if (provider != null && provider.hasCapability(FLUID_HANDLER, side)) {
       return provider.getCapability(FLUID_HANDLER, side);
     }
     return getLegacyHandler(provider, side);
