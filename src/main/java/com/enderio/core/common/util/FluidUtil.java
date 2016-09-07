@@ -36,7 +36,7 @@ public class FluidUtil {
   @CapabilityInject(net.minecraftforge.fluids.capability.IFluidHandler.class)
   private static final Capability<net.minecraftforge.fluids.capability.IFluidHandler> FLUID_HANDLER = null;
 
-  // TODO: 1.10 see if this is still needed once BC updates. Might work with
+  // TODO: Mod BC see if this is still needed once BC updates. Might work with
   // caps.
 //  public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
 //
@@ -67,14 +67,14 @@ public class FluidUtil {
   private static IFluidHandler getLegacyHandler(ICapabilityProvider provider, EnumFacing side) {
     if (provider instanceof ItemStack) {
       ItemStack stack = (ItemStack) provider;
-      if (stack.getItem() instanceof IFluidContainerItem) {        
+      if (stack.getItem() instanceof IFluidContainerItem) {
         return new FluidContainerItemWrapper((IFluidContainerItem) stack.getItem(), stack);
-      }      
+      }
       if(FluidContainerRegistry.isContainer(stack)) {
-        return new FluidContainerRegistryWrapper(stack); 
+        return new FluidContainerRegistryWrapper(stack);
       }
     }
-    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {      
+    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {
       return new FluidHandlerWrapper((net.minecraftforge.fluids.IFluidHandler) provider, side);
     }
     return null;

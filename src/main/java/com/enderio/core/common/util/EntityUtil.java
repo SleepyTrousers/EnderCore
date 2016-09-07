@@ -104,16 +104,11 @@ public class EntityUtil {
 
   
   public static List<String> getAllRegisteredMobNames() {
-    //TODO: 1.9 taken out boss check for now as you need to create an instance of the entity to see if it is a boss
-  //public static List<String> getAllRegisteredMobNames(boolean excludeBosses) {
-       
     List<String> result = new ArrayList<String>();
     Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.CLASS_TO_NAME.entrySet();
     for (Map.Entry<Class<? extends Entity>, String> entry : entries) {
       if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-//        if (!excludeBosses || !isBoss(entry)) { // !IBossDisplayData.class.isAssignableFrom(entry.getKey())) {
-          result.add(entry.getValue());
-//        }
+        result.add(entry.getValue());
       }
     }
     return result;

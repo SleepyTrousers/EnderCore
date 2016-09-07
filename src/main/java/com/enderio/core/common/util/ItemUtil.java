@@ -156,7 +156,7 @@ public class ItemUtil {
     if (nbtIdx != -1) {
       String nbt = string.substring(nbtIdx + 1);
       try {
-        tag = (NBTTagCompound) JsonToNBT.getTagFromJson(nbt);
+        tag = JsonToNBT.getTagFromJson(nbt);
       } catch (NBTException e) {
         throw new IllegalArgumentException(nbt + " is not valid NBT json.", e);
       }
@@ -350,8 +350,8 @@ public class ItemUtil {
       return ItemUtil.doInsertItemInv((ISidedInventory) into, item, side, true);
     } else if (into instanceof IInventory) {
       return ItemUtil.doInsertItemInv(getInventory((IInventory) into), item, side, true);
-    } 
-    //TODO: 1.8 Wait for CoFH update
+    }
+    //TODO: Mod TE
 //    else if (into instanceof IItemDuct) {
 //      return ItemUtil.doInsertItem((IItemDuct) into, item, side);
 //    }
@@ -365,7 +365,6 @@ public class ItemUtil {
     return 0;
   }
 
-  //TODO: 1.8 Wait for CoFH update
 //  public static int doInsertItem(IItemDuct con, ItemStack item, ForgeDirection inventorySide) {
 //    int startedWith = item.stackSize;
 //    ItemStack remaining = con.insertItem(inventorySide, item);
@@ -390,7 +389,7 @@ public class ItemUtil {
     final ISidedInventory sidedInv = inv instanceof ISidedInventory ? (ISidedInventory) inv : null;
     ISlotIterator slots;
 
-    if (sidedInv != null) {     
+    if (sidedInv != null) {
       //TODO Note: This is not thread-safe. Change to getInstance() to constructor when needed (1.9+?).
       slots = sidedSlotter.getInstance(sidedInv.getSlotsForFace(inventorySide));
     } else {

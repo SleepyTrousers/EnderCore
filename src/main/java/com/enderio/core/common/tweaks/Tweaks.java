@@ -19,8 +19,8 @@ public class Tweaks {
         tweaks.add(new Tweak("fixBedSound", "Makes the bed stepSound wool instead of stone") {
             @Override
             public void load() {
-              //TODO: 1.9 this method is now private 
-              //Blocks.bed.setStepSound(SoundType.CLOTH); 
+              //TODO: 1.10 this method is now private
+              //Blocks.BED.setStepSound(SoundType.CLOTH);
             }
         });
         
@@ -49,5 +49,5 @@ public class Tweaks {
             @Override
             public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS); }
         });
-    }    
+    }
 }
