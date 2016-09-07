@@ -2,13 +2,13 @@ package com.enderio.core.client.gui.widget;
 
 import java.lang.reflect.Field;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.api.client.gui.IHideable;
 import com.google.common.base.Strings;
+
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class TextFieldEnder extends GuiTextField implements IHideable {
 
@@ -118,5 +118,14 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
     
     public void setYOrigin(int yOrigin) {
       this.yOrigin = yOrigin;
+    }
+    
+    public Integer getInteger() {
+      String text = getText();
+      try {
+        return Integer.parseInt(text);
+      } catch(Exception e) {
+        return null;
+      }
     }
 }
