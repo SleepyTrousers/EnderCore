@@ -3,6 +3,8 @@ package com.enderio.core.common.transform;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.event.AnvilMaxCostEvent;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,6 +15,10 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class EnderCoreMethods {
@@ -169,13 +175,46 @@ public class EnderCoreMethods {
     public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack);
   }
 
+  // Note: isRiding() and isInWater() are cheap getters, isInLava() is an expensive volumetric search
   public static boolean isElytraFlying(EntityLivingBase entity) {
-    if (!entity.isRiding() && !entity.isInWater() && !entity.isInLava()) {
+    if (!entity.isRiding() && !entity.isInWater()) {
       ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-      if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider) {
+      if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider && !isInLavaSafe(entity)) {
         return ((IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack);
       }
     }
+    return false;
+  }
+
+  // non-chunkloading copy of Entity.isInLava()
+  public static boolean isInLavaSafe(Entity entity) {
+    return isMaterialInBBSafe(entity.worldObj, entity.getEntityBoundingBox().expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D),
+        Material.LAVA);
+  }
+
+  // non-chunkloading copy of World.isMaterialInBB()
+  public static boolean isMaterialInBBSafe(World world, AxisAlignedBB bb, Material materialIn) {
+    int i = MathHelper.floor_double(bb.minX);
+    int j = MathHelper.ceiling_double_int(bb.maxX);
+    int k = MathHelper.floor_double(bb.minY);
+    int l = MathHelper.ceiling_double_int(bb.maxY);
+    int i1 = MathHelper.floor_double(bb.minZ);
+    int j1 = MathHelper.ceiling_double_int(bb.maxZ);
+    BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain();
+
+    for (int k1 = i; k1 < j; ++k1) {
+      for (int l1 = k; l1 < l; ++l1) {
+        for (int i2 = i1; i2 < j1; ++i2) {
+          blockpos$pooledmutableblockpos.setPos(k1, l1, i2);
+          if (world.isBlockLoaded(blockpos$pooledmutableblockpos, false) && world.getBlockState(blockpos$pooledmutableblockpos).getMaterial() == materialIn) {
+            blockpos$pooledmutableblockpos.release();
+            return true;
+          }
+        }
+      }
+    }
+
+    blockpos$pooledmutableblockpos.release();
     return false;
   }
 
