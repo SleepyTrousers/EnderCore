@@ -2,10 +2,13 @@ package com.enderio.core.common.transform;
 
 import java.util.Iterator;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -38,8 +41,18 @@ public class EnderCoreTransformerClient extends EnderCoreTransformer {
                     m.instructions.remove(m.instructions.get(i));
                     m.instructions.remove(m.instructions.get(i));
                     m.instructions.remove(m.instructions.get(i));
-                    m.instructions.remove(m.instructions.get(i));
-                    m.instructions.insert(insertPoint, new InsnNode(ICONST_1));
+                    
+                    JumpInsnNode jmp = (JumpInsnNode) m.instructions.get(i);
+                    
+                    InsnList newInstructions = new InsnList();
+                    newInstructions.add(new VarInsnNode(ALOAD, 0));
+                    newInstructions.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false));
+                    newInstructions.add(new LdcInsnNode(Type.getObjectType("cpw/mods/fml/client/GuiSlotModList")));
+                    newInstructions.add(new JumpInsnNode(IF_ACMPNE, jmp.label));
+                    
+                    m.instructions.remove(jmp);
+                    
+                    m.instructions.insert(insertPoint, newInstructions);
                   }
                 }
               }
