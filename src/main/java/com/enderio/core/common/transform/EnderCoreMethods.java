@@ -2,6 +2,7 @@ package com.enderio.core.common.transform;
 
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.event.AnvilMaxCostEvent;
+import com.enderio.core.common.event.ItemGUIRenderEvent;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -166,8 +167,11 @@ public class EnderCoreMethods {
   }
 
   public static void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition) {
-    if (stack != null && stack.getItem() instanceof IOverlayRenderAware) {
-      ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
+    if (stack != null) {
+      if (stack.getItem() instanceof IOverlayRenderAware) {
+        ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
+      }
+      MinecraftForge.EVENT_BUS.post(new ItemGUIRenderEvent.Post(stack, xPosition, yPosition));
     }
   }
 
