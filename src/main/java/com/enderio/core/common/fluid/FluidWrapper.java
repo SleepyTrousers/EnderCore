@@ -173,9 +173,9 @@ public class FluidWrapper {
     if (drainable == null || drainable.amount <= 0) {
       return 0;
     }
+    drainable = drainable.copy();
 
     if (drainable.amount > limit) {
-      drainable = drainable.copy();
       drainable.amount = limit;
     }
 
