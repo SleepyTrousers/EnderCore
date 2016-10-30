@@ -175,17 +175,21 @@ public class EnderCoreMethods {
     }
   }
 
+  @Deprecated
   public static interface IElytraFlyingProvider {
     public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack);
   }
 
+  public static interface IElytraFlyingProvider2 {
+    public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack, boolean shouldStop);
+  }
+
   // Note: isRiding() and isInWater() are cheap getters, isInLava() is an expensive volumetric search
   public static boolean isElytraFlying(EntityLivingBase entity) {
-    if (!entity.isRiding() && !entity.isInWater()) {
-      ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-      if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider && !isInLavaSafe(entity)) {
-        return ((IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack);
-      }
+    ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+    if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider2) {
+      return ((IElytraFlyingProvider2) itemstack.getItem()).isElytraFlying(entity, itemstack,
+          entity.onGround || entity.isRiding() || entity.isInWater() || isInLavaSafe(entity));
     }
     return false;
   }
