@@ -71,6 +71,7 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.Attributes;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.client.model.pipeline.UnpackedBakedQuad;
@@ -737,6 +738,7 @@ public class RenderUtil {
     if (translateToOrigin) {
       wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
+    BlockRenderLayer oldRenderLayer = MinecraftForgeClient.getRenderLayer();
     //TODO: Need to setup GL state correctly for each layer    
     for(BlockRenderLayer layer : BlockRenderLayer.values()) {
       ForgeHooksClient.setRenderLayer(layer);
@@ -749,7 +751,7 @@ public class RenderUtil {
       wr.setTranslation(0, 0, 0);
     }
     Tessellator.getInstance().draw();
-
+    ForgeHooksClient.setRenderLayer(oldRenderLayer);
   }
 
   public static void renderBlockModelAsItem(World world, ItemStack stack, IBlockState state) {
