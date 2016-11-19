@@ -43,10 +43,23 @@ public class ResourcePackAssembler {
       this.file = file;
     }
   }
+  
+  public enum ModelType {
+    BLOCK("models/block"),
+    ITEM("models/item"),
+    BLOCKSTATE("blockstates");
+    
+    private final String path;
+    private ModelType(String path) {
+      this.path = path;
+    }    
 
-  private List<File> icons = new ArrayList<File>();
-  private List<File> langs = new ArrayList<File>();
-  private List<CustomFile> customs = new ArrayList<CustomFile>();
+    String getPath() {
+      return path;
+    }
+  }
+
+  private List<CustomFile> files = new ArrayList<CustomFile>();
 
   private static List<IResourcePack> defaultResourcePacks;
 
@@ -57,6 +70,7 @@ public class ResourcePackAssembler {
   private String name;
   private String mcmeta;
   private String modid;
+  private String assetsPath;
   private boolean hasPackPng = false;
   private Class<?> jarClass;
 
@@ -77,6 +91,7 @@ public class ResourcePackAssembler {
     this.name = packName;
     this.modid = modid.toLowerCase(Locale.US);
     this.mcmeta = String.format(MC_META_BASE, this.name);
+    this.assetsPath = "/assets/" + modid + "/";
   }
 
   /**
@@ -103,7 +118,8 @@ public class ResourcePackAssembler {
    *          The icon file.
    */
   public void addIcon(File icon) {
-    icons.add(icon);
+    files.add(new CustomFile(assetsPath + "textures/items/", icon));
+    files.add(new CustomFile(assetsPath + "textures/blocks/", icon));
   }
 
   /**
@@ -113,7 +129,18 @@ public class ResourcePackAssembler {
    *          A language file (e.g. en_US.lang)
    */
   public void addLang(File lang) {
-    langs.add(lang);
+    files.add(new CustomFile(assetsPath + "lang/", lang));
+  }
+  
+  /**
+   * Adds a model json file. This file will be inserted into the models dir only.
+   * 
+   * @param lang
+   *          A language file (e.g. myblock.json)
+   */
+  public void addModel(File model, ModelType type) {
+    String path = assetsPath + type.getPath() + "/";
+    files.add(new CustomFile(path, model));
   }
 
   /**
@@ -126,7 +153,7 @@ public class ResourcePackAssembler {
    *          The file to add.
    */
   public void addCustomFile(String path, File file) {
-    customs.add(new CustomFile(path, file));
+    files.add(new CustomFile(path, file));
   }
 
   /**
@@ -162,20 +189,7 @@ public class ResourcePackAssembler {
         EnderFileUtils.copyFromJar(jarClass, modid + "/" + "pack.png", new File(dir.getAbsolutePath() + "/pack.png"));
       }
 
-      String itemsDir = pathToDir + "/assets/" + modid + "/textures/items";
-      String blocksDir = pathToDir + "/assets/" + modid + "/textures/blocks";
-      String langDir = pathToDir + "/assets/" + modid + "/lang";
-
-      for (File icon : icons) {
-        FileUtils.copyFile(icon, new File(itemsDir + "/" + icon.getName()));
-        FileUtils.copyFile(icon, new File(blocksDir + "/" + icon.getName()));
-      }
-
-      for (File lang : langs) {
-        FileUtils.copyFile(lang, new File(langDir + "/" + lang.getName()));
-      }
-
-      for (CustomFile custom : customs) {
+      for (CustomFile custom : files) {
         File directory = new File(pathToDir + (custom.ext != null ? "/" + custom.ext : ""));
         directory.mkdirs();
         FileUtils.copyFile(custom.file, new File(directory.getAbsolutePath() + "/" + custom.file.getName()));
