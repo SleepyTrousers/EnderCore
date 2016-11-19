@@ -1,32 +1,51 @@
 package com.enderio.core.client.gui.widget;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class GhostBackgroundItemSlot extends GhostSlot {
 
-  private final ItemStack stack;
+  private ItemStack stack;
+  private final List<ItemStack> stacks;
+  private int idx = 999;
   private final Slot parent;
-  
+  private long lastSwitch = 0;
 
-  public GhostBackgroundItemSlot(ItemStack stack, int x, int y) {
+  private GhostBackgroundItemSlot(ItemStack stack, List<ItemStack> stacks, Slot parent, int x, int y) {
     this.stack = stack;
-    this.parent = null;
+    if (stack == null && stacks != null && !stacks.isEmpty()) {
+      this.stacks = new ArrayList<ItemStack>(stacks);
+    } else {
+      this.stacks = null;
+    }
+    this.parent = parent;
     this.x = x;
     this.y = y;
     this.grayOut = true;
     this.grayOutLevel = .75f;
   }
 
+  public GhostBackgroundItemSlot(ItemStack stack, int x, int y) {
+    this(stack, null, null, x, y);
+  }
+
+  public GhostBackgroundItemSlot(List<ItemStack> stacks, int x, int y) {
+    this(null, stacks, null, x, y);
+  }
+
   public GhostBackgroundItemSlot(ItemStack stack, Slot parent) {
-    this.stack = stack;
-    this.parent = parent;
-    this.x = parent.xDisplayPosition;
-    this.y = parent.yDisplayPosition;
-    this.grayOut = true;
-    this.grayOutLevel = .75f;
+    this(stack, null, parent, parent.xDisplayPosition, parent.yDisplayPosition);
+  }
+
+  public GhostBackgroundItemSlot(List<ItemStack> stacks, Slot parent) {
+    this(null, stacks, parent, parent.xDisplayPosition, parent.yDisplayPosition);
   }
 
   public GhostBackgroundItemSlot(Item item, int x, int y) {
@@ -52,11 +71,19 @@ public class GhostBackgroundItemSlot extends GhostSlot {
 
   @Override
   public ItemStack getStack() {
+    if (stacks != null && Minecraft.getSystemTime() - lastSwitch > 1000L) {
+      lastSwitch = Minecraft.getSystemTime();
+      if (++idx >= stacks.size()) {
+        idx = 0;
+        Collections.shuffle(stacks);
+      }
+      stack = stacks.get(idx);
+    }
     return stack;
   }
 
   @Override
-  public void putStack(ItemStack stack) {
+  public void putStack(ItemStack stackIn) {
   }
 
   @Override
