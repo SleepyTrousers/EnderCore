@@ -1,5 +1,18 @@
 package com.enderio.core.client.render;
 
+import static net.minecraft.util.EnumFacing.DOWN;
+import static net.minecraft.util.EnumFacing.EAST;
+import static net.minecraft.util.EnumFacing.NORTH;
+import static net.minecraft.util.EnumFacing.SOUTH;
+import static net.minecraft.util.EnumFacing.UP;
+import static net.minecraft.util.EnumFacing.WEST;
+import static org.lwjgl.opengl.GL11.GL_SMOOTH;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -23,19 +36,7 @@ import com.enderio.core.common.vecmath.Vector4d;
 import com.enderio.core.common.vecmath.Vector4f;
 import com.enderio.core.common.vecmath.Vertex;
 
-import static net.minecraft.util.EnumFacing.DOWN;
-import static net.minecraft.util.EnumFacing.EAST;
-import static net.minecraft.util.EnumFacing.NORTH;
-import static net.minecraft.util.EnumFacing.SOUTH;
-import static net.minecraft.util.EnumFacing.UP;
-import static net.minecraft.util.EnumFacing.WEST;
-import static org.lwjgl.opengl.GL11.GL_SMOOTH;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -733,24 +734,28 @@ public class RenderUtil {
 
   public static void renderBlockModel(World world, BlockPos pos, boolean translateToOrigin) {
 
-    VertexBuffer wr = Tessellator.getInstance().getBuffer();
-    wr.begin(7, DefaultVertexFormats.BLOCK);
+    final BlockRenderLayer oldRenderLayer = MinecraftForgeClient.getRenderLayer();
+    final IBlockState state = world.getBlockState(pos);
+    final Block block = state.getBlock();
+    final BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+    final IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(state);
+    final Tessellator tesselator = Tessellator.getInstance();
+    final VertexBuffer wr = tesselator.getBuffer();
+    wr.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
     if (translateToOrigin) {
       wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());
     }
-    BlockRenderLayer oldRenderLayer = MinecraftForgeClient.getRenderLayer();
-    //TODO: Need to setup GL state correctly for each layer    
-    for(BlockRenderLayer layer : BlockRenderLayer.values()) {
-      ForgeHooksClient.setRenderLayer(layer);
-      IBlockState state = world.getBlockState(pos);
-      BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-      IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(state);
-      blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, state, pos, Tessellator.getInstance().getBuffer(), false);
+    for (BlockRenderLayer layer : BlockRenderLayer.values()) {
+      if (block.canRenderInLayer(state, layer)) {
+        ForgeHooksClient.setRenderLayer(layer);
+        // TODO: Need to setup GL state correctly for each layer
+        blockrendererdispatcher.getBlockModelRenderer().renderModel(world, ibakedmodel, state, pos, wr, false);
+      }
     }
     if (translateToOrigin) {
       wr.setTranslation(0, 0, 0);
     }
-    Tessellator.getInstance().draw();
+    tesselator.draw();
     ForgeHooksClient.setRenderLayer(oldRenderLayer);
   }
 
