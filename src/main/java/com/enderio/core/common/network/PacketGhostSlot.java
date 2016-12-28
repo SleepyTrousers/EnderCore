@@ -16,15 +16,17 @@ public class PacketGhostSlot implements IMessage {
   private int windowId;
   private int slot;
   private ItemStack stack;
+  private int realsize;
 
   public PacketGhostSlot() {
   }
 
-  public static PacketGhostSlot setGhostSlotContents(int slot, ItemStack stack) {
+  public static PacketGhostSlot setGhostSlotContents(int slot, ItemStack stack, int realsize) {
     PacketGhostSlot msg = new PacketGhostSlot();
     msg.slot = slot;
     msg.stack = stack;
-    msg.windowId = Minecraft.getMinecraft().thePlayer.openContainer.windowId;
+    msg.realsize = realsize;
+    msg.windowId = Minecraft.getMinecraft().player.openContainer.windowId;
     return msg;
   }
 
@@ -33,6 +35,7 @@ public class PacketGhostSlot implements IMessage {
     windowId = buf.readInt();
     slot = buf.readShort();
     stack = ByteBufUtils.readItemStack(buf);
+    realsize = buf.readInt();
   }
 
   @Override
@@ -40,6 +43,7 @@ public class PacketGhostSlot implements IMessage {
     buf.writeInt(windowId);
     buf.writeShort(slot);
     ByteBufUtils.writeItemStack(buf, stack);
+    buf.writeInt(realsize);
   }
 
   public static class Handler implements IMessageHandler<PacketGhostSlot, IMessage> {
@@ -48,7 +52,7 @@ public class PacketGhostSlot implements IMessage {
     public IMessage onMessage(PacketGhostSlot msg, MessageContext ctx) {
       Container openContainer = ctx.getServerHandler().playerEntity.openContainer;
       if (openContainer instanceof GhostSlot.IGhostSlotAware && openContainer.windowId == msg.windowId) {
-        ((GhostSlot.IGhostSlotAware) openContainer).setGhostSlotContents(msg.slot, msg.stack);
+        ((GhostSlot.IGhostSlotAware) openContainer).setGhostSlotContents(msg.slot, msg.stack, msg.realsize);
       }
       return null;
     }

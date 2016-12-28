@@ -2,13 +2,12 @@ package com.enderio.core.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import com.enderio.core.common.vecmath.Vector3d;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -20,6 +19,7 @@ import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -37,11 +37,11 @@ public class EntityUtil {
     entity.motionZ = velZ;
   }
 
-  public static EntityFireworkRocket getRandomFirework(World world) {
-    return getRandomFirework(world, new BlockCoord(0, 0, 0));
+  public static @Nonnull EntityFireworkRocket getRandomFirework(@Nonnull World world) {
+    return getRandomFirework(world, new BlockPos(0, 0, 0));
   }
 
-  public static EntityFireworkRocket getRandomFirework(World world, BlockCoord pos) {
+  public static @Nonnull EntityFireworkRocket getRandomFirework(@Nonnull World world, @Nonnull BlockPos pos) {
     ItemStack firework = new ItemStack(Items.FIREWORKS);
     firework.setTagCompound(new NBTTagCompound());
     NBTTagCompound expl = new NBTTagCompound();
@@ -63,24 +63,23 @@ public class EntityUtil {
     NBTTagCompound fireworkTag = new NBTTagCompound();
     fireworkTag.setTag("Explosions", explosions);
     fireworkTag.setByte("Flight", (byte) 1);
-    firework.getTagCompound().setTag("Fireworks", fireworkTag);
+    firework.setTagInfo("Fireworks", fireworkTag);
 
-    EntityFireworkRocket e = new EntityFireworkRocket(world, pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, firework);
+    EntityFireworkRocket e = new EntityFireworkRocket(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, firework);
     return e;
   }
 
-  public static void spawnFirework(BlockCoord block, int dimID) {
+  public static void spawnFirework(@Nonnull BlockPos block, int dimID) {
     spawnFirework(block, dimID, 0);
   }
 
-  public static void spawnFirework(BlockCoord block, int dimID, int range) {
+  public static void spawnFirework(@Nonnull BlockPos pos, int dimID, int range) {
     World world = DimensionManager.getWorld(dimID);
 
-    BlockPos pos = new BlockPos(block.x, block.y, block.z);
     IBlockState bs = world.getBlockState(pos);
     // don't bother if there's no randomness at all
     if (range > 0) {
-      pos = new BlockPos(moveRandomly(block.x, range), block.y, moveRandomly(block.z, range));
+      pos = new BlockPos(moveRandomly(pos.getX(), range), pos.getY(), moveRandomly(pos.getZ(), range));
 
       int tries = -1;
       while (!world.isAirBlock(new BlockPos(pos)) && !bs.getBlock().isReplaceable(world, pos)) {
@@ -91,24 +90,23 @@ public class EntityUtil {
       }
     }
 
-    world.spawnEntityInWorld(getRandomFirework(world, new BlockCoord(pos)));
+    world.spawnEntity(getRandomFirework(world, pos));
   }
 
   private static double moveRandomly(double base, double range) {
     return base + 0.5 + rand.nextDouble() * range - (range / 2);
   }
 
-  public static String getDisplayNameForEntity(String mobName) {
+  public static @Nonnull String getDisplayNameForEntity(@Nonnull String mobName) {
     return I18n.translateToLocal("entity." + mobName + ".name");
   }
 
   
-  public static List<String> getAllRegisteredMobNames() {
-    List<String> result = new ArrayList<String>();
-    Set<Map.Entry<Class<? extends Entity>, String>> entries = EntityList.CLASS_TO_NAME.entrySet();
-    for (Map.Entry<Class<? extends Entity>, String> entry : entries) {
-      if (EntityLiving.class.isAssignableFrom(entry.getKey())) {
-        result.add(entry.getValue());
+  public static @Nonnull List<ResourceLocation> getAllRegisteredMobNames() {
+    List<ResourceLocation> result = new ArrayList<ResourceLocation>();
+    for (ResourceLocation entityName : EntityList.getEntityNameList()) {
+      if (EntityLiving.class.isAssignableFrom(EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()")))) {
+        result.add(entityName);
       }
     }
     return result;
@@ -117,57 +115,53 @@ public class EntityUtil {
   private EntityUtil() {
   }
 
-  public static Vector3d getEntityPosition(Entity ent) {
+  public static Vector3d getEntityPosition(@Nonnull Entity ent) {
     return new Vector3d(ent.posX, ent.posY, ent.posZ);
   }
 
-  public static List<AxisAlignedBB> getCollidingBlockGeometry(World world, Entity entity) {
+  public static List<AxisAlignedBB> getCollidingBlockGeometry(@Nonnull World world, @Nonnull Entity entity) {
     AxisAlignedBB entityBounds = entity.getEntityBoundingBox();
     ArrayList<AxisAlignedBB> collidingBoundingBoxes = new ArrayList<AxisAlignedBB>();
-    int minX = MathHelper.floor_double(entityBounds.minX);
-    int minY = MathHelper.floor_double(entityBounds.minY);
-    int minZ = MathHelper.floor_double(entityBounds.minZ);
-    int maxX = MathHelper.floor_double(entityBounds.maxX + 1.0D);
-    int maxY = MathHelper.floor_double(entityBounds.maxY + 1.0D);
-    int maxZ = MathHelper.floor_double(entityBounds.maxZ + 1.0D);
+    int minX = MathHelper.floor(entityBounds.minX);
+    int minY = MathHelper.floor(entityBounds.minY);
+    int minZ = MathHelper.floor(entityBounds.minZ);
+    int maxX = MathHelper.floor(entityBounds.maxX + 1.0D);
+    int maxY = MathHelper.floor(entityBounds.maxY + 1.0D);
+    int maxZ = MathHelper.floor(entityBounds.maxZ + 1.0D);
     for (int x = minX; x < maxX; x++) {
       for (int z = minZ; z < maxZ; z++) {
         for (int y = minY; y < maxY; y++) {
           BlockPos pos = new BlockPos(x,y,z);
-          IBlockState bs = world.getBlockState(pos);
-          Block block = bs.getBlock();
-          if (block != null) {
-            block.addCollisionBoxToList(bs, world, pos, entityBounds, collidingBoundingBoxes, entity);
-          }
+          world.getBlockState(pos).addCollisionBoxToList(world, pos, entityBounds, collidingBoundingBoxes, entity, false);
         }
       }
     }
     return collidingBoundingBoxes;
   }
 
-  public static void spawnItemInWorldWithRandomMotion(World world, ItemStack item, int x, int y, int z) {
-    if (item != null) {
+  public static void spawnItemInWorldWithRandomMotion(@Nonnull World world, @Nonnull ItemStack item, int x, int y, int z) {
+    if (!item.isEmpty()) {
       spawnItemInWorldWithRandomMotion(world, item, x + 0.5, y + 0.5, z + 0.5);
     }
   }
 
-  public static void spawnItemInWorldWithRandomMotion(World world, ItemStack item, double x, double y, double z) {
-    if (item != null) {
+  public static void spawnItemInWorldWithRandomMotion(@Nonnull World world, @Nonnull ItemStack item, double x, double y, double z) {
+    if (!item.isEmpty()) {
       spawnItemInWorldWithRandomMotion(new EntityItem(world, x, y, z, item));
     }
   }
 
-  public static void spawnItemInWorldWithRandomMotion(EntityItem entity) {
+  public static void spawnItemInWorldWithRandomMotion(@Nonnull EntityItem entity) {
     entity.setDefaultPickupDelay();
 
-    float f = (entity.worldObj.rand.nextFloat() * 0.1f) - 0.05f;
-    float f1 = (entity.worldObj.rand.nextFloat() * 0.1f) - 0.05f;
-    float f2 = (entity.worldObj.rand.nextFloat() * 0.1f) - 0.05f;
+    float f = (entity.world.rand.nextFloat() * 0.1f) - 0.05f;
+    float f1 = (entity.world.rand.nextFloat() * 0.1f) - 0.05f;
+    float f2 = (entity.world.rand.nextFloat() * 0.1f) - 0.05f;
 
     entity.motionX += f;
     entity.motionY += f1;
     entity.motionZ += f2;
 
-    entity.worldObj.spawnEntityInWorld(entity);
+    entity.world.spawnEntity(entity);
   }
 }

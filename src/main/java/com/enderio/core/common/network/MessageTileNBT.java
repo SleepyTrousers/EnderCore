@@ -1,6 +1,10 @@
 package com.enderio.core.common.network;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.common.util.Log;
+import com.enderio.core.common.util.NullHelper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
@@ -31,8 +35,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
   public MessageTileNBT(TileEntity te) {
     this.te = te;
     pos = te.getPos().toLong();
-    tags = new NBTTagCompound();
-    te.writeToNBT(tags);
+    te.writeToNBT(tags = new NBTTagCompound());
   }
 
   @Override
@@ -47,31 +50,31 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
     tags = NetworkUtil.readNBTTagCompound(dis);
   }
 
-  public BlockPos getPos() {
+  public @Nonnull BlockPos getPos() {
     return BlockPos.fromLong(pos);
   }
 
   @Override
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
-    te = handle(ctx.getServerHandler().playerEntity.worldObj);
-    if (te != null && renderOnUpdate) {      
+    te = handle(ctx.getServerHandler().playerEntity.world);
+    if (te != null && renderOnUpdate) {
       IBlockState bs = te.getWorld().getBlockState(msg.getPos());
       te.getWorld().notifyBlockUpdate(msg.getPos(), bs, bs, 3);
     }
     return null;
   }
 
-  private TileEntity handle(World world) {
+  private @Nullable TileEntity handle(World world) {
     if (world == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null world processing tile entity packet.");
       return null;
     }
-    TileEntity te = world.getTileEntity(getPos());
-    if (te == null) {
+    TileEntity tileEntity = world.getTileEntity(getPos());
+    if (tileEntity == null) {
       Log.warn("PacketUtil.handleTileEntityPacket: TileEntity null when processing tile entity packet.");
       return null;
     }
-    te.readFromNBT(tags);
-    return te;
+    tileEntity.readFromNBT(NullHelper.notnull(tags, "NetworkUtil.readNBTTagCompound()"));
+    return tileEntity;
   }
 }

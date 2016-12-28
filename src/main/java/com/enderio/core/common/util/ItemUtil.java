@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.util.IItemReceptor;
 import com.enderio.core.common.vecmath.Vector3f;
@@ -133,7 +135,7 @@ public class ItemUtil {
    *          The String to parse.
    * @return An ItemStack the string represents.
    */
-  public static ItemStack parseStringIntoItemStack(String string) {
+  public static @Nonnull ItemStack parseStringIntoItemStack(String string) {
     int size = 1;
     int numIdx = string.indexOf('#');
     int nbtIdx = string.indexOf('$');

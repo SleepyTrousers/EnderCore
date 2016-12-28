@@ -17,7 +17,7 @@ public abstract class GhostSlot {
      * @param stack
      *          The stack that should be placed, null to clear
      */
-    void setGhostSlotContents(int slot, ItemStack stack);
+    void setGhostSlotContents(int slot, ItemStack stack, int realsize);
   }
 
   public TileEntityBase te = null;

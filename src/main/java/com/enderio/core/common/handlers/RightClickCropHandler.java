@@ -2,9 +2,12 @@ package com.enderio.core.common.handlers;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.ItemUtil;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -27,7 +30,7 @@ public class RightClickCropHandler {
     public int meta = 7;
     public int resetMeta = 0;
 
-    private transient ItemStack seedStack;
+    private transient @Nonnull ItemStack seedStack = ItemStack.EMPTY;
     private transient Block blockInst;
     
     public PlantInfo() {
@@ -42,8 +45,12 @@ public class RightClickCropHandler {
 
     public void init() {
       seedStack = ItemUtil.parseStringIntoItemStack(seed);
-      String[] blockinfo = block.split(":");      
-      blockInst = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockinfo[0], blockinfo[1]));
+      String[] blockinfo = block.split(":");
+      if (blockinfo == null || blockinfo.length != 2) {
+        throw new RuntimeException("invalid block specifier '" + block + "' received in IMV message from another mod");
+      }
+      blockInst = ForgeRegistries.BLOCKS
+          .getValue(new ResourceLocation(NullHelper.notnullJ(blockinfo[0], "String.split()"), NullHelper.notnullJ(blockinfo[1], "String.split()")));
     }
   }
 
@@ -66,19 +73,19 @@ public class RightClickCropHandler {
     if(pos == null) {
       return;
     }
-    
+
     IBlockState blockState = event.getWorld().getBlockState(pos);
     Block block = blockState.getBlock();
     int meta = block.getMetaFromState(blockState);
     if (ConfigHandler.allowCropRC 
-        && (event.getEntityPlayer().getHeldItemMainhand() == null || !event.getEntityPlayer().isSneaking())) {
-      for (PlantInfo info : plants) {        
+        && (event.getEntityPlayer().getHeldItemMainhand().isEmpty() || !event.getEntityPlayer().isSneaking())) {
+      for (PlantInfo info : plants) {
         if (info.blockInst == block && meta == info.meta) {
           if (event.getWorld().isRemote) {
-            event.getEntityPlayer().swingArm(EnumHand.MAIN_HAND);            
+            event.getEntityPlayer().swingArm(EnumHand.MAIN_HAND);
           } else {
             currentPlant = info;
-            block.dropBlockAsItem(event.getWorld(), pos, blockState, 0);
+            block.dropBlockAsItem(NullHelper.notnullF(event.getWorld(), "RightClickBlock.getWorld()"), pos, blockState, 0);
             currentPlant = null;
             IBlockState newBS = block.getStateFromMeta(info.resetMeta);
             event.getWorld().setBlockState(pos, newBS, 3);

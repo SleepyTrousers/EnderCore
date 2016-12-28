@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,11 +49,12 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 @Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, dependencies = "after:ttCore", guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
 
-  public static final String MODID = "endercore";
-  public static final String DOMAIN = MODID.toLowerCase(Locale.US);
-  public static final String NAME = "EnderCore";
-  public static final String BASE_PACKAGE = "com.enderio";
-  public static final String VERSION = "@VERSION@";
+  public static final @Nonnull String MODID = "endercore";
+  @SuppressWarnings("null")
+  public static final @Nonnull String DOMAIN = MODID.toLowerCase(Locale.US);
+  public static final @Nonnull String NAME = "EnderCore";
+  public static final @Nonnull String BASE_PACKAGE = "com.enderio";
+  public static final @Nonnull String VERSION = "@VERSION@";
 
   public static final Logger logger = LogManager.getLogger(NAME);
   public static final Lang lang = new Lang(MODID);
@@ -62,9 +65,9 @@ public class EnderCore implements IEnderMod {
   @SidedProxy(serverSide = "com.enderio.core.common.CommonProxy", clientSide = "com.enderio.core.client.ClientProxy")
   public static CommonProxy proxy;
 
-  public List<IConfigHandler> configs = Lists.newArrayList();
+  public @Nonnull List<IConfigHandler> configs = Lists.newArrayList();
 
-  private Set<String> invisibleRequesters = Sets.newHashSet();
+  private @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
 
   /**
    * Call this method BEFORE preinit (construction phase) to request that
@@ -79,7 +82,7 @@ public class EnderCore implements IEnderMod {
     return !invisibleRequesters.isEmpty();
   }
 
-  public Set<String> getInvisibleRequsters() {
+  public @Nonnull Set<String> getInvisibleRequsters() {
     return ImmutableSet.copyOf(invisibleRequesters);
   }
 
@@ -129,7 +132,7 @@ public class EnderCore implements IEnderMod {
 
     Handlers.register(event);
     CompatRegistry.INSTANCE.handle(event);
-    if(event.getSide().isServer()) {            
+    if (event.getSide().isServer()) {
       ((CommandHandler) FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(CommandReloadConfigs.SERVER);
     } else {
       ClientCommandHandler.instance.registerCommand(CommandReloadConfigs.CLIENT);
@@ -160,17 +163,17 @@ public class EnderCore implements IEnderMod {
   }
 
   @Override
-  public String modid() {
+  public @Nonnull String modid() {
     return MODID;
   }
 
   @Override
-  public String name() {
+  public @Nonnull String name() {
     return NAME;
   }
 
   @Override
-  public String version() {
+  public @Nonnull String version() {
     return VERSION;
   }
 }

@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.config.IConfigHandler;
 import com.enderio.core.common.Lang;
@@ -74,7 +76,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   String modid;
   Configuration config;
 
-  private List<Section> sections = new ArrayList<Section>();
+  private @Nonnull List<Section> sections = new ArrayList<Section>();
   private Section activeSection = null;
 
   protected AbstractConfigHandler(String modid) {
@@ -510,7 +512,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   @SuppressWarnings("unchecked")
   static <T extends Number & Comparable<T>> T boundValue(Property prop, Bound<T> bound, T defVal) throws IllegalArgumentException {
-    Object b = (Object) bound;
+    Object b = bound;
     if (defVal instanceof Integer) {
       return (T) boundInt(prop, (Bound<Integer>) b);
     }

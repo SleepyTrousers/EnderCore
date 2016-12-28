@@ -89,6 +89,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
                     return data.floatValue();
                 }
                 
+                @Override
                 public Double createBaseType(Float actual) 
                 {
                     return Double.parseDouble(Floatfmt.format(actual));
@@ -125,6 +126,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Integer>, int[]> INTEGER_LIST = 
             new TypeAdapterBase<List<Integer>, int[]>(new TypeToken<List<Integer>>(){}, Type.INTEGER)
             {
+                @SuppressWarnings("null")
                 @Override
                 public List<Integer> createActualType(int[] data)
                 {
@@ -141,6 +143,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Double>, double[]> DOUBLE_LIST = 
             new TypeAdapterBase<List<Double>, double[]>(new TypeToken<List<Double>>(){}, Type.DOUBLE)
             {
+                @SuppressWarnings("null")
                 @Override
                 public List<Double> createActualType(double[] data)
                 {
@@ -157,6 +160,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Float>, double[]> FLOAT_LIST = 
             new TypeAdapterBase<List<Float>, double[]>(new TypeToken<List<Float>>(){}, Type.DOUBLE)
             {
+                @SuppressWarnings("null")
                 @Override
                 public List<Float> createActualType(double[] data)
                 {
@@ -174,6 +178,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Boolean>, boolean[]> BOOLEAN_LIST = 
             new TypeAdapterBase<List<Boolean>, boolean[]>(new TypeToken<List<Boolean>>(){}, Type.BOOLEAN)
             {
+                @SuppressWarnings("null")
                 @Override
                 public List<Boolean> createActualType(boolean[] data)
                 {
@@ -190,6 +195,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<String>, String[]> STRING_LIST = 
             new TypeAdapterBase<List<String>, String[]>(new TypeToken<List<String>>(){}, Type.STRING)
             {
+                @SuppressWarnings("null")
                 @Override
                 public List<String> createActualType(String[] data)
                 {

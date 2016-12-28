@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.command.CommandBase;
@@ -20,12 +21,12 @@ import net.minecraft.util.text.TextComponentString;
 
 public class CommandScoreboardInfo extends CommandBase {
   @Override
-  public String getCommandName() {
+  public @Nonnull String getName() {
     return "scoreboardinfo";
   }
 
   @Override
-  public String getCommandUsage(ICommandSender p_71518_1_) {
+  public @Nonnull String getUsage(@Nonnull ICommandSender p_71518_1_) {
     return "/scoreboardinfo <board> <name>";
   }
 
@@ -35,12 +36,12 @@ public class CommandScoreboardInfo extends CommandBase {
   }
 
   @Override
-  public boolean checkPermission(MinecraftServer server, ICommandSender sender) { 
+  public boolean checkPermission(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender) {
     return true;
   }
 
   @Override
-  public void execute(MinecraftServer server, ICommandSender player, String[] args) throws CommandException {
+  public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender player, @Nonnull String[] args) throws CommandException {
   
     if (args.length < 2) {
       throw new WrongUsageException("This command requires 2 args: <board> <name>");
@@ -48,31 +49,39 @@ public class CommandScoreboardInfo extends CommandBase {
 
     Scoreboard board = player.getEntityWorld().getScoreboard();
 
-    ScoreObjective obj = board.getObjective(args[0]);
+    final String arg0 = args[0];
+    if (arg0 == null) {
+      player.sendMessage(new TextComponentString("No such board ''"));
+      return;
+    }
+
+    ScoreObjective obj = board.getObjective(arg0);
 
     if (obj == null) {
-      player.addChatMessage(new TextComponentString("No such board " + args[0]));
+      player.sendMessage(new TextComponentString("No such board " + arg0));
+      return;
     }
 
     Collection<Score> collection = board.getSortedScores(obj);
 
     for (Score score : collection) {
       if (score.getPlayerName().equals(args[1])) {
-        player.addChatMessage(new TextComponentString(args[1] + "'s score on board \"" + args[0] + "\": " + score.getScorePoints()));
+        player.sendMessage(new TextComponentString(args[1] + "'s score on board \"" + arg0 + "\": " + score.getScorePoints()));
         return;
       }
     }
 
-    player.addChatMessage(new TextComponentString("No score for " + args[1] + " on board \"" + args[0] + "\""));
+    player.sendMessage(new TextComponentString("No score for " + args[1] + " on board \"" + arg0 + "\""));
   }
 
   
   
   @Override
-  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
+  public @Nonnull List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args,
+      @Nullable BlockPos pos) {
     if (args.length == 1) {
       List<String> boards = new ArrayList<String>();
-      for (ScoreObjective obj : (Collection<ScoreObjective>) sender.getEntityWorld().getScoreboard().getScoreObjectives()) {
+      for (ScoreObjective obj : sender.getEntityWorld().getScoreboard().getScoreObjectives()) {
         boards.add(obj.getName());
       }
 
@@ -81,14 +90,14 @@ public class CommandScoreboardInfo extends CommandBase {
 
     if (args.length == 2) {
       List<String> players = new ArrayList<String>();
-      for (EntityPlayer p : (List<EntityPlayer>) sender.getEntityWorld().playerEntities) {
+      for (EntityPlayer p : sender.getEntityWorld().playerEntities) {
         players.add(p.getDisplayNameString());
       }
 
       return getListOfStringsMatchingLastWord(args, players);
     }
 
-    return null;
+    return super.getTabCompletions(server, sender, args, pos);
   }
   
   

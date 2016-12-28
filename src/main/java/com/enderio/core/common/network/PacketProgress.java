@@ -1,5 +1,7 @@
 package com.enderio.core.common.network;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.util.IProgressTile;
 
@@ -16,7 +18,7 @@ public class PacketProgress extends MessageTileEntity<TileEntity> {
   public PacketProgress() {
   }
 
-  public PacketProgress(IProgressTile tile) {
+  public PacketProgress(@Nonnull IProgressTile tile) {
     super(tile.getTileEntity());
     progress = tile.getProgress();
     if (progress == 0) {

@@ -182,8 +182,8 @@ public class ConfigProcessor {
     return this;
   }
 
-  public <ACTUAL, BASE> ConfigProcessor addAdapters(ITypeAdapter<ACTUAL, BASE>... adapters) {
-    for (ITypeAdapter<ACTUAL, BASE> adapter : adapters) {
+  public <ACTUAL, BASE> ConfigProcessor addAdapters(ITypeAdapter<ACTUAL, BASE>... adaptersIn) {
+    for (ITypeAdapter<ACTUAL, BASE> adapter : adaptersIn) {
       addAdapter(adapter);
     }
     return this;
@@ -301,6 +301,7 @@ public class ConfigProcessor {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected ITypeAdapter getAdapterFor(Field f) {
+    @SuppressWarnings("null")
     TypeToken<?> t = TypeToken.of(f.getGenericType());
     Class<?> c = f.getType();
     for (ITypeAdapter adapter : adapters) {
@@ -311,6 +312,7 @@ public class ConfigProcessor {
     return null;
   }
 
+  @SuppressWarnings("null")
   public ImmutableSet<String> sections() {
     return ImmutableSet.copyOf(sections);
   }

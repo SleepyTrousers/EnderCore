@@ -3,6 +3,7 @@ package com.enderio.core.common.fluid;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
@@ -17,7 +18,6 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class FluidWrapper {
@@ -33,15 +33,16 @@ public class FluidWrapper {
   }
 
   public static @Nullable IFluidWrapper wrap(@Nullable TileEntity te, EnumFacing side) {
-    if (te != null && te.hasWorldObj() && !te.isInvalid()) {
+    if (te != null && te.hasWorld() && !te.isInvalid()) {
       if (te instanceof IFluidWrapper) {
         return (IFluidWrapper) te;
       }
-      if (te.hasCapability(FLUID_HANDLER, side)) {
-        return wrap(te.getCapability(FLUID_HANDLER, side));
+      final Capability<IFluidHandler> fluidHandler = FLUID_HANDLER;
+      if (fluidHandler == null) {
+        throw new NullPointerException("Capability<IFluidHandler> missing");
       }
-      if (te instanceof net.minecraftforge.fluids.IFluidHandler) {
-        return wrap((net.minecraftforge.fluids.IFluidHandler) te, side);
+      if (te.hasCapability(fluidHandler, side)) {
+        return wrap(te.getCapability(fluidHandler, side));
       }
     }
     return null;
@@ -51,23 +52,9 @@ public class FluidWrapper {
     return new TankAccessFluidWrapper(tankAccess);
   }
 
-  public static LegacyFluidWrapper wrap(final net.minecraftforge.fluids.IFluidHandler fluidHandler, EnumFacing side) {
-    if (fluidHandler != null) {
-      return new LegacyFluidWrapper(fluidHandler, side);
-    }
-    return null;
-  }
-
   public static CapabilityFluidWrapper wrap(final IFluidHandler fluidHandler) {
     if (fluidHandler != null) {
       return new CapabilityFluidWrapper(fluidHandler);
-    }
-    return null;
-  }
-
-  public static @Nullable IFluidWrapper wrap(@Nullable FluidTank tank) {
-    if (tank != null) {
-      return new FluidTankFluidWrapper(tank);
     }
     return null;
   }
@@ -76,16 +63,16 @@ public class FluidWrapper {
     return wrapper;
   }
 
-  public static @Nullable IFluidWrapper wrap(ItemStack itemStack) {
-    if (itemStack != null && itemStack.getItem() instanceof IFluidContainerItem) {
-      return new FluidContainerItemFluidWrapper((IFluidContainerItem) itemStack.getItem(), itemStack);
-    }
+  public static @Nullable IFluidWrapper wrap(@Nonnull ItemStack itemStack) {
     return wrap(FluidUtil.getFluidHandler(itemStack));
   }
 
   public static Map<EnumFacing, IFluidWrapper> wrapNeighbours(IBlockAccess world, BlockPos pos) {
     Map<EnumFacing, IFluidWrapper> res = new EnumMap<EnumFacing, IFluidWrapper>(EnumFacing.class);
     for (EnumFacing dir : EnumFacing.values()) {
+      if (dir == null) {
+        throw new NullPointerException("EnumFacing.values() contains null values???");
+      }
       IFluidWrapper wrapper = wrap(world, pos.offset(dir), dir.getOpposite());
       if (wrapper != null) {
         res.put(dir, wrapper);

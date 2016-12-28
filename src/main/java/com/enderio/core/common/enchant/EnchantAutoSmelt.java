@@ -1,5 +1,6 @@
 package com.enderio.core.common.enchant;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.EnderCore;
@@ -50,18 +51,18 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
-  public boolean canApply(ItemStack stack) {
+  public boolean canApply(@Nonnull ItemStack stack) {
     return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemSword)
         && !(stack.getItem() instanceof ItemBow) && !(stack.getItem() instanceof ItemFishingRod);
   }
 
   @Override
-  public boolean canApplyAtEnchantingTable(ItemStack stack) {
+  public boolean canApplyAtEnchantingTable(@Nonnull ItemStack stack) {
     return canApply(stack);
   }
 
   @Override
-  public String getName() {
+  public @Nonnull String getName() {
     return "enchantment.autosmelt";
   }
 
@@ -85,7 +86,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
-  public boolean canApplyTogether(Enchantment ench) {
+  public boolean canApplyTogether(@Nonnull Enchantment ench) {
     return super.canApplyTogether(ench) && ench != Enchantments.SILK_TOUCH;
   }
 

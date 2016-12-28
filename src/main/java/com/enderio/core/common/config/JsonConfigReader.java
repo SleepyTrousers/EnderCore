@@ -151,17 +151,17 @@ public class JsonConfigReader<T> implements Iterable<T> {
     initialize(mod, file);
   }
 
-  private void initialize(ModToken mod, File file) {
-    this.file = file;
+  private void initialize(ModToken mod, File fileIn) {
+    this.file = fileIn;
 
-    if (!file.exists()) {
-      file.getParentFile().mkdirs();
+    if (!fileIn.exists()) {
+      fileIn.getParentFile().mkdirs();
       String assetPath = mod.getAssetPath();
       if (!assetPath.endsWith("/")) {
         assetPath = assetPath + "/";
       }
 
-      EnderFileUtils.copyFromJar(mod.getMainClass(), assetPath + file.getName(), file);
+      EnderFileUtils.copyFromJar(mod.getMainClass(), assetPath + fileIn.getName(), fileIn);
     }
 
     refresh();

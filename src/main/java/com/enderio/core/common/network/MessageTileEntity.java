@@ -1,5 +1,10 @@
 package com.enderio.core.common.network;
 
+import java.lang.reflect.TypeVariable;
+
+import javax.annotation.Nonnull;
+
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.reflect.TypeToken;
 
 import io.netty.buffer.ByteBuf;
@@ -12,17 +17,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public abstract class MessageTileEntity<T extends TileEntity> implements IMessage {
 
   private long pos;
-  @Deprecated
-  protected int x;
-  @Deprecated
-  protected int y;
-  @Deprecated
-  protected int z;
 
   protected MessageTileEntity() {
   }
 
-  protected MessageTileEntity(T tile) {
+  protected MessageTileEntity(@Nonnull T tile) {
     pos = tile.getPos().toLong();
   }
 
@@ -34,13 +33,9 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   @Override
   public void fromBytes(ByteBuf buf) {
     pos = buf.readLong();
-    BlockPos bp = getPos();
-    x = bp.getX();
-    y = bp.getY();
-    z = bp.getZ();
   }
 
-  public BlockPos getPos() {
+  public @Nonnull BlockPos getPos() {
     return BlockPos.fromLong(pos);
   }
 
@@ -53,14 +48,20 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
     if (te == null) {
       return null;
     }
-    TypeToken<?> teType = TypeToken.of(getClass()).resolveType(MessageTileEntity.class.getTypeParameters()[0]);
-    if (teType.isAssignableFrom(te.getClass())) {
+    @SuppressWarnings("rawtypes")
+    final Class<? extends MessageTileEntity> ourClass = NullHelper.notnullJ(getClass(), "Object.getClass()");
+    @SuppressWarnings("rawtypes")
+    final TypeVariable<Class<MessageTileEntity>> typeParam0 = NullHelper.notnullJ(MessageTileEntity.class.getTypeParameters()[0],
+        "Class.getTypeParameters()[0]");
+    TypeToken<?> teType = TypeToken.of(ourClass).resolveType(typeParam0);
+    final Class<? extends TileEntity> teClass = NullHelper.notnullJ(te.getClass(), "Object.getClass()");
+    if (teType.isAssignableFrom(teClass)) {
       return (T) te;
     }
     return null;
   }
 
   protected World getWorld(MessageContext ctx) {
-    return ctx.getServerHandler().playerEntity.worldObj;
+    return ctx.getServerHandler().playerEntity.world;
   }
 }

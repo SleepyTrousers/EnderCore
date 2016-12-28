@@ -75,9 +75,7 @@ public class ThreadedNetworkWrapper {
             sendToServer(reply);
           } else {
             final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
-            if (player != null) {
-              sendTo(reply, player);
-            }
+            sendTo(reply, player);
           }
         }
       }
