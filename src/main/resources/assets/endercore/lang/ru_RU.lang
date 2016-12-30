@@ -17,11 +17,11 @@ endercore.celebrate=С Новым Годом!
 endercore.resourcepack.readme=Этот файл используется для ресурсов в игре. 
 endercore.resourcepack.readme2=Не редактируйте его, он будет создан/удалён модификацией.
 
-endercore.gui.normal=Обычный
-endercore.gui.search=Поиск:
-endercore.gui.modlistinfo1=О Боже что случилось!
-endercore.gui.modlistinfo2=Новый дизайн добавлен:
+endercore.chat.invis.warn.1=EnderCore находится в %1$sневидимом режиме%2$s %3$s.
+endercore.chat.invis.warn.2=Это означает то, что %1$sизменения в геймплее не будут активны%2$s.
+endercore.chat.invis.warn.3=Вы можете изменить это в конфигурации.
+endercore.chat.invis.warn.4=Это предупреждение будет отображаться только один раз, если оно не настроено иначе.
+endercore.chat.invis.reason.1=по требованию мода(ов): %s
+endercore.chat.invis.reason.2=в соответствии с конфигурацией
 
-endercore.error.ttcore.1=EnderCore не может работать вместе с ttCore.
-endercore.error.ttcore.2=Все функции ttCore имеются в EnderCore.
-endercore.error.ttcore.3=Пожалуйста удалите ttCore и попробуйте запустить игру снова.
+endercore.config.title=Ender Core
