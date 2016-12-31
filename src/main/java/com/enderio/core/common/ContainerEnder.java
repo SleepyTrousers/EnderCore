@@ -18,10 +18,10 @@ public class ContainerEnder<T extends IInventory> extends Container {
 
   protected Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
 
-  protected final int startPlayerSlot;
-  protected final int endPlayerSlot;
-  protected final int startHotBarSlot;
-  protected final int endHotBarSlot;
+  protected int startPlayerSlot;
+  protected int endPlayerSlot;
+  protected int startHotBarSlot;
+  protected int endHotBarSlot;
 
   private final @Nonnull T inv;
   private final @Nonnull InventoryPlayer playerInv;
@@ -38,6 +38,24 @@ public class ContainerEnder<T extends IInventory> extends Container {
     this.inv = checkNotNull(inv);
     this.playerInv = checkNotNull(playerInv);
 
+    init();
+  }
+
+  /**
+   * Use this constructor if you need a fully initialized object for your
+   * addSlots(), e.g. because you need to pass your slots on to your
+   * createGhostSlots(). You <b>must</b> call init() in your constructor.
+   */
+  public ContainerEnder(boolean iPromiseToCallInitInTheImplementationClassConstructor, InventoryPlayer playerInv, T inv) {
+    this.inv = checkNotNull(inv);
+    this.playerInv = checkNotNull(playerInv);
+
+    if (!iPromiseToCallInitInTheImplementationClassConstructor) {
+      init();
+    }
+  }
+
+  protected void init() {
     addSlots(playerInv);
 
     int x = getPlayerInventoryOffset().x;
