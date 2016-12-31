@@ -282,6 +282,24 @@ public class TechneUtil {
         tes.setBrightness(world.getBlock(bx, by, bz).getMixedBrightnessForBlock(world, bx, by, bz));
       }
 
+      if (vt != null) {
+        // TODO BLECH
+        if (vt instanceof VertexRotationFacing) {
+          normal = ((VertexRotationFacing) vt).rotate(normal);
+        } else if (vt instanceof VertexTransformComposite) {
+          for (VertexTransform xform : ((VertexTransformComposite) vt).xforms) {
+            if (xform instanceof VertexRotationFacing) {
+              normal = ((VertexRotationFacing) xform).rotate(normal);
+            }
+          }
+        }
+      }
+
+      if (isbrh) {
+        int c = (int) (0xFF * RenderUtil.getColorMultiplierForFace(normal));
+        tes.setColorOpaque(c, c, c);
+      }
+
       for (int i = 0; i < f.vertices.length; i++) {
         Vertex vert = f.vertices[i];
         Vector3d v = new Vector3d(vert);
@@ -289,22 +307,6 @@ public class TechneUtil {
         tv.add(0.5, 0, 0.5);
         if (vt != null) {
           vt.apply(v);
-          // TODO BLECH
-          if (vt instanceof VertexRotationFacing) {
-            normal = ((VertexRotationFacing) vt).rotate(normal);
-          }
-          if (vt instanceof VertexTransformComposite) {
-            for (VertexTransform xform : ((VertexTransformComposite) vt).xforms) {
-              if (xform instanceof VertexRotationFacing) {
-                normal = ((VertexRotationFacing) xform).rotate(normal);
-              }
-            }
-          }
-        }
-
-        if (isbrh) {
-          int c = (int) (0xFF * RenderUtil.getColorMultiplierForFace(normal));
-          tes.setColorOpaque(c, c, c);
         }
 
         if (override != null) {
