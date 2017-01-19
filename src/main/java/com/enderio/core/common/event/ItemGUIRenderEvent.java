@@ -34,6 +34,18 @@ public class ItemGUIRenderEvent extends Event {
   }
 
   /**
+   * Fired before the item is rendered
+   *
+   */
+  public static class Pre extends ItemGUIRenderEvent {
+
+    public Pre(@Nonnull ItemStack stack, int xPosition, int yPosition) {
+      super(stack, xPosition, yPosition);
+    }
+
+  }
+
+  /**
    * Fired after the item and either the damage bar or the stack size are rendered but before the cooldown overlay is rendered
    *
    */
