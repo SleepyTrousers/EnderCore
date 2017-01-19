@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * Fired when an item is rendered into the GUI
  *
  */
-public abstract class ItemGUIRenderEvent extends Event {
+public class ItemGUIRenderEvent extends Event {
 
   private final @Nonnull ItemStack stack;
   private final int xPosition, yPosition;
