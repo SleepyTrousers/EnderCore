@@ -80,6 +80,9 @@ public class EnderCoreTransformer implements IClassTransformer {
 
   private static final String renderItemClass = "net.minecraft.client.renderer.RenderItem";
   private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
+  private static final ObfSafeName renderItemAndEffectIntoGUI = new ObfSafeName("renderItemAndEffectIntoGUI", "func_184391_a");
+  private static final ObfSafeName renderItemDisplayName = new ObfSafeName("renderItemAndEffectIntoGUI, renderItemOverlayIntoGUI",
+      "func_180453_a, func_184391_a");
 
   private static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
 
@@ -151,12 +154,22 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     // Item Overlay Rendering hook
     if (transformedName.equals(renderItemClass)) {
-      return transform(basicClass, renderItemClass, renderItemOverlayIntoGUIMethod, new Transform() {
+      return transform(basicClass, renderItemClass, renderItemDisplayName, new Transform() {
         @Override
         void transform(Iterator<MethodNode> methods) {
-          boolean done = false;
+          int done = 0;
           while (methods.hasNext()) {
             MethodNode m = methods.next();
+            if (renderItemAndEffectIntoGUI.equals(m.name) && "(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;II)V".equals(m.desc)) {
+              InsnList toAdd = new InsnList();
+              toAdd.add(new VarInsnNode(ALOAD, 2));
+              toAdd.add(new VarInsnNode(ILOAD, 3));
+              toAdd.add(new VarInsnNode(ILOAD, 4));
+              toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "renderItemAndEffectIntoGUI",
+                  "(Lnet/minecraft/item/ItemStack;II)V", false));
+              m.instructions.insert(toAdd);
+              done++;
+            }
             if (renderItemOverlayIntoGUIMethod.equals(m.name)) {
 
               InsnList toAdd = new InsnList();
@@ -166,7 +179,7 @@ public class EnderCoreTransformer implements IClassTransformer {
               toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "renderItemOverlayIntoGUI",
                   "(Lnet/minecraft/item/ItemStack;II)V", false));
 
-              boolean primed = false;
+              boolean primed = false, applied = false;
               Label target = null;
               for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode next = m.instructions.get(i);
@@ -187,20 +200,21 @@ public class EnderCoreTransformer implements IClassTransformer {
                 // (3) insert our callback there
                 if (target != null && next instanceof LabelNode && ((LabelNode) next).getLabel() == target) {
                   m.instructions.insert(next, toAdd);
-                  done = true;
+                  done++;
+                  applied = true;
                   break;
                 }
               }
-              if (!done) {
+              if (!applied) {
                 logger.info("Transforming failed. Applying ersatz patch...");
                 m.instructions.insert(toAdd);
                 logger.warn("Ersatz patch applied, things may break!");
-                done = true;
+                done++;
               }
               break;
             }
           }
-          if (!done) {
+          if (done != 2) {
             logger.info("Transforming failed.");
           }
         }

@@ -22,7 +22,7 @@ public class ToolTipManager {
 
         FontRenderer getFontRenderer();
 
-        void drawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font);
+    void drawHoveringToolTipText(List<String> par1List, int par2, int par3, FontRenderer font);
     }
 
     private final Set<GuiToolTip> toolTips = Sets.newHashSet();
@@ -75,7 +75,7 @@ public class ToolTipManager {
             }
             mouseX -= maxWidth + 18;
         }
-        renderer.drawHoveringText(formatted, mouseX, mouseY, renderer.getFontRenderer());
+    renderer.drawHoveringToolTipText(formatted, mouseX, mouseY, renderer.getFontRenderer());
     }
 
 }

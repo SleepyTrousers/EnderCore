@@ -166,6 +166,10 @@ public class EnderCoreMethods {
     public void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition);
   }
 
+  public static interface IUnderlayRenderAware {
+    public void renderItemAndEffectIntoGUI(ItemStack stack, int xPosition, int yPosition);
+  }
+
   public static void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition) {
     if (stack != null) {
       if (stack.getItem() instanceof IOverlayRenderAware) {
@@ -175,6 +179,14 @@ public class EnderCoreMethods {
     }
   }
 
+  public static void renderItemAndEffectIntoGUI(ItemStack stack, int xPosition, int yPosition) {
+    if (stack != null) {
+      if (stack.getItem() instanceof IUnderlayRenderAware) {
+        ((IUnderlayRenderAware) stack.getItem()).renderItemAndEffectIntoGUI(stack, xPosition, yPosition);
+      }
+      MinecraftForge.EVENT_BUS.post(new ItemGUIRenderEvent.Pre(stack, xPosition, yPosition));
+    }
+  }
   @Deprecated
   public static interface IElytraFlyingProvider {
     public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack);

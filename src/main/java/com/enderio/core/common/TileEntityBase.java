@@ -31,6 +31,10 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   @Override
   public final void update() {
+    if (isInvalid() || !worldObj.isBlockLoaded(getPos()) || worldObj.getTileEntity(getPos()) != this) {
+      // we can get ticked after being removed from the world, ignore this
+      return;
+    }
     if (ConfigHandler.allowExternalTickSpeedup || worldObj.getTotalWorldTime() != lastUpdate) {
       lastUpdate = worldObj.getTotalWorldTime();
       doUpdate();

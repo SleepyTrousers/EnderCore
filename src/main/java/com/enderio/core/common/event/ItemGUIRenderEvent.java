@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * Fired when an item is rendered into the GUI
  *
  */
-public abstract class ItemGUIRenderEvent extends Event {
+public class ItemGUIRenderEvent extends Event {
 
   private final @Nonnull ItemStack stack;
   private final int xPosition, yPosition;
@@ -31,6 +31,18 @@ public abstract class ItemGUIRenderEvent extends Event {
 
   public int getyPosition() {
     return yPosition;
+  }
+
+  /**
+   * Fired before the item is rendered
+   *
+   */
+  public static class Pre extends ItemGUIRenderEvent {
+
+    public Pre(@Nonnull ItemStack stack, int xPosition, int yPosition) {
+      super(stack, xPosition, yPosition);
+    }
+
   }
 
   /**

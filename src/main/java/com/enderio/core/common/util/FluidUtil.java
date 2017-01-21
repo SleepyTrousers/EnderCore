@@ -155,7 +155,7 @@ public class FluidUtil {
     }
 
     int filledAmount = handler.fill(source.copy(), true);
-    if (filledAmount <= 0) {
+    if (filledAmount <= 0 || filledAmount > source.amount) {
       return new FluidAndStackResult(null, null, target, source);
     }
     FluidStack resultFluid = source.copy();
@@ -197,7 +197,7 @@ public class FluidUtil {
       drained = handler.drain(maxDrain, true);
     }
 
-    if (drained == null || drained.amount <= 0) {
+    if (drained == null || drained.amount <= 0 || drained.amount > maxDrain) {
       return new FluidAndStackResult(null, null, source, target);
     }
 

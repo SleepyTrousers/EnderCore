@@ -1,7 +1,6 @@
 package com.enderio.core.client.gui;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.input.Mouse;
@@ -27,10 +26,8 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Timer;
-import net.minecraftforge.fml.common.Optional;
 
-@Optional.InterfaceList({ @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems") })
-public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen {//, INEIGuiHandler {
+public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen {
 
   protected ToolTipManager ttMan = new ToolTipManager();
   protected List<IGuiOverlay> overlays = Lists.newArrayList();
@@ -449,78 +446,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void drawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font) {
-    copyOfdrawHoveringText(par1List, par2, par3, font);   
-  }
-
-  //This is a copy of the super class method due to 'Method not found' errors
-  // reported with some mods installed.
-  protected void copyOfdrawHoveringText(List<String> par1List, int par2, int par3, FontRenderer font) {
-    
-    if (!par1List.isEmpty()) {      
-
-      GlStateManager.disableLighting();
-      GlStateManager.disableDepth();      
-      int k = 0;
-      Iterator<String> iterator = par1List.iterator();
-
-      while (iterator.hasNext()) {
-        String s = iterator.next();
-        int l = font.getStringWidth(s);
-
-        if (l > k) {
-          k = l;
-        }
-      }
-
-      int i1 = par2 + 12;
-      int j1 = par3 - 12;
-      int k1 = 8;
-
-      if (par1List.size() > 1) {
-        k1 += 2 + (par1List.size() - 1) * 10;
-      }
-
-      if (i1 + k > this.width) {
-        i1 -= 28 + k;
-      }
-
-      if (j1 + k1 + 6 > this.height) {
-        j1 = this.height - k1 - 6;
-      }
-
-      this.zLevel = 300.0F;
-      //itemRenderer.zLevel = 300.0F;
-      int l1 = -267386864;
-      this.drawGradientRect(i1 - 3, j1 - 4, i1 + k + 3, j1 - 3, l1, l1);
-      this.drawGradientRect(i1 - 3, j1 + k1 + 3, i1 + k + 3, j1 + k1 + 4, l1, l1);
-      this.drawGradientRect(i1 - 3, j1 - 3, i1 + k + 3, j1 + k1 + 3, l1, l1);
-      this.drawGradientRect(i1 - 4, j1 - 3, i1 - 3, j1 + k1 + 3, l1, l1);
-      this.drawGradientRect(i1 + k + 3, j1 - 3, i1 + k + 4, j1 + k1 + 3, l1, l1);
-      int i2 = 1347420415;
-      int j2 = (i2 & 16711422) >> 1 | i2 & -16777216;
-      this.drawGradientRect(i1 - 3, j1 - 3 + 1, i1 - 3 + 1, j1 + k1 + 3 - 1, i2, j2);
-      this.drawGradientRect(i1 + k + 2, j1 - 3 + 1, i1 + k + 3, j1 + k1 + 3 - 1, i2, j2);
-      this.drawGradientRect(i1 - 3, j1 - 3, i1 + k + 3, j1 - 3 + 1, i2, i2);
-      this.drawGradientRect(i1 - 3, j1 + k1 + 2, i1 + k + 3, j1 + k1 + 3, j2, j2);
-
-      for (int k2 = 0; k2 < par1List.size(); ++k2) {
-        String s1 = par1List.get(k2);
-        font.drawStringWithShadow(s1, i1, j1, -1);
-
-        if (k2 == 0) {
-          j1 += 2;
-        }
-
-        j1 += 10;
-      }
-
-      this.zLevel = 0.0F;
-      //itemRenderer.zLevel = 0.0F;
-      GlStateManager.enableLighting();
-      GlStateManager.enableDepth();      
-      
-    }
+  public void drawHoveringToolTipText(List<String> par1List, int par2, int par3, FontRenderer font) {
+    super.drawHoveringText(par1List, par2, par3, font);
   }
 
   public float getZlevel() {
@@ -601,34 +528,5 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
       }
   }
   
-//  @Override
-//  @Optional.Method(modid = "NotEnoughItems")
-//  public VisiblityData modifyVisiblity(GuiContainer gc, VisiblityData vd) {
-//    return vd;
-//  }
-//
-//  @Override
-//  @Optional.Method(modid = "NotEnoughItems")
-//  public Iterable<Integer> getItemSpawnSlots(GuiContainer gc, ItemStack is) {
-//    return null;
-//  }
-//
-//  @Override
-//  @Optional.Method(modid = "NotEnoughItems")
-//  public List<TaggedInventoryArea> getInventoryAreas(GuiContainer gc) {
-//    return Collections.<TaggedInventoryArea> emptyList();
-//  }
-//
-//  @Override
-//  @Optional.Method(modid = "NotEnoughItems")
-//  public boolean handleDragNDrop(GuiContainer gc, int i, int i1, ItemStack is, int i2) {
-//    return false;
-//  }
-//
-//  @Override
-//  @Optional.Method(modid = "NotEnoughItems")
-//  public boolean hideItemPanelSlot(GuiContainer gc, int x, int y, int w, int h) {
-//    return false;
-//  }
 }
 
