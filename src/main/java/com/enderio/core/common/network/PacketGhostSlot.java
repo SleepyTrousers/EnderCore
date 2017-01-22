@@ -1,6 +1,9 @@
 package com.enderio.core.common.network;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.common.util.NullHelper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -13,15 +16,16 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketGhostSlot implements IMessage {
 
-  private int windowId;
-  private int slot;
-  private ItemStack stack;
-  private int realsize;
+  int windowId;
+  int slot;
+  @Nonnull
+  ItemStack stack = ItemStack.EMPTY;
+  int realsize;
 
   public PacketGhostSlot() {
   }
 
-  public static PacketGhostSlot setGhostSlotContents(int slot, ItemStack stack, int realsize) {
+  public static PacketGhostSlot setGhostSlotContents(int slot, @Nonnull ItemStack stack, int realsize) {
     PacketGhostSlot msg = new PacketGhostSlot();
     msg.slot = slot;
     msg.stack = stack;
@@ -34,7 +38,7 @@ public class PacketGhostSlot implements IMessage {
   public void fromBytes(ByteBuf buf) {
     windowId = buf.readInt();
     slot = buf.readShort();
-    stack = ByteBufUtils.readItemStack(buf);
+    stack = NullHelper.notnullF(ByteBufUtils.readItemStack(buf), "ByteBufUtils.readItemStack()");
     realsize = buf.readInt();
   }
 

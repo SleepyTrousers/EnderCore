@@ -30,7 +30,7 @@ public class Scheduler {
   public static interface ITask {
     /**
      * This method will be called at the next post tick event. It can return a new task (or itself) to be enqueued again.
-     * 
+     *
      * @return null or a task to be enqueued
      */
     ITask run();
@@ -40,7 +40,7 @@ public class Scheduler {
     private int delay;
     private Runnable toRun;
 
-    private Task(int delay, Runnable toRun) {
+    Task(int delay, Runnable toRun) {
       this.delay = delay;
       this.toRun = toRun;
     }
@@ -73,12 +73,12 @@ public class Scheduler {
 
   /**
    * Schedules a task to be called later
-   * 
+   *
    * @param delay
    *          The amount of ticks to delay the call
    * @param task
    *          The {@link Runnable} to be run when the delay is up
-   * 
+   *
    * @see #schedule(int, Runnable, Side)
    */
   public void schedule(int delay, Runnable task) {
@@ -87,7 +87,7 @@ public class Scheduler {
 
   /**
    * Schedules a task to be called later
-   * 
+   *
    * @param delay
    *          The amount of ticks to delay the call
    * @param task
@@ -95,9 +95,8 @@ public class Scheduler {
    * @param side
    *          The side to schedule the task on.
    *          <p>
-   *          Note: passing in {@link Side#CLIENT} on a dedicated server will
-   *          work, but your task will never be called. Please avoid doing this
-   *          to save processing.
+   *          Note: passing in {@link Side#CLIENT} on a dedicated server will work, but your task will never be called. Please avoid doing this to save
+   *          processing.
    */
   public void schedule(int delay, Runnable task, Side side) {
     schedule(new Task(delay, task), side);
@@ -105,7 +104,7 @@ public class Scheduler {
 
   /**
    * Schedules a task to be called later
-   * 
+   *
    * @param task
    *          The {@link ITask} to be run at the next tick
    * @param side
@@ -124,9 +123,9 @@ public class Scheduler {
 
   /**
    * Returns the {@link Scheduler} instance for the current side.
-   * 
+   *
    * @see #schedule(int, Runnable)
-   * 
+   *
    * @return The {@link Scheduler} instance.
    */
   public static Scheduler instance() {
@@ -157,7 +156,7 @@ public class Scheduler {
     }
   }
 
-  private void runTasks(Queue<ITask> queue) {
+  private static void runTasks(Queue<ITask> queue) {
     if (!queue.isEmpty()) {
       List<ITask> newtasks = new ArrayList<ITask>(queue.size());
       while (!queue.isEmpty()) {

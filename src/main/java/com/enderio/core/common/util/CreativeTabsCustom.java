@@ -1,14 +1,16 @@
 package com.enderio.core.common.util;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class CreativeTabsCustom extends CreativeTabs {
-  private ItemStack displayStack;
 
-  public CreativeTabsCustom(String unloc) {
+  private @Nonnull ItemStack displayStack = ItemStack.EMPTY;
+
+  public CreativeTabsCustom(@Nonnull String unloc) {
     super(unloc);
   }
 
@@ -16,7 +18,7 @@ public class CreativeTabsCustom extends CreativeTabs {
    * @param item
    *          Item to display
    */
-  public CreativeTabsCustom setDisplay(Item item) {
+  public CreativeTabsCustom setDisplay(@Nonnull Item item) {
     return setDisplay(item, 0);
   }
 
@@ -26,7 +28,7 @@ public class CreativeTabsCustom extends CreativeTabs {
    * @param damage
    *          Damage of item to display
    */
-  public CreativeTabsCustom setDisplay(Item item, int damage) {
+  public CreativeTabsCustom setDisplay(@Nonnull Item item, int damage) {
     return setDisplay(new ItemStack(item, 1, damage));
   }
 
@@ -34,18 +36,13 @@ public class CreativeTabsCustom extends CreativeTabs {
    * @param display
    *          ItemStack to display
    */
-  public CreativeTabsCustom setDisplay(ItemStack display) {
+  public CreativeTabsCustom setDisplay(@Nonnull ItemStack display) {
     this.displayStack = display.copy();
     return this;
   }
 
   @Override
-  public ItemStack getIconItemStack() {
-    return displayStack == null ? new ItemStack(Items.DIAMOND) : displayStack;
-  }
-
-  @Override
-  public Item getTabIconItem() {
-    return null; // defaults to getIconItemStack()
+  public @Nonnull ItemStack getTabIconItem() {
+    return displayStack;
   }
 }

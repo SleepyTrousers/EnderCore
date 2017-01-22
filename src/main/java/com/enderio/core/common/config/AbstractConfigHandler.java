@@ -58,8 +58,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     REQUIRES_WORLD_RESTART,
 
     /**
-     * This config requires the game to be restarted to take effect.
-     * {@code REQUIRES_WORLD_RESTART} is implied when using this.
+     * This config requires the game to be restarted to take effect. {@code REQUIRES_WORLD_RESTART} is implied when using this.
      */
     REQUIRES_MC_RESTART;
 
@@ -73,20 +72,21 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     }
   }
 
+  @Nonnull
   String modid;
   Configuration config;
 
   private @Nonnull List<Section> sections = new ArrayList<Section>();
   private Section activeSection = null;
 
-  protected AbstractConfigHandler(String modid) {
-    this.modid = modid;    
+  protected AbstractConfigHandler(@Nonnull String modid) {
+    this.modid = modid;
     MinecraftForge.EVENT_BUS.register(this);
     EnderCore.instance.configs.add(this);
   }
 
   @Override
-  public final void initialize(File cfg) {
+  public final void initialize(@Nonnull File cfg) {
     config = new Configuration(cfg);
     init();
     reloadAllConfigs();
@@ -137,22 +137,20 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   /**
    * Refresh all config values that can only be loaded when NOT in-game.
    * <p>
-   * {@code reloadIngameConfigs()} will be called after this, do not duplicate
-   * calls in this method and that one.
+   * {@code reloadIngameConfigs()} will be called after this, do not duplicate calls in this method and that one.
    */
   protected abstract void reloadNonIngameConfigs();
 
   /**
    * Refresh all config values that can only be loaded when in-game.
    * <p>
-   * This is separated from {@code reloadNonIngameConfigs()} because some values
-   * may not be able to be modified at runtime.
+   * This is separated from {@code reloadNonIngameConfigs()} because some values may not be able to be modified at runtime.
    */
   protected abstract void reloadIngameConfigs();
 
   /**
    * Adds a section to your config to be used later
-   * 
+   *
    * @param sectionName
    *          The name of the section. Will also be used as language key.
    * @return A {@link Section} representing your section in the config
@@ -163,12 +161,11 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Adds a section to your config to be used later
-   * 
+   *
    * @param sectionName
    *          The name of the section
    * @param langKey
-   *          The language key to use to display your section name in the Config
-   *          GUI
+   *          The language key to use to display your section name in the Config GUI
    * @return A {@link Section} representing your section in the config
    */
   protected Section addSection(String sectionName, String langKey) {
@@ -177,12 +174,11 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Adds a section to your config to be used later
-   * 
+   *
    * @param sectionName
    *          The name of the section
    * @param langKey
-   *          The language key to use to display your section name in the Config
-   *          GUI
+   *          The language key to use to display your section name in the Config GUI
    * @param comment
    *          The section comment
    * @return A {@link Section} representing your section in the config
@@ -209,10 +205,10 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Activates a section
-   * 
+   *
    * @param sectionName
    *          The name of the section
-   * 
+   *
    * @throws IllegalArgumentException
    *           if {@code sectionName} is not valid
    */
@@ -226,7 +222,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Activates a section
-   * 
+   *
    * @param section
    *          The section to activate
    */
@@ -236,11 +232,10 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a {@link Section} for a name
-   * 
+   *
    * @param sectionName
    *          The name of the section
-   * @return A section object representing the section in your config with this
-   *         name
+   * @return A section object representing the section in your config with this name
    */
   protected Section getSectionByName(String sectionName) {
     for (Section s : sections) {
@@ -253,13 +248,13 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param defaultVal
    *          Default value so a new property can be created
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           If defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -271,7 +266,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param defaultVal
@@ -279,7 +274,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param req
    *          Restart requirement of the property to be created
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           If defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -291,7 +286,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param defaultVal
@@ -299,7 +294,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param bound
    *          The bounds to set on this property
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           If defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -311,7 +306,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param comment
@@ -319,7 +314,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param defaultVal
    *          Default value so a new property can be created
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -331,7 +326,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param comment
@@ -341,7 +336,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param req
    *          Restart requirement of the property to be created
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -353,7 +348,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param comment
@@ -363,7 +358,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param bound
    *          The bounds to set on this property
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -375,7 +370,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from this config handler
-   * 
+   *
    * @param key
    *          Name of the key for this property
    * @param comment
@@ -387,7 +382,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
    * @param bound
    *          The bounds to set on this property
    * @return The value of the property
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -402,12 +397,12 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from a property
-   * 
+   *
    * @param prop
    *          Property to get value from
    * @param defaultVal
    *          Default value so a new property can be created
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -419,14 +414,14 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a value from a property
-   * 
+   *
    * @param prop
    *          Property to get value from
    * @param defaultVal
    *          Default value so a new property can be created
    * @param bound
    *          The bounds to set on this property
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -437,24 +432,26 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   protected <T> T getValue(Property prop, T defaultVal, Bound<? extends Number> bound) {
     checkInitialized();
 
+    final @Nonnull Bound<? extends Number> realbound;
     if (bound != null) {
-      setBounds(prop, bound);
+      realbound = bound;
+      setBounds(prop, realbound);
     } else {
-      bound = Bound.MAX_BOUND;
+      realbound = Bound.MAX_BOUND;
     }
 
-    addCommentDetails(prop, bound);
+    addCommentDetails(prop, realbound);
 
     if (defaultVal instanceof Integer) {
-      Bound<Integer> b = Bound.of(bound.min.intValue(), bound.max.intValue());
+      Bound<Integer> b = Bound.of(realbound.min.intValue(), realbound.max.intValue());
       return (T) boundValue(prop, b, (Integer) defaultVal);
     }
     if (defaultVal instanceof Float) {
-      Bound<Float> b = Bound.of(bound.min.floatValue(), bound.max.floatValue());
+      Bound<Float> b = Bound.of(realbound.min.floatValue(), realbound.max.floatValue());
       return (T) boundValue(prop, b, (Float) defaultVal);
     }
     if (defaultVal instanceof Double) {
-      Bound<Double> b = Bound.of(bound.min.doubleValue(), bound.max.doubleValue());
+      Bound<Double> b = Bound.of(realbound.min.doubleValue(), realbound.max.doubleValue());
       return (T) boundValue(prop, b, (Double) defaultVal);
     }
     if (defaultVal instanceof Boolean) {
@@ -548,20 +545,20 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     } else {
       boolean minIsInt = bound.min.doubleValue() == bound.min.intValue();
       boolean maxIsInt = bound.max.doubleValue() == bound.max.intValue();
-      prop.setComment(prop.getComment() + fmlLang.localize("defaultNumeric", minIsInt ? bound.min.intValue() : bound.min, maxIsInt ? bound.max.intValue() : bound.max,
-          prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault()));
+      prop.setComment(prop.getComment() + fmlLang.localize("defaultNumeric", minIsInt ? bound.min.intValue() : bound.min,
+          maxIsInt ? bound.max.intValue() : bound.max, prop.isList() ? Arrays.toString(prop.getDefaults()) : prop.getDefault()));
     }
   }
 
   /**
    * Gets a property from this config handler
-   * 
+   *
    * @param key
    *          name of the key for this property
    * @param defaultVal
    *          default value so a new property can be created
    * @return The property in the config
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -573,13 +570,13 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   /**
    * Gets a property from this config handler
-   * 
+   *
    * @param key
    *          name of the key for this property
    * @param defaultVal
    *          default value so a new property can be created
    * @return The property in the config
-   * 
+   *
    * @throws IllegalArgumentException
    *           if defaultVal is not a valid property type
    * @throws IllegalStateException
@@ -627,9 +624,8 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   }
 
   /**
-   * @return If this config handler should recieve {@link #initHook()} and
-   *         {@link #postInitHook()} during config reload events. If this
-   *         returns false, these methods will only be called on load.
+   * @return If this config handler should recieve {@link #initHook()} and {@link #postInitHook()} during config reload events. If this returns false, these
+   *         methods will only be called on load.
    *         <p>
    *         Defaults to false.
    */
@@ -650,17 +646,21 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   // no need to override these, they are merely utilities, and reference private fields anyways
 
   @Override
-  public final List<Section> getSections() {
+  public final @Nonnull List<Section> getSections() {
     return ImmutableList.copyOf(sections);
   }
 
   @Override
-  public final ConfigCategory getCategory(String name) {
-    return config.getCategory(name);
+  public final @Nonnull ConfigCategory getCategory(String name) {
+    final ConfigCategory category = config.getCategory(name);
+    if (category == null) {
+      throw new NullPointerException("Forge is rejecting to create a config category '" + name + "'");
+    }
+    return category;
   }
 
   @Override
-  public final String getModID() {
+  public final @Nonnull String getModID() {
     return modid;
   }
 }

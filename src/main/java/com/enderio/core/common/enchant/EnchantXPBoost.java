@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
-  
+
   private static EnchantXPBoost INSTANCE;
 
   /**
@@ -31,7 +31,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   private EnchantXPBoost() {
     // The ResourceLocation is mostly irrelevant, it's just a key to retrieve the enchantment with
-    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE,  new EntityEquipmentSlot[] {EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND});
+    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND });
     setRegistryName("xpboost");
   }
 
@@ -54,7 +54,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   public boolean canApply(@Nonnull ItemStack stack) {
     return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemFishingRod);
   }
-  
+
   @Override
   public boolean canApplyTogether(@Nonnull Enchantment ench) {
     return super.canApplyTogether(ench) && ench != Enchantments.SILK_TOUCH;
@@ -76,16 +76,16 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
-  public String[] getTooltipDetails(ItemStack stack) {
+  public @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack) {
     return new String[] { EnderCore.lang.localize("enchantment.xpboost.tooltip", false) };
   }
 
   public static void register() {
-    if(ConfigHandler.allowXPBoost) {
+    if (ConfigHandler.allowXPBoost) {
       INSTANCE = new EnchantXPBoost();
       GameRegistry.register(INSTANCE);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" >\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");      
+          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" >\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
     }
   }
 }

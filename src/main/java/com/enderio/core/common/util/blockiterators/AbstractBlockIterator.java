@@ -2,12 +2,15 @@ package com.enderio.core.common.util.blockiterators;
 
 import java.util.Iterator;
 
-import com.enderio.core.common.util.BlockCoord;
+import javax.annotation.Nonnull;
 
-public abstract class AbstractBlockIterator implements Iterable<BlockCoord>, Iterator<BlockCoord> {
-  protected BlockCoord base;
+import net.minecraft.util.math.BlockPos;
 
-  protected AbstractBlockIterator(BlockCoord base) {
+public abstract class AbstractBlockIterator implements Iterable<BlockPos>, Iterator<BlockPos> {
+
+  protected @Nonnull BlockPos base;
+
+  protected AbstractBlockIterator(@Nonnull BlockPos base) {
     this.base = base;
   }
 
@@ -17,7 +20,8 @@ public abstract class AbstractBlockIterator implements Iterable<BlockCoord>, Ite
   }
 
   @Override
-  public Iterator<BlockCoord> iterator() {
+  public @Nonnull Iterator<BlockPos> iterator() {
     return this;
   }
+
 }

@@ -2,7 +2,8 @@ package com.enderio.core.common.imc.handlers;
 
 import com.enderio.core.api.common.imc.IMC;
 import com.enderio.core.common.handlers.RightClickCropHandler;
-import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
+import com.enderio.core.common.handlers.RightClickCropHandler.IPlantInfo;
+import com.enderio.core.common.handlers.RightClickCropHandler.LegacyPlantInfo;
 import com.enderio.core.common.imc.IMCRegistry.IMCBase;
 
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
@@ -24,7 +25,7 @@ public class IMCRightClickCrop extends IMCBase {
       return;
     }
 
-    PlantInfo plantinfo = new PlantInfo(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
+    IPlantInfo plantinfo = new LegacyPlantInfo(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
     plantinfo.init();
     RightClickCropHandler.INSTANCE.addCrop(plantinfo);
   }

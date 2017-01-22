@@ -1,5 +1,7 @@
 package com.enderio.core.common.tweaks;
 
+import com.enderio.core.common.util.NullHelper;
+
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
@@ -29,7 +31,7 @@ public class InfiniBow extends Tweak {
     ItemStack stack = event.getBow();
     if (player.capabilities.isCreativeMode || player.inventory.hasItemStack(new ItemStack(Items.ARROW))
         || EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, stack) > 0) {
-      event.getEntityPlayer().setActiveHand(event.getHand());
+      event.getEntityPlayer().setActiveHand(NullHelper.notnullF(event.getHand(), "null hand in ArrowNockEvent event"));
       event.setAction(new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack));
     }
   }

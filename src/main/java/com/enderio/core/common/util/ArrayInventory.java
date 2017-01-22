@@ -1,11 +1,13 @@
 package com.enderio.core.common.util;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 public class ArrayInventory implements IInventory {
 
@@ -25,12 +27,13 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public ItemStack getStackInSlot(int slot) {
-    return items[slot];
+  public @Nonnull ItemStack getStackInSlot(int slot) {
+    final ItemStack itemStack = items[slot];
+    return itemStack != null ? itemStack : ItemStack.EMPTY;
   }
 
   @Override
-  public ItemStack decrStackSize(int slot, int amount) {
+  public @Nonnull ItemStack decrStackSize(int slot, int amount) {
     return Util.decrStackSize(this, slot, amount);
   }
 
@@ -46,12 +49,12 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public boolean isUseableByPlayer(EntityPlayer var1) {
+  public boolean isUsableByPlayer(@Nonnull EntityPlayer var1) {
     return true;
   }
 
   @Override
-  public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+  public boolean isItemValidForSlot(int i, @Nonnull ItemStack itemstack) {
     return true;
   }
 
@@ -61,7 +64,7 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public String getName() {
+  public @Nonnull String getName() {
     return "ArrayInventory";
   }
 
@@ -71,23 +74,23 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public ITextComponent getDisplayName() {
-    return null;
+  public @Nonnull ITextComponent getDisplayName() {
+    return new TextComponentString(getName());
   }
 
   @Override
-  public ItemStack removeStackFromSlot(int index) {
+  public @Nonnull ItemStack removeStackFromSlot(int index) {
     ItemStack res = items[index];
-    items[index] = null;
-    return res;
+    items[index] = ItemStack.EMPTY;
+    return res != null ? res : ItemStack.EMPTY;
   }
 
   @Override
-  public void openInventory(EntityPlayer player) {
+  public void openInventory(@Nonnull EntityPlayer player) {
   }
 
   @Override
-  public void closeInventory(EntityPlayer player) {
+  public void closeInventory(@Nonnull EntityPlayer player) {
   }
 
   @Override
@@ -106,10 +109,20 @@ public class ArrayInventory implements IInventory {
 
   @Override
   public void clear() {
-    for(int i=0;i<items.length;i++) {
-      items[i] = null;
+    for (int i = 0; i < items.length; i++) {
+      items[i] = ItemStack.EMPTY;
     }
 
+  }
+
+  @Override
+  public boolean isEmpty() {
+    for (ItemStack itemstack : items) {
+      if (itemstack != null && !itemstack.isEmpty()) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

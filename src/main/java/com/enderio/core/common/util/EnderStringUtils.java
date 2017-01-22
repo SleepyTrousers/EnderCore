@@ -1,5 +1,7 @@
 package com.enderio.core.common.util;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 
 import net.minecraft.potion.PotionEffect;
@@ -8,7 +10,7 @@ import net.minecraft.util.text.TextFormatting;
 public class EnderStringUtils {
   /**
    * Formats a string and number for use in GUIs and tooltips
-   * 
+   *
    * @param prefix
    *          - The string to put before the formatted number
    * @param suffix
@@ -21,42 +23,34 @@ public class EnderStringUtils {
    *          - Whether or not to format the thousands
    * @return A string numeric formatted to use SI suffixes
    */
-  public static String formatString(String prefix, String suffix, long amnt, boolean useDecimals, boolean formatK) {
+  public static @Nonnull String formatString(String prefix, String suffix, long amnt, boolean useDecimals, boolean formatK) {
     if (formatK && Long.toString(amnt).length() < 7 && Long.toString(amnt).length() > 3) {
       return formatSmallerNumber(prefix, suffix, amnt, useDecimals);
     }
 
     switch (Long.toString(amnt).length()) {
     case 7:
-      prefix += Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "M" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "M" + suffix;
     case 8:
-      prefix += Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "M" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "M" + suffix;
     case 9:
-      prefix += Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "M" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "M" + suffix;
     case 10:
-      prefix += Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "B" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "B" + suffix;
     case 11:
-      prefix += Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "B" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "B" + suffix;
     case 12:
-      prefix += Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "B" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "B" + suffix;
     case 13:
-      prefix += Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 5) : "") + "T" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 5) : "") + "T" + suffix;
     default:
-      prefix += "" + amnt + suffix;
-      return prefix;
+      return prefix + "" + amnt + suffix;
     }
   }
 
   /**
    * Formats a string and number for use in GUIs and tooltips
-   * 
+   *
    * @param prefix
    *          - The string to put before the formatted number
    * @param suffix
@@ -67,38 +61,35 @@ public class EnderStringUtils {
    *          - Whether or not to use decimals in the representation
    * @return A string numeric formatted to use SI suffixes
    */
-  public static String formatString(String prefix, String suffix, long amnt, boolean useDecimals) {
+  public static @Nonnull String formatString(String prefix, String suffix, long amnt, boolean useDecimals) {
     return formatString(prefix, suffix, amnt, useDecimals, false);
   }
 
-  private static String formatSmallerNumber(String prefix, String suffix, long amnt, boolean useDecimals) {
+  private static @Nonnull String formatSmallerNumber(String prefix, String suffix, long amnt, boolean useDecimals) {
     switch (Long.toString(amnt).length()) {
     case 4:
-      prefix += Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "K" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 1) + (useDecimals ? "." + Long.toString(amnt).substring(1, 3) : "") + "K" + suffix;
     case 5:
-      prefix += Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "K" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 2) + (useDecimals ? "." + Long.toString(amnt).substring(2, 4) : "") + "K" + suffix;
     case 6:
-      prefix += Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "K" + suffix;
-      return prefix;
+      return prefix + Long.toString(amnt).substring(0, 3) + (useDecimals ? "." + Long.toString(amnt).substring(3, 5) : "") + "K" + suffix;
     }
     return "";
   }
 
   /**
    * Returns a color for the number passed, based on its percentage of the max
-   * 
+   *
    * @param num
    *          The number to compare
    * @param max
    *          The max number
-   * 
+   *
    * @return if num {@literal <}= 10% of max : RED<br>
    *         if 10% {@literal <} num {@literal <}= 25% of max: GOLD (orange-ish)<br>
    *         if num {@literal >} 25% of max: GREEN
    */
-  public static TextFormatting getColorFor(double num, double max) {
+  public static @Nonnull TextFormatting getColorFor(double num, double max) {
     if (num / max <= .1)
       return TextFormatting.RED;
     else if (num / max <= .25)
@@ -107,7 +98,7 @@ public class EnderStringUtils {
       return TextFormatting.GREEN;
   }
 
-  public static String getEffectNameWithLevel(PotionEffect effect) {
+  public static @Nonnull String getEffectNameWithLevel(@Nonnull PotionEffect effect) {
     String name = EnderCore.lang.localize(effect.getEffectName(), false);
 
     if (effect.getAmplifier() > 0) {

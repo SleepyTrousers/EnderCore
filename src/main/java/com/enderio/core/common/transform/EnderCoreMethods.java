@@ -1,5 +1,7 @@
 package com.enderio.core.common.transform;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.event.AnvilMaxCostEvent;
 import com.enderio.core.common.event.ItemGUIRenderEvent;
@@ -23,155 +25,167 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class EnderCoreMethods {
-  
+
   public static int getMaxAnvilCost(Object source) {
     int maxCost = ConfigHandler.invisibleMode == 1 ? 40 : ConfigHandler.anvilMaxLevel;
-    AnvilMaxCostEvent event = new AnvilMaxCostEvent(source, maxCost);    
-    MinecraftForge.EVENT_BUS.post(event);    
-    return event.getMaxAnvilCost();    
+    AnvilMaxCostEvent event = new AnvilMaxCostEvent(source, maxCost);
+    MinecraftForge.EVENT_BUS.post(event);
+    return event.getMaxAnvilCost();
   }
 
-  // mostly copied from ContainerFurnace
-  public static ItemStack transferStackInSlot(ContainerFurnace inv, EntityPlayer p_82846_1_, int p_82846_2_) {
-    ItemStack itemstack = null;
-    Slot slot = inv.inventorySlots.get(p_82846_2_);
+  // copied from ContainerFurnace, changes marked
+  public static @Nonnull ItemStack transferStackInSlot(@Nonnull ContainerFurnace inv, @Nonnull EntityPlayer playerIn, int index) {
+    ItemStack itemstack = ItemStack.EMPTY;
+    Slot slot = inv.inventorySlots.get(index);
 
     if (slot != null && slot.getHasStack()) {
       ItemStack itemstack1 = slot.getStack();
       itemstack = itemstack1.copy();
 
-      if (p_82846_2_ == 2) {
+      if (index == 2) {
         if (!mergeItemStack(inv, itemstack1, 3, 39, true)) {
-          return null;
+          return ItemStack.EMPTY;
         }
 
         slot.onSlotChange(itemstack1, itemstack);
-      } else if (p_82846_2_ != 1 && p_82846_2_ != 0) {
-        // I have moved this check to the beginning
-        if (TileEntityFurnace.isItemFuel(itemstack1)) {
-          if (!mergeItemStack(inv, itemstack1, 1, 2, false)) {
-            // Nest this inside so that if the above fails it will
-            // attempt to do the input slot
-            if (FurnaceRecipes.instance().getSmeltingResult(itemstack1) != null) {
-              if (!mergeItemStack(inv, itemstack1, 0, 1, false)) {
-                return null;
-              }
-            }
-          }
-        } else if (FurnaceRecipes.instance().getSmeltingResult(itemstack1) != null) {
+      } else if (index != 1 && index != 0) {
+        if (TileEntityFurnace.isItemFuel(itemstack1) && mergeItemStack(inv, itemstack1, 1, 2, false)) { // HL: added this case
+          // NOP - if we can move an item into the fuel slot, we're happy and done. Otherwise try to move it into the input slot, then stop moving it.
+        } else if (!FurnaceRecipes.instance().getSmeltingResult(itemstack1).isEmpty()) {
           if (!mergeItemStack(inv, itemstack1, 0, 1, false)) {
-            return null;
+            return ItemStack.EMPTY;
           }
-        } else if (p_82846_2_ >= 3 && p_82846_2_ < 30) {
+        } else if (TileEntityFurnace.isItemFuel(itemstack1)) {
+          if (!mergeItemStack(inv, itemstack1, 1, 2, false)) {
+            return ItemStack.EMPTY;
+          }
+        } else if (index >= 3 && index < 30) {
           if (!mergeItemStack(inv, itemstack1, 30, 39, false)) {
-            return null;
+            return ItemStack.EMPTY;
           }
-        } else if (p_82846_2_ >= 30 && p_82846_2_ < 39 && !mergeItemStack(inv, itemstack1, 3, 30, false)) {
-          return null;
+        } else if (index >= 30 && index < 39 && !mergeItemStack(inv, itemstack1, 3, 30, false)) {
+          return ItemStack.EMPTY;
         }
       } else if (!mergeItemStack(inv, itemstack1, 3, 39, false)) {
-        return null;
+        return ItemStack.EMPTY;
       }
 
-      if (itemstack1.stackSize == 0) {
-        slot.putStack((ItemStack) null);
+      if (itemstack1.isEmpty()) {
+        slot.putStack(ItemStack.EMPTY);
       } else {
         slot.onSlotChanged();
       }
 
-      if (itemstack1.stackSize == itemstack.stackSize) {
-        return null;
+      if (itemstack1.getCount() == itemstack.getCount()) {
+        return ItemStack.EMPTY;
       }
 
-      slot.onPickupFromSlot(p_82846_1_, itemstack1);
+      slot.onTake(playerIn, itemstack1);
     }
 
     return itemstack;
   }
 
-  // copied from Container
-  private static boolean mergeItemStack(Container inv, ItemStack p_75135_1_, int p_75135_2_, int p_75135_3_, boolean p_75135_4_) {
-    boolean flag1 = false;
-    int k = p_75135_2_;
+  // copied from Container, unchanged
+  private static boolean mergeItemStack(@Nonnull Container inv, @Nonnull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+    boolean flag = false;
+    int i = startIndex;
 
-    if (p_75135_4_) {
-      k = p_75135_3_ - 1;
+    if (reverseDirection) {
+      i = endIndex - 1;
     }
 
-    Slot slot;
-    ItemStack itemstack1;
-
-    if (p_75135_1_.isStackable()) {
-      while (p_75135_1_.stackSize > 0 && (!p_75135_4_ && k < p_75135_3_ || p_75135_4_ && k >= p_75135_2_)) {
-        slot = inv.inventorySlots.get(k);
-        itemstack1 = slot.getStack();
-
-        if (itemstack1 != null && itemstack1.getItem() == p_75135_1_.getItem()
-            && (!p_75135_1_.getHasSubtypes() || p_75135_1_.getItemDamage() == itemstack1.getItemDamage())
-            && ItemStack.areItemStackTagsEqual(p_75135_1_, itemstack1)) {
-          int l = itemstack1.stackSize + p_75135_1_.stackSize;
-
-          if (l <= p_75135_1_.getMaxStackSize()) {
-            p_75135_1_.stackSize = 0;
-            itemstack1.stackSize = l;
-            slot.onSlotChanged();
-            flag1 = true;
-          } else if (itemstack1.stackSize < p_75135_1_.getMaxStackSize()) {
-            p_75135_1_.stackSize -= p_75135_1_.getMaxStackSize() - itemstack1.stackSize;
-            itemstack1.stackSize = p_75135_1_.getMaxStackSize();
-            slot.onSlotChanged();
-            flag1 = true;
+    if (stack.isStackable()) {
+      while (!stack.isEmpty()) {
+        if (reverseDirection) {
+          if (i < startIndex) {
+            break;
           }
-        }
-
-        if (p_75135_4_) {
-          --k;
-        } else {
-          ++k;
-        }
-      }
-    }
-
-    if (p_75135_1_.stackSize > 0) {
-      if (p_75135_4_) {
-        k = p_75135_3_ - 1;
-      } else {
-        k = p_75135_2_;
-      }
-
-      while (!p_75135_4_ && k < p_75135_3_ || p_75135_4_ && k >= p_75135_2_) {
-        slot = inv.inventorySlots.get(k);
-        itemstack1 = slot.getStack();
-
-        if (itemstack1 == null) {
-          slot.putStack(p_75135_1_.copy());
-          slot.onSlotChanged();
-          p_75135_1_.stackSize = 0;
-          flag1 = true;
+        } else if (i >= endIndex) {
           break;
         }
 
-        if (p_75135_4_) {
-          --k;
+        Slot slot = inv.inventorySlots.get(i);
+        ItemStack itemstack = slot.getStack();
+
+        if (!itemstack.isEmpty() && itemstack.getItem() == stack.getItem() && (!stack.getHasSubtypes() || stack.getMetadata() == itemstack.getMetadata())
+            && ItemStack.areItemStackTagsEqual(stack, itemstack)) {
+          int j = itemstack.getCount() + stack.getCount();
+          int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
+
+          if (j <= maxSize) {
+            stack.setCount(0);
+            itemstack.setCount(j);
+            slot.onSlotChanged();
+            flag = true;
+          } else if (itemstack.getCount() < maxSize) {
+            stack.shrink(maxSize - itemstack.getCount());
+            itemstack.setCount(maxSize);
+            slot.onSlotChanged();
+            flag = true;
+          }
+        }
+
+        if (reverseDirection) {
+          --i;
         } else {
-          ++k;
+          ++i;
         }
       }
     }
 
-    return flag1;
+    if (!stack.isEmpty()) {
+      if (reverseDirection) {
+        i = endIndex - 1;
+      } else {
+        i = startIndex;
+      }
+
+      while (true) {
+        if (reverseDirection) {
+          if (i < startIndex) {
+            break;
+          }
+        } else if (i >= endIndex) {
+          break;
+        }
+
+        Slot slot1 = inv.inventorySlots.get(i);
+        ItemStack itemstack1 = slot1.getStack();
+
+        if (itemstack1.isEmpty() && slot1.isItemValid(stack)) {
+          if (stack.getCount() > slot1.getSlotStackLimit()) {
+            slot1.putStack(stack.splitStack(slot1.getSlotStackLimit()));
+          } else {
+            slot1.putStack(stack.splitStack(stack.getCount()));
+          }
+
+          slot1.onSlotChanged();
+          flag = true;
+          break;
+        }
+
+        if (reverseDirection) {
+          --i;
+        } else {
+          ++i;
+        }
+      }
+    }
+
+    return flag;
   }
 
   public static interface IOverlayRenderAware {
-    public void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition);
+    public void renderItemOverlayIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition);
   }
 
   public static interface IUnderlayRenderAware {
-    public void renderItemAndEffectIntoGUI(ItemStack stack, int xPosition, int yPosition);
+    public void renderItemAndEffectIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition);
   }
 
-  public static void renderItemOverlayIntoGUI(ItemStack stack, int xPosition, int yPosition) {
-    if (stack != null) {
+  public static void renderItemOverlayIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition) {
+    if (!stack.isEmpty()) {
       if (stack.getItem() instanceof IOverlayRenderAware) {
         ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
       }
@@ -179,47 +193,43 @@ public class EnderCoreMethods {
     }
   }
 
-  public static void renderItemAndEffectIntoGUI(ItemStack stack, int xPosition, int yPosition) {
-    if (stack != null) {
+  public static void renderItemAndEffectIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition) {
+    if (!stack.isEmpty()) {
       if (stack.getItem() instanceof IUnderlayRenderAware) {
         ((IUnderlayRenderAware) stack.getItem()).renderItemAndEffectIntoGUI(stack, xPosition, yPosition);
       }
       MinecraftForge.EVENT_BUS.post(new ItemGUIRenderEvent.Pre(stack, xPosition, yPosition));
     }
   }
-  @Deprecated
-  public static interface IElytraFlyingProvider {
-    public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack);
-  }
 
-  public static interface IElytraFlyingProvider2 {
-    public boolean isElytraFlying(EntityLivingBase entity, ItemStack itemstack, boolean shouldStop);
+  public static interface IElytraFlyingProvider {
+    public boolean isElytraFlying(@Nonnull EntityLivingBase entity, @Nonnull ItemStack itemstack, boolean shouldStop);
   }
 
   // Note: isRiding() and isInWater() are cheap getters, isInLava() is an expensive volumetric search
-  public static boolean isElytraFlying(EntityLivingBase entity) {
+  public static boolean isElytraFlying(@Nonnull EntityLivingBase entity) {
     ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-    if (itemstack != null && itemstack.getItem() instanceof IElytraFlyingProvider2) {
-      return ((IElytraFlyingProvider2) itemstack.getItem()).isElytraFlying(entity, itemstack,
+    if (itemstack.getItem() instanceof IElytraFlyingProvider) {
+      return ((IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack,
           entity.onGround || entity.isRiding() || entity.isInWater() || isInLavaSafe(entity));
     }
     return false;
   }
 
   // non-chunkloading copy of Entity.isInLava()
-  public static boolean isInLavaSafe(Entity entity) {
-    return isMaterialInBBSafe(entity.worldObj, entity.getEntityBoundingBox().expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D),
+  public static boolean isInLavaSafe(@Nonnull Entity entity) {
+    return isMaterialInBBSafe(entity.world, entity.getEntityBoundingBox().expand(-0.10000000149011612D, -0.4000000059604645D, -0.10000000149011612D),
         Material.LAVA);
   }
 
   // non-chunkloading copy of World.isMaterialInBB()
-  public static boolean isMaterialInBBSafe(World world, AxisAlignedBB bb, Material materialIn) {
-    int i = MathHelper.floor_double(bb.minX);
-    int j = MathHelper.ceiling_double_int(bb.maxX);
-    int k = MathHelper.floor_double(bb.minY);
-    int l = MathHelper.ceiling_double_int(bb.maxY);
-    int i1 = MathHelper.floor_double(bb.minZ);
-    int j1 = MathHelper.ceiling_double_int(bb.maxZ);
+  public static boolean isMaterialInBBSafe(@Nonnull World world, @Nonnull AxisAlignedBB bb, @Nonnull Material materialIn) {
+    int i = MathHelper.floor(bb.minX);
+    int j = MathHelper.ceil(bb.maxX);
+    int k = MathHelper.floor(bb.minY);
+    int l = MathHelper.ceil(bb.maxY);
+    int i1 = MathHelper.floor(bb.minZ);
+    int j1 = MathHelper.ceil(bb.maxZ);
     BlockPos.PooledMutableBlockPos blockpos$pooledmutableblockpos = BlockPos.PooledMutableBlockPos.retain();
 
     for (int k1 = i; k1 < j; ++k1) {
@@ -243,15 +253,15 @@ public class EnderCoreMethods {
      * Determine if the given creeper should blow up when nearby.
      * <p>
      * Note that the creeper stills tracks the target, even if this returns false.
-     * 
+     *
      * @param swellingCreeper
      *          The creeper that wants to explode
      * @return True if the creeper is allowed to explode, false otherwise.
      */
-    boolean isCreeperTarget(EntityCreeper swellingCreeper);
+    boolean isCreeperTarget(@Nonnull EntityCreeper swellingCreeper);
   }
 
-  public static boolean isCreeperTarget(EntityCreeper swellingCreeper, EntityLivingBase entitylivingbase) {
+  public static boolean isCreeperTarget(@Nonnull EntityCreeper swellingCreeper, @Nonnull EntityLivingBase entitylivingbase) {
     if (entitylivingbase instanceof ICreeperTarget) {
       return ((ICreeperTarget) entitylivingbase).isCreeperTarget(swellingCreeper);
     }

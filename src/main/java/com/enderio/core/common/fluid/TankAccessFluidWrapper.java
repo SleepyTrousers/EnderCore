@@ -42,7 +42,7 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
   @Nullable
   public FluidStack drain(FluidStack resource) {
     FluidTank[] outputTanks = tankAccess.getOutputTanks();
-    if (outputTanks != null && outputTanks.length >= 1 && outputTanks[0] != null) {
+    if (outputTanks.length >= 1 && outputTanks[0] != null) {
       tankAccess.setTanksDirty();
       return outputTanks[0].drain(resource, true);
     }
@@ -53,7 +53,7 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
   @Nullable
   public FluidStack getAvailableFluid() {
     FluidTank[] outputTanks = tankAccess.getOutputTanks();
-    if (outputTanks != null && outputTanks.length >= 1 && outputTanks[0] != null) {
+    if (outputTanks.length >= 1 && outputTanks[0] != null) {
       return outputTanks[0].getFluid();
     }
     return null;

@@ -32,13 +32,13 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 @Handler
 public class XPBoostHandler {
-  private static final Method getExperiencePoints = ReflectionHelper.findMethod(EntityLivingBase.class, null, new String[] { "e", "func_70693_a",
-      "getExperiencePoints" }, EntityPlayer.class);
+  private static final Method getExperiencePoints = ReflectionHelper.findMethod(EntityLivingBase.class, null,
+      new String[] { "e", "func_70693_a", "getExperiencePoints" }, EntityPlayer.class);
 
   private static final @Nonnull String NBT_KEY = "endercore:xpboost";
 
   @SubscribeEvent
-  public void handleEntityKill(LivingDeathEvent event) {
+  public static void handleEntityKill(LivingDeathEvent event) {
     EntityLivingBase entity = event.getEntityLiving();
     Entity killer = event.getSource().getSourceOfDamage();
 
@@ -57,7 +57,7 @@ public class XPBoostHandler {
   }
 
   @SubscribeEvent
-  public void handleArrowFire(EntityJoinWorldEvent event) {
+  public static void handleArrowFire(EntityJoinWorldEvent event) {
     if (event.getEntity() instanceof EntityArrow) {
       EntityArrow arrow = (EntityArrow) event.getEntity();
       if (arrow.shootingEntity instanceof EntityPlayer) {
@@ -67,7 +67,7 @@ public class XPBoostHandler {
   }
 
   @SubscribeEvent
-  public void handleBlockBreak(BreakEvent event) {    
+  public static void handleBlockBreak(BreakEvent event) {
     ItemStack held = event.getPlayer().getHeldItemMainhand();
     if (!held.isEmpty()) {
       int level = getXPBoostLevel(held);
@@ -85,11 +85,11 @@ public class XPBoostHandler {
     }
   }
 
-  private int getXPBoost(EntityLivingBase killed, EntityPlayer player) {
+  private static int getXPBoost(EntityLivingBase killed, EntityPlayer player) {
     return getXPBoost(killed, player, getXPBoostLevel(player.getHeldItemMainhand()));
   }
 
-  private int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
+  private static int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
     if (level >= 0) {
       try {
         int xp = (Integer) getExperiencePoints.invoke(killed, player);
@@ -101,33 +101,33 @@ public class XPBoostHandler {
     return 0;
   }
 
-  private int getXPBoost(int xp, int level) {
+  private static int getXPBoost(int xp, int level) {
     return Math.round(xp * ((float) Math.log10(level + 1) * 2));
   }
 
-  private int getXPBoostLevel(@Nonnull ItemStack weapon) {
+  private static int getXPBoostLevel(@Nonnull ItemStack weapon) {
     if (weapon.isEmpty()) {
       return -1;
     }
 
     int result = -1;
     Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(weapon);
-    for (Enchantment i : enchants.keySet()) {      
+    for (Enchantment i : enchants.keySet()) {
       if (i == EnchantXPBoost.instance()) {
         result = enchants.get(i);
-      } else if(i == Enchantments.SILK_TOUCH) {
-        //No XP boost on silk touch
+      } else if (i == Enchantments.SILK_TOUCH) {
+        // No XP boost on silk touch
         return -1;
       }
     }
     return result;
   }
 
-  private void scheduleXP(Entity entity, int boost) {
+  private static void scheduleXP(Entity entity, int boost) {
     scheduleXP(entity.world, entity.posX, entity.posY, entity.posZ, boost);
   }
 
-  private void scheduleXP(final World world, final double x, final double y, final double z, final int boost) {
+  private static void scheduleXP(final World world, final double x, final double y, final double z, final int boost) {
     if (boost <= 0) {
       return;
     }
@@ -138,6 +138,9 @@ public class XPBoostHandler {
         world.spawnEntity(new EntityXPOrb(world, x, y, z, boost));
       }
     });
+  }
+
+  private XPBoostHandler() {
   }
 
 }

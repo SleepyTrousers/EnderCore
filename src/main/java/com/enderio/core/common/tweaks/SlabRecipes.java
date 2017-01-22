@@ -1,5 +1,7 @@
 package com.enderio.core.common.tweaks;
 
+import com.enderio.core.common.util.NullHelper;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -23,14 +25,15 @@ public class SlabRecipes extends Tweak {
     registerSlabToBlock();
   }
 
-  private void registerSlabToBlock() {
-    for (int i = 0; i <= 1; i++) {
-      String[] arr = i == 0 ? slabEndingsWood : slabEndingsStone;
-      Block[] results = i == 1 ? slabResults : null;
-      for (int j = 0; j < arr.length; j++) {
-        GameRegistry
-            .addRecipe(new ShapelessOreRecipe(i == 0 ? new ItemStack(Blocks.PLANKS, 1, j) : new ItemStack(results[j]), "slab" + arr[j], "slab" + arr[j]));
-      }
+  private static void registerSlabToBlock() {
+    for (int j = 0; j < slabEndingsWood.length; j++) {
+      GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Blocks.PLANKS, 1, j), "slab" + slabEndingsWood[j], "slab" + slabEndingsWood[j]));
+    }
+
+    for (int j = 0; j < slabEndingsStone.length; j++) {
+      GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(NullHelper.notnullM(slabResults[j], "Blocks are missing from the game")),
+          "slab" + slabEndingsStone[j], "slab" + slabEndingsStone[j]));
     }
   }
+
 }

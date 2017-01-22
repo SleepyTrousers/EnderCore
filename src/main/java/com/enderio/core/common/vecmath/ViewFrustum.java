@@ -63,7 +63,7 @@ public class ViewFrustum {
     return true;
   }
 
-  private double distanceFromPointToPlane(Vector4d plane, Vector3d point) {
+  private static double distanceFromPointToPlane(Vector4d plane, Vector3d point) {
     Vector4d newPoint = new Vector4d(point.x, point.y, point.z, 1);
     return plane.dot(newPoint);
   }

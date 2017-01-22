@@ -3,9 +3,11 @@ package com.enderio.core.common.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.util.NNList.Callback;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,112 +21,95 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
-import net.minecraftforge.fluids.capability.wrappers.FluidContainerItemWrapper;
-import net.minecraftforge.fluids.capability.wrappers.FluidContainerRegistryWrapper;
-import net.minecraftforge.fluids.capability.wrappers.FluidHandlerWrapper;
 
 public class FluidUtil {
 
-  @CapabilityInject(net.minecraftforge.fluids.capability.IFluidHandler.class)
-  private static final Capability<net.minecraftforge.fluids.capability.IFluidHandler> FLUID_HANDLER = null;
+  @CapabilityInject(IFluidHandler.class)
+  private static final Capability<IFluidHandler> FLUID_HANDLER = null;
 
   // TODO: Mod BC see if this is still needed once BC updates. Might work with
   // caps.
-//  public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
-//
-//  static {
-//    try {
-//      Class.forName("crazypants.util.BuildcraftUtil");
-//    } catch (Exception e) {
-//      if (Loader.isModLoaded("BuildCraft|Transport")) {
-//        Log.warn("ItemUtil: Could not register Build Craft pipe handler. Fluid conduits will show connections to all Build Craft pipes.");
-//      } //Don't log if BC isn't installed, but we still check in case another mod is using their API
-//    }
-//  }
-  
+  // public static final List<IFluidReceptor> fluidReceptors = new ArrayList<IFluidReceptor>();
+  //
+  // static {
+  // try {
+  // Class.forName("crazypants.util.BuildcraftUtil");
+  // } catch (Exception e) {
+  // if (Loader.isModLoaded("BuildCraft|Transport")) {
+  // Log.warn("ItemUtil: Could not register Build Craft pipe handler. Fluid conduits will show connections to all Build Craft pipes.");
+  // } //Don't log if BC isn't installed, but we still check in case another mod is using their API
+  // }
+  // }
 
-  @SuppressWarnings("deprecation")
-  public static IFluidHandler getFluidHandlerCapability(@Nullable ICapabilityProvider provider, EnumFacing side) {
-    if (provider != null && provider.hasCapability(FLUID_HANDLER, side)) {
-      return provider.getCapability(FLUID_HANDLER, side);
-    }
-    return getLegacyHandler(provider, side);
+  public static @Nonnull Capability<IFluidHandler> getFluidCapability() {
+    return NullHelper.notnullF(FLUID_HANDLER, "IFluidHandler capability is missing");
   }
 
-  public static IFluidHandler getFluidHandlerCapability(ItemStack stack) {
-    return getFluidHandlerCapability(stack, null);
-  }
-
-  @Deprecated
-  private static IFluidHandler getLegacyHandler(ICapabilityProvider provider, EnumFacing side) {
-    if (provider instanceof ItemStack) {
-      ItemStack stack = (ItemStack) provider;
-      if (stack.getItem() instanceof IFluidContainerItem) {
-        return new FluidContainerItemWrapper((IFluidContainerItem) stack.getItem(), stack);
-      }
-      if(FluidContainerRegistry.isContainer(stack)) {
-        return new FluidContainerRegistryWrapper(stack);
-      }
-    }
-    if (provider instanceof net.minecraftforge.fluids.IFluidHandler) {
-      return new FluidHandlerWrapper((net.minecraftforge.fluids.IFluidHandler) provider, side);
+  public static @Nullable IFluidHandler getFluidHandlerCapability(@Nullable ICapabilityProvider provider, @Nullable EnumFacing side) {
+    if (provider != null && provider.hasCapability(getFluidCapability(), side)) {
+      return provider.getCapability(getFluidCapability(), side);
     }
     return null;
   }
 
-  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(World worldObj, BlockPos location) {
-    Map<EnumFacing, IFluidHandler> res = new HashMap<EnumFacing, IFluidHandler>();
-    for (EnumFacing dir : EnumFacing.VALUES) {
-      IFluidHandler fh = getFluidHandler(worldObj, location.offset(dir), dir.getOpposite());
-      if (fh != null) {
-        res.put(dir, fh);
+  public static @Nullable IFluidHandler getFluidHandlerCapability(@Nonnull ItemStack stack) {
+    return getFluidHandlerCapability(stack, null);
+  }
+
+  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(@Nonnull final World worldObj, @Nonnull final BlockPos location) {
+    final Map<EnumFacing, IFluidHandler> res = new HashMap<EnumFacing, IFluidHandler>();
+    NNList.FACING.apply(new Callback<EnumFacing>() {
+      @Override
+      public void apply(@Nonnull EnumFacing dir) {
+        IFluidHandler fh = getFluidHandler(worldObj, location.offset(dir), dir.getOpposite());
+        if (fh != null) {
+          res.put(dir, fh);
+        }
       }
-    }
+    });
     return res;
   }
 
-  private static IFluidHandler getFluidHandler(World worldObj, BlockPos location, EnumFacing side) {
+  static @Nullable IFluidHandler getFluidHandler(@Nonnull World worldObj, @Nonnull BlockPos location, @Nullable EnumFacing side) {
     return getFluidHandlerCapability(worldObj.getTileEntity(location), side);
   }
-  
-  public static FluidStack getFluidTypeFromItem(ItemStack stack) {
-    if (stack == null) {
+
+  public static FluidStack getFluidTypeFromItem(@Nonnull ItemStack stack) {
+    if (stack.isEmpty()) {
       return null;
     }
 
-    stack = stack.copy();
-    stack.stackSize = 1;
-    IFluidHandler handler = getFluidHandlerCapability(stack);
+    ItemStack copy = stack.copy();
+    copy.setCount(1);
+    IFluidHandler handler = getFluidHandlerCapability(copy);
     if (handler != null) {
       return handler.drain(Fluid.BUCKET_VOLUME, false);
     }
-    if (Block.getBlockFromItem(stack.getItem()) instanceof IFluidBlock) {
-      Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(stack.getItem())).getFluid();
+    if (Block.getBlockFromItem(copy.getItem()) instanceof IFluidBlock) {
+      Fluid fluid = ((IFluidBlock) Block.getBlockFromItem(copy.getItem())).getFluid();
       if (fluid != null) {
         return new FluidStack(fluid, 1000);
       }
     }
     return null;
-
   }
 
-  public static boolean isFluidContainer(ItemStack stack) {
+  public static boolean isFluidContainer(@Nonnull ItemStack stack) {
     return isFluidContainer(stack, null);
   }
 
-  public static boolean isFluidContainer(ICapabilityProvider provider, EnumFacing side) {
+  public static boolean isFluidContainer(@Nonnull ICapabilityProvider provider, @Nullable EnumFacing side) {
     return getFluidHandlerCapability(provider, side) != null;
   }
 
-  public static boolean hasEmptyCapacity(ItemStack stack) {
-    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(stack);
+  public static boolean hasEmptyCapacity(@Nonnull ItemStack stack) {
+    IFluidHandler handler = getFluidHandlerCapability(stack);
     if (handler == null) {
       return false;
     }
@@ -142,49 +127,53 @@ public class FluidUtil {
     return false;
   }
 
-  public static FluidAndStackResult tryFillContainer(ItemStack target, FluidStack source) {
-    if (target == null || target.getItem() == null || source == null || source.getFluid() == null || source.amount <= 0) {
-      return new FluidAndStackResult(null, null, target, source);
+  public static @Nonnull FluidAndStackResult tryFillContainer(@Nonnull ItemStack target, @Nullable FluidStack source) {
+    if (target.isEmpty() || source == null || source.getFluid() == null || source.amount <= 0) {
+      return new FluidAndStackResult(ItemStack.EMPTY, null, target, source);
     }
 
     ItemStack filledStack = target.copy();
-    filledStack.stackSize = 1;
-    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(filledStack);
+    filledStack.setCount(1);
+    IFluidHandler handler = getFluidHandlerCapability(filledStack);
     if (handler == null) {
-      return new FluidAndStackResult(null, null, target, source);
+      return new FluidAndStackResult(ItemStack.EMPTY, null, target, source);
     }
 
     int filledAmount = handler.fill(source.copy(), true);
     if (filledAmount <= 0 || filledAmount > source.amount) {
-      return new FluidAndStackResult(null, null, target, source);
+      return new FluidAndStackResult(ItemStack.EMPTY, null, target, source);
     }
+
+    if (handler instanceof IFluidHandlerItem) {
+      filledStack = ((IFluidHandlerItem) handler).getContainer();
+    }
+
     FluidStack resultFluid = source.copy();
     resultFluid.amount = filledAmount;
 
     ItemStack remainderStack = target.copy();
-    remainderStack.stackSize--;
-    if (remainderStack.stackSize <= 0) {
-      remainderStack = null;
-    }
+    remainderStack.shrink(1);
+
     FluidStack remainderFluid = source.copy();
     remainderFluid.amount -= filledAmount;
     if (remainderFluid.amount <= 0) {
       remainderFluid = null;
     }
+
     return new FluidAndStackResult(filledStack, resultFluid, remainderStack, remainderFluid);
 
   }
 
-  public static FluidAndStackResult tryDrainContainer(ItemStack source, FluidStack target, int capacity) {
-    if (source == null || source.getItem() == null) {
-      return new FluidAndStackResult(null, null, source, target);
+  public static @Nonnull FluidAndStackResult tryDrainContainer(@Nonnull ItemStack source, @Nullable FluidStack target, int capacity) {
+    if (source.isEmpty()) {
+      return new FluidAndStackResult(ItemStack.EMPTY, null, source, target);
     }
 
     ItemStack emptiedStack = source.copy();
-    emptiedStack.stackSize = 1;
-    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
+    emptiedStack.setCount(1);
+    IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
     if (handler == null) {
-      return new FluidAndStackResult(null, null, target, source);
+      return new FluidAndStackResult(null, ItemStack.EMPTY, target, source);
     }
 
     int maxDrain = capacity - (target != null ? target.amount : 0);
@@ -198,32 +187,29 @@ public class FluidUtil {
     }
 
     if (drained == null || drained.amount <= 0 || drained.amount > maxDrain) {
-      return new FluidAndStackResult(null, null, source, target);
+      return new FluidAndStackResult(ItemStack.EMPTY, null, source, target);
+    }
+
+    if (handler instanceof IFluidHandlerItem) {
+      emptiedStack = ((IFluidHandlerItem) handler).getContainer();
     }
 
     ItemStack remainderStack = source.copy();
-    remainderStack.stackSize--;
-    if (remainderStack.stackSize <= 0) {
-      remainderStack = null;
-    }
+    remainderStack.shrink(1);
+
     FluidStack remainderFluid = target != null ? target.copy() : new FluidStack(drained, 0);
     remainderFluid.amount += drained.amount;
 
-    if (emptiedStack.stackSize <= 0) {
-      emptiedStack = null;
-    }
     return new FluidAndStackResult(emptiedStack, drained, remainderStack, remainderFluid);
   }
 
-  public static FluidAndStackResult tryDrainContainer(ItemStack source, ITankAccess tank) {
-    FluidAndStackResult result = new FluidAndStackResult(null, null, null, source);
-    if (source == null || source.getItem() == null || tank == null) {
+  public static @Nonnull FluidAndStackResult tryDrainContainer(@Nonnull ItemStack source, @Nonnull ITankAccess tank) {
+    FluidAndStackResult result = new FluidAndStackResult(null, ItemStack.EMPTY, null, source);
+
+    if (source.isEmpty()) {
       return result;
     }
-
-    ItemStack emptiedStack = source.copy();
-    emptiedStack.stackSize = 1;
-    net.minecraftforge.fluids.capability.IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
+    IFluidHandler handler = getFluidHandlerCapability(source);
     if (handler == null) {
       return result;
     }
@@ -239,43 +225,33 @@ public class FluidUtil {
     return tryDrainContainer(source, targetTank.getFluid(), targetTank.getCapacity());
   }
 
-  public static boolean fillPlayerHandItemFromInternalTank(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
-    return fillPlayerHandItemFromInternalTank(world, pos.getX(), pos.getY(), pos.getZ(), entityPlayer, hand, tank);
-  }
-
   /**
-   * If the currently held item of the given player can be filled with the
-   * liquid in the given tank's output tank, do so and put the resultant filled
-   * container item where it can go. This will also drain the tank and set it to
-   * dirty.
-   * 
+   * If the currently held item of the given player can be filled with the liquid in the given tank's output tank, do so and put the resultant filled container
+   * item where it can go. This will also drain the tank and set it to dirty.
+   *
    * <p>
    * Cases handled for the the filled container:
-   * 
+   *
    * <ul>
-   * <li>If the stacksize of the held item is one, then it will be replaced by
-   * the filled container unless the player in in creative.
-   * <li>If the filled container is stackable and the player already has a
-   * non-maxed stack in the inventory, it is put there.
+   * <li>If the stacksize of the held item is one, then it will be replaced by the filled container unless the player in in creative.
+   * <li>If the filled container is stackable and the player already has a non-maxed stack in the inventory, it is put there.
    * <li>If the player has space in his inventory, it is put there.
-   * <li>Otherwise it will be dropped on the ground between the position given
-   * as parameter and the player's position.
+   * <li>Otherwise it will be dropped on the ground between the position given as parameter and the player's position.
    * </ul>
-   * 
+   *
    * @param world
-   * @param x
-   * @param y
-   * @param z
+   * @param pos
    * @param entityPlayer
    * @param hand
    * @param tank
    * @return true if a container was filled, false otherwise
    */
-  public static boolean fillPlayerHandItemFromInternalTank(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
+  public static boolean fillPlayerHandItemFromInternalTank(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer entityPlayer,
+      @Nonnull EnumHand hand, @Nonnull ITankAccess tank) {
 
     ItemStack heldItem = entityPlayer.getHeldItem(hand);
-    boolean doFill = !(entityPlayer.capabilities.isCreativeMode && heldItem != null && heldItem.getItem() == Items.BUCKET);
-    
+    boolean doFill = !(entityPlayer.capabilities.isCreativeMode && heldItem.getItem() == Items.BUCKET);
+
     for (FluidTank subTank : tank.getOutputTanks()) {
       FluidAndStackResult fill = tryFillContainer(entityPlayer.getHeldItem(hand), subTank.getFluid());
       if (fill.result.fluidStack != null) {
@@ -283,35 +259,27 @@ public class FluidUtil {
         subTank.setFluid(fill.remainder.fluidStack);
         tank.setTanksDirty();
         if (doFill) {
-          if (fill.remainder.itemStack == null) {
+          if (fill.remainder.itemStack.isEmpty()) {
+            // The input item was used up. We can simply replace it with the output item and be done.
             entityPlayer.setHeldItem(hand, fill.result.itemStack);
             return true;
           } else {
             entityPlayer.setHeldItem(hand, fill.remainder.itemStack);
-          }
-
-          if (fill.result.itemStack.isStackable()) {
-            for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-              ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
-              if (ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
-                fill.result.itemStack.stackSize += inventoryItem.stackSize;
-                entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
-                return true;
-              }
-            }
-          }
-
-          for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-            if (entityPlayer.inventory.mainInventory[i] == null) {
-              entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
+            if (fill.result.itemStack.isEmpty()) {
+              // We got no result item. Weird case, but whatever... (maybe an item that takes liquid XP and puts it into the player's XP bar and is used up?)
               return true;
             }
           }
 
+          if (entityPlayer.inventory.addItemStackToInventory(fill.result.itemStack)) {
+            // will change the itemstack's count on partial inserts
+            return true;
+          }
+
           if (!world.isRemote) {
-            double x0 = (x + entityPlayer.posX) / 2.0D;
-            double y0 = (y + entityPlayer.posY) / 2.0D + 0.5D;
-            double z0 = (z + entityPlayer.posZ) / 2.0D;
+            double x0 = (pos.getX() + 0.5D + entityPlayer.posX) / 2.0D;
+            double y0 = (pos.getY() + 0.5D + entityPlayer.posY + 0.5D) / 2.0D;
+            double z0 = (pos.getZ() + 0.5D + entityPlayer.posZ) / 2.0D;
             Util.dropItems(world, fill.result.itemStack, x0, y0, z0, true);
           }
         }
@@ -322,53 +290,41 @@ public class FluidUtil {
     return false;
   }
 
-  public static boolean fillInternalTankFromPlayerHandItem(World world, BlockPos pos, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
-    return fillInternalTankFromPlayerHandItem(world, pos.getX(), pos.getY(), pos.getZ(), entityPlayer, hand, tank);
-  }
-
-  public static boolean fillInternalTankFromPlayerHandItem(World world, int x, int y, int z, EntityPlayer entityPlayer, EnumHand hand, ITankAccess tank) {
+  public static boolean fillInternalTankFromPlayerHandItem(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer entityPlayer,
+      @Nonnull EnumHand hand, @Nonnull ITankAccess tank) {
     FluidAndStackResult fill = tryDrainContainer(entityPlayer.getHeldItem(hand), tank);
     if (fill.result.fluidStack == null) {
       return false;
     }
 
-    tank.getInputTank(fill.result.fluidStack).setFluid(fill.remainder.fluidStack);
+    final FluidTank inputTank = tank.getInputTank(fill.result.fluidStack);
+    if (inputTank == null) {
+      return false;
+    }
+    inputTank.setFluid(fill.remainder.fluidStack);
     tank.setTanksDirty();
 
     if (!entityPlayer.capabilities.isCreativeMode) {
-      if (fill.remainder.itemStack == null) {
+      if (fill.remainder.itemStack.isEmpty()) {
         entityPlayer.setHeldItem(hand, fill.result.itemStack);
         return true;
       } else {
         entityPlayer.setHeldItem(hand, fill.remainder.itemStack);
       }
 
-      if (fill.result.itemStack == null) {
+      if (fill.result.itemStack.isEmpty()) {
         return true;
       }
 
-      if (fill.result.itemStack.isStackable()) {
-        for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-          ItemStack inventoryItem = entityPlayer.inventory.mainInventory[i];
-          if (ItemUtil.areStackMergable(inventoryItem, fill.result.itemStack) && inventoryItem.stackSize < inventoryItem.getMaxStackSize()) {
-            fill.result.itemStack.stackSize += inventoryItem.stackSize;
-            entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
-            return true;
-          }
-        }
-      }
-
-      for (int i = 0; i < entityPlayer.inventory.mainInventory.length; i++) {
-        if (entityPlayer.inventory.mainInventory[i] == null) {
-          entityPlayer.inventory.setInventorySlotContents(i, fill.result.itemStack);
-          return true;
-        }
+      if (entityPlayer.inventory.addItemStackToInventory(fill.result.itemStack)) {
+        // will change the itemstack's count on partial inserts
+        return true;
       }
 
       if (!world.isRemote) {
-        double x0 = (x + entityPlayer.posX) / 2.0D;
-        double y0 = (y + entityPlayer.posY) / 2.0D + 0.5D;
-        double z0 = (z + entityPlayer.posZ) / 2.0D;
+        double x0 = (pos.getX() + 0.5D + entityPlayer.posX) / 2.0D;
+        double y0 = (pos.getY() + 0.5D + entityPlayer.posY + 0.5D) / 2.0D;
+        double z0 = (pos.getZ() + 0.5D + entityPlayer.posZ) / 2.0D;
         Util.dropItems(world, fill.result.itemStack, x0, y0, z0, true);
       }
     }
@@ -377,41 +333,43 @@ public class FluidUtil {
   }
 
   public static class FluidAndStack {
-    public final FluidStack fluidStack;
-    public final ItemStack itemStack;
+    public final @Nullable FluidStack fluidStack;
+    public final @Nonnull ItemStack itemStack;
 
-    public FluidAndStack(FluidStack fluidStack, ItemStack itemStack) {
+    public FluidAndStack(@Nullable FluidStack fluidStack, @Nonnull ItemStack itemStack) {
       this.fluidStack = fluidStack;
       this.itemStack = itemStack;
     }
 
-    public FluidAndStack(ItemStack itemStack, FluidStack fluidStack) {
+    public FluidAndStack(@Nonnull ItemStack itemStack, @Nullable FluidStack fluidStack) {
       this.fluidStack = fluidStack;
       this.itemStack = itemStack;
     }
   }
 
   public static class FluidAndStackResult {
-    public final FluidAndStack result;
-    public final FluidAndStack remainder;
+    public final @Nonnull FluidAndStack result;
+    public final @Nonnull FluidAndStack remainder;
 
-    public FluidAndStackResult(FluidAndStack result, FluidAndStack remainder) {
+    public FluidAndStackResult(@Nonnull FluidAndStack result, @Nonnull FluidAndStack remainder) {
       this.result = result;
       this.remainder = remainder;
     }
 
-    public FluidAndStackResult(FluidStack fluidStackResult, ItemStack itemStackResult, FluidStack fluidStackRemainder, ItemStack itemStackRemainder) {
+    public FluidAndStackResult(FluidStack fluidStackResult, @Nonnull ItemStack itemStackResult, FluidStack fluidStackRemainder,
+        @Nonnull ItemStack itemStackRemainder) {
       this.result = new FluidAndStack(fluidStackResult, itemStackResult);
       this.remainder = new FluidAndStack(fluidStackRemainder, itemStackRemainder);
     }
 
-    public FluidAndStackResult(ItemStack itemStackResult, FluidStack fluidStackResult, ItemStack itemStackRemainder, FluidStack fluidStackRemainder) {
+    public FluidAndStackResult(@Nonnull ItemStack itemStackResult, FluidStack fluidStackResult, @Nonnull ItemStack itemStackRemainder,
+        FluidStack fluidStackRemainder) {
       this.result = new FluidAndStack(fluidStackResult, itemStackResult);
       this.remainder = new FluidAndStack(fluidStackRemainder, itemStackRemainder);
     }
   }
 
-  public static boolean areFluidsTheSame(Fluid fluid, Fluid fluid2) {
+  public static boolean areFluidsTheSame(@Nullable Fluid fluid, @Nullable Fluid fluid2) {
     if (fluid == null) {
       return fluid2 == null;
     }

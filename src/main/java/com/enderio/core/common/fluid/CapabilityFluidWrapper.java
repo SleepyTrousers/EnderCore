@@ -60,7 +60,7 @@ public class CapabilityFluidWrapper implements IFluidWrapper {
 
     private final IFluidTankProperties prop;
 
-    private InfoWrapper(IFluidTankProperties prop) {
+    InfoWrapper(IFluidTankProperties prop) {
       this.prop = prop;
     }
 

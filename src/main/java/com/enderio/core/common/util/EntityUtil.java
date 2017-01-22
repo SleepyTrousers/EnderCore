@@ -6,6 +6,7 @@ import java.util.Random;
 
 import javax.annotation.Nonnull;
 
+import com.enderio.core.EnderCore;
 import com.enderio.core.common.vecmath.Vector3d;
 
 import net.minecraft.block.state.IBlockState;
@@ -23,7 +24,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -75,14 +75,15 @@ public class EntityUtil {
 
   public static void spawnFirework(@Nonnull BlockPos pos, int dimID, int range) {
     World world = DimensionManager.getWorld(dimID);
+    BlockPos spawnPos = pos;
 
-    IBlockState bs = world.getBlockState(pos);
     // don't bother if there's no randomness at all
     if (range > 0) {
-      pos = new BlockPos(moveRandomly(pos.getX(), range), pos.getY(), moveRandomly(pos.getZ(), range));
+      spawnPos = new BlockPos(moveRandomly(spawnPos.getX(), range), spawnPos.getY(), moveRandomly(spawnPos.getZ(), range));
+      IBlockState bs = world.getBlockState(spawnPos);
 
       int tries = -1;
-      while (!world.isAirBlock(new BlockPos(pos)) && !bs.getBlock().isReplaceable(world, pos)) {
+      while (!world.isAirBlock(new BlockPos(spawnPos)) && !bs.getBlock().isReplaceable(world, spawnPos)) {
         tries++;
         if (tries > 100) {
           return;
@@ -90,7 +91,7 @@ public class EntityUtil {
       }
     }
 
-    world.spawnEntity(getRandomFirework(world, pos));
+    world.spawnEntity(getRandomFirework(world, spawnPos));
   }
 
   private static double moveRandomly(double base, double range) {
@@ -98,10 +99,9 @@ public class EntityUtil {
   }
 
   public static @Nonnull String getDisplayNameForEntity(@Nonnull String mobName) {
-    return I18n.translateToLocal("entity." + mobName + ".name");
+    return EnderCore.lang.localizeExact("entity." + mobName + ".name");
   }
 
-  
   public static @Nonnull List<ResourceLocation> getAllRegisteredMobNames() {
     List<ResourceLocation> result = new ArrayList<ResourceLocation>();
     for (ResourceLocation entityName : EntityList.getEntityNameList()) {
@@ -131,7 +131,7 @@ public class EntityUtil {
     for (int x = minX; x < maxX; x++) {
       for (int z = minZ; z < maxZ; z++) {
         for (int y = minY; y < maxY; y++) {
-          BlockPos pos = new BlockPos(x,y,z);
+          BlockPos pos = new BlockPos(x, y, z);
           world.getBlockState(pos).addCollisionBoxToList(world, pos, entityBounds, collidingBoundingBoxes, entity, false);
         }
       }

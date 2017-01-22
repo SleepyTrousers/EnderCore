@@ -42,8 +42,7 @@ public class EnderFileUtils {
    * @param jarClass
    *          - A class from the jar in question
    * @param filename
-   *          - Name of the file to copy, automatically prepended with
-   *          "/assets/"
+   *          - Name of the file to copy, automatically prepended with "/assets/"
    * @param to
    *          - File to copy to
    */
@@ -61,19 +60,17 @@ public class EnderFileUtils {
   /**
    * @author Ilias Tsagklis
    *         <p>
-   *         From <a href=
-   *         "http://examples.javacodegeeks.com/core-java/util/zip/extract-zip-file-with-subdirectories/"
-   *         > this site.</a>
-   * 
+   *         From <a href= "http://examples.javacodegeeks.com/core-java/util/zip/extract-zip-file-with-subdirectories/" > this site.</a>
+   *
    * @param zip
    *          - The zip file to extract
-   * 
+   *
    * @return The folder extracted to
    */
   @Nonnull
   public static File extractZip(File zip) {
     String zipPath = zip.getParent() + "/extracted";
-    File temp = new File(zipPath);
+    final @Nonnull File temp = new File(zipPath);
     temp.mkdir();
 
     ZipFile zipFile = null;
@@ -127,16 +124,14 @@ public class EnderFileUtils {
       }
     }
 
-    return temp;
+    return NullHelper.notnullJ(temp, "Neither '@Nonnull', 'final', nor the single assignment from 'new' stopped this variable from going null. Whow!");
   }
 
   /**
-   * @author McDowell - http://stackoverflow.com/questions/1399126/java-util-zip
-   *         -recreating-directory-structure
-   * 
+   * @author McDowell - http://stackoverflow.com/questions/1399126/java-util-zip -recreating-directory-structure
+   *
    * @param directory
-   *          The directory to zip the contents of. Content structure will be
-   *          preserved.
+   *          The directory to zip the contents of. Content structure will be preserved.
    * @param zipfile
    *          The zip file to output to.
    * @throws IOException
@@ -152,8 +147,8 @@ public class EnderFileUtils {
       ZipOutputStream zout = new ZipOutputStream(out);
       res = zout;
       while (!queue.isEmpty()) {
-        directory = queue.pop();
-        for (File child : directory.listFiles()) {
+        File dir = queue.pop();
+        for (File child : dir.listFiles()) {
           String name = base.relativize(child.toURI()).getPath();
           if (child.isDirectory()) {
             queue.push(child);
@@ -227,7 +222,7 @@ public class EnderFileUtils {
 
   /**
    * I don't think this ever worked.
-   * 
+   *
    * @param directory
    */
   @Deprecated
@@ -236,15 +231,12 @@ public class EnderFileUtils {
   }
 
   /**
-   * Same as <code>manuallyChangeConfigValue(String, String, String)</code>, but
-   * with an additional parameter for <i>what</i> config file to edit
-   * 
+   * Same as <code>manuallyChangeConfigValue(String, String, String)</code>, but with an additional parameter for <i>what</i> config file to edit
+   *
    * @param filePathFromConfigFolder
-   *          - the full path to the files, including extensions, from inside
-   *          config/
+   *          - the full path to the files, including extensions, from inside config/
    * @param prefix
-   *          - The prefix of the config option (anything before '='), must
-   *          match exactly.
+   *          - The prefix of the config option (anything before '='), must match exactly.
    * @param from
    *          - The setting to change it from
    * @param to
@@ -291,17 +283,13 @@ public class EnderFileUtils {
   }
 
   /**
-   * Finds the config value in the file specified (path starting after config/),
-   * and for the key specified
-   * 
+   * Finds the config value in the file specified (path starting after config/), and for the key specified
+   *
    * @param filePathFromConfigFolder
-   *          - The path to the file, everything up to config/ is calculated for
-   *          you
+   *          - The path to the file, everything up to config/ is calculated for you
    * @param key
    *          - A key to find the value by, does not need to match exactly
-   * @return A parseable string that can be transformed into any of the types of
-   *         config values, for instance using
-   *         <code>Boolean.parseBoolean(String)</code>
+   * @return A parseable string that can be transformed into any of the types of config values, for instance using <code>Boolean.parseBoolean(String)</code>
    */
   public static String manuallyGetConfigValue(String filePathFromConfigFolder, String key) {
     File config = new File(ConfigHandler.configFolder.getAbsolutePath() + "/" + filePathFromConfigFolder);

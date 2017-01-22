@@ -20,6 +20,9 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.IFEQ;
@@ -27,10 +30,7 @@ import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-
-@MCVersion(value = "1.10")
+@MCVersion(value = "1.11")
 public class EnderCoreTransformer implements IClassTransformer {
 
   // The EnderCore class cannot be referenced from the transformer,
@@ -40,7 +40,7 @@ public class EnderCoreTransformer implements IClassTransformer {
   public static final Logger logger = LogManager.getLogger("EnderCore");
 
   protected static class ObfSafeName {
-    private String deobf, srg;
+    final String deobf, srg;
 
     public ObfSafeName(String deobf, String srg) {
       this.deobf = deobf;
@@ -61,33 +61,36 @@ public class EnderCoreTransformer implements IClassTransformer {
       return false;
     }
 
-    // no hashcode because I'm naughty
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
   }
 
   protected static abstract class Transform {
     abstract void transform(Iterator<MethodNode> methods);
   }
 
-  private static final String anvilContainerClass = "net.minecraft.inventory.ContainerRepair";
-  private static final ObfSafeName anvilContainerMethod = new ObfSafeName("updateRepairOutput", "func_82848_d");
+  static final String anvilContainerClass = "net.minecraft.inventory.ContainerRepair";
+  static final ObfSafeName anvilContainerMethod = new ObfSafeName("updateRepairOutput", "func_82848_d");
 
-  private static final String anvilGuiClass = "net.minecraft.client.gui.GuiRepair";
-  private static final ObfSafeName anvilGuiMethod = new ObfSafeName("drawGuiContainerForegroundLayer", "func_146979_b");
+  static final String anvilGuiClass = "net.minecraft.client.gui.GuiRepair";
+  static final ObfSafeName anvilGuiMethod = new ObfSafeName("drawGuiContainerForegroundLayer", "func_146979_b");
 
-  private static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
-  private static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
-  private static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
+  static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
+  static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
+  static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
 
-  private static final String renderItemClass = "net.minecraft.client.renderer.RenderItem";
-  private static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
-  private static final ObfSafeName renderItemAndEffectIntoGUI = new ObfSafeName("renderItemAndEffectIntoGUI", "func_184391_a");
-  private static final ObfSafeName renderItemDisplayName = new ObfSafeName("renderItemAndEffectIntoGUI, renderItemOverlayIntoGUI",
-      "func_180453_a, func_184391_a");
+  static final String renderItemClass = "net.minecraft.client.renderer.RenderItem";
+  static final ObfSafeName renderItemOverlayIntoGUIMethod = new ObfSafeName("renderItemOverlayIntoGUI", "func_180453_a");
+  static final ObfSafeName renderItemAndEffectIntoGUI = new ObfSafeName("renderItemAndEffectIntoGUI", "func_184391_a");
+  static final ObfSafeName renderItemDisplayName = new ObfSafeName("renderItemAndEffectIntoGUI, renderItemOverlayIntoGUI", "func_180453_a, func_184391_a");
 
-  private static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
+  static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
 
-  private static final String entityAICreeperSwellClass = "net.minecraft.entity.ai.EntityAICreeperSwell";
-  private static final ObfSafeName updateTaskMethod = new ObfSafeName("updateTask", "func_75246_d");
+  static final String entityAICreeperSwellClass = "net.minecraft.entity.ai.EntityAICreeperSwell";
+  static final ObfSafeName updateTaskMethod = new ObfSafeName("updateTask", "func_75246_d");
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
@@ -307,7 +310,7 @@ public class EnderCoreTransformer implements IClassTransformer {
     return basicClass;
   }
 
-  protected final byte[] transform(byte[] classBytes, String className, ObfSafeName methodName, Transform transformer) {
+  protected final static byte[] transform(byte[] classBytes, String className, ObfSafeName methodName, Transform transformer) {
     logger.info("Transforming Class [" + className + "], Method [" + methodName.getName() + "]");
 
     ClassNode classNode = new ClassNode();
@@ -323,4 +326,5 @@ public class EnderCoreTransformer implements IClassTransformer {
     logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
   }
+
 }

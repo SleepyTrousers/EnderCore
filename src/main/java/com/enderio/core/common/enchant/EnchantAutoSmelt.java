@@ -72,7 +72,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
-  public String[] getTooltipDetails(ItemStack stack) {
+  public @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack) {
     return new String[] { EnderCore.lang.localize("enchantment.autosmelt.tooltip", false) };
   }
 
@@ -81,7 +81,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
       INSTANCE = new EnchantAutoSmelt();
       GameRegistry.register(INSTANCE);
       FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN +  ":autosmelt\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+          "<enchantment name=\"" + EnderCore.DOMAIN + ":autosmelt\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
     }
   }
 
