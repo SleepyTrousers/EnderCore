@@ -36,7 +36,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
       this.lang = "section." + lang;
     }
 
-    private Section register() {
+    Section register() {
       sections.add(this);
       return this;
     }
@@ -76,7 +76,8 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   String modid;
   Configuration config;
 
-  private @Nonnull List<Section> sections = new ArrayList<Section>();
+  @Nonnull
+  List<Section> sections = new ArrayList<Section>();
   private Section activeSection = null;
 
   protected AbstractConfigHandler(@Nonnull String modid) {

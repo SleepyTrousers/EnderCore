@@ -36,7 +36,7 @@ public final class ForgeDirectionOffsets {
     return res;
   }
 
-  public EnumFacing closest(float x, float y, float z) {
+  public static EnumFacing closest(float x, float y, float z) {
     float ax = Math.abs(x);
     float ay = Math.abs(y);
     float az = Math.abs(z);

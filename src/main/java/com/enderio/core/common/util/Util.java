@@ -258,8 +258,9 @@ public class Util {
 
   // Code adapted from World.rayTraceBlocks to return all
   // collided blocks
-  public static @Nonnull List<RayTraceResult> raytraceAll(@Nonnull World world, @Nonnull Vec3d startVec, @Nonnull Vec3d endVec, boolean includeLiquids) {
+  public static @Nonnull List<RayTraceResult> raytraceAll(@Nonnull World world, @Nonnull Vec3d startVector, @Nonnull Vec3d endVec, boolean includeLiquids) {
     boolean ignoreBlockWithoutBoundingBox = true;
+    Vec3d startVec = startVector;
 
     List<RayTraceResult> result = new ArrayList<RayTraceResult>();
 

@@ -37,11 +37,9 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 /**
- * This class can be used to automatically process {@link Config} annotations on
- * fields, and sync the data in those fields to clients. It will also
- * automatically respond to all config changed events and handle them
- * appropriately.
- * 
+ * This class can be used to automatically process {@link Config} annotations on fields, and sync the data in those fields to clients. It will also
+ * automatically respond to all config changed events and handle them appropriately.
+ *
  * @see #process(boolean)
  */
 public class ConfigProcessor {
@@ -53,8 +51,7 @@ public class ConfigProcessor {
    * A simple adapter for reading custom config types.
    *
    * @param <BASE>
-   *          Must be a possible class that can be used in configs. This
-   *          consists of:
+   *          Must be a possible class that can be used in configs. This consists of:
    *          <ul>
    *          <code>
    * <li>Boolean</li>
@@ -68,8 +65,7 @@ public class ConfigProcessor {
    * </code>
    *          </ul>
    * @param <ACTUAL>
-   *          The actual type of this adapter. This is what the field type must
-   *          be for this adapter to be applied.
+   *          The actual type of this adapter. This is what the field type must be for this adapter to be applied.
    */
   public interface ITypeAdapter<ACTUAL, BASE> {
     TypeToken<ACTUAL> getActualType();
@@ -77,9 +73,8 @@ public class ConfigProcessor {
     Property.Type getType();
 
     /**
-     * If this binds to a primitive type, return it here (e.g. int.class).
-     * Otherwise, return null.
-     * 
+     * If this binds to a primitive type, return it here (e.g. int.class). Otherwise, return null.
+     *
      * @return The class for this ITypeAdapter's primitive type.
      */
     @Nullable
@@ -108,7 +103,7 @@ public class ConfigProcessor {
 
   /**
    * This constructor omits the callback arg.
-   * 
+   *
    * @see #ConfigProcessor(Class, File, String, IReloadCallback)
    */
   public ConfigProcessor(Class<?> configs, File configFile, String modid) {
@@ -117,7 +112,7 @@ public class ConfigProcessor {
 
   /**
    * Constructs a new ConfigProcessor to read and set {@link Config} values.
-   * 
+   *
    * @param configs
    *          The class which contains your {@link Config} annotations
    * @param configFile
@@ -125,22 +120,18 @@ public class ConfigProcessor {
    * @param modid
    *          The modid of the owner mod
    * @param callback
-   *          an {@link IReloadCallback} object which will be called whenever
-   *          config values are edited.
+   *          an {@link IReloadCallback} object which will be called whenever config values are edited.
    */
   public ConfigProcessor(Class<?> configs, File configFile, String modid, IReloadCallback callback) {
     this(configs, new Configuration(configFile), modid, callback);
   }
 
   /**
-   * Use this constructor if you are using a {@code ConfigProcessor} alongside
-   * an {@link AbstractConfigHandler}. Do not pass a handler that has not been
+   * Use this constructor if you are using a {@code ConfigProcessor} alongside an {@link AbstractConfigHandler}. Do not pass a handler that has not been
    * {@link AbstractConfigHandler#initialize(File) initialized}!
-   * 
+   *
    * @param configs
-   *          The class which contains your {@link Config} annotations
-   *          (typically same class as your {@link AbstractConfigHandler
-   *          handler})
+   *          The class which contains your {@link Config} annotations (typically same class as your {@link AbstractConfigHandler handler})
    * @param handler
    *          Your {@link AbstractConfigHandler}
    */
@@ -149,19 +140,15 @@ public class ConfigProcessor {
   }
 
   /**
-   * Use this constructor if you are using a {@code ConfigProcessor} alongside
-   * an {@link AbstractConfigHandler}. Do not pass a handler that has not been
+   * Use this constructor if you are using a {@code ConfigProcessor} alongside an {@link AbstractConfigHandler}. Do not pass a handler that has not been
    * {@link AbstractConfigHandler#initialize(File) initialized}!
-   * 
+   *
    * @param configs
-   *          The class which contains your {@link Config} annotations
-   *          (typically same class as your {@link AbstractConfigHandler
-   *          handler})
+   *          The class which contains your {@link Config} annotations (typically same class as your {@link AbstractConfigHandler handler})
    * @param handler
    *          Your {@link AbstractConfigHandler}
    * @param callback
-   *          an {@link IReloadCallback} object which will be called whenever
-   *          config values are edited.
+   *          an {@link IReloadCallback} object which will be called whenever config values are edited.
    */
   public ConfigProcessor(Class<?> configs, AbstractConfigHandler handler, IReloadCallback callback) {
     this(configs, handler.config, handler.modid, callback);
@@ -172,7 +159,7 @@ public class ConfigProcessor {
     this.configFile = configFile;
     this.modid = modid;
     this.callback = callback;
-    processorMap.put(modid, this);    
+    processorMap.put(modid, this);
     MinecraftForge.EVENT_BUS.register(this);
     adapters.addAll(TypeAdapterBase.all);
   }
@@ -190,12 +177,10 @@ public class ConfigProcessor {
   }
 
   /**
-   * Processes all the configs in this processors class, optionally loading them
-   * from file first.
-   * 
+   * Processes all the configs in this processors class, optionally loading them from file first.
+   *
    * @param load
-   *          If true, the values from the file will be loaded. Otherwise, the
-   *          values existing in memory will be used.
+   *          If true, the values from the file will be loaded. Otherwise, the values existing in memory will be used.
    */
   public void process(boolean load) {
     if (load) {
@@ -241,14 +226,14 @@ public class ConfigProcessor {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
+  protected Object getConfigValue(String section, String[] commentLines, Field f, Object defaultValue) {
     Property prop = null;
     Object res = null;
     Bound<Double> bound = getBound(f);
     ITypeAdapter adapter = getAdapterFor(f);
     String comment = StringUtils.join(commentLines, "\n");
     if (adapter != null) {
-      defVal = adapter.createBaseType(defVal);
+      Object defVal = adapter.createBaseType(defaultValue);
       switch (adapter.getType()) {
       case BOOLEAN:
         if (defVal.getClass().isArray()) {

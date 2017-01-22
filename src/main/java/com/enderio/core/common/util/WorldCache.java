@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.base.Throwables;
@@ -26,8 +28,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
- * Untested way to save arbitrary to a game save. The name to ID map will be
- * hot-swapped when a new save is loaded.
+ * Untested way to save arbitrary to a game save. The name to ID map will be hot-swapped when a new save is loaded.
  */
 public class WorldCache<I> {
 
@@ -112,20 +113,22 @@ public class WorldCache<I> {
     generateIDs();
   }
 
-  protected void saveData(File file) throws IOException {
+  protected void saveData(@Nonnull File file) throws IOException {
     NBTTagCompound data = new NBTTagCompound();
 
     // name <-> id mappings
     NBTTagList dataList = new NBTTagList();
     for (String key : nameToID.keySet()) {
-      NBTTagCompound tag = new NBTTagCompound();
-      tag.setString("K", key);
-      tag.setInteger("V", nameToID.get(key));
-      dataList.appendTag(tag);
+      if (key != null) {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setString("K", key);
+        tag.setInteger("V", nameToID.get(key));
+        dataList.appendTag(tag);
+      }
     }
     data.setTag("ItemData", dataList);
     // blocked ids
-    data.setIntArray("BlockedItemIds", ArrayUtils.toPrimitive(blockedIDs.toArray(new Integer[0])));
+    data.setIntArray("BlockedItemIds", NullHelper.notnullJ(ArrayUtils.toPrimitive(blockedIDs.toArray(new Integer[0])), "ArrayUtils.toPrimitive()"));
 
     CompressedStreamTools.write(data, file);
   }
@@ -183,7 +186,7 @@ public class WorldCache<I> {
     usedIDs.set(id, true);
   }
 
-  protected File getSaveFile() {
+  protected @Nonnull File getSaveFile() {
     return new File(DimensionManager.getCurrentSaveRootDirectory(), ident + ".json");
   }
 

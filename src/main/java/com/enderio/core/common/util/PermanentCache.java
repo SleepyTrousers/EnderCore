@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -23,7 +25,7 @@ public class PermanentCache<I> extends WorldCache<I> {
   }
 
   @Override
-  protected File getSaveFile() {
+  protected @Nonnull File getSaveFile() {
     if (FMLCommonHandler.instance().getSide().isServer()) {
       return new File(ident + ".dat");
     }

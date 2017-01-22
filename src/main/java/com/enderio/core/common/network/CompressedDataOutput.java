@@ -20,11 +20,12 @@ public class CompressedDataOutput extends DataOutputStream {
   }
 
   public void writeVariable(int value) throws IOException {
-    while ((value & ~0x7F) != 0) {
-      writeByte(value | 0x80);
-      value >>= 7;
+    int val = value;
+    while ((val & ~0x7F) != 0) {
+      writeByte(val | 0x80);
+      val >>= 7;
     }
-    writeByte(value);
+    writeByte(val);
   }
 
   public byte[] getCompressed() throws IOException {

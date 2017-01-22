@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketProgress extends MessageTileEntity<TileEntity> {
 
-  private float progress;
+  float progress;
 
   public PacketProgress() {
   }

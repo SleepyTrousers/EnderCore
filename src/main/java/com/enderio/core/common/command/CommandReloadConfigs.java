@@ -111,7 +111,7 @@ public class CommandReloadConfigs extends CommandBase {
       }
   }
 
-  private void sendResult(ICommandSender player, String modid, String result) {
+  private static void sendResult(ICommandSender player, String modid, String result) {
     player.sendMessage(new TextComponentString(EnderCore.lang.localize("command.config.result." + result, modid)));
   }
 

@@ -2,6 +2,9 @@ package com.enderio.core.common;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -13,15 +16,15 @@ public final class OreDict {
 
   public static void registerVanilla() {
     safeRegister("barsIron", Blocks.IRON_BARS);
-    safeRegister("blockHopper", Blocks.HOPPER);         
+    safeRegister("blockHopper", Blocks.HOPPER);
     safeRegister("itemCoal", Items.COAL);
-    safeRegister("itemCharcoal", new ItemStack(Items.COAL, 1, 1));   
+    safeRegister("itemCharcoal", new ItemStack(Items.COAL, 1, 1));
     safeRegister("pearlEnderEye", Items.ENDER_EYE);
     safeRegister("itemBlazeRod", Items.BLAZE_ROD);
     safeRegister("itemBlazePowder", Items.BLAZE_POWDER);
     safeRegister("itemClay", Items.CLAY_BALL);
     safeRegister("itemFlint", Items.FLINT);
-    safeRegister("itemGhastTear", Items.GHAST_TEAR);    
+    safeRegister("itemGhastTear", Items.GHAST_TEAR);
     safeRegister("itemLeather", Items.LEATHER);
     safeRegister("slabWoodOak", new ItemStack(Blocks.WOODEN_SLAB, 1, 0));
     safeRegister("slabWoodSpruce", new ItemStack(Blocks.WOODEN_SLAB, 1, 1));
@@ -38,22 +41,26 @@ public final class OreDict {
     safeRegister("slabQuartz", new ItemStack(Blocks.STONE_SLAB, 1, 7));
   }
 
-  public static void safeRegister(String name, Block block) {
+  public static void safeRegister(@Nonnull String name, @Nonnull Block block) {
     safeRegister(name, Item.getItemFromBlock(block));
   }
 
-  public static void safeRegister(String name, Item item) {
+  public static void safeRegister(@Nonnull String name, @Nonnull Item item) {
     safeRegister(name, new ItemStack(item));
   }
 
-  public static void safeRegister(String name, ItemStack stack) {
-    if (!isRegistered(stack, OreDictionary.getOres(name))) OreDictionary.registerOre(name, stack);
+  public static void safeRegister(@Nonnull String name, @Nonnull ItemStack stack) {
+    if (!isRegistered(stack, OreDictionary.getOres(name)))
+      OreDictionary.registerOre(name, stack);
   }
 
-  private static boolean isRegistered(ItemStack stack, List<ItemStack> toCheck) {
-    for (ItemStack check : toCheck) {
-      if (stack != null && stack.getItem() == check.getItem() && (stack.getItemDamage() == check.getItemDamage() || stack.getItemDamage() == OreDictionary.WILDCARD_VALUE)) {
-        return true;
+  private static boolean isRegistered(@Nonnull ItemStack stack, @Nullable List<ItemStack> toCheck) {
+    if (toCheck != null) {
+      for (ItemStack check : toCheck) {
+        if (!stack.isEmpty() && stack.getItem() == check.getItem()
+            && (stack.getItemDamage() == check.getItemDamage() || stack.getItemDamage() == OreDictionary.WILDCARD_VALUE)) {
+          return true;
+        }
       }
     }
     return false;

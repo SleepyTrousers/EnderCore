@@ -1,5 +1,7 @@
 package com.enderio.core.common;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.util.Scheduler;
 
 import net.minecraft.world.World;
@@ -11,21 +13,20 @@ public class CommonProxy {
   /**
    * Returns a scheduler for the current side
    * <p>
-   * For internal use only, please call {@link Scheduler#instance()} to obtain
-   * an {@link Scheduler} instance.
+   * For internal use only, please call {@link Scheduler#instance()} to obtain an {@link Scheduler} instance.
    */
-  public Scheduler getScheduler() {
-    if (scheduler == null) {
-      scheduler = new Scheduler(true);
+  public @Nonnull Scheduler getScheduler() {
+    if (scheduler != null) {
+      return scheduler;
     }
-    return scheduler;
+    return scheduler = new Scheduler(true);
   }
 
   public World getClientWorld() {
     return null;
   }
 
-  public void throwModCompatibilityError(String... msgs) {
+  public void throwModCompatibilityError(@Nonnull String... msgs) {
     StringBuilder sb = new StringBuilder();
     for (String msg : msgs) {
       if (sb.length() > 0) {
@@ -35,8 +36,8 @@ public class CommonProxy {
     }
     throw new RuntimeException(sb.toString());
   }
-  
-  public void onPreInit(FMLPreInitializationEvent event) {
-    
+
+  public void onPreInit(@Nonnull FMLPreInitializationEvent event) {
   }
+
 }

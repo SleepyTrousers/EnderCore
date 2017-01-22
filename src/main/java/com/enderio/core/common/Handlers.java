@@ -12,6 +12,12 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.enderio.core.EnderCore;
+import com.enderio.core.IEnderMod;
+import com.enderio.core.common.Handlers.Handler.HandlerSide;
+import com.enderio.core.common.Handlers.Handler.Inst;
+import com.google.common.base.Throwables;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -26,22 +32,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import com.enderio.core.EnderCore;
-import com.enderio.core.IEnderMod;
-import com.enderio.core.common.Handlers.Handler.HandlerSide;
-import com.enderio.core.common.Handlers.Handler.Inst;
-import com.google.common.base.Throwables;
-
-import static com.enderio.core.common.Handlers.Handler.Inst.*;
+import static com.enderio.core.common.Handlers.Handler.Inst.AUTO;
+import static com.enderio.core.common.Handlers.Handler.Inst.CONSTRUCTOR;
+import static com.enderio.core.common.Handlers.Handler.Inst.FIELD;
+import static com.enderio.core.common.Handlers.Handler.Inst.METHOD;
+import static com.enderio.core.common.Handlers.Handler.Inst.SCALA_OBJECT;
 
 public class Handlers {
 
   /**
-   * New enum to represent handler types. Possible to use to figure out what
-   * type a method is without direct info.
-   * 
-   * The order of the constants is the order they are tried. This is VERY
-   * important!
+   * New enum to represent handler types. Possible to use to figure out what type a method is without direct info.
+   *
+   * The order of the constants is the order they are tried. This is VERY important!
    */
   public enum HandlerType {
 
@@ -70,18 +72,14 @@ public class Handlers {
   }
 
   /**
-   * To be put on classes that are Forge/FML event handlers. EnderCore will
-   * automatically figure out what busses it needs to be registered to.
+   * To be put on classes that are Forge/FML event handlers. EnderCore will automatically figure out what busses it needs to be registered to.
    * <p>
    * It can get the instance of the handler in a few ways: <br>
-   * A public no args constructor 
-   * <b>OR</b><br>
-   * A static singleton object with field name {@code INSTANCE} (public or
-   * private). <b>OR</b><br>
+   * A public no args constructor <b>OR</b><br>
+   * A static singleton object with field name {@code INSTANCE} (public or private). <b>OR</b><br>
    * A static method with name <code>instance()</code> (public or private)
    * <p>
-   * This can also be explicitly set using {@link #getInstFrom()} to avoid
-   * invoking code that may cause issues.
+   * This can also be explicitly set using {@link #getInstFrom()} to avoid invoking code that may cause issues.
    */
   @Target(ElementType.TYPE)
   @Retention(RetentionPolicy.RUNTIME)
@@ -101,32 +99,27 @@ public class Handlers {
 
     public enum Inst {
       /**
-       * The default, will try all three methods, in the order
-       * {@link Inst#CONSTRUCTOR}, {@link Inst#FIELD}, {@link Inst#METHOD}
+       * The default, will try all three methods, in the order {@link Inst#CONSTRUCTOR}, {@link Inst#FIELD}, {@link Inst#METHOD}
        */
       AUTO,
 
       /**
-       * The handler should be constructed from the default constructor of the
-       * class
+       * The handler should be constructed from the default constructor of the class
        */
       CONSTRUCTOR,
 
       /**
-       * The handler should be grabbed from the static {@code INSTANCE} field of
-       * the class
+       * The handler should be grabbed from the static {@code INSTANCE} field of the class
        */
       FIELD,
 
       /**
-       * The handler should be grabbed from the static {@code instance()} method
-       * of the class
+       * The handler should be grabbed from the static {@code instance()} method of the class
        */
       METHOD,
 
       /**
-       * Added for scala compat, not necessary to set explicitly ({@link #AUTO}
-       * will find this).
+       * Added for scala compat, not necessary to set explicitly ({@link #AUTO} will find this).
        */
       SCALA_OBJECT;
 
@@ -138,10 +131,9 @@ public class Handlers {
     public enum HandlerSide {
 
       /**
-       * Whether to load this handler or not will be determined by the package
-       * name. If it contains "client" it will only load clientside. The default
-       * value.
+       * Whether to load this handler or not will be determined by the package name. If it contains "client" it will only load clientside. The default value.
        */
+      @SuppressWarnings("hiding")
       AUTO,
 
       /**
@@ -175,8 +167,7 @@ public class Handlers {
     HandlerType[] value() default { HandlerType.FORGE, HandlerType.FML };
 
     /**
-     * The method of getting your handler's instance. Defaults to
-     * {@link Inst#AUTO}
+     * The method of getting your handler's instance. Defaults to {@link Inst#AUTO}
      */
     Inst getInstFrom() default AUTO;
 
@@ -194,27 +185,26 @@ public class Handlers {
     annotations = event.getAsmData().getAll(Handler.class.getName());
   }
 
-  //  private String getEnclosingPackage(Object obj) {
-  //    Class<?> modClass = obj.getClass();
+  // private String getEnclosingPackage(Object obj) {
+  // Class<?> modClass = obj.getClass();
   //
-  //    while (modClass.getComponentType() != null) {
-  //      modClass = modClass.getComponentType();
-  //    }
+  // while (modClass.getComponentType() != null) {
+  // modClass = modClass.getComponentType();
+  // }
   //
-  //    while (modClass.getEnclosingClass() != null) {
-  //      modClass = modClass.getEnclosingClass();
-  //    }
+  // while (modClass.getEnclosingClass() != null) {
+  // modClass = modClass.getEnclosingClass();
+  // }
   //
-  //    String name = modClass.getName();
-  //    int lastDot = name.lastIndexOf('.');
+  // String name = modClass.getName();
+  // int lastDot = name.lastIndexOf('.');
   //
-  //    return lastDot == -1 ? name : name.substring(0, lastDot);
-  //  }
+  // return lastDot == -1 ? name : name.substring(0, lastDot);
+  // }
 
   /**
-   * Registers a top level package to be searched for {@link Handler} classes.
-   * Not needed if your {@code @Mod} class implements {@link IEnderMod}
-   * 
+   * Registers a top level package to be searched for {@link Handler} classes. Not needed if your {@code @Mod} class implements {@link IEnderMod}
+   *
    * @param packageName
    * @deprecated This is not needed, period.
    */
@@ -232,7 +222,7 @@ public class Handlers {
 
   /**
    * For internal use only. Do not call. Callers will be sacked.
-   * 
+   *
    * @param event
    */
   public static void register(FMLInitializationEvent event) {
@@ -274,8 +264,8 @@ public class Handlers {
         side = HandlerSide.valueOf((String) _value.get(holder));
       }
       Side currentSide = FMLCommonHandler.instance().getEffectiveSide();
-      
-      if (side == null || side == HandlerSide.AUTO) {
+
+      if (side == HandlerSide.AUTO) {
         return !data.getClassName().contains("client") || currentSide.isClient();
       } else {
         return side.equals(currentSide);

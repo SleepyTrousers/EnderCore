@@ -24,7 +24,7 @@ public class ThreadedNetworkWrapper {
 
   private final class Wrapper<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
 
-    private final IMessageHandler<REQ, REPLY> wrapped;
+    final IMessageHandler<REQ, REPLY> wrapped;
 
     public Wrapper(IMessageHandler<REQ, REPLY> wrapped) {
       this.wrapped = wrapped;

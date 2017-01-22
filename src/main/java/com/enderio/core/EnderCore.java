@@ -26,6 +26,7 @@ import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
+import com.enderio.core.common.util.NullHelper;
 import com.enderio.core.common.util.PermanentCache;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
@@ -56,8 +57,8 @@ public class EnderCore implements IEnderMod {
   public static final @Nonnull String BASE_PACKAGE = "com.enderio";
   public static final @Nonnull String VERSION = "@VERSION@";
 
-  public static final Logger logger = LogManager.getLogger(NAME);
-  public static final Lang lang = new Lang(MODID);
+  public static final @Nonnull Logger logger = NullHelper.notnull(LogManager.getLogger(NAME), "failed to aquire logger");
+  public static final @Nonnull Lang lang = new Lang(MODID);
 
   @Instance(MODID)
   public static EnderCore instance;
@@ -65,14 +66,13 @@ public class EnderCore implements IEnderMod {
   @SidedProxy(serverSide = "com.enderio.core.common.CommonProxy", clientSide = "com.enderio.core.client.ClientProxy")
   public static CommonProxy proxy;
 
-  public @Nonnull List<IConfigHandler> configs = Lists.newArrayList();
+  public final @Nonnull List<IConfigHandler> configs = Lists.newArrayList();
 
-  private @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
+  private final @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
 
   /**
-   * Call this method BEFORE preinit (construction phase) to request that
-   * EnderCore start in invisible mode. This will disable ANY gameplay features
-   * unless the user forcibly disables invisible mode in the config.
+   * Call this method BEFORE preinit (construction phase) to request that EnderCore start in invisible mode. This will disable ANY gameplay features unless the
+   * user forcibly disables invisible mode in the config.
    */
   public void requestInvisibleMode() {
     invisibleRequesters.add(Loader.instance().activeModContainer().getName());
@@ -87,21 +87,13 @@ public class EnderCore implements IEnderMod {
   }
 
   @EventHandler
-  public void preInit(FMLPreInitializationEvent event) {
-
-    /*{
-      // for dev env: force classload the classes we have transforms for so we can see the output early in the logfile
-      if (net.minecraft.inventory.ContainerRepair.class.equals(null) || net.minecraft.client.gui.GuiRepair.class.equals(null)
-          || net.minecraft.inventory.ContainerFurnace.class.equals(null) || net.minecraft.client.renderer.RenderItem.class.equals(null)) {
-        Log.warn("Elvis has entered the building.");
-      }
-    }*/
+  public void preInit(@Nonnull FMLPreInitializationEvent event) {
 
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
     ConfigHandler.configFile = new File(ConfigHandler.enderConfigFolder.getPath() + "/" + event.getSuggestedConfigurationFile().getName());
 
-    if(!ConfigHandler.configFile.exists() && event.getSuggestedConfigurationFile().exists()) {
+    if (!ConfigHandler.configFile.exists() && event.getSuggestedConfigurationFile().exists()) {
       try {
         FileUtils.copyFile(event.getSuggestedConfigurationFile(), ConfigHandler.configFile);
       } catch (IOException e) {
@@ -110,7 +102,7 @@ public class EnderCore implements IEnderMod {
       EnderFileUtils.safeDelete(event.getSuggestedConfigurationFile());
     }
 
-    ConfigHandler.instance().initialize(ConfigHandler.configFile);
+    ConfigHandler.instance().initialize(NullHelper.notnullJ(ConfigHandler.configFile, "it was there a second ago, I swear!"));
     Handlers.preInit(event);
 
     CompatRegistry.INSTANCE.handle(event);
@@ -118,12 +110,12 @@ public class EnderCore implements IEnderMod {
 
     EnchantXPBoost.register();
     EnchantAutoSmelt.register();
-    
+
     proxy.onPreInit(event);
   }
 
   @EventHandler
-  public void init(FMLInitializationEvent event) {
+  public void init(@Nonnull FMLInitializationEvent event) {
     EnderPacketHandler.init();
 
     for (IConfigHandler c : configs) {
@@ -142,7 +134,7 @@ public class EnderCore implements IEnderMod {
   }
 
   @EventHandler
-  public void postInit(FMLPostInitializationEvent event) {
+  public void postInit(@Nonnull FMLPostInitializationEvent event) {
     for (IConfigHandler c : configs) {
       c.postInitHook();
     }
@@ -152,13 +144,13 @@ public class EnderCore implements IEnderMod {
   }
 
   @EventHandler
-  public void onServerStarting(FMLServerStartingEvent event) {
+  public void onServerStarting(@Nonnull FMLServerStartingEvent event) {
     event.registerServerCommand(new CommandScoreboardInfo());
     PermanentCache.saveCaches();
   }
 
   @EventHandler
-  public void onIMCEvent(IMCEvent event) {
+  public void onIMCEvent(@Nonnull IMCEvent event) {
     IMCRegistry.INSTANCE.handleEvent(event);
   }
 

@@ -17,21 +17,21 @@ import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class BaseConfigGui extends GuiConfig {
-  
+
   public BaseConfigGui(GuiScreen parentScreen) {
     // dummy super so we can call instance methods
     super(parentScreen, new ArrayList<IConfigElement>(), null, false, false, null);
 
     try {
       // pffft final, what a wimpy modifier
-      Field modID = GuiConfig.class.getDeclaredField("modID");
-      Field configElements = GuiConfig.class.getDeclaredField("configElements");
+      Field modIDField = GuiConfig.class.getDeclaredField("modID");
+      Field configElementsField = GuiConfig.class.getDeclaredField("configElements");
 
-      modID.setAccessible(true);
-      configElements.setAccessible(true);
+      modIDField.setAccessible(true);
+      configElementsField.setAccessible(true);
 
-      modID.set(this, getConfigHandler().getModID());
-      configElements.set(this, getConfigElements());
+      modIDField.set(this, getConfigHandler().getModID());
+      configElementsField.set(this, getConfigElements());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -73,12 +73,12 @@ public class BaseConfigGui extends GuiConfig {
 
     return list;
   }
-  
+
   private class ConfigSection extends ConfigElement {
     private Section section;
     private String prefix;
 
-    private ConfigSection(Section s, String prefix) {
+    ConfigSection(Section s, String prefix) {
       super(BaseConfigGui.this.getConfigHandler().getCategory(s.lc()).setLanguageKey(prefix + s.lang));
       this.section = s;
       this.prefix = prefix;
@@ -99,9 +99,8 @@ public class BaseConfigGui extends GuiConfig {
     }
   }
 
-  
   private static class ConfigElementExtended extends ConfigElement {
-    
+
     private static final Field _prop;
     static {
       try {
@@ -112,7 +111,7 @@ public class BaseConfigGui extends GuiConfig {
       }
     }
 
-    private ConfigElementExtended(IConfigElement other) {
+    ConfigElementExtended(IConfigElement other) {
       super(getProp(other));
     }
 

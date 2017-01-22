@@ -26,12 +26,12 @@ public class ClientProxy extends CommonProxy {
   }
 
   @Override
-  public void throwModCompatibilityError(String... msgs) {
+  public void throwModCompatibilityError(@Nonnull String... msgs) {
     throw new EnderCoreModConflictException(msgs);
   }
 
   @Override
-  public void onPreInit(FMLPreInitializationEvent event) {
+  public void onPreInit(@Nonnull FMLPreInitializationEvent event) {
     IconUtil.instance.init();
   }
 

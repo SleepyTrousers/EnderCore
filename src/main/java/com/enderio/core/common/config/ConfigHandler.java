@@ -17,7 +17,7 @@ import com.enderio.core.common.config.annot.NoSync;
 import com.enderio.core.common.config.annot.Range;
 import com.enderio.core.common.config.annot.RestartReq;
 import com.enderio.core.common.handlers.RightClickCropHandler;
-import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
+import com.enderio.core.common.handlers.RightClickCropHandler.LegacyPlantInfo;
 import com.enderio.core.common.tweaks.Tweak;
 import com.enderio.core.common.tweaks.Tweaks;
 
@@ -42,8 +42,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Config
   @Comment({
       "Control the behavior of invisible mode (disables all gameplay features). Having this setting be different between client and server could cause some desync, but otherwise is harmless.",
-      "0 - Default. Lets other mods request invisible mode. If none do, invisible mode is off.",
-      "-1 (or below) - Never invisible, even if mods request it.",
+      "0 - Default. Lets other mods request invisible mode. If none do, invisible mode is off.", "-1 (or below) - Never invisible, even if mods request it.",
       "1 (or above) - Always invisible, even if no mods request it." })
   public static int invisibleMode = 0;
 
@@ -73,7 +72,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Config
   @Comment("The way the game should have been made (Yes this is the fireworks thing).")
   public static boolean betterAchievements = false;
-  
+
   @Config
   @Comment("Fireworks display on new years eve")
   public static boolean newYearsFireworks = true;
@@ -97,14 +96,14 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @RestartReq(RestartReqs.REQUIRES_MC_RESTART)
   public static boolean allowAutoSmelt = true;
 
-  //    @Config("test")
-  //    public static List<Integer> test1 = Lists.newArrayList(1, 2, 3);
-  //    @Config("test")
-  //    public static List<Double> test2 = Lists.newArrayList(0.1, 0.2, 0.3);
-  //    @Config("test")
-  //    public static List<Boolean> test3 = Lists.newArrayList(true, false, true);
-  //    @Config("test")
-  //    public static List<String> test4 = Lists.newArrayList("test1", "test2", "test3");
+  // @Config("test")
+  // public static List<Integer> test1 = Lists.newArrayList(1, 2, 3);
+  // @Config("test")
+  // public static List<Double> test2 = Lists.newArrayList(0.1, 0.2, 0.3);
+  // @Config("test")
+  // public static List<Boolean> test3 = Lists.newArrayList(true, false, true);
+  // @Config("test")
+  // public static List<String> test4 = Lists.newArrayList("test1", "test2", "test3");
 
   private static ConfigHandler INSTANCE;
 
@@ -130,18 +129,18 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     addSection("tweaks");
     addSection("invisibility");
     processor = new ConfigProcessor(getClass(), this, this) {
-      
+
       @Override
       protected Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
         Object res = super.getConfigValue(section, commentLines, f, defVal);
-        if(f.getName() == "invisibleMode") {
-          if(res.equals(0)) {
+        if (f.getName() == "invisibleMode") {
+          if (res.equals(0)) {
             return EnderCore.instance.invisibilityRequested() ? 1 : -1;
           }
-        } else if(invisibleMode == 1 && !f.isAnnotationPresent(InvisIgnore.class)) {
-          if(f.getType() == int.class) {
+        } else if (invisibleMode == 1 && !f.isAnnotationPresent(InvisIgnore.class)) {
+          if (f.getType() == int.class) {
             return 0;
-          } else if(f.getType() == boolean.class) {
+          } else if (f.getType() == boolean.class) {
             return false;
           }
         }
@@ -172,12 +171,12 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     boolean ret = getValue(tweak.getName(), tweak.getComment(), true);
     return invisibleMode == 1 ? false : ret;
   }
-  
+
   public boolean showInvisibleWarning() {
     activateSection("invisibility");
     ConfigCategory cat = config.getCategory("invisibility");
     boolean ret = false;
-    if(!cat.containsKey("invisibilityWarning")) {
+    if (!cat.containsKey("invisibilityWarning")) {
       ret = true;
     }
     boolean val = getValue("invisibilityWarning", "If set to true, the invisibility warning will show every time the user logs in.", false);
@@ -186,9 +185,10 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   }
 
   public void loadRightClickCrops() {
-    JsonConfigReader<PlantInfo> reader = new JsonConfigReader<PlantInfo>(new ModToken(EnderCore.class, EnderCore.MODID.toLowerCase(Locale.US) + "/config"),
-        enderConfigFolder.getAbsolutePath() + "/cropConfig.json", PlantInfo.class);
-    for (PlantInfo i : reader) {
+    JsonConfigReader<LegacyPlantInfo> reader = new JsonConfigReader<LegacyPlantInfo>(
+        new ModToken(EnderCore.class, EnderCore.MODID.toLowerCase(Locale.US) + "/config"), enderConfigFolder.getAbsolutePath() + "/cropConfig.json",
+        LegacyPlantInfo.class);
+    for (LegacyPlantInfo i : reader) {
       i.init();
       RightClickCropHandler.INSTANCE.addCrop(i);
     }

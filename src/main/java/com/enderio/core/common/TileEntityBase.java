@@ -1,5 +1,7 @@
 package com.enderio.core.common;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.api.common.util.IProgressTile;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.network.EnderPacketHandler;
@@ -31,14 +33,14 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   @Override
   public final void update() {
-    if (isInvalid() || !worldObj.isBlockLoaded(getPos()) || worldObj.getTileEntity(getPos()) != this) {
+    if (!hasWorld() || isInvalid() || !world.isBlockLoaded(getPos()) || world.getTileEntity(getPos()) != this) {
       // we can get ticked after being removed from the world, ignore this
       return;
     }
-    if (ConfigHandler.allowExternalTickSpeedup || worldObj.getTotalWorldTime() != lastUpdate) {
-      lastUpdate = worldObj.getTotalWorldTime();
+    if (ConfigHandler.allowExternalTickSpeedup || world.getTotalWorldTime() != lastUpdate) {
+      lastUpdate = world.getTotalWorldTime();
       doUpdate();
-      if (isProgressTile && !worldObj.isRemote) {
+      if (isProgressTile && !world.isRemote) {
         int curScaled = getProgressScaled(16);
         if (++ticksSinceLastProgressUpdate >= getProgressUpdateFreq() || curScaled != lastProgressScaled) {
           sendTaskProgressPacket();
@@ -48,7 +50,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
   }
 
-  public static int getProgressScaled(int scale, IProgressTile tile) {
+  public static int getProgressScaled(int scale, @Nonnull IProgressTile tile) {
     return (int) (tile.getProgress() * scale);
   }
 
@@ -77,55 +79,98 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     return 20;
   }
 
-  @Override
-  public final void readFromNBT(NBTTagCompound root) {
-    super.readFromNBT(root);
-    readCustomNBT(root);
+  public static enum NBT_Action {
+    /**
+     * The TE is saved to/loaded from the save file.
+     */
+    SAVE,
+    /**
+     * The TE is initially synced to the client.
+     */
+    SYNC,
+    /**
+     * The TE is updated to the client.
+     */
+    UPDATE,
+    /**
+     * TE data is written to/read from an item.
+     */
+    ITEM;
   }
 
+  /**
+   * SERVER: Called when being written to the save file.
+   */
   @Override
-  public final NBTTagCompound writeToNBT(NBTTagCompound root) {
+  public final @Nonnull NBTTagCompound writeToNBT(@Nonnull NBTTagCompound root) {
     super.writeToNBT(root);
-    writeCustomNBT(root);
+    writeCustomNBT(NBT_Action.SAVE, root);
     return root;
   }
 
+  /**
+   * SERVER: Called when being read from the save file.
+   */
   @Override
-  public NBTTagCompound getUpdateTag() {
-    NBTTagCompound tag = new NBTTagCompound();
-    writeCustomNBT(tag);
+  public final void readFromNBT(@Nonnull NBTTagCompound tag) {
+    super.readFromNBT(tag);
+    readCustomNBT(NBT_Action.SAVE, tag);
+  }
+
+  /**
+   * Called when the chunk/block data is sent (client receiving chunks from server). Must have x/y/z tags.
+   */
+  @Override
+  public @Nonnull NBTTagCompound getUpdateTag() {
+    NBTTagCompound tag = super.getUpdateTag();
+    writeCustomNBT(NBT_Action.SYNC, tag);
     return tag;
   }
 
+  /**
+   * CLIENT: Called on initial syncing.
+   */
+  @Override
+  public void handleUpdateTag(@Nonnull NBTTagCompound tag) {
+    super.handleUpdateTag(tag);
+    readCustomNBT(NBT_Action.SYNC, tag);
+  }
+
+  /**
+   * SERVER: Called when TE is re-synced (via notifyBlockUpdate). No need for x/y/z tags.
+   */
   @Override
   public SPacketUpdateTileEntity getUpdatePacket() {
     NBTTagCompound tag = new NBTTagCompound();
-    writeCustomNBT(tag);
+    writeCustomNBT(NBT_Action.UPDATE, tag);
     return new SPacketUpdateTileEntity(getPos(), 1, tag);
   }
 
+  /**
+   * CLIENT: Called on re-syncing.
+   */
   @Override
-  public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-    readCustomNBT(pkt.getNbtCompound());
+  public void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
+    readCustomNBT(NBT_Action.UPDATE, pkt.getNbtCompound());
   }
+
+  protected abstract void writeCustomNBT(@Nonnull NBT_Action action, @Nonnull NBTTagCompound root);
+
+  protected abstract void readCustomNBT(@Nonnull NBT_Action action, @Nonnull NBTTagCompound root);
 
   public boolean canPlayerAccess(EntityPlayer player) {
-    return !isInvalid() && player.getDistanceSqToCenter(getPos().add(0.5, 0.5, 0.5)) <= 64D;
+    return hasWorld() && !isInvalid() && player.getDistanceSqToCenter(getPos()) <= 64D;
   }
 
-  protected abstract void writeCustomNBT(NBTTagCompound root);
-
-  protected abstract void readCustomNBT(NBTTagCompound root);
-
   protected void updateBlock() {
-    if (worldObj != null) {
-      IBlockState bs = worldObj.getBlockState(getPos());
-      worldObj.notifyBlockUpdate(pos, bs, bs, 3);
+    if (hasWorld()) {
+      IBlockState bs = world.getBlockState(getPos());
+      world.notifyBlockUpdate(pos, bs, bs, 3);
     }
   }
 
   protected boolean isPoweredRedstone() {
-    return worldObj.isBlockLoaded(getPos()) ? worldObj.isBlockIndirectlyGettingPowered(getPos()) > 0 : false;
+    return hasWorld() && world.isBlockLoaded(getPos()) ? world.isBlockIndirectlyGettingPowered(getPos()) > 0 : false;
   }
 
   /**
@@ -153,32 +198,33 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * If you have different work items in your TE, use this variant to stagger your work.
    */
   protected boolean shouldDoWorkThisTick(int interval, int offset) {
-    return (worldObj.getTotalWorldTime() + checkOffset + offset) % interval == 0;
+    return (world.getTotalWorldTime() + checkOffset + offset) % interval == 0;
   }
 
   @Override
-  public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
-    return oldState.getBlock() != newSate.getBlock();
+  public boolean shouldRefresh(@Nonnull World worldIn, @Nonnull BlockPos posIn, @Nonnull IBlockState oldState, @Nonnull IBlockState newState) {
+    return oldState.getBlock() != newState.getBlock();
   }
 
   /**
    * Called server-side when a GhostSlot is changed. Check that the given slot number really is a ghost slot before storing the given stack.
-   * 
+   *
    * @param slot
    *          The slot number that was given to the ghost slot
    * @param stack
    *          The stack that should be placed, null to clear
+   * @param realsize
    */
-  public void setGhostSlotContents(int slot, ItemStack stack) {
+  public void setGhostSlotContents(int slot, ItemStack stack, int realsize) {
   }
 
   @Override
   public void markDirty() {
-    if (worldObj != null) {
-      worldObj.markChunkDirty(pos, this);
-      IBlockState state = worldObj.getBlockState(pos);
+    if (hasWorld()) {
+      world.markChunkDirty(pos, this);
+      IBlockState state = world.getBlockState(pos);
       if (state.hasComparatorInputOverride()) {
-        worldObj.updateComparatorOutputLevel(pos, state.getBlock());
+        world.updateComparatorOutputLevel(pos, state.getBlock());
       }
     }
   }

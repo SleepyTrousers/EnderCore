@@ -19,19 +19,19 @@ public enum CompatRegistry {
   INSTANCE;
 
   private static class Registration {
-    private final String[] modids;
-    private final RegisterTime[] times;
+    final String[] modids;
+    final RegisterTime[] times;
 
-    private Registration(RegisterTime time, String... modids) {
+    Registration(RegisterTime time, String... modids) {
       this.modids = modids;
       this.times = new RegisterTime[] { time };
     }
 
-    private Registration(RegisterTime[] times, String... modids) {
+    Registration(RegisterTime[] times, String... modids) {
       this.modids = modids;
       this.times = times;
     }
-    
+
     public String[] getModids() {
       return this.modids;
     }
@@ -43,11 +43,15 @@ public enum CompatRegistry {
     @Override
     @Generated("lombok")
     public boolean equals(final java.lang.Object o) {
-      if (o == this) return true;
-      if (!(o instanceof CompatRegistry.Registration)) return false;
-      final Registration other = (Registration)o;
-      if (!java.util.Arrays.deepEquals(this.getModids(), other.getModids())) return false;
-      if (!java.util.Arrays.deepEquals(this.getTimes(), other.getTimes())) return false;
+      if (o == this)
+        return true;
+      if (!(o instanceof CompatRegistry.Registration))
+        return false;
+      final Registration other = (Registration) o;
+      if (!java.util.Arrays.deepEquals(this.getModids(), other.getModids()))
+        return false;
+      if (!java.util.Arrays.deepEquals(this.getTimes(), other.getTimes()))
+        return false;
       return true;
     }
 
@@ -64,17 +68,18 @@ public enum CompatRegistry {
     @Override
     @Generated("lombok")
     public java.lang.String toString() {
-      return "CompatRegistry.Registration(modids=" + java.util.Arrays.deepToString(this.getModids()) + ", times=" + java.util.Arrays.deepToString(this.getTimes()) + ")";
+      return "CompatRegistry.Registration(modids=" + java.util.Arrays.deepToString(this.getModids()) + ", times="
+          + java.util.Arrays.deepToString(this.getTimes()) + ")";
     }
   }
-  
+
   private Map<Registration, String> compatMap = new HashMap<Registration, String>();
 
   private RegisterTime state = null;
-  
+
   private CompatRegistry() {
   }
-  
+
   public RegisterTime getState() {
     return state;
   }
@@ -97,7 +102,7 @@ public enum CompatRegistry {
     }
   }
 
-  private boolean allModsLoaded(String[] modids) {
+  private static boolean allModsLoaded(String[] modids) {
     for (String s : modids) {
       if (!Loader.isModLoaded(s)) {
         return false;
@@ -117,7 +122,7 @@ public enum CompatRegistry {
     }
   }
 
-  private void doLoad(String clazz) {
+  private static void doLoad(String clazz) {
     try {
       EnderCore.logger.info("[Compat] Loading compatability class " + clazz);
       Class<?> compat = Class.forName(clazz);

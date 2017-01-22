@@ -22,8 +22,8 @@ public class PacketConfigSync implements IMessage {
   public PacketConfigSync() {
   }
 
-  private Map<String, Object> configValues;
-  private String modid;
+  Map<String, Object> configValues;
+  String modid;
 
   public PacketConfigSync(ConfigProcessor toSync) {
     this.configValues = toSync.configValues;

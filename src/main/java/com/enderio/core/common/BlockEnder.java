@@ -6,7 +6,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.TileEntityBase.NBT_Action;
 import com.enderio.core.common.util.FluidUtil;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -14,9 +16,11 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -63,12 +67,12 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public boolean hasTileEntity(IBlockState state) {
+  public boolean hasTileEntity(@Nonnull IBlockState state) {
     return teClass != null;
   }
 
   @Override
-  public @Nonnull TileEntity createTileEntity(World world, IBlockState state) {
+  public @Nonnull TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
     if (teClass != null) {
       try {
         T te = teClass.newInstance();
@@ -84,16 +88,14 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   /* Subclass Helpers */
 
-  
-  
   @Override
-  public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, @Nullable ItemStack heldItem,
-      EnumFacing side,
-      float hitX, float hitY, float hitZ) {
+  public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn,
+      @Nonnull EnumHand hand, @Nonnull EnumFacing side, float hitX, float hitY, float hitZ) {
     if (playerIn.isSneaking()) {
       return false;
     }
-    TileEntity te = worldIn.getTileEntity(pos);
+
+    TileEntity te = getTileEntity(worldIn, pos);
     if (te instanceof ITankAccess) {
       if (FluidUtil.fillInternalTankFromPlayerHandItem(worldIn, pos, playerIn, hand, (ITankAccess) te)) {
         return true;
@@ -114,9 +116,8 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     return true;
   }
 
-  
   @Override
-  public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+  public boolean removedByPlayer(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player, boolean willHarvest) {
     if (willHarvest) {
       return true;
     }
@@ -124,15 +125,15 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te,
-      @Nullable ItemStack stack) {
+  public void harvestBlock(@Nonnull World worldIn, @Nonnull EntityPlayer player, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nullable TileEntity te,
+      @Nonnull ItemStack stack) {
     super.harvestBlock(worldIn, player, pos, state, te, stack);
     worldIn.setBlockToAir(pos);
   }
 
   @Override
-  public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-    if (world == null || pos == null || doNormalDrops(world, pos)) {
+  public @Nonnull List<ItemStack> getDrops(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune) {
+    if (doNormalDrops(world, pos)) {
       return super.getDrops(world, pos, state, fortune);
     }
     return Lists.newArrayList(getNBTDrop(world, pos, getTileEntity(world, pos)));
@@ -145,21 +146,39 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     return itemStack;
   }
 
-  protected void processDrop(IBlockAccess world, BlockPos pos, @Nullable T te, ItemStack drop) {
+  protected void processDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te, @Nonnull ItemStack drop) {
+    if (te != null) {
+      final NBTTagCompound tag = new NBTTagCompound();
+      te.writeCustomNBT(NBT_Action.ITEM, tag);
+      if (!tag.hasNoTags()) {
+        drop.setTagCompound(tag);
+      }
+    }
+  }
+
+  @Override
+  public void onBlockPlacedBy(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer,
+      @Nonnull ItemStack stack) {
+    if (stack.hasTagCompound()) {
+      T te = getTileEntity(worldIn, pos);
+      if (te != null) {
+        te.readCustomNBT(NBT_Action.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
+      }
+    }
   }
 
   /**
    * Tries to load this block's TileEntity if it exists. Will create the TileEntity if it doesn't yet exist.
    * <p>
    * <strong>This will crash if used in any other thread than the main (client or server) thread!</strong>
-   * 
+   *
    */
-  @SuppressWarnings({ "unchecked", "null" })
   protected @Nullable T getTileEntity(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
-    if (teClass != null) {
+    final Class<? extends T> teClass2 = teClass;
+    if (teClass2 != null) {
       TileEntity te = world.getTileEntity(pos);
-      if (teClass.isInstance(te)) {
-        return (T) te;
+      if (teClass2.isInstance(te)) {
+        return teClass2.cast(te);
       }
     }
     return null;
@@ -167,15 +186,15 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   /**
    * Tries to load this block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess.
-   * 
+   *
    */
-  @SuppressWarnings({ "unchecked", "null" })
   protected @Nullable T getTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
     if (world instanceof ChunkCache) {
-      if (teClass != null) {
-        TileEntity te = ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
-        if (teClass.isInstance(te)) {
-          return (T) te;
+      final Class<? extends T> teClass2 = teClass;
+      if (teClass2 != null) {
+        TileEntity te = ((ChunkCache) world).getTileEntity(pos, EnumCreateEntityType.CHECK);
+        if (teClass2.isInstance(te)) {
+          return teClass2.cast(te);
         }
       }
       return null;
@@ -187,29 +206,25 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   /**
    * Tries to load any block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess. Will not
    * cause chunk loads.
-   * 
+   *
    */
-  @SuppressWarnings({ "unchecked", "null" })
   public static @Nullable TileEntity getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos) {
     return getAnyTileEntitySafe(world, pos, TileEntity.class);
   }
-  
+
   /**
-   * Tries to load any block's TileEntity if it exists. Will not create the
-   * TileEntity when used in a render thread with the correct IBlockAccess. Will
-   * not cause chunk loads.
-   * 
+   * Tries to load any block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess. Will not
+   * cause chunk loads.
+   *
    */
-  @SuppressWarnings({ "unchecked", "null" })
+  @SuppressWarnings("unchecked")
   public static @Nullable <Q extends TileEntity> Q getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, Class<Q> teClass) {
     TileEntity te = null;
     if (world instanceof ChunkCache) {
-      te = ((ChunkCache) world).func_190300_a(pos, EnumCreateEntityType.CHECK);
+      te = ((ChunkCache) world).getTileEntity(pos, EnumCreateEntityType.CHECK);
     } else if (world instanceof World) {
       if (((World) world).isBlockLoaded(pos)) {
         te = world.getTileEntity(pos);
-      } else {
-        te = null;
       }
     } else {
       te = world.getTileEntity(pos);
@@ -218,7 +233,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
       return (Q) te;
     }
     if (teClass.isInstance(te)) {
-      return (Q) te;
+      return teClass.cast(te);
     }
     return null;
   }
