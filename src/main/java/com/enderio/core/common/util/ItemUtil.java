@@ -105,7 +105,7 @@ public class ItemUtil {
    *          The String to parse.
    * @return An ItemStack the string represents.
    */
-  public static @Nonnull ItemStack parseStringIntoItemStack(String string) {
+  public static @Nonnull ItemStack parseStringIntoItemStack(@Nonnull String string) {
     String value = string;
     int size = 1;
     int numIdx = value.indexOf('#');

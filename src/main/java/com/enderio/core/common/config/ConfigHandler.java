@@ -6,7 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.Locale;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigProcessor.IReloadCallback;
@@ -185,9 +184,8 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   }
 
   public void loadRightClickCrops() {
-    JsonConfigReader<LegacyPlantInfo> reader = new JsonConfigReader<LegacyPlantInfo>(
-        new ModToken(EnderCore.class, EnderCore.MODID.toLowerCase(Locale.US) + "/config"), enderConfigFolder.getAbsolutePath() + "/cropConfig.json",
-        LegacyPlantInfo.class);
+    JsonConfigReader<LegacyPlantInfo> reader = new JsonConfigReader<LegacyPlantInfo>(new ModToken(EnderCore.class, EnderCore.DOMAIN + "/config"),
+        enderConfigFolder.getAbsolutePath() + "/cropConfig.json", LegacyPlantInfo.class);
     for (LegacyPlantInfo i : reader) {
       i.init();
       RightClickCropHandler.INSTANCE.addCrop(i);

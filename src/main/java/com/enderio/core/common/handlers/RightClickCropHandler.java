@@ -40,18 +40,18 @@ public class RightClickCropHandler {
   }
 
   public static class LegacyPlantInfo implements IPlantInfo {
-    public String seedName;
-    public String blockName;
+    public String seed;
+    public String block;
     public int meta = 7;
     public int resetMeta = 0;
 
-    private @Nonnull ItemStack seedStack = ItemStack.EMPTY;
-    private @Nonnull IBlockState grownState = Blocks.AIR.getDefaultState();
-    private @Nonnull IBlockState resetState = Blocks.AIR.getDefaultState();
+    private transient @Nonnull ItemStack seedStack = ItemStack.EMPTY;
+    private transient @Nonnull IBlockState grownState = Blocks.AIR.getDefaultState();
+    private transient @Nonnull IBlockState resetState = Blocks.AIR.getDefaultState();
 
     public LegacyPlantInfo(String seed, String block, int meta, int resetMeta) {
-      this.seedName = seed;
-      this.blockName = block;
+      this.seed = seed;
+      this.block = block;
       this.meta = meta;
       this.resetMeta = resetMeta;
     }
@@ -59,15 +59,15 @@ public class RightClickCropHandler {
     @SuppressWarnings("deprecation")
     @Override
     public void init() {
-      seedStack = ItemUtil.parseStringIntoItemStack(seedName);
-      String[] blockinfo = blockName.split(":");
+      seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier received in IMC message from another mod"));
+      String[] blockinfo = block.split(":");
       if (blockinfo == null || blockinfo.length != 2) {
-        throw new RuntimeException("invalid block specifier '" + blockName + "' received in IMV message from another mod");
+        throw new RuntimeException("invalid block specifier '" + block + "' received in IMC message from another mod");
       }
-      Block block = ForgeRegistries.BLOCKS
+      Block mcblock = ForgeRegistries.BLOCKS
           .getValue(new ResourceLocation(NullHelper.notnullJ(blockinfo[0], "String.split()"), NullHelper.notnullJ(blockinfo[1], "String.split()")));
-      grownState = block.getStateFromMeta(meta);
-      resetState = block.getStateFromMeta(resetMeta);
+      grownState = mcblock.getStateFromMeta(meta);
+      resetState = mcblock.getStateFromMeta(resetMeta);
     }
 
     @Override

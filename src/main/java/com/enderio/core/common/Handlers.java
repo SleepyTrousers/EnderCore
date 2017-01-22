@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 
 import static com.enderio.core.common.Handlers.Handler.Inst.AUTO;
+import static com.enderio.core.common.Handlers.Handler.Inst.CLASS;
 import static com.enderio.core.common.Handlers.Handler.Inst.CONSTRUCTOR;
 import static com.enderio.core.common.Handlers.Handler.Inst.FIELD;
 import static com.enderio.core.common.Handlers.Handler.Inst.METHOD;
@@ -84,18 +86,6 @@ public class Handlers {
   @Target(ElementType.TYPE)
   @Retention(RetentionPolicy.RUNTIME)
   public @interface Handler {
-    @Deprecated
-    public enum HandlerType {
-      /**
-       * Represents the {@link MinecraftForge#EVENT_BUS}
-       */
-      FORGE,
-
-      /**
-       * Represents the {@link FMLCommonHandler#bus()}
-       */
-      FML
-    }
 
     public enum Inst {
       /**
@@ -121,7 +111,12 @@ public class Handlers {
       /**
        * Added for scala compat, not necessary to set explicitly ({@link #AUTO} will find this).
        */
-      SCALA_OBJECT;
+      SCALA_OBJECT,
+
+      /**
+       * The handler is the class object itself.
+       */
+      CLASS;
 
       boolean matches(Inst other) {
         return this == AUTO || other == AUTO || other == this;
@@ -159,12 +154,6 @@ public class Handlers {
         }
       }
     }
-
-    /**
-     * Array of buses to register this handler to. Leave blank for all.
-     */
-    @Deprecated
-    HandlerType[] value() default { HandlerType.FORGE, HandlerType.FML };
 
     /**
      * The method of getting your handler's instance. Defaults to {@link Inst#AUTO}
@@ -277,8 +266,6 @@ public class Handlers {
   }
 
   private static void registerHandler(Class<?> c, ASMData data, Handler handler) throws InstantiationException, IllegalAccessException {
-    EnderCore.logger.info(String.format("[Handlers] Registering handler %s to busses: %s", c.getSimpleName(), Arrays.deepToString(handler.value())));
-
     Object inst = tryInit(handler, c);
 
     Method[] methods = c.getDeclaredMethods();
@@ -303,6 +290,7 @@ public class Handlers {
       }
     }
 
+    EnderCore.logger.info(String.format("[Handlers] Registering handler %s to busses: %s", c.getSimpleName(), Arrays.deepToString(types.toArray())));
     for (HandlerType type : types) {
       type.bus.register(inst);
     }
@@ -347,6 +335,18 @@ public class Handlers {
       }
     }
 
-    throw new RuntimeException("Could not instantiate @Handler class " + c.getName() + " or access INSTANCE field or instance() method.");
+    if (pref.matches(CLASS)) {
+      try {
+        for (Method method : c.getDeclaredMethods()) {
+          if (Modifier.isStatic(method.getModifiers()) && method.isAnnotationPresent(SubscribeEvent.class)) {
+            return c;
+          }
+        }
+      } catch (Exception e) {
+      }
+    }
+
+    throw new RuntimeException(
+        "Could not instantiate @Handler class " + c.getName() + " or access INSTANCE field or instance() method or find static event handlers.");
   }
 }
