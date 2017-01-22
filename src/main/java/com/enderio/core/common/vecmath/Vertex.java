@@ -1,8 +1,10 @@
 package com.enderio.core.common.vecmath;
 
+import javax.annotation.Nonnull;
+
 public class Vertex {
 
-  public Vector3d xyz = new Vector3d();
+  public @Nonnull Vector3d xyz = new Vector3d();
   public Vector2f uv = null;
   public Vector3f normal = null;
   public Vector4f color = null;
@@ -45,8 +47,8 @@ public class Vertex {
   }
 
   public Vertex(double x, double y, double z, double u, double v, float nx, float ny, float nz) {
-    this(x,y,z,u,v);
-    normal = new Vector3f(nx,ny,nz);
+    this(x, y, z, u, v);
+    normal = new Vector3f(nx, ny, nz);
   }
 
   public void setXYZ(double x, double y, double z) {

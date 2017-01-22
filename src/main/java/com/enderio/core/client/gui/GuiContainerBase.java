@@ -3,6 +3,9 @@ package com.enderio.core.client.gui;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Mouse;
 
 import com.enderio.core.api.client.gui.IGuiOverlay;
@@ -13,8 +16,7 @@ import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 import com.enderio.core.client.gui.widget.TextFieldEnder;
 import com.enderio.core.client.gui.widget.VScrollbar;
-import com.enderio.core.client.render.RenderUtil;
-import com.google.common.collect.Lists;
+import com.enderio.core.common.util.NNList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,24 +27,18 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Timer;
 
 public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen {
 
-  protected ToolTipManager ttMan = new ToolTipManager();
-  protected List<IGuiOverlay> overlays = Lists.newArrayList();
-  protected List<TextFieldEnder> textFields = Lists.newArrayList();
-  protected List<VScrollbar> scrollbars = Lists.newArrayList();
-  protected GhostSlotHandler ghostSlotHandler = new GhostSlotHandler();
+  protected @Nonnull ToolTipManager ttMan = new ToolTipManager();
+  protected @Nonnull NNList<IGuiOverlay> overlays = new NNList<IGuiOverlay>();
+  protected @Nonnull NNList<TextFieldEnder> textFields = new NNList<TextFieldEnder>();
+  protected @Nonnull NNList<VScrollbar> scrollbars = new NNList<VScrollbar>();
+  protected @Nonnull GhostSlotHandler ghostSlotHandler = new GhostSlotHandler();
 
-  @Deprecated
-  protected List<GhostSlot> ghostSlots = ghostSlotHandler.getGhostSlots();
-  @Deprecated
-  protected GhostSlot hoverGhostSlot;
+  protected @Nullable VScrollbar draggingScrollbar;
 
-  protected VScrollbar draggingScrollbar;
-
-  protected GuiContainerBase(Container par1Container) {
+  protected GuiContainerBase(@Nonnull Container par1Container) {
     super(par1Container);
   }
 
@@ -78,7 +74,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
         focused = null;
         return;
       } else if (!hideOverlays()) { // Otherwise close overlays/GUI
-        this.mc.thePlayer.closeScreen();
+        this.mc.player.closeScreen();
         return;
       }
     }
@@ -113,7 +109,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     // Finally if 'e' was pressed but not captured by a text field, close the overlays/GUI
     if (key == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
       if (!hideOverlays()) {
-        this.mc.thePlayer.closeScreen();
+        this.mc.player.closeScreen();
       }
       return;
     }
@@ -122,13 +118,13 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     super.keyTyped(c, key);
   }
 
-  protected final void setText(TextFieldEnder tf, String newText) {
+  protected final void setText(@Nonnull TextFieldEnder tf, @Nonnull String newText) {
     String old = tf.getText();
     tf.setText(newText);
     onTextFieldChanged(tf, old);
   }
 
-  protected void onTextFieldChanged(TextFieldEnder tf, String old) {
+  protected void onTextFieldChanged(@Nonnull TextFieldEnder tf, @Nonnull String old) {
 
   }
 
@@ -143,14 +139,14 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void addToolTip(GuiToolTip toolTip) {
+  public void addToolTip(@Nonnull GuiToolTip toolTip) {
     ttMan.addToolTip(toolTip);
   }
 
   @Override
   public void updateScreen() {
     super.updateScreen();
-    
+
     for (GuiTextField f : textFields) {
       f.updateCursorCounter();
     }
@@ -186,13 +182,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public List<GhostSlot> getGhostSlots() {
-    return ghostSlotHandler.getGhostSlots();
-  }
-
-  @Deprecated
-  protected void ghostSlotClicked(GhostSlot slot, int x, int y, int button) {
-    ghostSlotHandler.ghostSlotClicked(this, slot, x, y, button);
+  public @Nonnull GhostSlotHandler getGhostSlotHandler() {
+    return ghostSlotHandler;
   }
 
   @Override
@@ -212,10 +203,10 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
         }
       }
     }
-    if (!ghostSlotHandler.getGhostSlots().isEmpty()) {
-      GhostSlot slot = getGhostSlot(x, y);
+    if (!getGhostSlotHandler().getGhostSlots().isEmpty()) {
+      GhostSlot slot = getGhostSlotHandler().getGhostSlotAt(this, x, y);
       if (slot != null) {
-        ghostSlotClicked(slot, x, y, button);
+        getGhostSlotHandler().ghostSlotClicked(this, slot, x, y, button);
         return;
       }
     }
@@ -244,11 +235,11 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   protected void mouseReleased(int x, int y, int button) {
-      if (draggingScrollbar != null) {
-          draggingScrollbar.mouseMovedOrUp(x, y, button);
-          draggingScrollbar = null;
-      }
-      super.mouseReleased(x, y, button);
+    if (draggingScrollbar != null) {
+      draggingScrollbar.mouseMovedOrUp(x, y, button);
+      draggingScrollbar = null;
+    }
+    super.mouseReleased(x, y, button);
   }
 
   @Override
@@ -266,32 +257,32 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
         vs.mouseWheel(x, y, delta);
       }
     }
-    if (!ghostSlotHandler.getGhostSlots().isEmpty()) {
-      GhostSlot slot = getGhostSlot(x, y);
+    if (!getGhostSlotHandler().getGhostSlots().isEmpty()) {
+      GhostSlot slot = getGhostSlotHandler().getGhostSlotAt(this, x, y);
       if (slot != null) {
-        ghostSlotClicked(slot, x, y, delta < 0 ? -1 : -2);
+        getGhostSlotHandler().ghostSlotClicked(this, slot, x, y, delta < 0 ? -1 : -2);
       }
     }
   }
 
-  protected void actionPerformedButton(IconButton btn, int mouseButton) throws IOException {
+  protected void actionPerformedButton(@Nonnull IconButton btn, int mouseButton) throws IOException {
     actionPerformed(btn);
   }
 
-  public void addOverlay(IGuiOverlay overlay) {
+  public void addOverlay(@Nonnull IGuiOverlay overlay) {
     overlays.add(overlay);
   }
 
-  public void removeOverlay(IGuiOverlay overlay) {
+  public void removeOverlay(@Nonnull IGuiOverlay overlay) {
     overlays.remove(overlay);
   }
 
-  public void addScrollbar(VScrollbar vs) {
+  public void addScrollbar(@Nonnull VScrollbar vs) {
     scrollbars.add(vs);
     vs.adjustPosition();
   }
 
-  public void removeScrollbar(VScrollbar vs) {
+  public void removeScrollbar(@Nonnull VScrollbar vs) {
     scrollbars.remove(vs);
     if (draggingScrollbar == vs) {
       draggingScrollbar = null;
@@ -304,24 +295,20 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   protected final void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
     drawForegroundImpl(mouseX, mouseY);
 
-    Timer t = RenderUtil.getTimer();
-
-    if (t != null) {
-      GlStateManager.pushMatrix();
-      GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-      GlStateManager.disableDepth();
-      zLevel = 300.0F;
-      itemRender.zLevel = 300.0F;
-      for (IGuiOverlay overlay : overlays) {
-        if (overlay != null && overlay.isVisible()) {
-          overlay.draw(realMx, realMy, t.renderPartialTicks);
-        }
+    GlStateManager.pushMatrix();
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.disableDepth();
+    zLevel = 300.0F;
+    itemRender.zLevel = 300.0F;
+    for (IGuiOverlay overlay : overlays) {
+      if (overlay != null && overlay.isVisible()) {
+        overlay.draw(realMx, realMy, mc.getRenderPartialTicks());
       }
-      zLevel = 0F;
-      itemRender.zLevel = 0F;
-      GlStateManager.enableDepth();      
-      GlStateManager.popMatrix();
     }
+    zLevel = 0F;
+    itemRender.zLevel = 0F;
+    GlStateManager.enableDepth();
+    GlStateManager.popMatrix();
   }
 
   @Override
@@ -335,7 +322,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
       }
     }
     if (!ghostSlotHandler.getGhostSlots().isEmpty()) {
-      drawGhostSlots(mouseX, mouseY);
+      getGhostSlotHandler().drawGhostSlots(this, mouseX, mouseY);
     }
   }
 
@@ -343,7 +330,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public void drawScreen(int par1, int par2, float par3) {
     int mx = realMx = par1;
     int my = realMy = par2;
-    
+
     super.drawScreen(mx, my, par3);
 
     if (draggingScrollbar == null) {
@@ -352,92 +339,72 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     }
   }
 
-//copied from super with hate
-  protected void drawItemStack(ItemStack stack, int mouseX, int mouseY, String str) {
-      if (stack == null) {
-          return;
-      }
+  // copied from super with hate
+  protected void drawItemStack(@Nonnull ItemStack stack, int mouseX, int mouseY, String str) {
+    if (stack.isEmpty()) {
+      return;
+    }
 
-      GlStateManager.translate(0.0F, 0.0F, 32.0F);
-      zLevel = 200.0F;
-      itemRender.zLevel = 200.0F;
-      FontRenderer font = null;
-      font = stack.getItem().getFontRenderer(stack);
-      if (font == null) {
-          font = fontRendererObj;
-      }
-      itemRender.renderItemIntoGUI(stack, mouseX, mouseY);
-      itemRender.renderItemOverlayIntoGUI(font, stack, mouseX, mouseY, str);
-      zLevel = 0.0F;
-      itemRender.zLevel = 0.0F;
+    GlStateManager.translate(0.0F, 0.0F, 32.0F);
+    zLevel = 200.0F;
+    itemRender.zLevel = 200.0F;
+    FontRenderer font = null;
+    font = stack.getItem().getFontRenderer(stack);
+    if (font == null) {
+      font = fontRendererObj;
+    }
+    itemRender.renderItemIntoGUI(stack, mouseX, mouseY);
+    itemRender.renderItemOverlayIntoGUI(font, stack, mouseX, mouseY, str);
+    zLevel = 0.0F;
+    itemRender.zLevel = 0.0F;
   }
 
   protected void drawFakeItemsStart() {
-      zLevel = 100.0F;
-      itemRender.zLevel = 100.0F;
+    zLevel = 100.0F;
+    itemRender.zLevel = 100.0F;
 
-      GlStateManager.enableLighting();
-      GlStateManager.enableRescaleNormal();
-      GlStateManager.enableDepth();
-      RenderHelper.enableGUIStandardItemLighting();
+    GlStateManager.enableLighting();
+    GlStateManager.enableRescaleNormal();
+    GlStateManager.enableDepth();
+    RenderHelper.enableGUIStandardItemLighting();
   }
 
-  protected void drawFakeItemStack(int x, int y, ItemStack stack) {
-      //itemRender.renderItemIntoGUI(stack, x, y);
+  protected void drawFakeItemStack(int x, int y, @Nonnull ItemStack stack) {
     itemRender.renderItemAndEffectIntoGUI(stack, x, y);
   }
-  
-  public void drawFakeItemStackStdOverlay(int x, int y, ItemStack stack) {
-    itemRender.renderItemOverlayIntoGUI(fontRendererObj, stack, x, y, null);      
+
+  public void drawFakeItemStackStdOverlay(int x, int y, @Nonnull ItemStack stack) {
+    itemRender.renderItemOverlayIntoGUI(fontRendererObj, stack, x, y, null);
   }
 
   protected void drawFakeItemHover(int x, int y) {
-    GlStateManager.disableLighting();    
+    GlStateManager.disableLighting();
     GlStateManager.disableDepth();
-    GlStateManager.colorMask(true, true, true, false);    
+    GlStateManager.colorMask(true, true, true, false);
     drawGradientRect(x, y, x + 16, y + 16, 0x80FFFFFF, 0x80FFFFFF);
-    GlStateManager.colorMask(true, true, true, true);    
+    GlStateManager.colorMask(true, true, true, true);
     GlStateManager.enableDepth();
-    
+
     GlStateManager.enableLighting();
   }
 
-  protected void drawFakeItemsEnd() {    
+  protected void drawFakeItemsEnd() {
     itemRender.zLevel = 0.0F;
     zLevel = 0.0F;
   }
 
   @Override
-  public void renderToolTip(ItemStack p_146285_1_, int p_146285_2_, int p_146285_3_) {
+  public void renderToolTip(@Nonnull ItemStack p_146285_1_, int p_146285_2_, int p_146285_3_) {
     super.renderToolTip(p_146285_1_, p_146285_2_, p_146285_3_);
   }
 
-  @Deprecated
-  protected void drawGhostSlotTooltip(GhostSlot slot, int mouseX, int mouseY) {
-    ghostSlotHandler.drawGhostSlotTooltip(this, slot, mouseX, mouseY);
-  }
-
   /**
-   * Override this to allow GhostSlots to gray out with a custom background. Not
-   * needed if the slot has the default "Minecraft-gray" background---but it may
-   * be nicer to texture pack creators.
+   * Return the current texture to allow GhostSlots to gray out by over-painting the slot background.
    */
-  protected String getGuiTexture() {
-    return null;
-  }
-
-  @Deprecated
-  protected void drawGhostSlots(int mouseX, int mouseY) {
-    ghostSlotHandler.drawGhostSlots(this, mouseX, mouseY);
-  }
-
-  @Deprecated
-  protected GhostSlot getGhostSlot(int mouseX, int mouseY) {
-    return ghostSlotHandler.getGhostSlot(this, mouseX, mouseY);
-  }
+  protected abstract @Nonnull String getGuiTexture();
 
   @Override
-  public boolean removeToolTip(GuiToolTip toolTip) {
+  public boolean removeToolTip(@Nonnull GuiToolTip toolTip) {
     return ttMan.removeToolTip(toolTip);
   }
 
@@ -446,7 +413,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void drawHoveringToolTipText(List<String> par1List, int par2, int par3, FontRenderer font) {
+  public void drawHoveringToolTipText(@Nonnull List<String> par1List, int par2, int par3, @Nonnull FontRenderer font) {
     super.drawHoveringText(par1List, par2, par3, font);
   }
 
@@ -491,19 +458,20 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public FontRenderer getFontRenderer() {
+  public @Nonnull FontRenderer getFontRenderer() {
     return Minecraft.getMinecraft().fontRendererObj;
   }
 
   @Override
-  public void addButton(GuiButton button) {
+  public @Nonnull <T extends GuiButton> T addButton(@Nonnull T button) {
     if (!buttonList.contains(button)) {
       buttonList.add(button);
     }
+    return button;
   }
 
   @Override
-  public void removeButton(GuiButton button) {
+  public void removeButton(@Nonnull GuiButton button) {
     buttonList.remove(button);
   }
 
@@ -513,20 +481,19 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   @Override
-  public void doActionPerformed(GuiButton guiButton) throws IOException {
+  public void doActionPerformed(@Nonnull GuiButton guiButton) throws IOException {
     actionPerformed(guiButton);
   }
-  
+
   @Override
-  public void clearToolTips() {    
+  public void clearToolTips() {
   }
 
   @Override
   public void onGuiClosed() {
-      for (IGuiOverlay overlay : overlays) {
-          overlay.guiClosed();
-      }
+    for (IGuiOverlay overlay : overlays) {
+      overlay.guiClosed();
+    }
   }
-  
-}
 
+}

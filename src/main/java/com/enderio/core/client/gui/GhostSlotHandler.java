@@ -2,12 +2,13 @@ package com.enderio.core.client.gui;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.render.RenderUtil;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
-
-import static com.enderio.core.client.render.EnderWidget.NEUTRAL_SLOT_BACKGROUND;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -15,23 +16,23 @@ import net.minecraft.item.ItemStack;
 
 public class GhostSlotHandler {
 
-  protected List<GhostSlot> ghostSlots = Lists.newArrayList();
-  protected GhostSlot hoverGhostSlot;
+  protected final @Nonnull List<GhostSlot> ghostSlots = Lists.newArrayList();
+  protected @Nullable GhostSlot hoverGhostSlot;
 
   public GhostSlotHandler() {
   }
 
   // GhostSlot managing
 
-  protected List<GhostSlot> getGhostSlots() {
+  protected @Nonnull List<GhostSlot> getGhostSlots() {
     return ghostSlots;
   }
 
-  protected GhostSlot getGhostSlot(GuiContainerBase guiContainerBase, int mouseX, int mouseY) {
-    mouseX -= guiContainerBase.getGuiLeft();
-    mouseY -= guiContainerBase.getGuiTop();
+  protected GhostSlot getGhostSlotAt(@Nonnull GuiContainerBase guiContainerBase, int mouseX, int mouseY) {
+    int mX = mouseX - guiContainerBase.getGuiLeft();
+    int mY = mouseY - guiContainerBase.getGuiTop();
     for (GhostSlot slot : ghostSlots) {
-      if (slot.isVisible() && slot.isMouseOver(mouseX, mouseY)) {
+      if (slot.isVisible() && slot.isMouseOver(mX, mY)) {
         return slot;
       }
     }
@@ -42,7 +43,7 @@ public class GhostSlotHandler {
 
   /**
    * Called when a ghost slot is clicked or mouse wheeled.
-   * 
+   *
    * @param gui
    *          The GUI the GhostSlot is in
    * @param slot
@@ -52,11 +53,10 @@ public class GhostSlotHandler {
    * @param y
    *          Mouse position y
    * @param button
-   *          The button used (0=left, 1=right). The mouse wheel is mapped to
-   *          -1=down and -2=up.
+   *          The button used (0=left, 1=right). The mouse wheel is mapped to -1=down and -2=up.
    */
-  protected void ghostSlotClicked(GuiContainerBase gui, GhostSlot slot, int x, int y, int button) {
-    ItemStack handStack = Minecraft.getMinecraft().thePlayer.inventory.getItemStack();
+  protected void ghostSlotClicked(@Nonnull GuiContainerBase gui, @Nonnull GhostSlot slot, int x, int y, int button) {
+    ItemStack handStack = Minecraft.getMinecraft().player.inventory.getItemStack();
     ItemStack existingStack = slot.getStack();
     if (button == 0) { // left
       ghostSlotClickedPrimaryMouseButton(slot, handStack, existingStack);
@@ -69,15 +69,15 @@ public class GhostSlotHandler {
     }
   }
 
-  protected void ghostSlotClickedPrimaryMouseButton(GhostSlot slot, ItemStack handStack, ItemStack existingStack) {
-    if (handStack == null || handStack.getItem() == null || handStack.stackSize == 0) { // empty hand
-      slot.putStack(null);
+  protected void ghostSlotClickedPrimaryMouseButton(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack, @Nonnull ItemStack existingStack) {
+    if (handStack.isEmpty()) { // empty hand
+      slot.putStack(ItemStack.EMPTY, 0);
     } else { // item in hand
-      if (existingStack == null || existingStack.getItem() == null || existingStack.stackSize == 0) { // empty slot
+      if (existingStack.isEmpty()) { // empty slot
         replaceSlot(slot, handStack);
       } else { // filled slot
         if (ItemUtil.areStackMergable(existingStack, handStack)) { // same item
-          if (existingStack.stackSize < existingStack.getMaxStackSize() && existingStack.stackSize < slot.getStackSizeLimit()) {
+          if (existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < slot.getStackSizeLimit()) {
             increaseSlot(slot, existingStack);
           } else {
             // NOP
@@ -89,11 +89,11 @@ public class GhostSlotHandler {
     }
   }
 
-  protected void ghostSlotClickedSecondaryMouseButton(GhostSlot slot, ItemStack handStack, ItemStack existingStack) {
-    if (handStack == null || handStack.getItem() == null || handStack.stackSize == 0) { // empty hand
-      slot.putStack(null);
+  protected void ghostSlotClickedSecondaryMouseButton(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack, @Nonnull ItemStack existingStack) {
+    if (handStack.isEmpty()) { // empty hand
+      slot.putStack(ItemStack.EMPTY, 0);
     } else { // item in hand
-      if (existingStack == null || existingStack.getItem() == null || existingStack.stackSize == 0) { // empty slot
+      if (existingStack.isEmpty()) { // empty slot
         replaceSlot1Item(slot, handStack);
       } else { // filled slot
         if (ItemUtil.areStackMergable(existingStack, handStack)) { // same item
@@ -105,84 +105,80 @@ public class GhostSlotHandler {
     }
   }
 
-  protected void ghostSlotClickedMouseWheelUp(GhostSlot slot, ItemStack handStack, ItemStack existingStack) {
-    if (existingStack != null && existingStack.getItem() != null && existingStack.stackSize > 0 && existingStack.stackSize < existingStack.getMaxStackSize()
-        && existingStack.stackSize < slot.getStackSizeLimit()) {
+  protected void ghostSlotClickedMouseWheelUp(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack, @Nonnull ItemStack existingStack) {
+    if (!existingStack.isEmpty() && existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < slot.getStackSizeLimit()) {
       increaseSlot(slot, existingStack);
     }
   }
 
-  protected void ghostSlotClickedMouseWheelDown(GhostSlot slot, ItemStack handStack, ItemStack existingStack) {
-    if (existingStack != null && existingStack.getItem() != null) {
+  protected void ghostSlotClickedMouseWheelDown(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack, @Nonnull ItemStack existingStack) {
+    if (!existingStack.isEmpty()) {
       descreaseSlot(slot, existingStack);
     }
   }
 
   // Slot interaction tools
 
-  protected void descreaseSlot(GhostSlot slot, ItemStack existingStack) {
-    if (existingStack.stackSize > 1) {
-      existingStack.stackSize--;
-      slot.putStack(existingStack);
-    } else {
-      slot.putStack(null);
-    }
+  protected void descreaseSlot(@Nonnull GhostSlot slot, @Nonnull ItemStack existingStack) {
+    existingStack.shrink(1);
+    slot.putStack(existingStack, existingStack.getCount());
   }
 
-  protected void increaseSlot(GhostSlot slot, ItemStack existingStack) {
-    existingStack.stackSize++;
-    slot.putStack(existingStack);
+  protected void increaseSlot(@Nonnull GhostSlot slot, @Nonnull ItemStack existingStack) {
+    existingStack.grow(1);
+    slot.putStack(existingStack, existingStack.getCount());
   }
 
-  protected void replaceSlot1Item(GhostSlot slot, ItemStack handStack) {
+  protected void replaceSlot1Item(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack) {
     ItemStack oneItem = handStack.copy();
-    oneItem.stackSize = 1;
-    slot.putStack(oneItem);
+    oneItem.setCount(1);
+    slot.putStack(oneItem, oneItem.getCount());
   }
 
-  protected void replaceSlot(GhostSlot slot, ItemStack handStack) {
-    if (handStack.stackSize <= slot.getStackSizeLimit()) {
-      slot.putStack(handStack);
+  protected void replaceSlot(@Nonnull GhostSlot slot, @Nonnull ItemStack handStack) {
+    if (handStack.getCount() <= slot.getStackSizeLimit()) {
+      slot.putStack(handStack, handStack.getCount());
     } else {
       ItemStack tmp = handStack.copy();
-      tmp.stackSize = slot.getStackSizeLimit();
-      slot.putStack(tmp);
+      tmp.setCount(slot.getStackSizeLimit());
+      slot.putStack(tmp, tmp.getCount());
     }
   }
 
   // Rendering
 
-  protected void startDrawing(GuiContainerBase gui) {
-    gui.hoverGhostSlot = hoverGhostSlot = null;
+  protected void startDrawing(@Nonnull GuiContainerBase gui) {
+    hoverGhostSlot = null;
   }
 
-  protected void drawGhostSlots(GuiContainerBase gui, int mouseX, int mouseY) {
+  protected void drawGhostSlots(@Nonnull GuiContainerBase gui, int mouseX, int mouseY) {
     int sx = gui.getGuiLeft();
     int sy = gui.getGuiTop();
     gui.drawFakeItemsStart();
     try {
-      gui.hoverGhostSlot = hoverGhostSlot = null;
+      hoverGhostSlot = null;
       for (GhostSlot slot : ghostSlots) {
         ItemStack stack = slot.getStack();
         if (slot.isVisible()) {
-          if (stack != null) {
+          if (!stack.isEmpty()) {
             gui.drawFakeItemStack(slot.x + sx, slot.y + sy, stack);
             if (slot.shouldDisplayStdOverlay()) {
-                  
+
               gui.drawFakeItemStackStdOverlay(slot.x + sx, slot.y + sy, stack);
             }
             if (slot.shouldGrayOut()) {
-              gui.ghostSlotHandler.drawGhostSlotGrayout(gui, slot);
+              drawGhostSlotGrayout(gui, slot);
             }
           }
           if (slot.isMouseOver(mouseX - sx, mouseY - sy)) {
-            gui.hoverGhostSlot = hoverGhostSlot = slot;
+            hoverGhostSlot = slot;
           }
         }
       }
-      if (hoverGhostSlot != null) {
+      final GhostSlot hoverGhostSlot2 = hoverGhostSlot;
+      if (hoverGhostSlot2 != null) {
         // draw hover last to prevent it from affecting rendering of other slots ...
-        gui.drawFakeItemHover(hoverGhostSlot.x + sx, hoverGhostSlot.y + sy);
+        gui.drawFakeItemHover(hoverGhostSlot2.x + sx, hoverGhostSlot2.y + sy);
       }
     } finally {
       gui.drawFakeItemsEnd();
@@ -190,37 +186,27 @@ public class GhostSlotHandler {
   }
 
   /**
-   * Gray out the item that was just painted into a GhostSlot by overpainting it
-   * with 50% transparent background. This gives the illusion that the item was
+   * Gray out the item that was just painted into a GhostSlot by over-painting it with 50% transparent background. This gives the illusion that the item was
    * painted with 50% transparency. (100%*a ° 100%*b ° 50%*a == 100%*a ° 50%*b)
    */
-  protected void drawGhostSlotGrayout(GuiContainerBase gui, GhostSlot slot) {
+  protected void drawGhostSlotGrayout(@Nonnull GuiContainerBase gui, @Nonnull GhostSlot slot) {
     GlStateManager.disableDepth();
-    GlStateManager.enableBlend();    
+    GlStateManager.enableBlend();
     GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
     String guiTexture = gui.getGuiTexture();
-    if (guiTexture == null) {
-      NEUTRAL_SLOT_BACKGROUND.getMap().render(NEUTRAL_SLOT_BACKGROUND, gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, gui.getZlevel(), true);
-    } else {
-      RenderUtil.bindTexture(guiTexture);
-      gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
-    }
+    RenderUtil.bindTexture(guiTexture);
+    gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
     GlStateManager.disableBlend();
-    GlStateManager.enableDepth();  
+    GlStateManager.enableDepth();
   }
 
-
-  protected void drawGhostSlotTooltip(GuiContainerBase guiContainerBase, GhostSlot slot, int mouseX, int mouseY) {
-    ItemStack stack = slot.getStack();
-    if (stack != null) {
-      guiContainerBase.renderToolTip(stack, mouseX, mouseY);
-    }
-  }
-
-
-  protected void drawGhostSlotToolTip(GuiContainerBase gui, int mouseX, int mouseY) {
-    if (hoverGhostSlot != null && gui.mc.thePlayer.inventory.getItemStack() == null) {
-      gui.drawGhostSlotTooltip(hoverGhostSlot, mouseX, mouseY);
+  protected void drawGhostSlotToolTip(@Nonnull GuiContainerBase gui, int mouseX, int mouseY) {
+    final GhostSlot hoverGhostSlot2 = hoverGhostSlot;
+    if (hoverGhostSlot2 != null && !gui.mc.player.inventory.getItemStack().isEmpty()) {
+      ItemStack stack = hoverGhostSlot2.getStack();
+      if (!stack.isEmpty()) {
+        gui.renderToolTip(stack, mouseX, mouseY);
+      }
     }
 
   }

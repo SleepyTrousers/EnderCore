@@ -1,5 +1,7 @@
 package com.enderio.core.client.render;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.vecmath.Vector3d;
 
 import net.minecraft.util.EnumFacing;
@@ -9,14 +11,14 @@ public class VertexRotationFacing extends VertexRotation {
 
   private static final double ROTATION_AMOUNT = Math.PI / 2;
 
-  private EnumFacing defaultDir;
+  private final @Nonnull EnumFacing defaultDir;
 
-  public VertexRotationFacing(EnumFacing defaultDir) {
+  public VertexRotationFacing(@Nonnull EnumFacing defaultDir) {
     super(0, new Vector3d(0, 0.5, 0), new Vector3d(0, 0, 0));
     this.defaultDir = defaultDir;
   }
 
-  public void setRotation(EnumFacing dir) {
+  public void setRotation(@Nonnull EnumFacing dir) {
     if (dir == defaultDir) {
       setAngle(0);
     } else if (dir == defaultDir.getOpposite()) {
@@ -28,11 +30,11 @@ public class VertexRotationFacing extends VertexRotation {
     }
   }
 
-  public EnumFacing rotate(EnumFacing dir) {
+  public EnumFacing rotate(@Nonnull EnumFacing dir) {
     if (dir.getFrontOffsetY() != 0) {
       return dir;
     }
-    if (getAngle() == ROTATION_AMOUNT) {      
+    if (getAngle() == ROTATION_AMOUNT) {
       return dir.rotateAround(Axis.Y);
     }
     if (getAngle() == ROTATION_AMOUNT * 2) {

@@ -1,5 +1,7 @@
 package com.enderio.core.client.gui.button;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.RenderUtil;
@@ -16,13 +18,13 @@ public class ItemButton extends GuiButton {
   public static final int DEFAULT_HEIGHT = 24;
   public static final int HHEIGHT = DEFAULT_HEIGHT / 2;
 
-  private ItemStack item;
+  private @Nonnull ItemStack item;
 
   protected int hwidth;
   protected int hheight;
 
-  public ItemButton(int id, int x, int y, Item item) {
-    super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");    
+  public ItemButton(int id, int x, int y, @Nonnull Item item) {
+    super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
     this.item = new ItemStack(item, 1, 0);
     hwidth = HWIDTH;
     hheight = HHEIGHT;
@@ -38,9 +40,8 @@ public class ItemButton extends GuiButton {
   /**
    * Draws this button to the screen.
    */
-  @SuppressWarnings("synthetic-access")
   @Override
-  public void drawButton(Minecraft par1Minecraft, int par2, int par3) {
+  public void drawButton(@Nonnull Minecraft par1Minecraft, int par2, int par3) {
     if (visible) {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
@@ -61,7 +62,7 @@ public class ItemButton extends GuiButton {
       mouseDragged(par1Minecraft, par2, par3);
 
       int xLoc = xPosition + hwidth - 8;
-      int yLoc = yPosition + hheight - 10;      
+      int yLoc = yPosition + hheight - 10;
       par1Minecraft.getRenderItem().renderItemIntoGUI(item, xLoc, yLoc);
     }
   }

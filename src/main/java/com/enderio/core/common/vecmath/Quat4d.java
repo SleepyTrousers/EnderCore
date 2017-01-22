@@ -1,8 +1,10 @@
 package com.enderio.core.common.vecmath;
 
+import javax.annotation.Nonnull;
+
 public class Quat4d {
 
-  public static Quat4d makeRotate(double angle, Vector3d axis) {
+  public static @Nonnull Quat4d makeRotate(double angle, Vector3d axis) {
     double epsilon = 0.0000001;
 
     double x = axis.x;

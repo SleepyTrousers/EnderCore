@@ -1,5 +1,7 @@
 package com.enderio.core.client.gui;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.IconUtil;
@@ -8,6 +10,7 @@ import com.enderio.core.client.render.RenderUtil;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
 public class GuiIconRenderer extends Gui {
@@ -22,26 +25,26 @@ public class GuiIconRenderer extends Gui {
   protected int width = DEFAULT_WIDTH;
   protected int height = DEFAULT_HEIGHT;
 
-  protected TextureAtlasSprite icon;
-  protected ResourceLocation texture;
+  protected @Nonnull TextureAtlasSprite icon;
+  protected @Nonnull ResourceLocation texture;
 
   private int yPosition;
   private int xPosition;
 
   private float alpha = 1.0f;
 
-  public GuiIconRenderer(int x, int y, int itemId, int itemMeta) {
+  public GuiIconRenderer(int x, int y, @Nonnull Item item, int itemMeta) {
     xPosition = x;
     yPosition = y;
-    icon = IconUtil.getIconForItem(itemId, itemMeta);
+    icon = IconUtil.getIconForItem(item, itemMeta);
     texture = RenderUtil.BLOCK_TEX;
   }
 
-  public GuiIconRenderer(int x, int y, TextureAtlasSprite icon, ResourceLocation texture) {
+  public GuiIconRenderer(int x, int y, @Nonnull TextureAtlasSprite icon, @Nonnull ResourceLocation texture) {
     xPosition = x;
     yPosition = y;
     this.icon = icon;
-    this.texture = texture;    
+    this.texture = texture;
   }
 
   public void setSize(int width, int height) {
@@ -59,7 +62,7 @@ public class GuiIconRenderer extends Gui {
     return height;
   }
 
-  public TextureAtlasSprite getIcon() {
+  public @Nonnull TextureAtlasSprite getIcon() {
     return icon;
   }
 
@@ -71,24 +74,23 @@ public class GuiIconRenderer extends Gui {
     this.alpha = alpha;
   }
 
-  public void setIcon(TextureAtlasSprite icon) {
+  public void setIcon(@Nonnull TextureAtlasSprite icon) {
     this.icon = icon;
   }
 
-  public ResourceLocation getTexture() {
+  public @Nonnull ResourceLocation getTexture() {
     return texture;
   }
 
-  public void setTexture(ResourceLocation textureName) {
+  public void setTexture(@Nonnull ResourceLocation textureName) {
     this.texture = textureName;
   }
 
   public void draw() {
-
     GlStateManager.color(1.0F, 1.0F, 1.0F, alpha);
     GlStateManager.pushAttrib();
     GlStateManager.enableBlend();
-    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);    
+    GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
     RenderUtil.bindTexture(texture);
     drawTexturedModalRect(xPosition, yPosition, icon, width, height);

@@ -7,12 +7,12 @@ import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.common.util.Log;
 
-public class GlState {
+public class GlStateDiagnosticsHelper {
 
   private final Set<String> before = getGLStates();
   private final String location;
 
-  public GlState(String location) {
+  public GlStateDiagnosticsHelper(String location) {
     this.location = location;
   }
 

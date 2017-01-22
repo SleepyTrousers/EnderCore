@@ -1,5 +1,8 @@
 package com.enderio.core.client.gui.button;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -8,7 +11,7 @@ public class IconToggleButton extends IIconButton {
 
   private boolean selected = false;
 
-  public IconToggleButton(FontRenderer fr, int id, int x, int y, TextureAtlasSprite icon, ResourceLocation texture) {
+  public IconToggleButton(@Nonnull FontRenderer fr, int id, int x, int y, @Nullable TextureAtlasSprite icon, @Nullable ResourceLocation texture) {
     super(fr, id, x, y, icon, texture);
   }
 

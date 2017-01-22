@@ -3,6 +3,9 @@ package com.enderio.core.client.gui.widget;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -22,7 +25,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public abstract class GuiScrollableList<T> {
 
-  private final Minecraft mc = Minecraft.getMinecraft();
+  private final @Nonnull Minecraft mc = Minecraft.getMinecraft();
 
   protected int originX;
   protected int originY;
@@ -39,10 +42,6 @@ public abstract class GuiScrollableList<T> {
 
   private int scrollDownButtonID;
 
-  protected int mouseX;
-
-  protected int mouseY;
-
   private float initialClickY = -2.0F;
 
   private float scrollMultiplier;
@@ -57,7 +56,7 @@ public abstract class GuiScrollableList<T> {
 
   protected int margin = 2;
 
-  protected List<ListSelectionListener<T>> listeners = new CopyOnWriteArrayList<ListSelectionListener<T>>();
+  protected @Nonnull List<ListSelectionListener<T>> listeners = new CopyOnWriteArrayList<ListSelectionListener<T>>();
 
   public GuiScrollableList(int width, int height, int originX, int originY, int slotHeight) {
     this.width = width;
@@ -72,26 +71,26 @@ public abstract class GuiScrollableList<T> {
     maxX = minX + width;
   }
 
-  public void onGuiInit(IGuiScreen gui) {
+  public void onGuiInit(@Nonnull IGuiScreen gui) {
     minY = originY + gui.getGuiTop();
     maxY = minY + height;
     minX = originX + gui.getGuiLeft();
     maxX = minX + width;
   }
 
-  public void addSelectionListener(ListSelectionListener<T> listener) {
+  public void addSelectionListener(@Nonnull ListSelectionListener<T> listener) {
     listeners.add(listener);
   }
 
-  public void removeSelectionListener(ListSelectionListener<T> listener) {
+  public void removeSelectionListener(@Nonnull ListSelectionListener<T> listener) {
     listeners.remove(listener);
   }
 
-  public T getSelectedElement() {
+  public @Nonnull T getSelectedElement() {
     return getElementAt(selectedIndex);
   }
 
-  public void setSelection(T selection) {
+  public void setSelection(@Nonnull T selection) {
     setSelection(getIndexOf(selection));
   }
 
@@ -105,7 +104,7 @@ public abstract class GuiScrollableList<T> {
     }
   }
 
-  public int getIndexOf(T element) {
+  public int getIndexOf(@Nullable T element) {
     if (element == null) {
       return -1;
     }
@@ -117,11 +116,11 @@ public abstract class GuiScrollableList<T> {
     return -1;
   }
 
-  public abstract T getElementAt(int index);
+  public abstract @Nonnull T getElementAt(int index);
 
   public abstract int getNumElements();
 
-  protected abstract void drawElement(int elementIndex, int x, int y, int height, VertexBuffer renderer);
+  protected abstract void drawElement(int elementIndex, int x, int y, int h, @Nonnull VertexBuffer renderer);
 
   protected boolean elementClicked(int elementIndex, boolean doubleClick, int elementX, int elementY) {
     return true;
@@ -157,7 +156,7 @@ public abstract class GuiScrollableList<T> {
     return getContentHeight() - (height - margin);
   }
 
-  public void actionPerformed(GuiButton b) {
+  public void actionPerformed(@Nonnull GuiButton b) {
     if (b.enabled) {
       if (b.id == scrollUpButtonID) {
         amountScrolled -= slotHeight * 2 / 3;
@@ -170,28 +169,24 @@ public abstract class GuiScrollableList<T> {
       }
     }
   }
-  
-  public T getElementAt(int mouseX, int mnouseY) {
-    if (mouseY >= minY && mouseY <= maxY && mouseX >= minX && mouseX <= maxX + 6) {
-      int y = mouseY - minY + (int) amountScrolled - margin;
+
+  public T getElementAt(int mX, int mY) {
+    if (mY >= minY && mY <= maxY && mX >= minX && mX <= maxX + 6) {
+      int y = mY - minY + (int) amountScrolled - margin;
       int mouseOverElement = y / slotHeight;
-      if (mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {       
-        return getElementAt(mouseOverElement);  
+      if (mX >= minX && mX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
+        return getElementAt(mouseOverElement);
       }
     }
-    return null;    
+    return null;
   }
 
   /**
-   * draws the slot to the screen, pass in mouse's current x and y and partial
-   * ticks
+   * draws the slot to the screen, pass in mouse's current x and y and partial ticks
    */
   public void drawScreen(int mX, int mY, float partialTick) {
-    this.mouseX = mX;
-    this.mouseY = mY;
-    
-    if(mX >= minY && mY <= maxY) {
-      processMouseEvents();
+    if (mX >= minY && mY <= maxY) {
+      processMouseEvents(mX, mY);
     }
 
     clampScrollToBounds();
@@ -199,41 +194,41 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.disableLighting();
     GlStateManager.disableFog();
 
-    ScaledResolution sr = new ScaledResolution(mc);
-    int sx = minX * sr.getScaleFactor();
-    int sw = width * sr.getScaleFactor();
-    int sy = mc.displayHeight - maxY * sr.getScaleFactor();
-    int sh = height * sr.getScaleFactor();
+    final @Nonnull ScaledResolution sr = new ScaledResolution(mc);
+    final int sx = minX * sr.getScaleFactor();
+    final int sw = width * sr.getScaleFactor();
+    final int sy = mc.displayHeight - maxY * sr.getScaleFactor();
+    final int sh = height * sr.getScaleFactor();
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
     GL11.glScissor(sx, sy, sw, sh);
 
-    VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+    final @Nonnull VertexBuffer renderer = Tessellator.getInstance().getBuffer();
     drawContainerBackground(renderer);
 
-    int contentYOffset = this.minY + margin - (int) this.amountScrolled;
+    final int contentYOffset = this.minY + margin - (int) this.amountScrolled;
+    final int drawHeight = this.slotHeight - margin;
 
-    Vector4f col = ColorUtil.toFloat4(8421504);
-    Vector4f colBlack = ColorUtil.toFloat4(0);
+    final Vector4f col = ColorUtil.toFloat4(8421504);
+    final Vector4f colBlack = ColorUtil.toFloat4(0);
 
     for (int i = 0; i < getNumElements(); ++i) {
 
-      int elementY = contentYOffset + i * this.slotHeight;
-      int slotHeight = this.slotHeight - margin;
+      final int elementY = contentYOffset + i * this.slotHeight;
 
-      if (elementY <= maxY && elementY + slotHeight >= minY) {
+      if (elementY <= maxY && elementY + drawHeight >= minY) {
 
         if (showSelectionBox && i == selectedIndex) {
           GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
           GlStateManager.disableTexture2D();
 
           renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-          renderer.pos(minX, elementY + slotHeight + 2, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
-          renderer.pos(maxX, elementY + slotHeight + 2, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
+          renderer.pos(minX, elementY + drawHeight + 2, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
+          renderer.pos(maxX, elementY + drawHeight + 2, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
           renderer.pos(maxX, elementY - 2, 0.0D).tex(1.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
           renderer.pos(minX, elementY - 2, 0.0D).tex(0.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
           renderer.putColor4(0);
-          renderer.pos(minX + 1, elementY + slotHeight + 1, 0.0D).tex(0.0D, 1.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
-          renderer.pos(maxX - 1, elementY + slotHeight + 1, 0.0D).tex(1.0D, 1.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
+          renderer.pos(minX + 1, elementY + drawHeight + 1, 0.0D).tex(0.0D, 1.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
+          renderer.pos(maxX - 1, elementY + drawHeight + 1, 0.0D).tex(1.0D, 1.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
           renderer.pos(maxX - 1, elementY - 1, 0.0D).tex(1.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
           renderer.pos(minX + 1, elementY - 1, 0.0D).tex(0.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
           Tessellator.getInstance().draw();
@@ -241,13 +236,12 @@ public abstract class GuiScrollableList<T> {
           GlStateManager.enableTexture2D();
         }
 
-        drawElement(i, minX, elementY, slotHeight, renderer);
+        drawElement(i, minX, elementY, drawHeight, renderer);
       }
     }
 
     GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
-    col = ColorUtil.toFloat4(0xFF000000);
     GlStateManager.disableDepth();
     GlStateManager.disableAlpha();
     GlStateManager.enableBlend();
@@ -256,14 +250,15 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.disableTexture2D();
 
     boolean renderBorder = true;
-    if(renderBorder) {
+    if (renderBorder) {
+      final Vector4f colBorder = ColorUtil.toFloat4(0xFF000000);
       renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
       renderer.pos(this.minX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(0.0D, 1.0D).endVertex();
       renderer.pos(this.maxX, this.minY + margin, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).tex(1.0D, 1.0D).endVertex();
-      renderer.pos(this.maxX, this.minY, 0.0D).tex(1.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
-      renderer.pos(this.minX, this.minY, 0.0D).tex(0.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
-      renderer.pos(this.minX, this.maxY, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
-      renderer.pos(this.maxX, this.maxY, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
+      renderer.pos(this.maxX, this.minY, 0.0D).tex(1.0D, 0.0D).color(colBorder.x, colBorder.y, colBorder.z, colBorder.w).endVertex();
+      renderer.pos(this.minX, this.minY, 0.0D).tex(0.0D, 0.0D).color(colBorder.x, colBorder.y, colBorder.z, colBorder.w).endVertex();
+      renderer.pos(this.minX, this.maxY, 0.0D).tex(0.0D, 1.0D).color(colBorder.x, colBorder.y, colBorder.z, colBorder.w).endVertex();
+      renderer.pos(this.maxX, this.maxY, 0.0D).tex(1.0D, 1.0D).color(colBorder.x, colBorder.y, colBorder.z, colBorder.w).endVertex();
       renderer.pos(this.maxX, this.maxY - margin + 1, 0.0D).tex(1.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
       renderer.pos(this.minX, this.maxY - margin + 1, 0.0D).tex(0.0D, 0.0D).color(colBlack.x, colBlack.y, colBlack.z, colBlack.w).endVertex();
       Tessellator.getInstance().draw();
@@ -273,12 +268,12 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.enableTexture2D();
     GlStateManager.enableAlpha();
     GlStateManager.disableBlend();
-    GlStateManager.shadeModel(GL11.GL_FLAT);      
+    GlStateManager.shadeModel(GL11.GL_FLAT);
   }
 
-  protected void renderScrollBar(VertexBuffer renderer) {
+  protected void renderScrollBar(@Nonnull VertexBuffer renderer) {
 
-    int contentHeightOverBounds = getContentOverhang();
+    final int contentHeightOverBounds = getContentOverhang();
     if (contentHeightOverBounds > 0) {
 
       int clear = (maxY - minY) * (maxY - minY) / getContentHeight();
@@ -296,23 +291,23 @@ public abstract class GuiScrollableList<T> {
         y = minY;
       }
 
-      Vector4f col = ColorUtil.toFloat4(0xFF000000);
-      
+      final Vector4f col = ColorUtil.toFloat4(0xFF000000);
+
       GlStateManager.disableTexture2D();
-      int scrollBarMinX = getScrollBarX();
-      int scrollBarMaxX = scrollBarMinX + 6;
+      final int scrollBarMinX = getScrollBarX();
+      final int scrollBarMaxX = scrollBarMinX + 6;
       renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-      
+
       renderer.pos(scrollBarMinX, maxY, 0.0D).tex(0.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
       renderer.pos(scrollBarMaxX, maxY, 0.0D).tex(1.0D, 1.0D).color(col.x, col.y, col.z, col.w).endVertex();
       renderer.pos(scrollBarMaxX, minY, 0.0D).tex(1.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
       renderer.pos(scrollBarMinX, minY, 0.0D).tex(0.0D, 0.0D).color(col.x, col.y, col.z, col.w).endVertex();
-      
+
       renderer.pos(scrollBarMinX, y + clear, 0.0D).tex(0.0D, 1.0D).color(0.3f, 0.3f, 0.3f, 1).endVertex();
       renderer.pos(scrollBarMaxX, y + clear, 0.0D).tex(1.0D, 1.0D).color(0.3f, 0.3f, 0.3f, 1).endVertex();
       renderer.pos(scrollBarMaxX, y, 0.0D).tex(1.0D, 0.0D).color(0.3f, 0.3f, 0.3f, 1).endVertex();
       renderer.pos(scrollBarMinX, y, 0.0D).tex(0.0D, 0.0D).color(0.3f, 0.3f, 0.3f, 1).endVertex();
-      
+
       renderer.pos(scrollBarMinX, y + clear - 1, 0.0D).tex(0.0D, 1.0D).color(0.7f, 0.7f, 0.7f, 1).endVertex();
       renderer.pos(scrollBarMaxX - 1, y + clear - 1, 0.0D).tex(1.0D, 1.0D).color(0.7f, 0.7f, 0.7f, 1).endVertex();
       renderer.pos(scrollBarMaxX - 1, y, 0.0D).tex(1.0D, 0.0D).color(0.7f, 0.7f, 0.7f, 1).endVertex();
@@ -323,9 +318,9 @@ public abstract class GuiScrollableList<T> {
     }
   }
 
-  private void processMouseEvents() {
+  private void processMouseEvents(int mX, int mY) {
     if (Mouse.isButtonDown(0)) {
-      processMouseBown();
+      processMouseBown(mX, mY);
     } else {
       while (!mc.gameSettings.touchscreen && Mouse.next()) {
 
@@ -344,31 +339,31 @@ public abstract class GuiScrollableList<T> {
     }
   }
 
-  private void processMouseBown() {
+  private void processMouseBown(int mX, int mY) {
     int contentHeightOverBounds;
     if (initialClickY == -1.0F) {
 
-      if (mouseY >= minY && mouseY <= maxY && mouseX >= minX && mouseX <= maxX + 6) {
+      if (mY >= minY && mY <= maxY && mX >= minX && mX <= maxX + 6) {
 
         boolean clickInBounds = true;
 
-        int y = mouseY - minY + (int) amountScrolled - margin;
+        int y = mY - minY + (int) amountScrolled - margin;
         int mouseOverElement = y / slotHeight;
 
-        if (mouseX >= minX && mouseX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
+        if (mX >= minX && mX <= maxX && mouseOverElement >= 0 && y >= 0 && mouseOverElement < getNumElements()) {
           boolean doubleClick = mouseOverElement == selectedIndex && Minecraft.getSystemTime() - lastClickedTime < 250L;
-          if (elementClicked(mouseOverElement, doubleClick, mouseX, y%slotHeight)) {
+          if (elementClicked(mouseOverElement, doubleClick, mX, y % slotHeight)) {
             setSelection(mouseOverElement);
           }
           lastClickedTime = Minecraft.getSystemTime();
 
-        } else if (mouseX >= minX && mouseX <= maxX && y < 0) {
+        } else if (mX >= minX && mX <= maxX && y < 0) {
           clickInBounds = false;
         }
 
         int scrollBarMinX = getScrollBarX();
         int scrollBarMaxX = scrollBarMinX + 6;
-        if (mouseX >= scrollBarMinX && mouseX <= scrollBarMaxX) {
+        if (mX >= scrollBarMinX && mX <= scrollBarMaxX) {
 
           scrollMultiplier = -1.0F;
           contentHeightOverBounds = getContentOverhang();
@@ -391,7 +386,7 @@ public abstract class GuiScrollableList<T> {
         }
 
         if (clickInBounds) {
-          initialClickY = mouseY;
+          initialClickY = mY;
         } else {
           initialClickY = -2.0F;
         }
@@ -402,8 +397,8 @@ public abstract class GuiScrollableList<T> {
 
     } else if (initialClickY >= 0.0F) {
       // Scrolling
-      amountScrolled -= (mouseY - initialClickY) * scrollMultiplier;
-      initialClickY = mouseY;
+      amountScrolled -= (mY - initialClickY) * scrollMultiplier;
+      initialClickY = mY;
     }
   }
 
@@ -411,7 +406,7 @@ public abstract class GuiScrollableList<T> {
     return minX + width - 6;
   }
 
-  protected void drawContainerBackground(VertexBuffer renderer) {
+  protected void drawContainerBackground(@Nonnull VertexBuffer renderer) {
 
     Vector3f col = ColorUtil.toFloat(2105376);
     GlStateManager.color(col.x, col.y, col.z, 1.0F);

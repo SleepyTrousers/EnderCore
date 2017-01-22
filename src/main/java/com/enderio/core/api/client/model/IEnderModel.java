@@ -5,10 +5,11 @@ import net.minecraft.client.model.ModelRenderer;
 /**
  * To be used on techne-style box models
  */
+@Deprecated
 public interface IEnderModel {
   /**
    * Renders all parts of the model
-   * 
+   *
    * @param size
    *          - Size of the model (usually 0.0625f)
    */
@@ -16,7 +17,7 @@ public interface IEnderModel {
 
   /**
    * Rotates the model part in the given directions
-   * 
+   *
    * @param model
    *          - part of the model to rotate
    * @param x

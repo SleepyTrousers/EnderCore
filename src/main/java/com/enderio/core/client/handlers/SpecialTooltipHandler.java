@@ -1,11 +1,11 @@
 package com.enderio.core.client.handlers;
 
-import static com.enderio.core.common.config.ConfigHandler.showDurabilityTooltips;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.util.text.TextFormatting;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.input.Keyboard;
 
 import com.enderio.core.EnderCore;
@@ -25,26 +25,28 @@ import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import static com.enderio.core.common.config.ConfigHandler.showDurabilityTooltips;
+
 @Handler
-public enum SpecialTooltipHandler {
-  INSTANCE;
-  
+public class SpecialTooltipHandler {
+
   public interface ITooltipCallback extends IAdvancedTooltipProvider {
-    boolean shouldHandleItem(ItemStack item);
+    boolean shouldHandleItem(@Nonnull ItemStack item);
   }
 
-  private final List<ITooltipCallback> callbacks = Lists.newArrayList();
+  private static final @Nonnull List<ITooltipCallback> callbacks = Lists.newArrayList();
 
-  public void addCallback(ITooltipCallback callback) {
+  public static void addCallback(@Nonnull ITooltipCallback callback) {
     callbacks.add(callback);
   }
 
   @SubscribeEvent
-  public void addTooltip(ItemTooltipEvent evt) {
-    if (evt.getItemStack() == null) {
+  public static void addTooltip(ItemTooltipEvent evt) {
+    if (evt.getItemStack().isEmpty()) {
       return;
     }
 
@@ -53,12 +55,12 @@ public enum SpecialTooltipHandler {
     boolean doDurability = showDurabilityTooltips == 3 ? debugMode : showDurabilityTooltips == 2 ? shiftDown : showDurabilityTooltips == 1;
 
     if (doDurability) {
-      addDurabilityTooltip(evt.getToolTip(), evt.getItemStack());
+      addDurabilityTooltip(getTooltip(evt), evt.getItemStack());
     }
 
     if (evt.getItemStack().getItem() instanceof IAdvancedTooltipProvider) {
       IAdvancedTooltipProvider ttp = (IAdvancedTooltipProvider) evt.getItemStack().getItem();
-      addInformation(ttp, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
+      addInformation(ttp, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
       return;
     } else if (evt.getItemStack().getItem() instanceof IResourceTooltipProvider) {
       addInformation((IResourceTooltipProvider) evt.getItemStack().getItem(), evt);
@@ -67,7 +69,7 @@ public enum SpecialTooltipHandler {
 
     Block blk = Block.getBlockFromItem(evt.getItemStack().getItem());
     if (blk instanceof IAdvancedTooltipProvider) {
-      addInformation((IAdvancedTooltipProvider) blk, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
+      addInformation((IAdvancedTooltipProvider) blk, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
       return;
     } else if (blk instanceof IResourceTooltipProvider) {
       addInformation((IResourceTooltipProvider) blk, evt);
@@ -76,12 +78,12 @@ public enum SpecialTooltipHandler {
 
     for (ITooltipCallback callback : callbacks) {
       if (callback.shouldHandleItem(evt.getItemStack())) {
-        addInformation(callback, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip(), false);
+        addInformation(callback, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
       }
     }
   }
 
-  public void addDurabilityTooltip(List<String> toolTip, ItemStack itemStack) {
+  public static void addDurabilityTooltip(@Nonnull List<String> toolTip, @Nonnull ItemStack itemStack) {
     if (!itemStack.isItemStackDamageable()) {
       return;
     }
@@ -91,11 +93,20 @@ public enum SpecialTooltipHandler {
     }
   }
 
-  public void addInformation(IResourceTooltipProvider item, ItemTooltipEvent evt) {
-    addInformation(item, evt.getItemStack(), evt.getEntityPlayer(), evt.getToolTip());
+  public static void addInformation(@Nonnull IResourceTooltipProvider item, @Nonnull ItemTooltipEvent evt) {
+    addInformation(item, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt));
   }
 
-  public void addInformation(IResourceTooltipProvider tt, ItemStack itemstack, EntityPlayer entityplayer, List<String> list) {
+  private static @Nonnull List<String> getTooltip(@Nonnull ItemTooltipEvent event) {
+    List<String> toolTip = event.getToolTip();
+    if (toolTip == null) {
+      throw new NullPointerException("How should we add a tooltip into a null list???");
+    }
+    return toolTip;
+  }
+
+  public static void addInformation(@Nonnull IResourceTooltipProvider tt, @Nonnull ItemStack itemstack, @Nullable EntityPlayer entityplayer,
+      @Nonnull List<String> list) {
     String name = tt.getUnlocalizedNameForTooltip(itemstack);
     if (showAdvancedTooltips()) {
       addCommonTooltipFromResources(list, name);
@@ -109,7 +120,8 @@ public enum SpecialTooltipHandler {
     }
   }
 
-  public void addInformation(IAdvancedTooltipProvider tt, ItemStack itemstack, EntityPlayer entityplayer, List<String> list, boolean flag) {
+  public static void addInformation(@Nonnull IAdvancedTooltipProvider tt, @Nonnull ItemStack itemstack, @Nullable EntityPlayer entityplayer,
+      @Nonnull List<String> list, boolean flag) {
     tt.addCommonEntries(itemstack, entityplayer, list, flag);
     if (showAdvancedTooltips()) {
       tt.addDetailedEntries(itemstack, entityplayer, list, flag);
@@ -121,22 +133,22 @@ public enum SpecialTooltipHandler {
     }
   }
 
-  private static final List<String> throwaway = new ArrayList<String>();
+  private static final @Nonnull List<String> throwaway = new ArrayList<String>();
 
-  private static boolean hasDetailedTooltip(IResourceTooltipProvider tt, ItemStack stack) {
+  private static boolean hasDetailedTooltip(@Nonnull IResourceTooltipProvider tt, @Nonnull ItemStack stack) {
     throwaway.clear();
     String name = tt.getUnlocalizedNameForTooltip(stack);
     addDetailedTooltipFromResources(throwaway, name);
     return !throwaway.isEmpty();
   }
 
-  private static boolean hasDetailedTooltip(IAdvancedTooltipProvider tt, ItemStack stack, EntityPlayer player, boolean flag) {
+  private static boolean hasDetailedTooltip(@Nonnull IAdvancedTooltipProvider tt, @Nonnull ItemStack stack, @Nullable EntityPlayer player, boolean flag) {
     throwaway.clear();
     tt.addDetailedEntries(stack, player, throwaway, flag);
     return !throwaway.isEmpty();
   }
 
-  public static void addShowDetailsTooltip(List<String> list) {
+  public static void addShowDetailsTooltip(@Nonnull List<String> list) {
     list.add(TextFormatting.WHITE + "" + TextFormatting.ITALIC + EnderCore.lang.localize("tooltip.showDetails"));
   }
 
@@ -144,25 +156,25 @@ public enum SpecialTooltipHandler {
     return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
   }
 
-  public static void addDetailedTooltipFromResources(List<String> list, String unlocalizedName) {
+  public static void addDetailedTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
     addTooltipFromResources(list, unlocalizedName.concat(".tooltip.detailed.line"));
   }
 
-  public static void addBasicTooltipFromResources(List<String> list, String unlocalizedName) {
+  public static void addBasicTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
     addTooltipFromResources(list, unlocalizedName.concat(".tooltip.basic.line"));
   }
 
-  public static void addCommonTooltipFromResources(List<String> list, String unlocalizedName) {
+  public static void addCommonTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
     addTooltipFromResources(list, unlocalizedName.concat(".tooltip.common.line"));
   }
 
-  public static void addTooltipFromResources(List<String> list, String keyBase) {
+  public static void addTooltipFromResources(@Nonnull List<String> list, @Nullable /* for String.concat() */ String keyBase) {
     boolean done = false;
     int line = 1;
     while (!done) {
       String key = keyBase + line;
       String val = EnderCore.lang.localizeExact(key);
-      if (val == null || val.trim().length() < 0 || val.equals(key) || line > 12) {
+      if (val.trim().length() < 0 || val.equals(key) || line > 12) {
         done = true;
       } else {
         list.add(val);
@@ -171,7 +183,7 @@ public enum SpecialTooltipHandler {
     }
   }
 
-  private static String getUnlocalizedNameForTooltip(ItemStack itemstack) {
+  private static @Nonnull String getUnlocalizedNameForTooltip(@Nonnull ItemStack itemstack) {
     String unlocalizedNameForTooltip = null;
     if (itemstack.getItem() instanceof IResourceTooltipProvider) {
       unlocalizedNameForTooltip = ((IResourceTooltipProvider) itemstack.getItem()).getUnlocalizedNameForTooltip(itemstack);
@@ -182,18 +194,21 @@ public enum SpecialTooltipHandler {
     return unlocalizedNameForTooltip;
   }
 
-  public static void addCommonTooltipFromResources(List<String> list, ItemStack itemstack) {
-    if (itemstack.getItem() == null) {
+  public static void addCommonTooltipFromResources(@Nonnull List<String> list, @Nonnull ItemStack itemstack) {
+    if (itemstack.isEmpty()) {
       return;
     }
     addCommonTooltipFromResources(list, getUnlocalizedNameForTooltip(itemstack));
   }
 
-  public static void addDetailedTooltipFromResources(List<String> list, ItemStack itemstack) {
-    if (itemstack.getItem() == null) {
+  public static void addDetailedTooltipFromResources(@Nonnull List<String> list, @Nonnull ItemStack itemstack) {
+    if (itemstack.isEmpty()) {
       return;
     }
     addDetailedTooltipFromResources(list, getUnlocalizedNameForTooltip(itemstack));
+  }
+
+  private SpecialTooltipHandler() {
   }
 
 }

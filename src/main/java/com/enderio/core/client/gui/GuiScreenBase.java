@@ -3,9 +3,10 @@ package com.enderio.core.client.gui;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
-import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 
 import net.minecraft.client.Minecraft;
@@ -17,7 +18,7 @@ import net.minecraft.client.renderer.RenderHelper;
 
 public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer, IGuiScreen {
 
-  protected ToolTipManager ttMan = new ToolTipManager();
+  protected @Nonnull ToolTipManager ttMan = new ToolTipManager();
 
   /** The X size of the inventory window in pixels. */
   protected int xSize = 176;
@@ -46,12 +47,12 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   }
 
   @Override
-  public void addToolTip(GuiToolTip toolTip) {
+  public void addToolTip(@Nonnull GuiToolTip toolTip) {
     ttMan.addToolTip(toolTip);
   }
 
   @Override
-  public boolean removeToolTip(GuiToolTip toolTip) {
+  public boolean removeToolTip(@Nonnull GuiToolTip toolTip) {
     return ttMan.removeToolTip(toolTip);
   }
 
@@ -103,7 +104,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   }
 
   @Override
-  public void drawHoveringToolTipText(List<String> par1List, int par2, int par3, FontRenderer font) {
+  public void drawHoveringToolTipText(@Nonnull List<String> par1List, int par2, int par3, @Nonnull FontRenderer font) {
     super.drawHoveringText(par1List, par2, par3, font);
   }
 
@@ -128,24 +129,25 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   }
 
   @Override
-  public FontRenderer getFontRenderer() {
+  public @Nonnull FontRenderer getFontRenderer() {
     return Minecraft.getMinecraft().fontRendererObj;
   }
 
   @Override
-  public void addButton(GuiButton button) {
+  public @Nonnull <T extends GuiButton> T addButton(@Nonnull T button) {
     if (!buttonList.contains(button)) {
       buttonList.add(button);
     }
+    return button;
   }
 
   @Override
-  public void removeButton(GuiButton button) {
+  public void removeButton(@Nonnull GuiButton button) {
     buttonList.remove(button);
   }
 
   @Override
-  public void doActionPerformed(GuiButton guiButton) throws IOException {
+  public void doActionPerformed(@Nonnull GuiButton guiButton) throws IOException {
     actionPerformed(guiButton);
   }
 
@@ -154,8 +156,4 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
     return 0;
   }
 
-  @Override
-  public List<GhostSlot> getGhostSlots() {
-    return null;
-  }
 }

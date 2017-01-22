@@ -2,11 +2,13 @@ package com.enderio.core.api.client.gui;
 
 import java.awt.Rectangle;
 
+import javax.annotation.Nonnull;
+
 public interface IGuiOverlay extends IHideable {
 
-    void init(IGuiScreen screen);
+    void init(@Nonnull IGuiScreen screen);
 
-    Rectangle getBounds();
+    @Nonnull Rectangle getBounds();
 
     void draw(int mouseX, int mouseY, float partialTick);
 

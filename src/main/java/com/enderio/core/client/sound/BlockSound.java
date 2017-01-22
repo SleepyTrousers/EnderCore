@@ -1,5 +1,7 @@
 package com.enderio.core.client.sound;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.ResourceLocation;
@@ -9,7 +11,7 @@ public class BlockSound extends PositionedSound implements ITickableSound {
 
   private boolean donePlaying = false;
 
-  public BlockSound(ResourceLocation p_i45103_1_) {
+  public BlockSound(@Nonnull ResourceLocation p_i45103_1_) {
     super(p_i45103_1_, SoundCategory.BLOCKS);
   }
 

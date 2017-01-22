@@ -1,5 +1,8 @@
 package com.enderio.core.client.render;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.api.client.render.IWidgetMap;
@@ -22,7 +25,7 @@ public enum EnderWidget implements IWidgetIcon {
   MINUS(16, 192),
   CROSS(64, 192),
   PLUS(80, 192),
-  
+
   VSCROLL_THUMB_OFF(234, 80, 11, 8),
   VSCROLL_THUMB_HOVER_OFF(234, 88, 11, 8),
   VSCROLL_THUMB_ON(245, 80, 11, 8),
@@ -58,38 +61,38 @@ public enum EnderWidget implements IWidgetIcon {
   X_BUT(200, 32, 8, 8),
   X_BUT_PRESSED(200, 40, 8, 8),
   X_BUT_HOVER(200, 48, 8, 8),
- X_BUT_HOVER_PRESSED(200, 56, 8, 8),
+  X_BUT_HOVER_PRESSED(200, 56, 8, 8),
 
   STOP_BUT(200, 64, 8, 8),
   RETURN_BUT(200, 72, 8, 8),
   STOP_BUT_HOVER(200, 80, 8, 8),
   RETURN_BUT_HOVER(200, 88, 8, 8),
 
-  NEUTRAL_SLOT_BACKGROUND(112, 176, 16, 16), ;
+  ;
 
-  public static final ResourceLocation TEXTURE = new ResourceLocation(EnderCore.MODID, "textures/gui/widgets.png");
+  public static final @Nonnull ResourceLocation TEXTURE = new ResourceLocation(EnderCore.MODID, "textures/gui/widgets.png");
 
-  public static final IWidgetMap map = new IWidgetMap.WidgetMapImpl(256, TEXTURE);
+  public static final @Nonnull IWidgetMap map = new IWidgetMap.WidgetMapImpl(256, TEXTURE);
 
   public final int x;
   public final int y;
   public final int width;
   public final int height;
-  public final IWidgetIcon overlay;
+  public final @Nullable IWidgetIcon overlay;
 
   EnderWidget(int x, int y) {
     this(x, y, null);
   }
 
-  EnderWidget(int x, int y, IWidgetIcon overlay) {
+  EnderWidget(int x, int y, @Nullable IWidgetIcon overlay) {
     this(x, y, 16, 16, overlay);
   }
 
   EnderWidget(int x, int y, int width, int height) {
     this(x, y, width, height, null);
   }
-  
-  EnderWidget(int x, int y, int width, int height, IWidgetIcon overlay) {
+
+  EnderWidget(int x, int y, int width, int height, @Nullable IWidgetIcon overlay) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -106,24 +109,24 @@ public enum EnderWidget implements IWidgetIcon {
   public int getY() {
     return y;
   }
-  
+
   @Override
   public int getWidth() {
     return width;
   }
-  
+
   @Override
   public int getHeight() {
     return height;
   }
-  
+
   @Override
-  public IWidgetIcon getOverlay() {
+  public @Nullable IWidgetIcon getOverlay() {
     return overlay;
   }
-  
+
   @Override
-  public IWidgetMap getMap() {
+  public @Nonnull IWidgetMap getMap() {
     return map;
   }
 }

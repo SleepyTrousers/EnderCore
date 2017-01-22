@@ -1,5 +1,8 @@
 package com.enderio.core.client.gui.button;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.RenderUtil;
@@ -21,10 +24,10 @@ public class IIconButton extends GuiButton {
   protected int hwidth;
   protected int hheight;
 
-  protected TextureAtlasSprite icon;
-  protected ResourceLocation texture;
+  protected @Nullable TextureAtlasSprite icon;
+  protected @Nullable ResourceLocation texture;
 
-  public IIconButton(FontRenderer fr, int id, int x, int y, TextureAtlasSprite icon, ResourceLocation texture) {
+  public IIconButton(@Nonnull FontRenderer fr, int id, int x, int y, @Nullable TextureAtlasSprite icon, @Nullable ResourceLocation texture) {
     super(id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
     hwidth = HWIDTH;
     hheight = HHEIGHT;
@@ -39,31 +42,30 @@ public class IIconButton extends GuiButton {
     hheight = height / 2;
   }
 
-  public TextureAtlasSprite getIcon() {
+  public @Nullable TextureAtlasSprite getIcon() {
     return icon;
   }
 
-  public void setIcon(TextureAtlasSprite icon) {
+  public void setIcon(@Nullable TextureAtlasSprite icon) {
     this.icon = icon;
   }
 
-  public ResourceLocation getTexture() {
+  public @Nullable ResourceLocation getTexture() {
     return texture;
   }
 
-  public void setTexture(ResourceLocation textureName) {
+  public void setTexture(@Nullable ResourceLocation textureName) {
     this.texture = textureName;
   }
 
   /**
    * Draws this button to the screen.
    */
-  @SuppressWarnings("synthetic-access")
   @Override
-  public void drawButton(Minecraft par1Minecraft, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft par1Minecraft, int mouseX, int mouseY) {
     if (visible) {
 
-      RenderUtil.bindTexture("textures/gui/widgets.png");      
+      RenderUtil.bindTexture("textures/gui/widgets.png");
       GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
       hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + width && mouseY < this.yPosition + height;
       int hoverState = getHoverState(hovered);
@@ -80,21 +82,21 @@ public class IIconButton extends GuiButton {
 
       mouseDragged(par1Minecraft, mouseX, mouseY);
 
-      if (icon != null && texture != null) {
-        
-        
+      final TextureAtlasSprite icon2 = icon;
+      final ResourceLocation texture2 = texture;
+      if (icon2 != null && texture2 != null) {
+
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        RenderUtil.bindTexture(texture);
+        RenderUtil.bindTexture(texture2);
         int xLoc = xPosition + 2;
         int yLoc = yPosition + 2;
-        drawTexturedModalRect(xLoc, yLoc, icon, width - 4, height - 4);    
-        
-        GlStateManager.disableBlend();
-        
-      }
+        drawTexturedModalRect(xLoc, yLoc, icon2, width - 4, height - 4);
 
+        GlStateManager.disableBlend();
+      }
     }
   }
+
 }

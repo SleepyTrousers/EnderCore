@@ -1,5 +1,8 @@
 package com.enderio.core.client.gui.button;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -19,14 +22,14 @@ public class ColorButton extends IconButton {
 
   private int colorIndex = 0;
 
-  private String tooltipPrefix = "";
+  private @Nonnull String tooltipPrefix = "";
 
-  public ColorButton(IGuiScreen gui, int id, int x, int y) {
+  public ColorButton(@Nonnull IGuiScreen gui, int id, int x, int y) {
     super(gui, id, x, y, null);
   }
 
   @Override
-  public boolean mousePressed(Minecraft par1Minecraft, int par2, int par3) {
+  public boolean mousePressed(@Nonnull Minecraft par1Minecraft, int par2, int par3) {
     boolean result = super.mousePressed(par1Minecraft, par2, par3);
     if (result) {
       nextColor();
@@ -35,7 +38,7 @@ public class ColorButton extends IconButton {
   }
 
   @Override
-  public boolean mousePressedButton(Minecraft mc, int x, int y, int button) {
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int x, int y, int button) {
     boolean result = button == 1 && super.checkMousePress(mc, x, y);
     if (result) {
       prevColor();
@@ -43,11 +46,11 @@ public class ColorButton extends IconButton {
     return result;
   }
 
-  public String getTooltipPrefix() {
+  public @Nonnull String getTooltipPrefix() {
     return tooltipPrefix;
   }
 
-  public void setToolTipHeading(String tooltipPrefix) {
+  public void setToolTipHeading(@Nullable String tooltipPrefix) {
     if (tooltipPrefix == null) {
       this.tooltipPrefix = "";
     } else {
@@ -76,9 +79,9 @@ public class ColorButton extends IconButton {
   }
 
   public void setColorIndex(int colorIndex) {
-    this.colorIndex = MathHelper.clamp_int(colorIndex, 0, ItemDye.DYE_COLORS.length - 1);
+    this.colorIndex = MathHelper.clamp(colorIndex, 0, ItemDye.DYE_COLORS.length - 1);
     String colStr = DyeColor.values()[colorIndex].getLocalisedName();
-    if (tooltipPrefix != null && tooltipPrefix.length() > 0) {
+    if (tooltipPrefix.length() > 0) {
       setToolTip(tooltipPrefix, colStr);
     } else {
       setToolTip(colStr);
@@ -86,20 +89,20 @@ public class ColorButton extends IconButton {
   }
 
   @Override
-  public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
     if (visible) {
       VertexBuffer tes = Tessellator.getInstance().getBuffer();
       tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-      
+
       int x = xPosition + 2;
       int y = yPosition + 2;
 
       GlStateManager.disableTexture2D();
       int col = ItemDye.DYE_COLORS[colorIndex];
-      Vector3f c = ColorUtil.toFloat(col);    
+      Vector3f c = ColorUtil.toFloat(col);
       GlStateManager.color(c.x, c.y, c.z);
-            
+
       tes.pos(x, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
       tes.pos(x + width - 4, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
       tes.pos(x + width - 4, y + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();

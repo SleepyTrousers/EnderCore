@@ -2,45 +2,47 @@ package com.enderio.core.client.render;
 
 import java.awt.Color;
 
-import org.lwjgl.opengl.GL11;
+import javax.annotation.Nonnull;
 
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vector4f;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 public final class ColorUtil {
 
-  public static Vector4f toFloat(Color color) {
+  public static @Nonnull Vector4f toFloat(@Nonnull Color color) {
     float[] rgba = color.getComponents(null);
     return new Vector4f(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 
-  public static Vector3f toFloat(int rgb) {
+  public static @Nonnull Vector3f toFloat(int rgb) {
     int r = rgb >> 16 & 255;
     int g = rgb >> 8 & 255;
     int b = rgb & 255;
     return new Vector3f(r / 255F, g / 255F, b / 255F);
   }
-  
-  public static Vector4f toFloat4(int rgb) {
+
+  public static @Nonnull Vector4f toFloat4(int rgb) {
     int r = rgb >> 16 & 255;
     int g = rgb >> 8 & 255;
     int b = rgb & 255;
     return new Vector4f(r / 255F, g / 255F, b / 255F, 1);
   }
 
-  public static int getRGB(Color color) {
+  public static int getRGB(@Nonnull Color color) {
     return getRGB(color.getRed(), color.getGreen(), color.getBlue());
   }
 
-  public static int getRGBA(Color color) {
+  public static int getRGBA(@Nonnull Color color) {
     return getRGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
   }
 
-  public static int getARGB(Color color) {
+  public static int getARGB(@Nonnull Color color) {
     return getRGBA(color.getAlpha(), color.getRed(), color.getGreen(), color.getBlue());
   }
 
-  public static int getRGB(Vector3f rgb) {
+  public static int getRGB(@Nonnull Vector3f rgb) {
     return getRGB(rgb.x, rgb.y, rgb.z);
   }
 
@@ -48,7 +50,7 @@ public final class ColorUtil {
     return getRGB((int) (r * 255), (int) (g * 255), (int) (b * 255));
   }
 
-  public static int getRGBA(Vector4f col) {
+  public static int getRGBA(@Nonnull Vector4f col) {
     return getRGBA(col.x, col.y, col.z, col.w);
   }
 
@@ -74,14 +76,14 @@ public final class ColorUtil {
 
   /**
    * Turns an int into a glColor4f function
-   * 
+   *
    * @author Buildcraft team
    */
   public static void setGLColorFromInt(int color) {
     float red = (color >> 16 & 255) / 255.0F;
     float green = (color >> 8 & 255) / 255.0F;
     float blue = (color & 255) / 255.0F;
-    GL11.glColor4f(red, green, blue, 1.0F);
+    GlStateManager.color(red, green, blue, 1.0F);
   }
 
   public static int toHex(int r, int g, int b) {

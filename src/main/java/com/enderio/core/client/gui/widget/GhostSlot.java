@@ -1,5 +1,8 @@
 package com.enderio.core.client.gui.widget;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.common.TileEntityBase;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.network.PacketGhostSlot;
@@ -11,16 +14,18 @@ public abstract class GhostSlot {
   public static interface IGhostSlotAware {
     /**
      * Called server-side on the container when a GhostSlot is changed. Check that the given slot number really is a ghost slot before storing the given stack.
-     * 
+     *
      * @param slot
      *          The slot number that was given to the ghost slot
      * @param stack
      *          The stack that should be placed, null to clear
+     * @param realsize
+     *          The real size of the stack if the stack has a size that cannot be stored in an itemstack.
      */
-    void setGhostSlotContents(int slot, ItemStack stack, int realsize);
+    void setGhostSlotContents(int slot, @Nonnull ItemStack stack, int realsize);
   }
 
-  public TileEntityBase te = null;
+  public @Nullable TileEntityBase te = null;
   public int slot = -1;
   public int x;
   public int y;
@@ -36,11 +41,16 @@ public abstract class GhostSlot {
     return mx >= x && mx < (x + 16) && my >= y && my < (y + 16);
   }
 
-  public abstract ItemStack getStack();
+  public abstract @Nonnull ItemStack getStack();
 
-  public void putStack(ItemStack stack) {
+  @Deprecated
+  public void putStack(@Nonnull ItemStack stack) {
+    putStack(stack, stack.getCount());
+  }
+
+  public void putStack(@Nonnull ItemStack stack, int realsize) {
     if (updateServer) {
-      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(slot, stack));
+      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(slot, stack, realsize));
     }
   }
 
@@ -78,5 +88,5 @@ public abstract class GhostSlot {
   public int getStackSizeLimit() {
     return stackSizeLimit;
   }
-}
 
+}

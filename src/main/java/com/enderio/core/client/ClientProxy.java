@@ -1,5 +1,7 @@
 package com.enderio.core.client;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.client.render.IconUtil;
 import com.enderio.core.common.CommonProxy;
 import com.enderio.core.common.util.Scheduler;
@@ -11,16 +13,16 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class ClientProxy extends CommonProxy {
 
   @Override
-  public Scheduler getScheduler() {
-    if (scheduler == null) {
-      scheduler = new Scheduler(false);
+  public @Nonnull Scheduler getScheduler() {
+    if (scheduler != null) {
+      return scheduler;
     }
-    return scheduler;
+    return scheduler = new Scheduler(false);
   }
 
   @Override
-  public World getClientWorld() {
-    return Minecraft.getMinecraft().theWorld;
+  public @Nonnull World getClientWorld() {
+    return Minecraft.getMinecraft().world;
   }
 
   @Override

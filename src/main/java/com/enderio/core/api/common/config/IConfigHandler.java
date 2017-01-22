@@ -3,6 +3,8 @@ package com.enderio.core.api.common.config;
 import java.io.File;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.config.AbstractConfigHandler.Section;
 
 import net.minecraftforge.common.config.ConfigCategory;
@@ -10,12 +12,16 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 
 public interface IConfigHandler {
-  void initialize(File cfg);
 
+  void initialize(@Nonnull File cfg);
+
+  @Nonnull
   List<Section> getSections();
 
+  @Nonnull
   ConfigCategory getCategory(String name);
 
+  @Nonnull
   String getModID();
 
   /**
@@ -27,4 +33,5 @@ public interface IConfigHandler {
    * A hook for the {@link FMLPostInitializationEvent}.
    */
   void postInitHook();
+
 }

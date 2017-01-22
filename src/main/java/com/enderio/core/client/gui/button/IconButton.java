@@ -1,5 +1,8 @@
 package com.enderio.core.client.gui.button;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -13,12 +16,12 @@ public class IconButton extends TooltipButton {
   public static final int DEFAULT_WIDTH = 16;
   public static final int DEFAULT_HEIGHT = 16;
 
-  protected IWidgetIcon icon;
+  protected @Nullable IWidgetIcon icon;
 
   private int marginY = 0;
   private int marginX = 0;
 
-  public IconButton(IGuiScreen gui, int id, int x, int y, IWidgetIcon icon) {
+  public IconButton(@Nonnull IGuiScreen gui, int id, int x, int y, @Nullable IWidgetIcon icon) {
     super(gui, id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
     this.icon = icon;
   }
@@ -35,11 +38,11 @@ public class IconButton extends TooltipButton {
     return this;
   }
 
-  public IWidgetIcon getIcon() {
+  public @Nullable IWidgetIcon getIcon() {
     return icon;
   }
 
-  public void setIcon(IWidgetIcon icon) {
+  public void setIcon(@Nullable IWidgetIcon icon) {
     this.icon = icon;
   }
 
@@ -56,11 +59,11 @@ public class IconButton extends TooltipButton {
    *          the mouse button - only called for button {@literal >}= 1
    * @return true if the mouse click is handled
    */
-  public boolean mousePressedButton(Minecraft mc, int x, int y, int button) {
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int x, int y, int button) {
     return false;
   }
 
-  protected boolean checkMousePress(Minecraft mc, int x, int y) {
+  protected boolean checkMousePress(@Nonnull Minecraft mc, int x, int y) {
     // call super here so that we only get the area check
     return super.mousePressed(mc, x, y);
   }
@@ -68,9 +71,8 @@ public class IconButton extends TooltipButton {
   /**
    * Draws this button to the screen.
    */
-  @SuppressWarnings("synthetic-access")
   @Override
-  public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     updateTooltip(mc, mouseX, mouseY);
     if (isVisible()) {
 
@@ -91,15 +93,16 @@ public class IconButton extends TooltipButton {
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
       background.getMap().render(background, x, y, width, height, 0, true);
-      if (icon != null) {
-        icon.getMap().render(icon, x + marginX, y + marginY, width - 2 * marginX, height - 2 * marginY, 0, true);
+      final @Nullable IWidgetIcon icon2 = icon;
+      if (icon2 != null) {
+        icon2.getMap().render(icon2, x + marginX, y + marginY, width - 2 * marginX, height - 2 * marginY, 0, true);
       }
 
       GL11.glPopAttrib();
     }
   }
 
-  protected IWidgetIcon getIconForHoverState(int hoverState) {
+  protected @Nonnull IWidgetIcon getIconForHoverState(int hoverState) {
     if (hoverState == 0) {
       return EnderWidget.BUTTON_DISABLED;
     }

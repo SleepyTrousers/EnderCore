@@ -22,22 +22,23 @@ public abstract class ManagedTESR<T extends TileEntityBase> extends TileEntitySp
     this.block = block;
   }
 
+  @SuppressWarnings({ "null", "unused" })
   @Override
-  public final void renderTileEntityAt(T te, double x, double y, double z, float partialTicks, int destroyStage) {
-    if (te != null && te.hasWorldObj() && !te.isInvalid()) {
+  public final void renderTileEntityAt(@Nonnull T te, double x, double y, double z, float partialTicks, int destroyStage) {
+    if (te != null && te.hasWorld() && !te.isInvalid()) {
       final IBlockState blockState = te.getWorld().getBlockState(te.getPos());
       final int renderPass = MinecraftForgeClient.getRenderPass();
-      if (blockState != null && (block == null || block == blockState.getBlock()) && shouldRender(te, blockState, renderPass)) {
+      if ((block == null || block == blockState.getBlock()) && shouldRender(te, blockState, renderPass)) {
         GlStateManager.disableLighting();
         if (renderPass == 0) {
-          GlStateManager.disableBlend();    
+          GlStateManager.disableBlend();
           GlStateManager.depthMask(true);
         } else {
           GlStateManager.enableBlend();
           GlStateManager.depthMask(false);
           GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         }
-        
+
         RenderUtil.bindBlockTexture();
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
@@ -56,7 +57,6 @@ public abstract class ManagedTESR<T extends TileEntityBase> extends TileEntitySp
   }
 
   protected void renderItem() {
-
   }
 
 }

@@ -1,37 +1,40 @@
 package com.enderio.core.api.client.gui;
 
 import java.io.IOException;
-import java.util.List;
 
-import com.enderio.core.client.gui.widget.GhostSlot;
+import javax.annotation.Nonnull;
+
+import com.enderio.core.client.gui.GhostSlotHandler;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 
 import net.minecraft.client.gui.GuiButton;
 
 public interface IGuiScreen {
 
-    void addToolTip(GuiToolTip toolTip);
+  void addToolTip(@Nonnull GuiToolTip toolTip);
 
-    boolean removeToolTip(GuiToolTip toolTip);
+  boolean removeToolTip(@Nonnull GuiToolTip toolTip);
 
-    void clearToolTips();
+  void clearToolTips();
 
-    int getGuiLeft();
+  int getGuiLeft();
 
-    int getGuiTop();
+  int getGuiTop();
 
-    int getXSize();
+  int getXSize();
 
-    int getYSize();
+  int getYSize();
 
-    void addButton(GuiButton button);
+  @Nonnull
+  <T extends GuiButton> T addButton(@Nonnull T button);
 
-    void removeButton(GuiButton button);
+  void removeButton(@Nonnull GuiButton button);
 
-    int getOverlayOffsetX();
+  int getOverlayOffsetX();
 
-    void doActionPerformed(GuiButton but) throws IOException;
+  void doActionPerformed(@Nonnull GuiButton but) throws IOException;
 
-    List<GhostSlot> getGhostSlots();
+  @Nonnull
+  GhostSlotHandler getGhostSlotHandler();
 
 }

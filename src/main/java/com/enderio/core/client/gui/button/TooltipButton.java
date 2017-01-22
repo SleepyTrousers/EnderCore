@@ -2,6 +2,9 @@ package com.enderio.core.client.gui.button;
 
 import java.awt.Rectangle;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 
@@ -11,11 +14,11 @@ public class TooltipButton extends GuiButtonHideable {
 
   protected int xOrigin;
   protected int yOrigin;
-  protected IGuiScreen gui;
-  protected String[] toolTipText;
-  protected GuiToolTip toolTip;
+  protected @Nonnull IGuiScreen gui;
+  protected @Nullable String[] toolTipText;
+  protected @Nullable GuiToolTip toolTip;
 
-  public TooltipButton(IGuiScreen gui, int id, int x, int y, int widthIn, int heightIn, String buttonText) {
+  public TooltipButton(@Nonnull IGuiScreen gui, int id, int x, int y, int widthIn, int heightIn, @Nonnull String buttonText) {
     super(id, x, y, widthIn, heightIn, buttonText);
     this.gui = gui;
     this.xOrigin = x;
@@ -23,10 +26,10 @@ public class TooltipButton extends GuiButtonHideable {
   }
 
   public void setToolTip(String... tooltipText) {
-    if (toolTip == null) {
-      toolTip = new GuiToolTip(getBounds(), tooltipText);
-    } else {
+    if (toolTip != null) {
       toolTip.setToolTipText(tooltipText);
+    } else {
+      toolTip = new GuiToolTip(getBounds(), tooltipText);
     }
     this.toolTipText = tooltipText;
     updateTooltipBounds();
@@ -44,7 +47,7 @@ public class TooltipButton extends GuiButtonHideable {
     updateTooltipBounds();
   }
 
-  public final Rectangle getBounds() {    
+  public final @Nonnull Rectangle getBounds() {
     return new Rectangle(xOrigin, yOrigin, getWidth(), getHeight());
   }
 
@@ -58,7 +61,9 @@ public class TooltipButton extends GuiButtonHideable {
   }
 
   public void detach() {
-    gui.removeToolTip(toolTip);
+    if (toolTip != null) {
+      gui.removeToolTip(toolTip);
+    }
     gui.removeButton(this);
   }
 
@@ -70,7 +75,7 @@ public class TooltipButton extends GuiButtonHideable {
     return height;
   }
 
-  public GuiToolTip getToolTip() {
+  public @Nullable GuiToolTip getToolTip() {
     return toolTip;
   }
 
@@ -101,13 +106,13 @@ public class TooltipButton extends GuiButtonHideable {
     }
   }
 
-  protected void updateTooltip(Minecraft mc, int mouseX, int mouseY) {
+  protected void updateTooltip(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     if (toolTip != null) {
       toolTip.setIsVisible(visible && enabled);
     }
   }
 
-  protected final void doDrawButton(Minecraft mc, int mouseX, int mouseY) {
+  protected final void doDrawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     super.drawButton(mc, mouseX, mouseY);
   }
 
@@ -115,7 +120,7 @@ public class TooltipButton extends GuiButtonHideable {
    * Draws this button to the screen.
    */
   @Override
-  public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     updateTooltip(mc, mouseX, mouseY);
     doDrawButton(mc, mouseX, mouseY);
   }

@@ -2,6 +2,8 @@ package com.enderio.core.client.render;
 
 import java.util.ArrayList;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 
 import net.minecraft.client.Minecraft;
@@ -17,29 +19,29 @@ public class IconUtil {
 
   public static interface IIconProvider {
 
-    public void registerIcons(TextureMap register);
-   
+    public void registerIcons(@Nonnull TextureMap register);
+
   }
 
-  public static IconUtil instance = new IconUtil();
-  
-  public static void addIconProvider(IIconProvider registrar) {
+  public static @Nonnull IconUtil instance = new IconUtil();
+
+  public static void addIconProvider(@Nonnull IIconProvider registrar) {
     instance.iconProviders.add(registrar);
   }
-  
-  private ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
-  
+
+  private final @Nonnull ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
+
   public TextureAtlasSprite whiteTexture;
   public TextureAtlasSprite blankTexture;
   public TextureAtlasSprite errorTexture;
-  
+
   private boolean doneInit = false;
-  
-  private IconUtil() {    
+
+  private IconUtil() {
   }
-  
+
   public void init() {
-    if(doneInit) {
+    if (doneInit) {
       return;
     }
     doneInit = true;
@@ -47,7 +49,7 @@ public class IconUtil {
     addIconProvider(new IIconProvider() {
 
       @Override
-      public void registerIcons(TextureMap register) {
+      public void registerIcons(@Nonnull TextureMap register) {
         whiteTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "white"));
         errorTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "error"));
         blankTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "blank"));
@@ -55,20 +57,21 @@ public class IconUtil {
 
     });
   }
-  
+
   @SubscribeEvent
   public void onIconLoad(TextureStitchEvent.Pre event) {
     for (IIconProvider reg : iconProviders) {
-      reg.registerIcons(event.getMap());      
+      final TextureMap map = event.getMap();
+      if (map != null) {
+        reg.registerIcons(map);
+      }
     }
   }
 
-  public static TextureAtlasSprite getIconForItem(int itemId, int meta) {
-    Item item = Item.getItemById(itemId);
-    if (item == null) {
-      return null;
-    }
-    return Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta);    
+  @SuppressWarnings("null") // don't trust modded models to not do stupid things...
+  public static @Nonnull TextureAtlasSprite getIconForItem(@Nonnull Item item, int meta) {
+    final TextureAtlasSprite icon = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta);
+    return icon != null ? icon : Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
   }
 
 }

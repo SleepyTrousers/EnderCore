@@ -45,31 +45,29 @@ public class ClientUtil {
       e.printStackTrace();
     }
   }
-  
+
   public static void setParticleVelocityY(Particle p, double y) {
     if (p == null || X == null || Y == null || Z == null) {
       return;
     }
-    try {      
+    try {
       Y.set(p, y);
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
-  
-  
+
   public static double getParticleVelocityY(Particle p) {
     if (p == null || X == null || Y == null || Z == null) {
       return 0;
     }
-    try {      
+    try {
       Object val = Y.get(p);
-      return ((Double)val).doubleValue();
+      return ((Double) val).doubleValue();
     } catch (Exception e) {
       e.printStackTrace();
       return 0;
-    }    
+    }
   }
-  
 
 }

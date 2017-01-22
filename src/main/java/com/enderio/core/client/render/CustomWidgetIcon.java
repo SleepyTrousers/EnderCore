@@ -1,16 +1,19 @@
 package com.enderio.core.client.render;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.api.client.render.IWidgetMap;
 
 public class CustomWidgetIcon implements IWidgetIcon {
 
   private final int x, y, width, height;
-  private final IWidgetMap map;
+  private final @Nonnull IWidgetMap map;
 
-  private IWidgetIcon overlay;
+  private @Nullable IWidgetIcon overlay;
 
-  public CustomWidgetIcon(int x, int y, int width, int height, IWidgetMap map, IWidgetIcon overlay) {
+  public CustomWidgetIcon(int x, int y, int width, int height, @Nonnull IWidgetMap map, @Nullable IWidgetIcon overlay) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -19,7 +22,7 @@ public class CustomWidgetIcon implements IWidgetIcon {
     this.overlay = overlay;
   }
 
-  public CustomWidgetIcon(int x, int y, int width, int height, IWidgetMap map) {
+  public CustomWidgetIcon(int x, int y, int width, int height, @Nonnull IWidgetMap map) {
     this(x, y, width, height, map, null);
   }
 
@@ -44,12 +47,12 @@ public class CustomWidgetIcon implements IWidgetIcon {
   }
 
   @Override
-  public IWidgetMap getMap() {
+  public @Nonnull IWidgetMap getMap() {
     return map;
   }
 
   @Override
-  public IWidgetIcon getOverlay() {
+  public @Nullable IWidgetIcon getOverlay() {
     return overlay;
   }
 }
