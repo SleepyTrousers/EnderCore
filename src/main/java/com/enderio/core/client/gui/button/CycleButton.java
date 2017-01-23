@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.client.gui.button.CycleButton.ICycleEnum;
+import com.enderio.core.common.util.NNList;
 
 import net.minecraft.client.Minecraft;
 
@@ -33,15 +34,14 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
     List<String> getTooltipLines();
   }
 
-  private final @Nonnull T[] modes;
+  private final @Nonnull NNList<T> modes;
 
   private @Nonnull T mode;
 
-  @SuppressWarnings("null")
   public CycleButton(@Nonnull IGuiScreen gui, int id, int x, int y, @Nonnull Class<T> enumClass) {
     super(gui, id, x, y, null);
-    modes = enumClass.getEnumConstants();
-    setMode(mode = modes[0]);
+    modes = NNList.of(enumClass);
+    setMode(mode = modes.get(0));
   }
 
   @Override
@@ -63,15 +63,11 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
   }
 
   private void nextMode() {
-    setMode(modes[(mode.ordinal() + 1) % modes.length]);
+    setMode(modes.next(mode));
   }
 
   private void prevMode() {
-    int ord = mode.ordinal() - 1;
-    if (ord < 0) {
-      ord = modes.length - 1;
-    }
-    setMode(modes[ord]);
+    setMode(modes.prev(mode));
   }
 
   public void setMode(T newMode) {

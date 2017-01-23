@@ -13,6 +13,7 @@ import com.enderio.core.api.common.config.IConfigHandler;
 import com.enderio.core.common.Lang;
 import com.enderio.core.common.event.ConfigFileChangedEvent;
 import com.enderio.core.common.util.Bound;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.ImmutableList;
 
 import net.minecraftforge.common.MinecraftForge;
@@ -74,7 +75,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   @Nonnull
   String modid;
-  Configuration config;
+  private Configuration config;
 
   @Nonnull
   List<Section> sections = new ArrayList<Section>();
@@ -94,12 +95,17 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     saveConfigFile();
   }
 
+  @Nonnull
+  Configuration getConfig() {
+    return NullHelper.notnull(config, "Configuration getConfig()");
+  }
+
   protected void loadConfigFile() {
-    config.load();
+    getConfig().load();
   }
 
   protected void saveConfigFile() {
-    config.save();
+    getConfig().save();
   }
 
   @SubscribeEvent
@@ -192,7 +198,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     }
 
     if (comment != null) {
-      config.addCustomCategoryComment(sectionName, comment);
+      getConfig().addCustomCategoryComment(sectionName, comment);
     }
 
     return section.register();
@@ -592,29 +598,29 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
         // same logic as above method, mostly
         if (defaultVal instanceof Integer)
         {
-            prop = config.get(section.name, key, (Integer) defaultVal);
+            prop = getConfig().get(section.name, key, (Integer) defaultVal);
         }
         if (defaultVal instanceof Boolean)
         {
-            prop = config.get(section.name, key, (Boolean) defaultVal);
+            prop = getConfig().get(section.name, key, (Boolean) defaultVal);
         }
         if (defaultVal instanceof int[])
         {
-            prop = config.get(section.name, key, (int[]) defaultVal);
+            prop = getConfig().get(section.name, key, (int[]) defaultVal);
         }
         if (defaultVal instanceof String)
         {
-            prop = config.get(section.name, key, (String) defaultVal);
+            prop = getConfig().get(section.name, key, (String) defaultVal);
         }
         if (defaultVal instanceof String[])
         {
-            prop = config.get(section.name, key, (String[]) defaultVal);
+            prop = getConfig().get(section.name, key, (String[]) defaultVal);
         }
         // @formatter:on
 
     if (defaultVal instanceof Float || defaultVal instanceof Double) {
       double val = defaultVal instanceof Float ? ((Float) defaultVal).doubleValue() : ((Double) defaultVal).doubleValue();
-      prop = config.get(section.name, key, val);
+      prop = getConfig().get(section.name, key, val);
     }
 
     if (prop != null) {
@@ -653,7 +659,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
 
   @Override
   public final @Nonnull ConfigCategory getCategory(String name) {
-    final ConfigCategory category = config.getCategory(name);
+    final ConfigCategory category = getConfig().getCategory(name);
     if (category == null) {
       throw new NullPointerException("Forge is rejecting to create a config category '" + name + "'");
     }

@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.util.NullHelper;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -59,11 +60,10 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
     return null;
   }
 
-  @SuppressWarnings("null")
   @Override
   @Nonnull
   public List<ITankInfoWrapper> getTankInfoWrappers() {
-    return Collections.<ITankInfoWrapper> emptyList();
+    return NullHelper.notnullJ(Collections.<ITankInfoWrapper> emptyList(), "Collections.emptyList()");
   }
 
 }

@@ -66,6 +66,9 @@ public class RightClickCropHandler {
       }
       Block mcblock = ForgeRegistries.BLOCKS
           .getValue(new ResourceLocation(NullHelper.notnullJ(blockinfo[0], "String.split()"), NullHelper.notnullJ(blockinfo[1], "String.split()")));
+      if (mcblock == null) {
+        throw new RuntimeException("invalid block specifier '" + block + "' received in IMV message from another mod");
+      }
       grownState = mcblock.getStateFromMeta(meta);
       resetState = mcblock.getStateFromMeta(resetMeta);
     }
@@ -104,11 +107,11 @@ public class RightClickCropHandler {
 
   @SubscribeEvent
   public void handleCropRightClick(RightClickBlock event) {
-    BlockPos pos = event.getPos();
-    if (!ConfigHandler.allowCropRC || pos == null) {
+    if (!ConfigHandler.allowCropRC) {
       return;
     }
 
+    BlockPos pos = event.getPos();
     IBlockState blockState = event.getWorld().getBlockState(pos);
     if (event.getEntityPlayer().getHeldItemMainhand().isEmpty() || !event.getEntityPlayer().isSneaking()) {
       for (IPlantInfo info : plants) {

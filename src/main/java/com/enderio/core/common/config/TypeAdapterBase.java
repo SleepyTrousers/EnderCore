@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.common.config.ConfigProcessor.ITypeAdapter;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
@@ -59,7 +62,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     }
 
     @Override
-    public TYPE createBaseType(TYPE actual) {
+    public @Nonnull TYPE createBaseType(@Nonnull TYPE actual) {
       return actual;
     }
   }
@@ -90,7 +93,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
                 }
 
                 @Override
-                public Double createBaseType(Float actual)
+                public @Nonnull Double createBaseType(@Nonnull Float actual)
                 {
                     return Double.parseDouble(Floatfmt.format(actual));
                 }
@@ -112,7 +115,7 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
                 }
 
                 @Override
-                public double[] createBaseType(float[] actual)
+                public @Nonnull double[] createBaseType(@Nonnull float[] actual)
                 {
                     double[] ret = new double[actual.length];
                     for (int i = 0; i < ret.length; i++)
@@ -126,51 +129,48 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Integer>, int[]> INTEGER_LIST =
             new TypeAdapterBase<List<Integer>, int[]>(new TypeToken<List<Integer>>(){}, Type.INTEGER)
             {
-                @SuppressWarnings("null")
                 @Override
                 public List<Integer> createActualType(int[] data)
                 {
-                    return Lists.newArrayList(ArrayUtils.toObject(data));
+                    return Lists.newArrayList(NullHelper.notnull(ArrayUtils.toObject(data),"LOC07929044"));
                 }
 
                 @Override
-                public int[] createBaseType(List<Integer> actual)
+                public @Nonnull int[] createBaseType(@Nonnull List<Integer> actual)
                 {
-                    return ArrayUtils.toPrimitive(actual.toArray(new Integer[actual.size()]));
+                    return NullHelper.notnullJ(ArrayUtils.toPrimitive(actual.toArray(new Integer[actual.size()])), "ArrayUtils.toPrimitive()");
                 }
             };
 
     public static final TypeAdapterBase<List<Double>, double[]> DOUBLE_LIST =
             new TypeAdapterBase<List<Double>, double[]>(new TypeToken<List<Double>>(){}, Type.DOUBLE)
             {
-                @SuppressWarnings("null")
                 @Override
                 public List<Double> createActualType(double[] data)
                 {
-                    return Lists.newArrayList(ArrayUtils.toObject(data));
+                    return Lists.newArrayList(NullHelper.notnull(ArrayUtils.toObject(data),"LOC07933087"));
                 }
 
                 @Override
-                public double[] createBaseType(List<Double> actual)
+                public @Nonnull double[] createBaseType(@Nonnull List<Double> actual)
                 {
-                    return ArrayUtils.toPrimitive(actual.toArray(new Double[actual.size()]));
+                    return NullHelper.notnullJ(ArrayUtils.toPrimitive(actual.toArray(new Double[actual.size()])), "ArrayUtils.toPrimitive()");
                 }
             };
 
     public static final TypeAdapterBase<List<Float>, double[]> FLOAT_LIST =
             new TypeAdapterBase<List<Float>, double[]>(new TypeToken<List<Float>>(){}, Type.DOUBLE)
             {
-                @SuppressWarnings("null")
                 @Override
                 public List<Float> createActualType(double[] data)
                 {
-                    return Lists.newArrayList(ArrayUtils.toObject(FLOAT_ARR.createActualType(data)));
+                    return Lists.newArrayList(NullHelper.notnull(ArrayUtils.toObject(FLOAT_ARR.createActualType(data)),"LOC07936094"));
                 }
 
                 @Override
-                public double[] createBaseType(List<Float> actual)
+                public @Nonnull double[] createBaseType(@Nonnull List<Float> actual)
                 {
-                    float[] temp = ArrayUtils.toPrimitive(actual.toArray(new Float[actual.size()]));
+                    final @Nonnull float[] temp = NullHelper.notnullJ(ArrayUtils.toPrimitive(actual.toArray(new Float[actual.size()])), "ArrayUtils.toPrimitive()");
                     return FLOAT_ARR.createBaseType(temp);
                 }
             };
@@ -178,34 +178,32 @@ public abstract class TypeAdapterBase<ACTUAL, BASE> implements ITypeAdapter<ACTU
     public static final TypeAdapterBase<List<Boolean>, boolean[]> BOOLEAN_LIST =
             new TypeAdapterBase<List<Boolean>, boolean[]>(new TypeToken<List<Boolean>>(){}, Type.BOOLEAN)
             {
-                @SuppressWarnings("null")
                 @Override
                 public List<Boolean> createActualType(boolean[] data)
                 {
-                    return Lists.newArrayList(ArrayUtils.toObject(data));
+                    return Lists.newArrayList(NullHelper.notnull(ArrayUtils.toObject(data),"LOC07943002"));
                 }
 
                 @Override
-                public boolean[] createBaseType(List<Boolean> actual)
+                public @Nonnull boolean[] createBaseType(@Nonnull List<Boolean> actual)
                 {
-                    return ArrayUtils.toPrimitive(actual.toArray(new Boolean[actual.size()]));
+                    return NullHelper.notnullJ(ArrayUtils.toPrimitive(actual.toArray(new Boolean[actual.size()])), "ArrayUtils.toPrimitive()");
                 }
             };
 
     public static final TypeAdapterBase<List<String>, String[]> STRING_LIST =
             new TypeAdapterBase<List<String>, String[]>(new TypeToken<List<String>>(){}, Type.STRING)
             {
-                @SuppressWarnings("null")
                 @Override
                 public List<String> createActualType(String[] data)
                 {
-                    return Lists.newArrayList(data);
+                    return Lists.newArrayList(NullHelper.notnull(data,"LOC07949017"));
                 }
 
                 @Override
-                public String[] createBaseType(List<String> actual)
+                public @Nonnull String[] createBaseType(@Nonnull List<String> actual)
                 {
-                    return actual.toArray(new String[actual.size()]);
+                    return NullHelper.notnullJ(actual.toArray(new String[actual.size()]), "List.toArray()");
                 }
             };
 

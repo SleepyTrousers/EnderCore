@@ -40,6 +40,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
@@ -51,8 +52,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 public class EnderCore implements IEnderMod {
 
   public static final @Nonnull String MODID = "endercore";
-  @SuppressWarnings("null")
-  public static final @Nonnull String DOMAIN = MODID.toLowerCase(Locale.US);
+  public static final @Nonnull String DOMAIN = NullHelper.notnullJ(MODID.toLowerCase(Locale.US), "String.toLowerCase()");
   public static final @Nonnull String NAME = "EnderCore";
   public static final @Nonnull String BASE_PACKAGE = "com.enderio";
   public static final @Nonnull String VERSION = "@VERSION@";
@@ -75,7 +75,12 @@ public class EnderCore implements IEnderMod {
    * user forcibly disables invisible mode in the config.
    */
   public void requestInvisibleMode() {
-    invisibleRequesters.add(Loader.instance().activeModContainer().getName());
+    final ModContainer activeModContainer = Loader.instance().activeModContainer();
+    if (activeModContainer != null) {
+      invisibleRequesters.add(activeModContainer.getName());
+    } else {
+      invisibleRequesters.add("null");
+    }
   }
 
   public boolean invisibilityRequested() {

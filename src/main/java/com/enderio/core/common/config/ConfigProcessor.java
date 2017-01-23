@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import com.enderio.core.common.config.annot.RestartReq;
 import com.enderio.core.common.event.ConfigFileChangedEvent;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.Bound;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -44,7 +46,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnection
  */
 public class ConfigProcessor {
   public interface IReloadCallback {
-    void callback(ConfigProcessor inst);
+    void callback(@Nonnull ConfigProcessor inst);
   }
 
   /**
@@ -82,31 +84,32 @@ public class ConfigProcessor {
 
     ACTUAL createActualType(BASE base);
 
-    BASE createBaseType(ACTUAL actual);
+    @Nonnull
+    BASE createBaseType(@Nonnull ACTUAL actual);
   }
 
-  static final Map<String, ConfigProcessor> processorMap = Maps.newHashMap();
+  static final @Nonnull Map<String, ConfigProcessor> processorMap = Maps.newHashMap();
 
-  protected final List<ITypeAdapter<?, ?>> adapters = Lists.newArrayList();
+  protected final @Nonnull List<ITypeAdapter<?, ?>> adapters = Lists.newArrayList();
 
-  protected final String modid;
+  protected final @Nonnull String modid;
 
-  protected final Class<?> configs;
-  protected final Configuration configFile;
-  protected final IReloadCallback callback;
+  protected final @Nonnull Class<?> configs;
+  protected final @Nonnull Configuration configFile;
+  protected final @Nullable IReloadCallback callback;
 
-  protected Map<String, Object> configValues = Maps.newHashMap();
-  protected Map<String, Object> defaultValues = Maps.newHashMap();
-  protected Map<String, Object> originalValues = Maps.newHashMap();
+  protected @Nonnull Map<String, Object> configValues = Maps.newHashMap();
+  protected final @Nonnull Map<String, Object> defaultValues = Maps.newHashMap();
+  protected final @Nonnull Map<String, Object> originalValues = Maps.newHashMap();
 
-  protected Set<String> sections = Sets.newHashSet();
+  protected final @Nonnull Set<String> sections = Sets.newHashSet();
 
   /**
    * This constructor omits the callback arg.
    *
    * @see #ConfigProcessor(Class, File, String, IReloadCallback)
    */
-  public ConfigProcessor(Class<?> configs, File configFile, String modid) {
+  public ConfigProcessor(@Nonnull Class<?> configs, @Nonnull File configFile, @Nonnull String modid) {
     this(configs, configFile, modid, null);
   }
 
@@ -122,7 +125,7 @@ public class ConfigProcessor {
    * @param callback
    *          an {@link IReloadCallback} object which will be called whenever config values are edited.
    */
-  public ConfigProcessor(Class<?> configs, File configFile, String modid, IReloadCallback callback) {
+  public ConfigProcessor(@Nonnull Class<?> configs, @Nonnull File configFile, @Nonnull String modid, @Nullable IReloadCallback callback) {
     this(configs, new Configuration(configFile), modid, callback);
   }
 
@@ -135,7 +138,7 @@ public class ConfigProcessor {
    * @param handler
    *          Your {@link AbstractConfigHandler}
    */
-  public ConfigProcessor(Class<?> configs, AbstractConfigHandler handler) {
+  public ConfigProcessor(@Nonnull Class<?> configs, @Nonnull AbstractConfigHandler handler) {
     this(configs, handler, null);
   }
 
@@ -150,11 +153,11 @@ public class ConfigProcessor {
    * @param callback
    *          an {@link IReloadCallback} object which will be called whenever config values are edited.
    */
-  public ConfigProcessor(Class<?> configs, AbstractConfigHandler handler, IReloadCallback callback) {
-    this(configs, handler.config, handler.modid, callback);
+  public ConfigProcessor(@Nonnull Class<?> configs, @Nonnull AbstractConfigHandler handler, @Nullable IReloadCallback callback) {
+    this(configs, handler.getConfig(), handler.modid, callback);
   }
 
-  protected ConfigProcessor(Class<?> configs, Configuration configFile, String modid, IReloadCallback callback) {
+  protected ConfigProcessor(@Nonnull Class<?> configs, @Nonnull Configuration configFile, @Nonnull String modid, @Nullable IReloadCallback callback) {
     this.configs = configs;
     this.configFile = configFile;
     this.modid = modid;
@@ -210,7 +213,7 @@ public class ConfigProcessor {
     String name = f.getName();
     Object value = defaultValues.get(name);
     if (value == null) {
-      value = f.get(null);
+      value = NullHelper.notnull(f.get(null), "missing default value");
       defaultValues.put(name, value);
     }
 
@@ -226,7 +229,7 @@ public class ConfigProcessor {
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  protected Object getConfigValue(String section, String[] commentLines, Field f, Object defaultValue) {
+  protected Object getConfigValue(@Nonnull String section, @Nonnull String[] commentLines, @Nonnull Field f, @Nonnull Object defaultValue) {
     Property prop = null;
     Object res = null;
     Bound<Double> bound = getBound(f);
@@ -284,12 +287,10 @@ public class ConfigProcessor {
     throw new IllegalArgumentException(String.format("No adapter for type %s in class %s, field %s", f.getGenericType(), configs, f));
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected ITypeAdapter getAdapterFor(Field f) {
-    @SuppressWarnings("null")
-    TypeToken<?> t = TypeToken.of(f.getGenericType());
+  protected ITypeAdapter<?, ?> getAdapterFor(@Nonnull Field f) {
+    TypeToken<?> t = TypeToken.of(NullHelper.notnullJ(f.getGenericType(), "Field.getGenericType()"));
     Class<?> c = f.getType();
-    for (ITypeAdapter adapter : adapters) {
+    for (ITypeAdapter<?, ?> adapter : adapters) {
       if ((c.isPrimitive() && c == adapter.getPrimitiveType()) || adapter.getActualType().isAssignableFrom(t)) {
         return adapter;
       }
@@ -297,7 +298,6 @@ public class ConfigProcessor {
     return null;
   }
 
-  @SuppressWarnings("null")
   public ImmutableSet<String> sections() {
     return ImmutableSet.copyOf(sections);
   }
@@ -306,7 +306,7 @@ public class ConfigProcessor {
     return configFile.getCategory(category);
   }
 
-  public void syncTo(Map<String, Object> values) {
+  public void syncTo(@Nonnull Map<String, Object> values) {
     this.configValues = values;
     for (String s : configValues.keySet()) {
       try {
@@ -333,9 +333,9 @@ public class ConfigProcessor {
     }
   }
 
-  protected String[] getComment(Field f) {
+  protected @Nonnull String[] getComment(Field f) {
     Comment c = f.getAnnotation(Comment.class);
-    return c == null ? new String[0] : c.value();
+    return NullHelper.first(c == null ? null : c.value(), new String[0]);
   }
 
   protected Bound<Double> getBound(Field f) {

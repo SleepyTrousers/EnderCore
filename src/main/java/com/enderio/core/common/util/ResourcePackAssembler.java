@@ -128,9 +128,6 @@ public class ResourcePackAssembler {
 
   /**
    * Adds a model json file. This file will be inserted into the models dir only.
-   *
-   * @param lang
-   *          A language file (e.g. myblock.json)
    */
   public void addModel(File model, ModelType type) {
     String path = assetsPath + type.getPath() + "/";

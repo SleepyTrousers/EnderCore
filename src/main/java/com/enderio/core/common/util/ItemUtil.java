@@ -159,12 +159,17 @@ public class ItemUtil {
    *          If stack size should be taken into account
    * @return A string that will be the equivalent of if {@link ItemStack stack} was constructed from it using {@link #parseStringIntoItemStack(String)}
    */
-  public static String getStringForItemStack(@Nonnull ItemStack stack, boolean damage, boolean size) {
+  public static @Nullable String getStringForItemStack(@Nonnull ItemStack stack, boolean damage, boolean size) {
     if (stack.isEmpty()) {
       return null;
     }
 
-    String base = stack.getItem().getRegistryName().toString();
+    final ResourceLocation registryName = stack.getItem().getRegistryName();
+    if (registryName == null) {
+      return null;
+    }
+
+    String base = registryName.toString();
 
     if (damage) {
       base += ";" + stack.getItemDamage();
