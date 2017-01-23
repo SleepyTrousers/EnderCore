@@ -92,8 +92,34 @@ public class EnderCoreTransformer implements IClassTransformer {
   static final String entityAICreeperSwellClass = "net.minecraft.entity.ai.EntityAICreeperSwell";
   static final ObfSafeName updateTaskMethod = new ObfSafeName("updateTask", "func_75246_d");
 
+  static final String extendedBlockStorageClass = "net.minecraft.world.chunk.storage.ExtendedBlockStorage";
+  static final ObfSafeName isEmptyMethod = new ObfSafeName("isEmpty", "func_76663_a");
+
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
+
+    // "Light data eaten instead of sent to client" fix (MC-80966)
+    if (transformedName.equals(extendedBlockStorageClass)) {
+      return transform(basicClass, extendedBlockStorageClass, isEmptyMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          boolean done = false;
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (isEmptyMethod.equals(m.name)) {
+              m.instructions.clear();
+              m.visitInsn(Opcodes.ICONST_0);
+              m.visitInsn(Opcodes.IRETURN);
+              done = true;
+              break;
+            }
+          }
+          if (!done) {
+            logger.info("Transforming failed.");
+          }
+        }
+      });
+    }
 
     // Anvil max level
     if (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass)) {
