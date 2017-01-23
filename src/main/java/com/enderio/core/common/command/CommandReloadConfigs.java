@@ -10,6 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.event.ConfigFileChangedEvent;
+import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -62,16 +63,15 @@ public class CommandReloadConfigs extends CommandBase {
     return 2;
   }
 
-  @SuppressWarnings("null")
   @Override
   public @Nonnull List<String> getTabCompletions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args,
       @Nullable BlockPos pos) {
     if (args.length >= 1) {
       @Nonnull
-      String[] avail = validModIDs.toArray(new String[validModIDs.size()]);
+      String[] avail = NullHelper.notnullJ(validModIDs.toArray(new String[validModIDs.size()]), "List.toArray()");
 
       for (int i = 0; i < args.length - 1; i++) {
-        avail = ArrayUtils.removeElement(avail, args[i]);
+        avail = NullHelper.notnullJ(ArrayUtils.removeElement(avail, args[i]), "ArrayUtils.removeElement()");
       }
 
       return getListOfStringsMatchingLastWord(args, avail);

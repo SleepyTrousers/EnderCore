@@ -32,7 +32,7 @@ compileJava {
 
 boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE").equalsIgnoreCase("false")
 
-def type = 'release'
+def type = 'alpha'
 if (project.hasProperty('mod_appendix')) {
     version += "-${project.mod_appendix}"
 	type = project.mod_appendix
@@ -133,13 +133,13 @@ publishing {
 
 task checkTranslations << {
     Map<String, String> mapen = new HashMap<String, String>()
-    (new File('resources/assets/enderio/lang/en_US.lang')).eachLine {
+    (new File('resources/assets/endercore/lang/en_US.lang')).eachLine {
         def (value1, value2) = it.tokenize( '=' )
         if (value1 == null || value2 == null) {return}
         mapen.put(value1, value2)
     }
     
-    new File('resources/assets/enderio/lang/').eachFileMatch( ~".*\\.lang\$" ) { langfile ->
+    new File('resources/assets/endercore/lang/').eachFileMatch( ~".*\\.lang\$" ) { langfile ->
         if (!langfile.getName().contains("en_US")) {
 	        Map<String, String> map = new HashMap<String, String>()
 	        File outfile = new File("${langfile}.txt")

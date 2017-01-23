@@ -1,5 +1,6 @@
 package com.enderio.core.common.util;
 
+import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +48,48 @@ public class NNList<E> extends NonNullList<E> {
   public static @Nonnull <X extends Enum<?>> NNList<X> of(Class<X> e) {
     NNList<X> list = new NNList<X>(e.getEnumConstants());
     return list;
+  }
+
+  /**
+   * Finds the element after the given element.
+   * <p>
+   * Please note that this does do identity, not equality, checks and cannot handle multiple occurrences of the same element in the list.
+   *
+   * @throws InvalidParameterException
+   *           if the given element is not part of the list.
+   */
+  public @Nonnull E next(E current) {
+    for (int i = 0; i < size(); i++) {
+      if (get(i) == current) {
+        if (i + 1 < size()) {
+          return get(i + 1);
+        } else {
+          return get(0);
+        }
+      }
+    }
+    throw new InvalidParameterException();
+  }
+
+  /**
+   * Finds the element before the given element.
+   * <p>
+   * Please note that this does do identity, not equality, checks and cannot handle multiple occurrences of the same element in the list.
+   *
+   * @throws InvalidParameterException
+   *           if the given element is not part of the list.
+   */
+  public @Nonnull E prev(E current) {
+    for (int i = 0; i < size(); i++) {
+      if (get(i) == current) {
+        if (i > 0) {
+          return get(i - 1);
+        } else {
+          return get(size() - 1);
+        }
+      }
+    }
+    throw new InvalidParameterException();
   }
 
   public void apply(@Nonnull Callback<E> callback) {

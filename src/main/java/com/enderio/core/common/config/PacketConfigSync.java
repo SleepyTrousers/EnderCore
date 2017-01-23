@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.base.Throwables;
 
 import io.netty.buffer.ByteBuf;
@@ -74,7 +75,7 @@ public class PacketConfigSync implements IMessage {
     public PacketConfigSync onMessage(PacketConfigSync message, MessageContext ctx) {
       ConfigProcessor processor = ConfigProcessor.processorMap.get(message.modid);
       if (processor != null) {
-        processor.syncTo(message.configValues);
+        processor.syncTo(NullHelper.notnull(message.configValues, "missing data in PacketConfigSync"));
       }
       return null;
     }

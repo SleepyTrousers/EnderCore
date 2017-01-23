@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigProcessor.IReloadCallback;
 import com.enderio.core.common.config.JsonConfigReader.ModToken;
@@ -131,7 +133,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     processor = new ConfigProcessor(getClass(), this, this) {
 
       @Override
-      protected Object getConfigValue(String section, String[] commentLines, Field f, Object defVal) {
+      protected Object getConfigValue(@Nonnull String section, @Nonnull String[] commentLines, @Nonnull Field f, @Nonnull Object defVal) {
         Object res = super.getConfigValue(section, commentLines, f, defVal);
         if (f.getName() == "invisibleMode") {
           if (res.equals(0)) {
@@ -161,7 +163,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   }
 
   @Override
-  public void callback(ConfigProcessor inst) {
+  public void callback(@Nonnull ConfigProcessor inst) {
     Tweaks.loadIngameTweaks();
   }
 
@@ -174,7 +176,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   public boolean showInvisibleWarning() {
     activateSection("invisibility");
-    ConfigCategory cat = config.getCategory("invisibility");
+    ConfigCategory cat = getConfig().getCategory("invisibility");
     boolean ret = false;
     if (!cat.containsKey("invisibilityWarning")) {
       ret = true;

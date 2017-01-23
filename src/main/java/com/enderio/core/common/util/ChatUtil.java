@@ -85,11 +85,11 @@ public class ChatUtil {
   }
 
   /**
-   * Returns a standard {@link ChatComponentText} for the given {@link String}.
+   * Returns a standard {@link ITextComponent} for the given {@link String}.
    *
    * @param s
    *          The string to wrap.
-   * @return An {@link IChatComponent} containing the string.
+   * @return An {@link ITextComponent} containing the string.
    */
   public static @Nonnull ITextComponent wrap(@Nullable String s) {
     return s == null ? new TextComponentString("") : new TextComponentString(s);
@@ -145,7 +145,7 @@ public class ChatUtil {
    * @param player
    *          The player to send the chat lines to.
    * @param lines
-   *          The {@link IChatComponent chat components} to send.yes
+   *          The {@link ITextComponent chat components} to send.
    */
   public static void sendChat(@Nonnull EntityPlayer player, @Nonnull ITextComponent... lines) {
     for (ITextComponent c : lines) {
