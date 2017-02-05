@@ -33,13 +33,13 @@ class StringThing implements IThing {
     boolean allowItem = true, allowBlock = true, allowOreDict = true;
     if (ident.startsWith("item:")) {
       allowBlock = allowOreDict = false;
-      ident = NullHelper.notnullJ(ident.substring("item:".length()), "String.substring()");
+      ident = ident.substring("item:".length());
     } else if (ident.startsWith("block:")) {
       allowItem = allowOreDict = false;
-      ident = NullHelper.notnullJ(ident.substring("block:".length()), "String.substring()");
+      ident = ident.substring("block:".length());
     } else if (ident.startsWith("oredict:")) {
       allowBlock = allowItem = false;
-      ident = NullHelper.notnullJ(ident.substring("oredict:".length()), "String.substring()");
+      ident = ident.substring("oredict:".length());
     }
     int meta = -1;
     if (ident.contains(":")) {

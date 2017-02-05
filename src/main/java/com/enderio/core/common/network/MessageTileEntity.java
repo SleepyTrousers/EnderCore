@@ -4,7 +4,6 @@ import java.lang.reflect.TypeVariable;
 
 import javax.annotation.Nonnull;
 
-import com.enderio.core.common.util.NullHelper;
 import com.google.common.reflect.TypeToken;
 
 import io.netty.buffer.ByteBuf;
@@ -49,14 +48,19 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
       return null;
     }
     @SuppressWarnings("rawtypes")
-    final Class<? extends MessageTileEntity> ourClass = NullHelper.notnullJ(getClass(), "Object.getClass()");
+    final Class<? extends MessageTileEntity> ourClass = getClass();
     @SuppressWarnings("rawtypes")
-    final TypeVariable<Class<MessageTileEntity>> typeParam0 = NullHelper.notnullJ(MessageTileEntity.class.getTypeParameters()[0],
-        "Class.getTypeParameters()[0]");
-    TypeToken<?> teType = TypeToken.of(ourClass).resolveType(typeParam0);
-    final Class<? extends TileEntity> teClass = NullHelper.notnullJ(te.getClass(), "Object.getClass()");
-    if (teType.isAssignableFrom(teClass)) {
-      return (T) te;
+    final TypeVariable<Class<MessageTileEntity>>[] typeParameters = MessageTileEntity.class.getTypeParameters();
+    if (typeParameters.length > 0) {
+      @SuppressWarnings("rawtypes")
+      final TypeVariable<Class<MessageTileEntity>> typeParam0 = typeParameters[0];
+      if (typeParam0 != null) {
+        TypeToken<?> teType = TypeToken.of(ourClass).resolveType(typeParam0);
+        final Class<? extends TileEntity> teClass = te.getClass();
+        if (teType.isAssignableFrom(teClass)) {
+          return (T) te;
+        }
+      }
     }
     return null;
   }

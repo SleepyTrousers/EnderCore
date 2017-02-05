@@ -72,9 +72,4 @@ public final class NullHelper {
     throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
   }
 
-  @SuppressWarnings("null")
-  public final static @Nonnull <P> P violate(@Nullable P p) {
-    return p;
-  }
-
 }

@@ -80,6 +80,21 @@ processResources {
     }
 }
 
+/*
+// Add external annotations
+eclipse.classpath.file {
+    withXml {
+        def node = it.asNode()
+        node.get('classpathentry').each {
+            // Allow external annotations on Minecraft/Forge and JRE
+            if (it.attribute('path').contains('forgeSrc') || it.attribute('path').contains('JRE_CONTAINER')) {
+                it.appendNode('attributes').appendNode('attribute', [name: 'annotationpath', value: '/'+rootProject.name+'/externalannotations/'])
+            }
+        }
+    }
+}
+*/
+
 jar {
     from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {

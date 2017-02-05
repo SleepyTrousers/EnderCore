@@ -1,0 +1,16 @@
+class java/lang/String
+concat
+ (Ljava/lang/String;)Ljava/lang/String;
+ (Ljava/lang/String;)L1java/lang/String;
+format
+ (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ (Ljava/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+split
+ (Ljava/lang/String;)[Ljava/lang/String;
+ (Ljava/lang/String;)[1Ljava/lang/String;
+substring
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+toLowerCase
+ (Ljava/util/Locale;)Ljava/lang/String;
+ (Ljava/util/Locale;)L1java/lang/String;

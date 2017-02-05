@@ -53,7 +53,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 public class EnderCore implements IEnderMod {
 
   public static final @Nonnull String MODID = "endercore";
-  public static final @Nonnull String DOMAIN = NullHelper.notnullJ(MODID.toLowerCase(Locale.US), "String.toLowerCase()");
+  public static final @Nonnull String DOMAIN = MODID.toLowerCase(Locale.US);
   public static final @Nonnull String NAME = "EnderCore";
   public static final @Nonnull String BASE_PACKAGE = "com.enderio";
   public static final @Nonnull String VERSION = "@VERSION@";

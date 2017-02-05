@@ -21,7 +21,6 @@ import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.LegacyPlantInfo;
 import com.enderio.core.common.tweaks.Tweak;
 import com.enderio.core.common.tweaks.Tweaks;
-import com.enderio.core.common.util.NullHelper;
 
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -130,7 +129,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     addSection(sectionEnchants);
     addSection("tweaks");
     addSection("invisibility");
-    processor = new ConfigProcessor(NullHelper.notnullJ(getClass(), "getClass()"), this, this) {
+    processor = new ConfigProcessor(getClass(), this, this) {
 
       @Override
       protected Object getConfigValue(@Nonnull String section, @Nonnull String[] commentLines, @Nonnull Field f, @Nonnull Object defVal) {

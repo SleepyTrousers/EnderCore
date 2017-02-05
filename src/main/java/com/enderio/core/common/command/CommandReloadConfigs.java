@@ -71,7 +71,7 @@ public class CommandReloadConfigs extends CommandBase {
       String[] avail = NullHelper.notnullJ(validModIDs.toArray(new String[validModIDs.size()]), "List.toArray()");
 
       for (int i = 0; i < args.length - 1; i++) {
-        avail = NullHelper.notnullJ(ArrayUtils.removeElement(avail, args[i]), "ArrayUtils.removeElement()");
+        avail = ArrayUtils.removeElement(avail, args[i]);
       }
 
       return getListOfStringsMatchingLastWord(args, avail);

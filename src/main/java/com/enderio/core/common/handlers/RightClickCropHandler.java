@@ -61,7 +61,7 @@ public class RightClickCropHandler {
     public void init() {
       seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier received in IMC message from another mod"));
       String[] blockinfo = block.split(":");
-      if (blockinfo == null || blockinfo.length != 2) {
+      if (blockinfo.length != 2) {
         throw new RuntimeException("invalid block specifier '" + block + "' received in IMC message from another mod");
       }
       Block mcblock = ForgeRegistries.BLOCKS

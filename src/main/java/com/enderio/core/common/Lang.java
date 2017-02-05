@@ -5,7 +5,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 
 import net.minecraft.util.text.translation.I18n;
@@ -19,7 +18,7 @@ public class Lang {
   private final @Nonnull String prefix;
 
   public Lang(@Nonnull String locKey) {
-    this.prefix = NullHelper.notnullJ(locKey.concat("."), "String.concat()");
+    this.prefix = locKey.concat(".");
   }
 
   /**
@@ -38,7 +37,7 @@ public class Lang {
    * @return The full string
    */
   public @Nonnull String addPrefix(@Nonnull String suffix) {
-    return NullHelper.notnullJ(prefix.concat(suffix), "String.concat()");
+    return prefix.concat(suffix);
   }
 
   /**
@@ -157,11 +156,7 @@ public class Lang {
    * @return An array of strings split on {@value #CHAR}
    */
   public @Nonnull String[] splitList(@Nonnull String list) {
-    return NullHelper.notnullJ(list.split(REGEX), "String.split()");
-  }
-
-  public @Nonnull String[] splitList(@Nonnull String list, @Nonnull String split) {
-    return NullHelper.notnullJ(list.split(split), "String.split()");
+    return list.split(REGEX);
   }
 
   /**

@@ -1,0 +1,4 @@
+class net/minecraftforge/oredict/OreDictionary
+getOreNames
+ ()[Ljava/lang/String;
+ ()[1Ljava/lang/String;

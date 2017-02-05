@@ -3,7 +3,6 @@ package com.enderio.core.common.network;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
-import com.enderio.core.common.util.NullHelper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -38,7 +37,7 @@ public class PacketGhostSlot implements IMessage {
   public void fromBytes(ByteBuf buf) {
     windowId = buf.readInt();
     slot = buf.readShort();
-    stack = NullHelper.notnullF(ByteBufUtils.readItemStack(buf), "ByteBufUtils.readItemStack()");
+    stack = ByteBufUtils.readItemStack(buf);
     realsize = buf.readInt();
   }
 

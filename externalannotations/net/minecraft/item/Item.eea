@@ -1,0 +1,7 @@
+class net/minecraft/item/Item
+getSubItems
+ (Lnet/minecraft/item/Item;Lnet/minecraft/creativetab/CreativeTabs;Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;)V
+ (Lnet/minecraft/item/Item;L0net/minecraft/creativetab/CreativeTabs;Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;)V
+setCreativeTab
+ (Lnet/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/item/Item;
+ (L0net/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/item/Item;

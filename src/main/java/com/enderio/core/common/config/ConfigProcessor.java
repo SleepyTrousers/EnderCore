@@ -288,7 +288,7 @@ public class ConfigProcessor {
   }
 
   protected ITypeAdapter<?, ?> getAdapterFor(@Nonnull Field f) {
-    TypeToken<?> t = TypeToken.of(NullHelper.notnullJ(f.getGenericType(), "Field.getGenericType()"));
+    TypeToken<?> t = TypeToken.of(f.getGenericType());
     Class<?> c = f.getType();
     for (ITypeAdapter<?, ?> adapter : adapters) {
       if ((c.isPrimitive() && c == adapter.getPrimitiveType()) || adapter.getActualType().isAssignableFrom(t)) {

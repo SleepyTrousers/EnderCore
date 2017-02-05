@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import com.enderio.core.client.render.IconUtil;
 import com.enderio.core.common.CommonProxy;
 import com.enderio.core.common.util.NNList;
-import com.enderio.core.common.util.NullHelper;
 import com.enderio.core.common.util.Scheduler;
 
 import net.minecraft.client.Minecraft;
@@ -48,7 +47,7 @@ public class ClientProxy extends CommonProxy {
 
   @Override
   public void getSubItems(@Nonnull Item itemIn, @Nullable CreativeTabs tab, @Nonnull NNList<ItemStack> subItems) {
-    itemIn.getSubItems(itemIn, NullHelper.violate(tab), subItems);
+    itemIn.getSubItems(itemIn, tab, subItems);
   }
 
 }

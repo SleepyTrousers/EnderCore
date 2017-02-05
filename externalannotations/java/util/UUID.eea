@@ -1,0 +1,4 @@
+class java/util/UUID
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

@@ -214,7 +214,7 @@ public class Util {
 
     try {
       String[] oreNames = OreDictionary.getOreNames();
-      Files.write(Joiner.on("\n").join(NullHelper.notnullF(oreNames, "OreDictionary.getOreNames()")), file, Charsets.UTF_8);
+      Files.write(Joiner.on("\n").join(oreNames), file, Charsets.UTF_8);
       return true;
     } catch (IOException e) {
       Log.warn("Error dumping ore dictionary entries: " + e.getMessage());

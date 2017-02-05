@@ -127,7 +127,7 @@ public class ItemUtil {
     }
 
     if (nbtIdx != -1) {
-      String nbt = NullHelper.notnullJ(value.substring(nbtIdx + 1), "String.substring()");
+      String nbt = value.substring(nbtIdx + 1);
       try {
         tag = JsonToNBT.getTagFromJson(nbt);
       } catch (NBTException e) {

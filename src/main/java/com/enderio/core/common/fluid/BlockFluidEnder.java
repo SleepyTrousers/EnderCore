@@ -3,6 +3,7 @@ package com.enderio.core.common.fluid;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.enderio.core.common.util.NullHelper;
 
@@ -115,8 +116,8 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
 
   @Override
   @SideOnly(Side.CLIENT)
-  public void getSubBlocks(@Nonnull Item itemIn, @Nonnull CreativeTabs tab, @Nonnull NonNullList<ItemStack> list) {
-    if (NullHelper.untrust(tab) != null) { // wrong annotation
+  public void getSubBlocks(@Nonnull Item itemIn, @Nullable CreativeTabs tab, @Nonnull NonNullList<ItemStack> list) {
+    if (tab != null) {
       super.getSubBlocks(itemIn, tab, list);
     }
   }

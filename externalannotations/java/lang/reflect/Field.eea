@@ -1,0 +1,4 @@
+class java/lang/reflect/Field
+getGenericType
+ ()Ljava/lang/reflect/Type;
+ ()L1java/lang/reflect/Type;

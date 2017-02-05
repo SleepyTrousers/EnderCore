@@ -203,7 +203,7 @@ public class SmartTank extends FluidTank {
     NBTTagCompound tankRoot = new NBTTagCompound();
     writeToNBT(tankRoot);
     if (restriction != null) {
-      tankRoot.setString("FluidRestriction", NullHelper.notnullM(restriction.getName(), "encountered fluid with null name"));
+      tankRoot.setString("FluidRestriction", NullHelper.notnullF(restriction.getName(), "encountered fluid with null name"));
     }
     tankRoot.setInteger("Capacity", capacity);
     nbtRoot.setTag(name, tankRoot);

@@ -1,0 +1,4 @@
+class net/minecraftforge/fml/common/network/ByteBufUtils
+readItemStack
+ (Lio/netty/buffer/ByteBuf;)Lnet/minecraft/item/ItemStack;
+ (Lio/netty/buffer/ByteBuf;)L1net/minecraft/item/ItemStack;
