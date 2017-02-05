@@ -59,8 +59,7 @@ public final class NullHelper {
    * Returns its {@link Nonnull} argument unchanged as {@link Nullable}. Use this if you want to null-check values that are annotated non-null but are known not
    * to be.
    */
-  @Nullable
-  public final static <P> P untrust(@Nonnull P o) {
+  public final static @Nullable <P> P untrust(@Nonnull P o) {
     return o;
   }
 
@@ -71,6 +70,11 @@ public final class NullHelper {
       }
     }
     throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
+  }
+
+  @SuppressWarnings("null")
+  public final static @Nonnull <P> P violate(@Nullable P p) {
+    return p;
   }
 
 }

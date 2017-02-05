@@ -147,4 +147,16 @@ public class NNList<E> extends NonNullList<E> {
 
   }
 
+  private static final @Nonnull NNList<Object> EMPTY = new NNList<Object>() {
+    @Override
+    public void add(int p_add_1_, Object p_add_2_) {
+      throw new UnsupportedOperationException();
+    }
+  };
+
+  @SuppressWarnings("unchecked")
+  public static @Nonnull <X> NNList<X> emptyList() {
+    return (NNList<X>) EMPTY;
+  }
+
 }

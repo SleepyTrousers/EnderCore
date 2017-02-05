@@ -28,6 +28,7 @@ import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.NullHelper;
 import com.enderio.core.common.util.PermanentCache;
+import com.enderio.core.common.util.stackable.Things;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -121,6 +122,7 @@ public class EnderCore implements IEnderMod {
 
   @EventHandler
   public void init(@Nonnull FMLInitializationEvent event) {
+    Things.init(event);
     EnderPacketHandler.init();
 
     for (IConfigHandler c : configs) {
