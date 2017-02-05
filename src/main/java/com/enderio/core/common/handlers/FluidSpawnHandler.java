@@ -2,6 +2,7 @@ package com.enderio.core.common.handlers;
 
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.fluid.BlockFluidEnder;
+import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -15,7 +16,8 @@ public class FluidSpawnHandler {
   @SubscribeEvent
   public static void onEntitySpawn(LivingSpawnEvent.CheckSpawn evt) {
     if (evt.getResult() != Result.DENY
-        && EntitySpawnPlacementRegistry.getPlacementForEntity(evt.getEntity().getClass()) == EntityLiving.SpawnPlacementType.IN_WATER
+        && EntitySpawnPlacementRegistry
+            .getPlacementForEntity(NullHelper.notnullJ(evt.getEntity().getClass(), "getClass()")) == EntityLiving.SpawnPlacementType.IN_WATER
         && evt.getWorld().getBlockState(evt.getEntityLiving().getPosition()).getBlock() instanceof BlockFluidEnder) {
       evt.setResult(Result.DENY);
     }

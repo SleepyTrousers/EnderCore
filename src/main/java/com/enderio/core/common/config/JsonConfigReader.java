@@ -175,6 +175,7 @@ public class JsonConfigReader<T> implements Iterable<T> {
    * @throws RuntimeException
    *           If there is an exception while reading the file.
    */
+  @SuppressWarnings("resource")
   public JsonObject parseFile() {
     try {
       return parser.parse(new FileReader(file)).getAsJsonObject();
