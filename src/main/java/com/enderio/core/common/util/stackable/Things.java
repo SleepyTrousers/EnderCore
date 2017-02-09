@@ -112,11 +112,14 @@ public class Things {
   }
 
   private void add(@Nullable IThing thing) {
+    IThing baked;
     if (!inPreInit && thing != null) {
-      thing = thing.bake();
+      baked = thing.bake();
+    } else {
+      baked = thing;
     }
-    if (thing != null) {
-      things.add(thing);
+    if (baked != null) {
+      things.add(baked);
       itemList.clear();
       itemStackListRaw.clear();
       itemStackList.clear();

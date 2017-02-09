@@ -199,7 +199,6 @@ public class ResourcePackAssembler {
    * A cache of the pack zip will be kept in "resourcepack/[pack name].zip" where "resourcepack" is a folder at the same level as the directory passed into the
    * constructor.
    */
-  @SuppressWarnings("resource")
   public void inject() {
     if (FMLCommonHandler.instance().getEffectiveSide().isClient()) {
       try {

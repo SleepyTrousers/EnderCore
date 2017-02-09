@@ -30,15 +30,14 @@ public class UserIdent {
   public @Nonnull UUID getUUID() {
     return uuid != null ? uuid : uuid_offline;
   }
-  
+
   public @Nonnull String getUUIDString() {
     return uuid != null ? uuid + "" : NONE_MARKER;
   }
 
   /**
-   * Create a UserIdent from a UUID object and a name. Use this when reading
-   * stored data, it will check for username changes, implement them and write a
-   * log message.
+   * Create a UserIdent from a UUID object and a name. Use this when reading stored data, it will check for username changes, implement them and write a log
+   * message.
    */
   public static @Nonnull UserIdent create(@Nullable UUID uuid, @Nullable String playerName) {
     if (uuid != null) {
@@ -61,9 +60,8 @@ public class UserIdent {
   }
 
   /**
-   * Create a UserIdent from a UUID string and a name. Use this when reading
-   * stored data, it will check for username changes, implement them and write a
-   * log message.
+   * Create a UserIdent from a UUID string and a name. Use this when reading stored data, it will check for username changes, implement them and write a log
+   * message.
    */
   public static @Nonnull UserIdent create(@Nonnull String suuid, @Nullable String playerName) {
     if (NONE_MARKER.equals(suuid)) {
@@ -81,8 +79,7 @@ public class UserIdent {
   }
 
   /**
-   * Create a UserIdent from a legacy string. The string can either be a UUID or
-   * a player name. Use this when reading legacy data or user configured values.
+   * Create a UserIdent from a legacy string. The string can either be a UUID or a player name. Use this when reading legacy data or user configured values.
    */
   public static @Nonnull UserIdent create(@Nullable String legacyData) {
     UUID uuid = PlayerUtil.getPlayerUIDUnstable(legacyData);
@@ -96,13 +93,11 @@ public class UserIdent {
   }
 
   /**
-   * Create a UserIdent from a GameProfile. Use this when creating a UserIdent
-   * for a currently active player.
+   * Create a UserIdent from a GameProfile. Use this when creating a UserIdent for a currently active player.
    */
   public static @Nonnull UserIdent create(@Nullable GameProfile gameProfile) {
     if (gameProfile != null && (gameProfile.getId() != null || gameProfile.getName() != null)) {
-      if (gameProfile.getId() != null && gameProfile.getName() != null
-          && gameProfile.getId().equals(offlineUUID(gameProfile.getName()))) {
+      if (gameProfile.getId() != null && gameProfile.getName() != null && gameProfile.getId().equals(offlineUUID(gameProfile.getName()))) {
         return new UserIdent(null, gameProfile.getName());
       } else {
         return new UserIdent(gameProfile.getId(), gameProfile.getName());
@@ -117,12 +112,11 @@ public class UserIdent {
     return result != null ? result : new UUID(-1, -1);
   }
 
-  private UserIdent(@Nullable UUID uuid, @Nullable String playerName) {
+  UserIdent(@Nullable UUID uuid, @Nullable String playerName) {
     this.uuid = uuid;
     this.uuid_offline = offlineUUID(playerName);
     this.playerName = playerName != null ? playerName : "[" + uuid + "]";
   }
-
 
   @Override
   public int hashCode() {
@@ -135,8 +129,7 @@ public class UserIdent {
   }
 
   /**
-   * Please note that a UserIdent will successfully equal against GameProfiles
-   * and UUIDs.
+   * Please note that a UserIdent will successfully equal against GameProfiles and UUIDs.
    */
   @Override
   public boolean equals(Object obj) {
@@ -162,7 +155,7 @@ public class UserIdent {
     }
     return false;
   }
-  
+
   public void saveToNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
     if (uuid != null) {
       nbt.setString(prefix + ".uuid", uuid.toString());
@@ -204,7 +197,7 @@ public class UserIdent {
   private static class Nobody extends UserIdent {
     private static final @Nonnull String NOBODY_MARKER = "nobody";
 
-    private Nobody() {
+    Nobody() {
       super(null, "[unknown player]");
     }
 

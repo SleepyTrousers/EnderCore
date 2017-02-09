@@ -17,7 +17,7 @@ import com.google.gson.reflect.TypeToken;
 
 /**
  * A utility to easily read in JSON config files.
- * 
+ *
  * The format of the JSON file is as follows:
  * <p>
  * <blockquote><code>
@@ -27,20 +27,16 @@ import com.google.gson.reflect.TypeToken;
  * </blockquote></code>
  * <p>
  * Where the objects go inbetween the brackets ( [] )
- * 
+ *
  * @param <T>
- *          The type of the object to be read in. If this type is generic in
- *          itself (ex. {@code HashMap}) you should use one of the TypeToken
- *          constructors.
+ *          The type of the object to be read in. If this type is generic in itself (ex. {@code HashMap}) you should use one of the TypeToken constructors.
  */
 public class JsonConfigReader<T> implements Iterable<T> {
   /**
    * A class representing some info about your mod.
    * <p>
-   * <b>mainClass</b> is a class in your mod so that files can be copied out of
-   * your jar.<br>
-   * <b>assetPath</b> is the path to your default json file. This includes the
-   * /modid part and whatever subfolders follow.
+   * <b>mainClass</b> is a class in your mod so that files can be copied out of your jar.<br>
+   * <b>assetPath</b> is the path to your default json file. This includes the /modid part and whatever subfolders follow.
    */
   public static class ModToken {
     private Class<?> mainClass;
@@ -50,19 +46,18 @@ public class JsonConfigReader<T> implements Iterable<T> {
       this.mainClass = mainClass;
       this.assetPath = assetPath;
     }
-    
+
     public Class<?> getMainClass() {
       return mainClass;
     }
-    
+
     public String getAssetPath() {
       return assetPath;
     }
   }
 
   /**
-   * The default key for the json data. This is what is used when calling
-   * {@link #getElements()}.
+   * The default key for the json data. This is what is used when calling {@link #getElements()}.
    */
   public static final String DEFAULT_KEY = "data";
   private static final JsonParser parser = new JsonParser();
@@ -77,17 +72,14 @@ public class JsonConfigReader<T> implements Iterable<T> {
 
   /**
    * An easy way to read in config files in JSON format
-   * 
+   *
    * @param mod
-   *          A {@link ModToken} object to hold data about your mod. This is
-   *          used to automatically copy the file from your jar if it does not
-   *          exist in the config folder
+   *          A {@link ModToken} object to hold data about your mod. This is used to automatically copy the file from your jar if it does not exist in the
+   *          config folder
    * @param fullFileName
-   *          The full file path and name of your JSON config. Can be relative
-   *          to the working directory or absolute.
+   *          The full file path and name of your JSON config. Can be relative to the working directory or absolute.
    * @param objClass
-   *          The type of the object being deserialized. Must be of the same
-   *          type as the generic type of this class.
+   *          The type of the object being deserialized. Must be of the same type as the generic type of this class.
    */
   public JsonConfigReader(ModToken mod, String fullFileName, Class<T> objClass) {
     this(mod, new File(fullFileName), objClass);
@@ -95,16 +87,14 @@ public class JsonConfigReader<T> implements Iterable<T> {
 
   /**
    * An easy way to read in config files in JSON format
-   * 
+   *
    * @param mod
-   *          A {@link ModToken} object to hold data about your mod. This is
-   *          used to automatically copy the file from your jar if it does not
-   *          exist in the config folder
+   *          A {@link ModToken} object to hold data about your mod. This is used to automatically copy the file from your jar if it does not exist in the
+   *          config folder
    * @param file
    *          The {@link File} representing your JSON config.
    * @param objClass
-   *          The type of the object being deserialized. Must be of the same
-   *          type as the generic type of this class.
+   *          The type of the object being deserialized. Must be of the same type as the generic type of this class.
    */
   public JsonConfigReader(ModToken mod, File file, Class<T> objClass) {
     this.type = objClass;
@@ -112,39 +102,30 @@ public class JsonConfigReader<T> implements Iterable<T> {
   }
 
   /**
-   * An easy way to read in config files in JSON format. Use this constructor if
-   * the type of this class is generic in itself. (ex. {@code HashMap<K, V>})
-   * 
+   * An easy way to read in config files in JSON format. Use this constructor if the type of this class is generic in itself. (ex. {@code HashMap<K, V>})
+   *
    * @param mod
-   *          A {@link ModToken} object to hold data about your mod. This is
-   *          used to automatically copy the file from your jar if it does not
-   *          exist in the config folder
+   *          A {@link ModToken} object to hold data about your mod. This is used to automatically copy the file from your jar if it does not exist in the
+   *          config folder
    * @param fullFileName
-   *          The full file path and name of your JSON config. Can be relative
-   *          to the working directory or absolute.
+   *          The full file path and name of your JSON config. Can be relative to the working directory or absolute.
    * @param objType
-   *          A {@link TypeToken} representing the type of the object to be
-   *          deserialized. Must be of the same type as the generic type of this
-   *          class.
+   *          A {@link TypeToken} representing the type of the object to be deserialized. Must be of the same type as the generic type of this class.
    */
   public JsonConfigReader(ModToken mod, String fullFileName, TypeToken<T> objType) {
     this(mod, new File(fullFileName), objType);
   }
 
   /**
-   * An easy way to read in config files in JSON format. Use this constructor if
-   * the type of this class is generic in itself. (ex. {@code HashMap<K, V>})
-   * 
+   * An easy way to read in config files in JSON format. Use this constructor if the type of this class is generic in itself. (ex. {@code HashMap<K, V>})
+   *
    * @param mod
-   *          A {@link ModToken} object to hold data about your mod. This is
-   *          used to automatically copy the file from your jar if it does not
-   *          exist in the config folder
+   *          A {@link ModToken} object to hold data about your mod. This is used to automatically copy the file from your jar if it does not exist in the
+   *          config folder
    * @param file
    *          The {@link File} representing your JSON config.
    * @param objType
-   *          A {@link TypeToken} representing the type of the object to be
-   *          deserialized. Must be of the same type as the generic type of this
-   *          class.
+   *          A {@link TypeToken} representing the type of the object to be deserialized. Must be of the same type as the generic type of this class.
    */
   public JsonConfigReader(ModToken mod, File file, TypeToken<T> objType) {
     this.typeToken = objType;
@@ -169,13 +150,12 @@ public class JsonConfigReader<T> implements Iterable<T> {
 
   /**
    * Reparses the config file.
-   * 
+   *
    * @return The {@link JsonObject} read.
-   * 
+   *
    * @throws RuntimeException
    *           If there is an exception while reading the file.
    */
-  @SuppressWarnings("resource")
   public JsonObject parseFile() {
     try {
       return parser.parse(new FileReader(file)).getAsJsonObject();
@@ -185,9 +165,8 @@ public class JsonConfigReader<T> implements Iterable<T> {
   }
 
   /**
-   * Reparses the config file and stores the result in this class. Use this if
-   * your JSON config was edited and you want to reload from disk.
-   * 
+   * Reparses the config file and stores the result in this class. Use this if your JSON config was edited and you want to reload from disk.
+   *
    * @throws RuntimeException
    *           If there is an exception while reading the file.
    */
@@ -197,7 +176,7 @@ public class JsonConfigReader<T> implements Iterable<T> {
 
   /**
    * If this key exists in the current JSON data.
-   * 
+   *
    * @param key
    *          The String key
    * @return True if this JSON has the given key. False otherwise.
@@ -207,19 +186,16 @@ public class JsonConfigReader<T> implements Iterable<T> {
   }
 
   /**
-   * Gives this reader's {@link GsonBuilder} object so that you may configure
-   * type adapters and other settings.
+   * Gives this reader's {@link GsonBuilder} object so that you may configure type adapters and other settings.
    */
   public GsonBuilder getBuilder() {
     return builder;
   }
 
   /**
-   * Reads from the {@link JsonObject} linked to the {@link String key} and
-   * returns a List of all the elements contained in its array.
-   * 
-   * @return A list of the generic type of this class containing the
-   *         deserialized elements from the passed key.
+   * Reads from the {@link JsonObject} linked to the {@link String key} and returns a List of all the elements contained in its array.
+   *
+   * @return A list of the generic type of this class containing the deserialized elements from the passed key.
    */
   @SuppressWarnings("unchecked")
   public List<T> getElements(String key) {
@@ -241,14 +217,11 @@ public class JsonConfigReader<T> implements Iterable<T> {
   }
 
   /**
-   * Reads the default (defined by {@value #DEFAULT_KEY}) cached JsonObject in
-   * this class and returns a List of all the elements contained in its array.
+   * Reads the default (defined by {@value #DEFAULT_KEY}) cached JsonObject in this class and returns a List of all the elements contained in its array.
    * <p>
-   * {@link #getElements(String)} should be used if your config has multiple
-   * keys.
-   * 
-   * @return A list of the generic type of this class containing the
-   *         deserialized elements from your JSON config's default key.
+   * {@link #getElements(String)} should be used if your config has multiple keys.
+   *
+   * @return A list of the generic type of this class containing the deserialized elements from your JSON config's default key.
    */
   public List<T> getElements() {
     return getElements(DEFAULT_KEY);
