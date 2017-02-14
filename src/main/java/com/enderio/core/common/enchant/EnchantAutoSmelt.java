@@ -6,21 +6,46 @@ import javax.annotation.Nullable;
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.util.NullHelper;
+import com.google.common.base.Predicate;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
+
   private static EnchantAutoSmelt INSTANCE;
+
+  private static final EnumEnchantmentType ENCH_TYPE = EnumHelper.addEnchantmentType("EC_AUTOSMELT", new Predicate<Item>() {
+
+    @Override
+    public boolean apply(@Nullable Item item) {
+      return NullHelper.notnullM(item, "EnumEnchantmentType.canEnchantItem(null)").isDamageable() && !(item instanceof ItemArmor)
+          && !(item instanceof ItemSword) && !(item instanceof ItemBow) && !(item instanceof ItemFishingRod);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+      return super.equals(obj);
+    }
+
+  });
 
   /**
    * Can be null prior to registration, or if disabled
@@ -31,7 +56,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   }
 
   private EnchantAutoSmelt() {
-    super(Rarity.RARE, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND });
+    super(Rarity.RARE, ENCH_TYPE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND });
     setRegistryName("autosmelt");
   }
 
@@ -48,17 +73,6 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   @Override
   public int getMaxLevel() {
     return 1;
-  }
-
-  @Override
-  public boolean canApply(@Nonnull ItemStack stack) {
-    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemSword)
-        && !(stack.getItem() instanceof ItemBow) && !(stack.getItem() instanceof ItemFishingRod);
-  }
-
-  @Override
-  public boolean canApplyAtEnchantingTable(@Nonnull ItemStack stack) {
-    return canApply(stack);
   }
 
   @Override

@@ -6,20 +6,44 @@ import javax.annotation.Nullable;
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
+import com.enderio.core.common.util.NullHelper;
+import com.google.common.base.Predicate;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.init.Enchantments;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   private static EnchantXPBoost INSTANCE;
+
+  private static final EnumEnchantmentType ENCH_TYPE = EnumHelper.addEnchantmentType("EC_XPBOOST", new Predicate<Item>() {
+
+    @Override
+    public boolean apply(@Nullable Item item) {
+      return NullHelper.notnullM(item, "EnumEnchantmentType.canEnchantItem(null)").isDamageable() && !(item instanceof ItemArmor)
+          && !(item instanceof ItemFishingRod);
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+      return super.equals(obj);
+    }
+
+  });
 
   /**
    * Can be null prior to registration, or if disabled
@@ -31,7 +55,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   private EnchantXPBoost() {
     // The ResourceLocation is mostly irrelevant, it's just a key to retrieve the enchantment with
-    super(Rarity.UNCOMMON, EnumEnchantmentType.BREAKABLE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND });
+    super(Rarity.UNCOMMON, ENCH_TYPE, new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND });
     setRegistryName("xpboost");
   }
 
@@ -51,18 +75,8 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
-  public boolean canApply(@Nonnull ItemStack stack) {
-    return type.canEnchantItem(stack.getItem()) && !(stack.getItem() instanceof ItemArmor) && !(stack.getItem() instanceof ItemFishingRod);
-  }
-
-  @Override
   public boolean canApplyTogether(@Nonnull Enchantment ench) {
     return super.canApplyTogether(ench) && ench != Enchantments.SILK_TOUCH;
-  }
-
-  @Override
-  public boolean canApplyAtEnchantingTable(@Nonnull ItemStack stack) {
-    return canApply(stack);
   }
 
   @Override

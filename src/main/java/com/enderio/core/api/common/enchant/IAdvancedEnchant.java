@@ -1,13 +1,38 @@
 package com.enderio.core.api.common.enchant;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import com.google.common.base.Predicate;
+
+import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.util.EnumHelper;
 
 /**
  * Allows your enchants to have some flavor or description text underneath them
  */
 public interface IAdvancedEnchant {
+
+  public static final EnumEnchantmentType ALL = EnumHelper.addEnchantmentType("EC_REALLY_ALL", new Predicate<Item>() {
+
+    @Override
+    public boolean apply(@Nullable Item input) {
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+      return super.equals(obj);
+    }
+
+  });
 
   /**
    * Get the detail for this itemstack
