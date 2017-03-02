@@ -100,7 +100,7 @@ public class FluidVisualsHandler {
 
   @SubscribeEvent
   public static void onFogDensity(@Nonnull EntityViewRenderEvent.FogDensity event) throws IllegalArgumentException, IllegalAccessException {
-    if (event.getState() instanceof BlockFluidEnder) {
+    if (event.getState().getBlock() instanceof BlockFluidEnder) {
       final EntityRenderer renderer = event.getRenderer();
       final Entity entity = event.getEntity();
       final boolean cloudFog = FcloudFog.getBoolean(renderer);
