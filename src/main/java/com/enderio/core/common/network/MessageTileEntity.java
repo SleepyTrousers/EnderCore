@@ -46,7 +46,8 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
 
   @SuppressWarnings("unchecked")
   protected T getTileEntity(World worldObj) {
-    if (worldObj == null) {
+    // Sanity check, and prevent malicious packets from loading chunks
+    if (worldObj == null || !worldObj.isBlockLoaded(getPos())) {
       return null;
     }
     TileEntity te = worldObj.getTileEntity(getPos());
