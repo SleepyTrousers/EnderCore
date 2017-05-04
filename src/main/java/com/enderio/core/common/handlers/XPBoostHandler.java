@@ -19,6 +19,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
@@ -38,9 +39,10 @@ public class XPBoostHandler {
     Entity killer = event.getSource().getSourceOfDamage();
 
     if (!entity.worldObj.isRemote && killer != null) {
-      if (killer instanceof EntityPlayer) {
+      if (killer instanceof EntityPlayer && !(killer instanceof FakePlayer)) {
         scheduleXP(entity, getXPBoost(entity, (EntityPlayer) killer));
-      } else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer) {
+      } else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer
+          && !(((EntityArrow) killer).shootingEntity instanceof FakePlayer)) {
         NBTTagCompound tag = killer.getEntityData();
         if (tag.hasKey(NBT_KEY) && tag.getInteger(NBT_KEY) >= 0) {
           int level = tag.getInteger(NBT_KEY);
@@ -64,7 +66,7 @@ public class XPBoostHandler {
   @SubscribeEvent
   public void handleBlockBreak(BreakEvent event) {    
     ItemStack held = event.getPlayer().getHeldItemMainhand();
-    if (held != null ) {
+    if (held != null && !(event.getPlayer() instanceof FakePlayer)) {
       int level = getXPBoostLevel(held);
       int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
 

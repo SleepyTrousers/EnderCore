@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -39,37 +40,39 @@ public class AutoSmeltHandler {
 
                 furnaceStack.onCrafting(event.getWorld(), event.getHarvester(), furnaceStack.stackSize);
 
-                int xp = furnaceStack.stackSize;
-                float f = FurnaceRecipes.instance().getSmeltingExperience(furnaceStack);
+                if (!(event.getHarvester() instanceof FakePlayer)) {
+                  int xp = furnaceStack.stackSize;
+                  float f = FurnaceRecipes.instance().getSmeltingExperience(furnaceStack);
 
-                if (f == 0.0F) {
-                  xp = 0;
-                } else if (f < 1.0F) {
-                  int j = MathHelper.floor_float(xp * f);
+                  if (f == 0.0F) {
+                    xp = 0;
+                  } else if (f < 1.0F) {
+                    int j = MathHelper.floor_float(xp * f);
 
-                  if (j < MathHelper.ceiling_float_int(xp * f) && (float) Math.random() < xp * f - j) {
-                    ++j;
+                    if (j < MathHelper.ceiling_float_int(xp * f) && (float) Math.random() < xp * f - j) {
+                      ++j;
+                    }
+
+                    xp = j;
                   }
 
-                  xp = j;
-                }
+                  while (xp > 0) {
+                    int k = EntityXPOrb.getXPSplit(xp);
+                    xp -= k;
+                    event.getWorld()
+                        .spawnEntityInWorld(new EntityXPOrb(event.getWorld(), event.getPos().getX(), event.getPos().getY() + 0.5, event.getPos().getZ(), k));
+                  }
 
-                while (xp > 0) {
-                  int k = EntityXPOrb.getXPSplit(xp);
-                  xp -= k;
-                  event.getWorld()
-                      .spawnEntityInWorld(new EntityXPOrb(event.getWorld(), event.getPos().getX(), event.getPos().getY() + 0.5, event.getPos().getZ(), k));
+                  if (furnaceStack.getItem() == Items.IRON_INGOT) {
+                    event.getHarvester().addStat(AchievementList.ACQUIRE_IRON);
+                  }
+
+                  if (furnaceStack.getItem() == Items.COOKED_FISH) {
+                    event.getHarvester().addStat(AchievementList.COOK_FISH);
+                  }
                 }
 
                 FMLCommonHandler.instance().firePlayerSmeltedEvent(event.getHarvester(), furnaceStack);
-
-                if (furnaceStack.getItem() == Items.IRON_INGOT) {
-                  event.getHarvester().addStat(AchievementList.ACQUIRE_IRON);
-                }
-
-                if (furnaceStack.getItem() == Items.COOKED_FISH) {
-                  event.getHarvester().addStat(AchievementList.COOK_FISH);
-                }
               }
             }
           }
