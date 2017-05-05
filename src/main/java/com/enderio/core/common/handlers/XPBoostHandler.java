@@ -24,6 +24,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
@@ -43,9 +44,10 @@ public class XPBoostHandler {
     Entity killer = event.getSource().getSourceOfDamage();
 
     if (!entity.world.isRemote && killer != null) {
-      if (killer instanceof EntityPlayer) {
+      if (killer instanceof EntityPlayer && !(killer instanceof FakePlayer)) {
         scheduleXP(entity, getXPBoost(entity, (EntityPlayer) killer));
-      } else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer) {
+      } else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer
+          && !(((EntityArrow) killer).shootingEntity instanceof FakePlayer)) {
         NBTTagCompound tag = killer.getEntityData();
         if (tag.hasKey(NBT_KEY) && tag.getInteger(NBT_KEY) >= 0) {
           int level = tag.getInteger(NBT_KEY);
@@ -60,7 +62,7 @@ public class XPBoostHandler {
   public static void handleArrowFire(EntityJoinWorldEvent event) {
     if (event.getEntity() instanceof EntityArrow) {
       EntityArrow arrow = (EntityArrow) event.getEntity();
-      if (arrow.shootingEntity instanceof EntityPlayer) {
+      if (arrow.shootingEntity != null && arrow.shootingEntity instanceof EntityPlayer) {
         arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getHeldItemMainhand()));
       }
     }
@@ -69,7 +71,7 @@ public class XPBoostHandler {
   @SubscribeEvent
   public static void handleBlockBreak(BreakEvent event) {
     ItemStack held = event.getPlayer().getHeldItemMainhand();
-    if (!held.isEmpty()) {
+    if (!held.isEmpty() && !(event.getPlayer() instanceof FakePlayer)) {
       int level = getXPBoostLevel(held);
       int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
 
