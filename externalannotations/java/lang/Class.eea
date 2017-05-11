@@ -1,4 +1,7 @@
 class java/lang/Class
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
 getTypeParameters
  ()[Ljava/lang/reflect/TypeVariable<Ljava/lang/Class<TT;>;>;
  ()[1Ljava/lang/reflect/TypeVariable<Ljava/lang/Class<TT;>;>;
