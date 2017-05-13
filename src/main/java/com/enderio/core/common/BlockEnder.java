@@ -6,7 +6,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
-import com.enderio.core.common.TileEntityBase.NBT_Action;
 import com.enderio.core.common.util.FluidUtil;
 import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
@@ -149,7 +148,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   protected void processDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te, @Nonnull ItemStack drop) {
     if (te != null) {
       final NBTTagCompound tag = new NBTTagCompound();
-      te.writeCustomNBT(NBT_Action.ITEM, tag);
+      te.writeCustomNBT(NBTAction.ITEM, tag);
       if (!tag.hasNoTags()) {
         drop.setTagCompound(tag);
       }
@@ -162,7 +161,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     if (stack.hasTagCompound()) {
       T te = getTileEntity(worldIn, pos);
       if (te != null) {
-        te.readCustomNBT(NBT_Action.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
+        te.readCustomNBT(NBTAction.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
       }
     }
   }

@@ -79,32 +79,13 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     return 20;
   }
 
-  public static enum NBT_Action {
-    /**
-     * The TE is saved to/loaded from the save file.
-     */
-    SAVE,
-    /**
-     * The TE is initially synced to the client.
-     */
-    SYNC,
-    /**
-     * The TE is updated to the client.
-     */
-    UPDATE,
-    /**
-     * TE data is written to/read from an item.
-     */
-    ITEM;
-  }
-
   /**
    * SERVER: Called when being written to the save file.
    */
   @Override
   public final @Nonnull NBTTagCompound writeToNBT(@Nonnull NBTTagCompound root) {
     super.writeToNBT(root);
-    writeCustomNBT(NBT_Action.SAVE, root);
+    writeCustomNBT(NBTAction.SAVE, root);
     return root;
   }
 
@@ -114,16 +95,16 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   @Override
   public final void readFromNBT(@Nonnull NBTTagCompound tag) {
     super.readFromNBT(tag);
-    readCustomNBT(NBT_Action.SAVE, tag);
+    readCustomNBT(NBTAction.SAVE, tag);
   }
 
   /**
    * Called when the chunk/block data is sent (client receiving chunks from server). Must have x/y/z tags.
    */
   @Override
-  public @Nonnull NBTTagCompound getUpdateTag() {
+  public final @Nonnull NBTTagCompound getUpdateTag() {
     NBTTagCompound tag = super.getUpdateTag();
-    writeCustomNBT(NBT_Action.SYNC, tag);
+    writeCustomNBT(NBTAction.SYNC, tag);
     return tag;
   }
 
@@ -131,18 +112,18 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * CLIENT: Called on initial syncing.
    */
   @Override
-  public void handleUpdateTag(@Nonnull NBTTagCompound tag) {
+  public final void handleUpdateTag(@Nonnull NBTTagCompound tag) {
     super.handleUpdateTag(tag);
-    readCustomNBT(NBT_Action.SYNC, tag);
+    readCustomNBT(NBTAction.SYNC, tag);
   }
 
   /**
    * SERVER: Called when TE is re-synced (via notifyBlockUpdate). No need for x/y/z tags.
    */
   @Override
-  public SPacketUpdateTileEntity getUpdatePacket() {
+  public final SPacketUpdateTileEntity getUpdatePacket() {
     NBTTagCompound tag = new NBTTagCompound();
-    writeCustomNBT(NBT_Action.UPDATE, tag);
+    writeCustomNBT(NBTAction.UPDATE, tag);
     return new SPacketUpdateTileEntity(getPos(), 1, tag);
   }
 
@@ -150,13 +131,13 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * CLIENT: Called on re-syncing.
    */
   @Override
-  public void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
-    readCustomNBT(NBT_Action.UPDATE, pkt.getNbtCompound());
+  public final void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
+    readCustomNBT(NBTAction.UPDATE, pkt.getNbtCompound());
   }
 
-  protected abstract void writeCustomNBT(@Nonnull NBT_Action action, @Nonnull NBTTagCompound root);
+  protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
 
-  protected abstract void readCustomNBT(@Nonnull NBT_Action action, @Nonnull NBTTagCompound root);
+  protected abstract void readCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
 
   public boolean canPlayerAccess(EntityPlayer player) {
     return hasWorld() && !isInvalid() && player.getDistanceSqToCenter(getPos()) <= 64D;

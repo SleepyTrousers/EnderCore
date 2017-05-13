@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen {
 
@@ -401,7 +402,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   /**
    * Return the current texture to allow GhostSlots to gray out by over-painting the slot background.
    */
-  protected abstract @Nonnull String getGuiTexture();
+  protected abstract @Nonnull ResourceLocation getGuiTexture();
 
   @Override
   public boolean removeToolTip(@Nonnull GuiToolTip toolTip) {

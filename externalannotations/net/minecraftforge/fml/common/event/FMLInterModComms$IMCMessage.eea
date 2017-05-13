@@ -1,0 +1,4 @@
+class net/minecraftforge/fml/common/event/FMLInterModComms$IMCMessage
+getResourceLocationValue
+ ()Lnet/minecraft/util/ResourceLocation;
+ ()L1net/minecraft/util/ResourceLocation;

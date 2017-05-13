@@ -1,0 +1,4 @@
+class net/minecraftforge/event/world/BlockEvent
+getPos
+ ()Lnet/minecraft/util/math/BlockPos;
+ ()L1net/minecraft/util/math/BlockPos;

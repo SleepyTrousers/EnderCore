@@ -193,8 +193,7 @@ public class GhostSlotHandler {
     GlStateManager.disableDepth();
     GlStateManager.enableBlend();
     GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
-    String guiTexture = gui.getGuiTexture();
-    RenderUtil.bindTexture(guiTexture);
+    RenderUtil.bindTexture(gui.getGuiTexture());
     gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
     GlStateManager.disableBlend();
     GlStateManager.enableDepth();

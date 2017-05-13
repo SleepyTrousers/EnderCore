@@ -105,6 +105,22 @@ public class NNList<E> extends NonNullList<E> {
     void apply(@Nonnull E e);
   }
 
+  public boolean apply(@Nonnull ShortCallback<E> callback) {
+    for (E e : this) {
+      if (e == null) {
+        throw new NullPointerException();
+      }
+      if (callback.apply(e)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static interface ShortCallback<E> {
+    boolean apply(@Nonnull E e);
+  }
+
   @Override
   public @Nonnull NNIterator<E> iterator() {
     return new ItrImpl<E>(super.iterator());

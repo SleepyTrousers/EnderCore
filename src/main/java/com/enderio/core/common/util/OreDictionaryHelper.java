@@ -1,7 +1,5 @@
 package com.enderio.core.common.util;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -17,14 +15,10 @@ public final class OreDictionaryHelper {
   public static final String INGOT_ENDERIUM = "ingotEnderium";
 
   public static boolean isRegistered(String name) {
-    if (!getOres(name).isEmpty()) {
+    if (!OreDictionary.getOres(name).isEmpty()) {
       return true;
     }
     return false;
-  }
-
-  public static List<ItemStack> getOres(String name) {
-    return OreDictionary.getOres(name);
   }
 
   public static boolean hasCopper() {
