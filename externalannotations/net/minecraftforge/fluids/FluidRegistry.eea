@@ -1,0 +1,4 @@
+class net/minecraftforge/fluids/FluidRegistry
+WATER
+ Lnet/minecraftforge/fluids/Fluid;
+ L1net/minecraftforge/fluids/Fluid;

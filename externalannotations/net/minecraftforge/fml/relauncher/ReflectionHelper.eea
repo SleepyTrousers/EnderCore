@@ -1,0 +1,4 @@
+class net/minecraftforge/fml/relauncher/ReflectionHelper
+getClass
+ (Ljava/lang/ClassLoader;[Ljava/lang/String;)Ljava/lang/Class<-Ljava/lang/Object;>;
+ (Ljava/lang/ClassLoader;[Ljava/lang/String;)L1java/lang/Class<-Ljava/lang/Object;>;

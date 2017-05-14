@@ -1,0 +1,4 @@
+class org/apache/commons/lang3/StringUtils
+capitalize
+ (Ljava/lang/String;)Ljava/lang/String;
+ (Ljava/lang/String;)L1java/lang/String;

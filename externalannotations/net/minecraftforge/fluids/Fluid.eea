@@ -1,0 +1,13 @@
+class net/minecraftforge/fluids/Fluid
+getFlowing
+ ()Lnet/minecraft/util/ResourceLocation;
+ ()L1net/minecraft/util/ResourceLocation;
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getStill
+ ()Lnet/minecraft/util/ResourceLocation;
+ ()L1net/minecraft/util/ResourceLocation;
+getUnlocalizedName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

@@ -54,10 +54,10 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
 
   protected void setNames(Fluid fluid) {
     setUnlocalizedName(NullHelper.notnullF(fluid.getUnlocalizedName(), "encountered fluid without a name"));
-    setRegistryName("block_" + fluid.getName().toLowerCase(Locale.ENGLISH));
+    setRegistryName("block_fluid_" + fluid.getName().toLowerCase(Locale.ENGLISH));
   }
 
-  protected void init() {
+  public void init() {
     GameRegistry.register(this);
   }
 
