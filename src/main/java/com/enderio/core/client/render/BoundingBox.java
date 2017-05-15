@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.api.client.render.VertexTransform;
+import com.enderio.core.common.util.NNList;
 import com.enderio.core.common.vecmath.Vector2f;
 import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
@@ -99,8 +100,8 @@ public final class BoundingBox extends AxisAlignedBB {
   /**
    * Returns the vertices of the corners for the specified face in counter clockwise order.
    */
-  public @Nonnull List<Vertex> getCornersWithUvForFace(@Nonnull EnumFacing face, float minU, float maxU, float minV, float maxV) {
-    List<Vertex> result = new ArrayList<Vertex>(4);
+  public @Nonnull NNList<Vertex> getCornersWithUvForFace(@Nonnull EnumFacing face, float minU, float maxU, float minV, float maxV) {
+    NNList<Vertex> result = new NNList<Vertex>();
     switch (face) {
     case NORTH:
       result.add(new Vertex(new Vector3d(maxX, minY, minZ), new Vector3f(0, 0, -1), new Vector2f(minU, minV)));

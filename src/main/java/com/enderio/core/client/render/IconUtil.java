@@ -33,7 +33,7 @@ public class IconUtil {
 
   public TextureAtlasSprite whiteTexture;
   public TextureAtlasSprite blankTexture;
-  public TextureAtlasSprite errorTexture;
+  public @Nonnull TextureAtlasSprite errorTexture;
 
   private boolean doneInit = false;
 

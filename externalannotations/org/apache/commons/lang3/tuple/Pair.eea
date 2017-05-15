@@ -1,0 +1,4 @@
+class org/apache/commons/lang3/tuple/Pair
+of
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;TR;)Lorg/apache/commons/lang3/tuple/Pair<TL;TR;>;
+ <L:Ljava/lang/Object;R:Ljava/lang/Object;>(TL;TR;)L1org/apache/commons/lang3/tuple/Pair<TL;TR;>;

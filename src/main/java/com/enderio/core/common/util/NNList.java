@@ -175,4 +175,14 @@ public class NNList<E> extends NonNullList<E> {
     return (NNList<X>) EMPTY;
   }
 
+  @Override
+  public @Nonnull E[] toArray() {
+    @SuppressWarnings("unchecked")
+    final E[] array = (E[]) super.toArray();
+    if (array == null) {
+      throw new NullPointerException();
+    }
+    return array;
+
+  }
 }
