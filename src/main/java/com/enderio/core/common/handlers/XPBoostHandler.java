@@ -62,7 +62,7 @@ public class XPBoostHandler {
   public static void handleArrowFire(EntityJoinWorldEvent event) {
     if (event.getEntity() instanceof EntityArrow) {
       EntityArrow arrow = (EntityArrow) event.getEntity();
-      if (arrow.shootingEntity != null && arrow.shootingEntity instanceof EntityPlayer) {
+      if (arrow.shootingEntity instanceof EntityPlayer) {
         arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getHeldItemMainhand()));
       }
     }

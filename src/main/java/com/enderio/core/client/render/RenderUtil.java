@@ -420,9 +420,6 @@ public class RenderUtil {
 
   public static @Nonnull TextureAtlasSprite getStillTexture(@Nonnull Fluid fluid) {
     ResourceLocation iconKey = fluid.getStill();
-    if (iconKey == null) {
-      return getMissingSprite();
-    }
     final TextureAtlasSprite textureExtry = Minecraft.getMinecraft().getTextureMapBlocks().getTextureExtry(iconKey.toString());
     return textureExtry != null ? textureExtry : getMissingSprite();
   }

@@ -1,0 +1,7 @@
+class java/text/NumberFormat
+getInstance
+ ()Ljava/text/NumberFormat;
+ ()L1java/text/NumberFormat;
+getIntegerInstance
+ ()Ljava/text/NumberFormat;
+ ()L1java/text/NumberFormat;

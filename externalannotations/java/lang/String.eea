@@ -5,12 +5,21 @@ concat
 format
  (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
  (Ljava/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+replace
+ (Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+ (Ljava/lang/CharSequence;Ljava/lang/CharSequence;)L1java/lang/String;
 split
  (Ljava/lang/String;)[Ljava/lang/String;
  (Ljava/lang/String;)[1Ljava/lang/String;
 substring
  (I)Ljava/lang/String;
  (I)L1java/lang/String;
+substring
+ (II)Ljava/lang/String;
+ (II)L1java/lang/String;
 toLowerCase
  (Ljava/util/Locale;)Ljava/lang/String;
  (Ljava/util/Locale;)L1java/lang/String;
+trim
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
