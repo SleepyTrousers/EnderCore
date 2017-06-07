@@ -54,28 +54,28 @@ public class Things {
 
   private final @Nonnull List<IThing> things = new ArrayList<IThing>();
 
-  public Things add(@Nullable Item item) {
+  public @Nonnull Things add(@Nullable Item item) {
     if (item != null) {
       add(new ItemThing(item));
     }
     return this;
   }
 
-  public Things add(@Nullable ItemStack itemStack) { // sic!
+  public @Nonnull Things add(@Nullable ItemStack itemStack) { // sic!
     if (itemStack != null && !itemStack.isEmpty()) {
       add(new ItemStackThing(itemStack));
     }
     return this;
   }
 
-  public Things add(@Nullable Block block) {
+  public @Nonnull Things add(@Nullable Block block) {
     if (block != null) {
       add(new BlockThing(block));
     }
     return this;
   }
 
-  public Things add(@Nullable String name) {
+  public @Nonnull Things add(@Nullable String name) {
     if (name != null) {
       add(new StringThing(name));
     }
@@ -88,21 +88,21 @@ public class Things {
     }
   }
 
-  public Things add(@Nullable ResourceLocation resourceLocation) {
+  public @Nonnull Things add(@Nullable ResourceLocation resourceLocation) {
     if (resourceLocation != null) {
       add(new ResourceThing(resourceLocation));
     }
     return this;
   }
 
-  public Things addOredict(@Nullable String name) {
+  public @Nonnull Things addOredict(@Nullable String name) {
     if (name != null) {
       add(new OreThing(name));
     }
     return this;
   }
 
-  public Things add(@Nullable Things otherThings) {
+  public @Nonnull Things add(@Nullable Things otherThings) {
     if (otherThings != null) {
       for (IThing thing : otherThings.things) {
         add(thing);

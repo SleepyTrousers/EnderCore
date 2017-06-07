@@ -31,8 +31,8 @@ public class IconUtil {
 
   private final @Nonnull ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
 
-  public TextureAtlasSprite whiteTexture;
-  public TextureAtlasSprite blankTexture;
+  public @Nonnull TextureAtlasSprite whiteTexture;
+  public @Nonnull TextureAtlasSprite blankTexture;
   public @Nonnull TextureAtlasSprite errorTexture;
 
   private boolean doneInit = false;

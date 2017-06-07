@@ -2,6 +2,12 @@ class java/util/Collections
 emptyList
  <T:Ljava/lang/Object;>()Ljava/util/List<TT;>;
  <T:Ljava/lang/Object;>()L1java/util/List<TT;>;
+singleton
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/Set<TT;>;
 singletonList
  <T:Ljava/lang/Object;>(TT;)Ljava/util/List<TT;>;
  <T:Ljava/lang/Object;>(TT;)L1java/util/List<TT;>;
+unmodifiableSet
+ <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)L1java/util/Set<TT;>;

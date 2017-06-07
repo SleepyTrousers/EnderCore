@@ -1,0 +1,7 @@
+class net/minecraft/block/Block
+getCreativeTabToDisplayOn
+ ()Lnet/minecraft/creativetab/CreativeTabs;
+ ()L0net/minecraft/creativetab/CreativeTabs;
+setCreativeTab
+ (Lnet/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/block/Block;
+ (L0net/minecraft/creativetab/CreativeTabs;)Lnet/minecraft/block/Block;

@@ -1,0 +1,10 @@
+class net/minecraft/tileentity/TileEntityChest
+adjacentChestXNeg
+ Lnet/minecraft/tileentity/TileEntityChest;
+ L0net/minecraft/tileentity/TileEntityChest;
+adjacentChestXPos
+ Lnet/minecraft/tileentity/TileEntityChest;
+ L0net/minecraft/tileentity/TileEntityChest;
+adjacentChestZNeg
+ Lnet/minecraft/tileentity/TileEntityChest;
+ L0net/minecraft/tileentity/TileEntityChest;

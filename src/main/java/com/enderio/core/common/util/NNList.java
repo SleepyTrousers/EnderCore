@@ -28,6 +28,13 @@ public class NNList<E> extends NonNullList<E> {
     addAll(fillWith);
   }
 
+  public NNList(int size, @Nonnull E fillWith) {
+    super();
+    for (int i = 0; i < size; i++) {
+      add(fillWith);
+    }
+  }
+
   public NNList(E... fillWith) {
     super();
     Collections.addAll(this, fillWith);
@@ -183,6 +190,12 @@ public class NNList<E> extends NonNullList<E> {
       throw new NullPointerException();
     }
     return array;
-
   }
+
+  public void addAll(E... el) {
+    for (E e : el) {
+      add(e);
+    }
+  }
+
 }

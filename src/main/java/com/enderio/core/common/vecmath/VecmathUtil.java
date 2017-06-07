@@ -2,6 +2,8 @@ package com.enderio.core.common.vecmath;
 
 import java.awt.Rectangle;
 
+import javax.annotation.Nonnull;
+
 public class VecmathUtil {
 
   /**
@@ -22,7 +24,7 @@ public class VecmathUtil {
     computePlaneEquation(new Vector3d(a.x, a.y, a.z), new Vector3d(b.x, b.y, b.z), new Vector3d(c.x, c.y, c.z), result);
   }
 
-  public static Vector3d clamp(Vector3d v, double min, double max) {
+  public static @Nonnull Vector3d clamp(Vector3d v, double min, double max) {
     v.x = clamp(v.x, min, max);
     v.y = clamp(v.y, min, max);
     v.z = clamp(v.z, min, max);

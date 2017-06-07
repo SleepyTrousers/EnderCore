@@ -33,6 +33,11 @@ public abstract class NNMap<K, V> extends HashMap<K, V> {
     return super.get(key);
   }
 
+  @Override
+  public V put(K key, @SuppressWarnings("null") @Nonnull V value) {
+    return super.put(key, value);
+  }
+
   public static class Default<K, V> extends NNMap<K, V> {
 
     private static final long serialVersionUID = -4833754907686663472L;

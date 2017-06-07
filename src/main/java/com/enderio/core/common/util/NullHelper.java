@@ -63,6 +63,7 @@ public final class NullHelper {
     return o;
   }
 
+  @SafeVarargs
   public final static @Nonnull <P> P first(@Nullable P... o) {
     for (P on : notnullJ(o, "... param is null")) {
       if (on != null) {

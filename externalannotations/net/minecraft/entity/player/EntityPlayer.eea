@@ -1,0 +1,10 @@
+class net/minecraft/entity/player/EntityPlayer
+addStat
+ (Lnet/minecraft/stats/StatBase;)V
+ (L0net/minecraft/stats/StatBase;)V
+addStat
+ (Lnet/minecraft/stats/StatBase;I)V
+ (L0net/minecraft/stats/StatBase;I)V
+takeStat
+ (Lnet/minecraft/stats/StatBase;)V
+ (L0net/minecraft/stats/StatBase;)V

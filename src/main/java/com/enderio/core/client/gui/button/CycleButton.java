@@ -70,8 +70,8 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
     setMode(modes.prev(mode));
   }
 
-  public void setMode(T newMode) {
-    if (mode == newMode || newMode == null) {
+  public void setMode(@Nonnull T newMode) {
+    if (mode == newMode) {
       return;
     }
     mode = newMode;
