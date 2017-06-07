@@ -1,5 +1,7 @@
 package com.enderio.core.common.vecmath;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -63,7 +65,7 @@ public class Vector3d {
     return this;
   }
 
-  public Vector3d add(double x2, double y2, double z2) {
+  public @Nonnull Vector3d add(double x2, double y2, double z2) {
     x += x2;
     y += y2;
     z += z2;
@@ -82,7 +84,7 @@ public class Vector3d {
     z -= vec.z;
   }
 
-  public Vector3d negate() {
+  public @Nonnull Vector3d negate() {
     x = -x;
     y = -y;
     z = -z;
@@ -147,7 +149,7 @@ public class Vector3d {
     z = Math.abs(z);
   }
 
-  public Vec3d getVec3() {
+  public @Nonnull Vec3d getVec3() {
     return new Vec3d(x, y, z);
   }
 }
