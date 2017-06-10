@@ -102,10 +102,14 @@ public class EntityUtil {
     return EnderCore.lang.localizeExact("entity." + mobName + ".name");
   }
 
-  public static @Nonnull List<ResourceLocation> getAllRegisteredMobNames() {
-    List<ResourceLocation> result = new ArrayList<ResourceLocation>();
+  public static @Nonnull NNList<ResourceLocation> getAllRegisteredMobNames() {
+    NNList<ResourceLocation> result = new NNList<ResourceLocation>();
     for (ResourceLocation entityName : EntityList.getEntityNameList()) {
-      if (EntityLiving.class.isAssignableFrom(EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()")))) {
+      final Class<? extends Entity> clazz = EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()"));
+      if (NullHelper.untrust(clazz) == null) {
+        Log.warn(
+            "net.minecraft.entity.EntityList.getClass(ResourceLocation) is marked @Nonnull but it returned null for the registered entity " + entityName + ".");
+      } else if (EntityLiving.class.isAssignableFrom(clazz)) {
         result.add(entityName);
       }
     }

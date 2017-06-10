@@ -1,0 +1,4 @@
+class net/minecraftforge/fluids/FluidStack
+copy
+ ()Lnet/minecraftforge/fluids/FluidStack;
+ ()L1net/minecraftforge/fluids/FluidStack;

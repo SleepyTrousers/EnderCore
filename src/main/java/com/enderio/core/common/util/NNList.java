@@ -182,20 +182,16 @@ public class NNList<E> extends NonNullList<E> {
     return (NNList<X>) EMPTY;
   }
 
-  @Override
-  public @Nonnull E[] toArray() {
-    @SuppressWarnings("unchecked")
-    final E[] array = (E[]) super.toArray();
-    if (array == null) {
-      throw new NullPointerException();
-    }
-    return array;
-  }
-
   public void addAll(E... el) {
     for (E e : el) {
       add(e);
     }
+  }
+
+  @SuppressWarnings("null")
+  @Override
+  public @Nonnull <T> T[] toArray(T[] a) {
+    return super.toArray(a);
   }
 
 }

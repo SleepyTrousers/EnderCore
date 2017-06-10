@@ -113,7 +113,7 @@ public class UserIdent {
 
   private static @Nonnull UUID offlineUUID(@Nullable String playerName) {
     UUID result = UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(Charsets.UTF_8));
-    return result != null ? result : new UUID(-1, -1);
+    return result;
   }
 
   UserIdent(@Nullable UUID uuid, @Nullable String playerName) {

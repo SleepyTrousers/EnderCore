@@ -182,11 +182,10 @@ public class Things {
     return itemList;
   }
 
-  private NNList<ItemStack> itemStackListRaw = null;
+  private final @Nonnull NNList<ItemStack> itemStackListRaw = new NNList<ItemStack>();
 
   public NNList<ItemStack> getItemStacksRaw() {
-    if (itemStackListRaw == null) {
-      itemStackListRaw = new NNList<ItemStack>();
+    if (itemStackListRaw.isEmpty()) {
       for (IThing thing : things) {
         itemStackListRaw.addAll(thing.getItemStacks());
       }

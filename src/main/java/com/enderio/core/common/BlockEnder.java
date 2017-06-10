@@ -33,35 +33,29 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   protected final @Nullable Class<? extends T> teClass;
-  protected final @Nonnull String name;
 
-  protected BlockEnder(@Nonnull String name, @Nullable Class<? extends T> teClass) {
-    this(name, teClass, new Material(MapColor.IRON));
+  protected BlockEnder(@Nullable Class<? extends T> teClass) {
+    this(teClass, new Material(MapColor.IRON));
   }
 
-  protected BlockEnder(@Nonnull String name, @Nullable Class<? extends T> teClass, @Nonnull Material mat) {
+  protected BlockEnder(@Nullable Class<? extends T> teClass, @Nonnull Material mat) {
     super(mat);
     this.teClass = teClass;
 
-    this.name = name;
     setHardness(0.5F);
-    setUnlocalizedName(name);
-    setRegistryName(name);
     setSoundType(SoundType.METAL);
     setHarvestLevel("pickaxe", 0);
   }
 
   protected void init() {
     GameRegistry.register(this);
-    if (teClass != null) {
-      GameRegistry.registerTileEntity(teClass, name + "TileEntity");
-    }
     GameRegistry.register(createItemBlock());
   }
 
   protected ItemBlock createItemBlock() {
     ItemBlock ib = new ItemBlock(this);
-    ib.setRegistryName(getName());
+    ib.setRegistryName(getRegistryName());
+    ib.setUnlocalizedName(getUnlocalizedName());
     return ib;
   }
 
@@ -78,7 +72,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
         te.init();
         return te;
       } catch (Exception e) {
-        throw new RuntimeException("Could not create tile entity for block " + name + " for class " + teClass, e);
+        throw new RuntimeException("Could not create tile entity for block " + getLocalizedName() + " for class " + teClass, e);
       }
     }
     throw new RuntimeException(
@@ -107,7 +101,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     return openGui(worldIn, pos, playerIn, side);
   }
 
-  protected boolean openGui(World world, BlockPos pos, EntityPlayer entityPlayer, EnumFacing side) {
+  protected boolean openGui(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer entityPlayer, @Nonnull EnumFacing side) {
     return false;
   }
 
@@ -255,8 +249,8 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     }
   }
 
-  public @Nonnull String getName() {
-    return name;
+  public Class<? extends T> getTeClass() {
+    return teClass;
   }
 
 }

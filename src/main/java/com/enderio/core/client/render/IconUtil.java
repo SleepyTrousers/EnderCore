@@ -37,6 +37,7 @@ public class IconUtil {
 
   private boolean doneInit = false;
 
+  @SuppressWarnings("null")
   private IconUtil() {
   }
 

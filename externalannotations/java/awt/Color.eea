@@ -1,4 +1,7 @@
 class java/awt/Color
+black
+ Ljava/awt/Color;
+ L1java/awt/Color;
 white
  Ljava/awt/Color;
  L1java/awt/Color;
