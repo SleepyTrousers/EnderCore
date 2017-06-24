@@ -25,9 +25,9 @@ group = "com.enderio.core"
 archivesBaseName = "EnderCore"
 version = "${minecraft_version}-${mod_version}.${buildnumber}"
 
-sourceCompatibility = targetCompatibility = "1.6" // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {
-    sourceCompatibility = targetCompatibility = "1.6"
+    sourceCompatibility = targetCompatibility = "1.8"
 }
 
 boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE").equalsIgnoreCase("false")

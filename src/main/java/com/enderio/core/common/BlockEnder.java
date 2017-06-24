@@ -17,7 +17,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -28,7 +27,6 @@ import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
@@ -45,18 +43,6 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     setHardness(0.5F);
     setSoundType(SoundType.METAL);
     setHarvestLevel("pickaxe", 0);
-  }
-
-  protected void init() {
-    GameRegistry.register(this);
-    GameRegistry.register(createItemBlock());
-  }
-
-  protected ItemBlock createItemBlock() {
-    ItemBlock ib = new ItemBlock(this);
-    ib.setRegistryName(getRegistryName());
-    ib.setUnlocalizedName(getUnlocalizedName());
-    return ib;
   }
 
   @Override
