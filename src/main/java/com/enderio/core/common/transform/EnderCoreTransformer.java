@@ -347,7 +347,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     transformer.transform(methods);
 
-    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS /* | ClassWriter.COMPUTE_FRAMES */);
     classNode.accept(cw);
     logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
