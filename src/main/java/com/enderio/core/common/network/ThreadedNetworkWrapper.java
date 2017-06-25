@@ -1,5 +1,6 @@
 package com.enderio.core.common.network;
 
+import com.enderio.core.common.util.Log;
 import com.google.common.base.Throwables;
 
 import net.minecraft.client.Minecraft;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class ThreadedNetworkWrapper {
@@ -22,6 +24,14 @@ public class ThreadedNetworkWrapper {
     parent = new SimpleNetworkWrapper(channelName);
   }
 
+  private final class NullHandler<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
+
+    @Override
+    public REPLY onMessage(REQ message, MessageContext ctx) {
+      return null;
+    }
+
+  }
   private final class Wrapper<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
 
     final IMessageHandler<REQ, REPLY> wrapped;
@@ -86,6 +96,10 @@ public class ThreadedNetworkWrapper {
 
   public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler,
       Class<REQ> requestMessageType, int discriminator, Side side) {
+    if (side == Side.CLIENT && FMLLaunchHandler.side() != Side.CLIENT) {
+      parent.registerMessage(new NullHandler<REQ, REPLY>(), requestMessageType, discriminator, side);
+      return;
+    }
     registerMessage(instantiate(messageHandler), requestMessageType, discriminator, side);
   }
 
@@ -93,7 +107,8 @@ public class ThreadedNetworkWrapper {
       Class<? extends IMessageHandler<? super REQ, ? extends REPLY>> handler) {
     try {
       return handler.newInstance();
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      Log.error("Failed to instanciate " + handler);
       throw Throwables.propagate(e);
     }
   }
