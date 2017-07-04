@@ -143,7 +143,7 @@ public class RenderUtil {
   }
 
   public static @Nonnull FontRenderer fontRenderer() {
-    return Minecraft.getMinecraft().fontRendererObj;
+    return Minecraft.getMinecraft().fontRenderer;
   }
 
   public static @Nonnull float[] getDefaultPerSideBrightness() {
@@ -489,7 +489,7 @@ public class RenderUtil {
     GlStateManager.rotate(180, 1, 0, 0);
 
     Minecraft mc = Minecraft.getMinecraft();
-    FontRenderer fnt = mc.fontRendererObj;
+    FontRenderer fnt = mc.fontRenderer;
     float scale = size / fnt.FONT_HEIGHT;
     GlStateManager.scale(scale, scale, scale);
     GlStateManager.rotate(mc.getRenderManager().playerViewY + 180, 0.0F, 1.0F, 0.0F);

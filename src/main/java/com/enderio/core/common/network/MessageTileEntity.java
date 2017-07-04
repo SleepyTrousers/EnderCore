@@ -67,6 +67,6 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   }
 
   protected World getWorld(MessageContext ctx) {
-    return ctx.getServerHandler().playerEntity.world;
+    return ctx.getServerHandler().player.world;
   }
 }

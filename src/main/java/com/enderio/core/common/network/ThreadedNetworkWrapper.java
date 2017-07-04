@@ -32,6 +32,7 @@ public class ThreadedNetworkWrapper {
     }
 
   }
+
   private final class Wrapper<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY> {
 
     final IMessageHandler<REQ, REPLY> wrapped;
@@ -84,7 +85,7 @@ public class ThreadedNetworkWrapper {
           if (ctx.side == Side.CLIENT) {
             sendToServer(reply);
           } else {
-            final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            final EntityPlayerMP player = ctx.getServerHandler().player;
             sendTo(reply, player);
           }
         }

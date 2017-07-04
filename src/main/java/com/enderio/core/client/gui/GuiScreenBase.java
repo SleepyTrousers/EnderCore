@@ -130,7 +130,7 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
 
   @Override
   public @Nonnull FontRenderer getFontRenderer() {
-    return Minecraft.getMinecraft().fontRendererObj;
+    return Minecraft.getMinecraft().fontRenderer;
   }
 
   @Override

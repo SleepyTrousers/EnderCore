@@ -53,7 +53,7 @@ public class PacketGhostSlot implements IMessage {
 
     @Override
     public IMessage onMessage(PacketGhostSlot msg, MessageContext ctx) {
-      Container openContainer = ctx.getServerHandler().playerEntity.openContainer;
+      Container openContainer = ctx.getServerHandler().player.openContainer;
       if (openContainer instanceof GhostSlot.IGhostSlotAware && openContainer.windowId == msg.windowId) {
         ((GhostSlot.IGhostSlotAware) openContainer).setGhostSlotContents(msg.slot, msg.stack, msg.realsize);
       }

@@ -56,7 +56,7 @@ public class MessageTileNBT implements IMessage, IMessageHandler<MessageTileNBT,
 
   @Override
   public IMessage onMessage(MessageTileNBT msg, MessageContext ctx) {
-    te = handle(ctx.getServerHandler().playerEntity.world);
+    te = handle(ctx.getServerHandler().player.world);
     if (te != null && renderOnUpdate) {
       IBlockState bs = te.getWorld().getBlockState(msg.getPos());
       te.getWorld().notifyBlockUpdate(msg.getPos(), bs, bs, 3);

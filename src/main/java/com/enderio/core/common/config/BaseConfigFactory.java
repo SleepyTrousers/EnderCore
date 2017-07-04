@@ -30,4 +30,14 @@ public class BaseConfigFactory implements IModGuiFactory {
     return null;
   }
 
+  @Override
+  public boolean hasConfigGui() {
+    return true;
+  }
+
+  @Override
+  public GuiScreen createConfigGui(GuiScreen parentScreen) {
+    return new BaseConfigGui(parentScreen);
+  }
+
 }

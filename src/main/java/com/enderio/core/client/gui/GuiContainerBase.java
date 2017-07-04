@@ -352,7 +352,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     FontRenderer font = null;
     font = stack.getItem().getFontRenderer(stack);
     if (font == null) {
-      font = fontRendererObj;
+      font = fontRenderer;
     }
     itemRender.renderItemIntoGUI(stack, mouseX, mouseY);
     itemRender.renderItemOverlayIntoGUI(font, stack, mouseX, mouseY, str);
@@ -375,7 +375,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   }
 
   public void drawFakeItemStackStdOverlay(int x, int y, @Nonnull ItemStack stack) {
-    itemRender.renderItemOverlayIntoGUI(fontRendererObj, stack, x, y, null);
+    itemRender.renderItemOverlayIntoGUI(fontRenderer, stack, x, y, null);
   }
 
   protected void drawFakeItemHover(int x, int y) {
@@ -460,7 +460,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   public @Nonnull FontRenderer getFontRenderer() {
-    return Minecraft.getMinecraft().fontRendererObj;
+    return Minecraft.getMinecraft().fontRenderer;
   }
 
   @Override
