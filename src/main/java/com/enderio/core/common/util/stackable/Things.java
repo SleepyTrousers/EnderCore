@@ -82,6 +82,13 @@ public class Things {
     return this;
   }
 
+  public @Nonnull Things add(@Nullable IProducer producer) {
+    if (producer != null) {
+      add(new ProducerThing(producer));
+    }
+    return this;
+  }
+
   public static void addAlias(@Nullable String name, @Nullable String value) {
     if (name != null && value != null) {
       aliases.put(name, new StringThing(value));

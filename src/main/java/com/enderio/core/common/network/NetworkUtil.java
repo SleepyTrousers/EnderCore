@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,11 +16,11 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
  */
 public class NetworkUtil {
 
-  public static NBTTagCompound readNBTTagCompound(ByteBuf dataIn) {
+  public static @Nonnull NBTTagCompound readNBTTagCompound(ByteBuf dataIn) {
     try {
       short size = dataIn.readShort();
       if (size < 0) {
-        return null;
+        return new NBTTagCompound();
       } else {
         byte[] buffer = new byte[size];
         dataIn.readBytes(buffer);
@@ -26,7 +28,7 @@ public class NetworkUtil {
       }
     } catch (IOException e) {
       FMLCommonHandler.instance().raiseException(e, "Custom Packet", true);
-      return null;
+      return new NBTTagCompound();
     }
   }
 
