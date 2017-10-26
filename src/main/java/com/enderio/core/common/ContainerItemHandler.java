@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.google.common.collect.Maps;
@@ -11,12 +12,14 @@ import com.google.common.collect.Maps;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
-@Deprecated
-public class ContainerEnder<T extends IInventory> extends Container implements GhostSlot.IGhostSlotAware {
+public abstract class ContainerItemHandler<T extends ICapabilityProvider> extends Container implements GhostSlot.IGhostSlotAware {
 
   protected final @Nonnull Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
 
@@ -25,7 +28,8 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
   protected final int startHotBarSlot;
   protected final int endHotBarSlot;
 
-  private final @Nonnull T inv;
+  private final @Nonnull T owner;
+  private final @Nonnull IItemHandler inv;
   private final @Nonnull InventoryPlayer playerInv;
 
   @Nonnull
@@ -36,8 +40,9 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     return reference;
   }
 
-  public ContainerEnder(@Nonnull InventoryPlayer playerInv, @Nonnull T inv) {
-    this.inv = checkNotNull(inv);
+  public ContainerItemHandler(@Nonnull InventoryPlayer playerInv, @Nonnull T owner, @Nullable EnumFacing facing) {
+    this.owner = checkNotNull(owner);
+    this.inv = checkNotNull(owner.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing));
     this.playerInv = checkNotNull(playerInv);
 
     addSlots(this.playerInv);
@@ -77,15 +82,14 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
   public @Nonnull Point getUpgradeOffset() {
     return new Point(12, 60);
   }
+  
+  public @Nonnull T getOwner() {
+		return owner;
+	}
 
-  public @Nonnull T getInv() {
-    return inv;
-  }
-
-  @Override
-  public boolean canInteractWith(@Nonnull EntityPlayer player) {
-    return getInv().isUsableByPlayer(player);
-  }
+	public @Nonnull IItemHandler getInv() {
+		return inv;
+	}
 
   @Override
   public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer p_82846_1_, int p_82846_2_) {
@@ -199,8 +203,8 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
 
   @Override
   public void setGhostSlotContents(int slot, @Nonnull ItemStack stack, int realsize) {
-    if (inv instanceof TileEntityBase) {
-      ((TileEntityBase) inv).setGhostSlotContents(slot, stack, realsize);
+    if (owner instanceof TileEntityBase) {
+      ((TileEntityBase) owner).setGhostSlotContents(slot, stack, realsize);
     }
 
   }
