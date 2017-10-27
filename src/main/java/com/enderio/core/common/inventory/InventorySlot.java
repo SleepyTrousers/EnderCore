@@ -207,7 +207,9 @@ public class InventorySlot implements IItemHandler {
   }
 
   public void set(@Nonnull ItemStack stack) {
+    ItemStack oldStack = itemStack;
     itemStack = stack;
+    onChange(oldStack, itemStack);
   }
 
   public int getMaxStackSize() {
