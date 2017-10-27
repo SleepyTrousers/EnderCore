@@ -24,7 +24,8 @@ public class GhostSlotHandler {
 
   // GhostSlot managing
 
-  protected @Nonnull List<GhostSlot> getGhostSlots() {
+  @Nonnull
+  public List<GhostSlot> getGhostSlots() {
     return ghostSlots;
   }
 

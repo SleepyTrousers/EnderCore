@@ -105,6 +105,14 @@ public class EnderInventory implements IItemHandler {
     return NullHelper.notnullJ(idents.get(ident), "Map.containsKey() lied to us");
   }
 
+  public boolean hasSlot(@Nonnull Enum<?> ident) {
+    return hasSlot(ident.name());
+  }
+
+  public boolean hasSlot(@Nonnull String ident) {
+    return idents.containsKey(ident);
+  }
+
   public @Nonnull View getView(@Nonnull EnderInventory.Type type) {
     return new View(type);
   }
@@ -177,9 +185,9 @@ public class EnderInventory implements IItemHandler {
 
   public class View implements IItemHandler, Iterable<InventorySlot> {
 
-    private final EnderInventory.Type type;
+    private final @Nonnull EnderInventory.Type type;
 
-    View(Type type) {
+    View(@Nonnull Type type) {
       this.type = type;
     }
 
@@ -250,6 +258,13 @@ public class EnderInventory implements IItemHandler {
       return 0;
     }
 
+    public @Nonnull Type getType() {
+      return type;
+    }
+
+    public @Nonnull EnderInventory getParent() {
+      return EnderInventory.this;
+    }
   }
 
   @Override

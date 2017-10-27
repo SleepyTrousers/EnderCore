@@ -3,6 +3,7 @@ package com.enderio.core.client.render;
 import java.awt.Color;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vector4f;
@@ -30,16 +31,17 @@ public final class ColorUtil {
     return new Vector4f(r / 255F, g / 255F, b / 255F, 1);
   }
 
-  public static int getRGB(@Nonnull Color color) {
-    return getRGB(color.getRed(), color.getGreen(), color.getBlue());
+  public static int getRGB(@Nullable Color color) {
+    // Note: Constants in java.awt.Color are not @Nonnull-annotated
+    return color == null ? 0 : getRGB(color.getRed(), color.getGreen(), color.getBlue());
   }
 
-  public static int getRGBA(@Nonnull Color color) {
-    return getRGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+  public static int getRGBA(@Nullable Color color) {
+    return color == null ? 0 : getRGBA(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
   }
 
-  public static int getARGB(@Nonnull Color color) {
-    return getRGBA(color.getAlpha(), color.getRed(), color.getGreen(), color.getBlue());
+  public static int getARGB(@Nullable Color color) {
+    return color == null ? 0 : getRGBA(color.getAlpha(), color.getRed(), color.getGreen(), color.getBlue());
   }
 
   public static int getRGB(@Nonnull Vector3f rgb) {
