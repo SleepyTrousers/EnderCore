@@ -99,7 +99,7 @@ public class EnderSlot extends SlotItemHandler {
     return this.type == typeIn;
   }
 
-  static boolean is(@Nullable SlotItemHandler slot, @Nonnull EnderInventory.Type typeIn) {
+  public static boolean is(@Nullable Slot slot, @Nonnull EnderInventory.Type typeIn) {
     return slot != null && slot instanceof EnderSlot && ((EnderSlot) slot).is(typeIn);
   }
 
