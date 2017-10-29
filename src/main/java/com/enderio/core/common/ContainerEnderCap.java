@@ -23,14 +23,16 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
   protected final @Nonnull Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
 
-  protected final int startPlayerSlot;
-  protected final int endPlayerSlot;
-  protected final int startHotBarSlot;
-  protected final int endHotBarSlot;
+  protected int startPlayerSlot;
+  protected int endPlayerSlot;
+  protected int startHotBarSlot;
+  protected int endHotBarSlot;
 
   private final @Nonnull T inv;
   private final @Nonnull InventoryPlayer playerInv;
   private final @Nullable S te;
+
+  private boolean initRan = false;
 
   @Nonnull
   private static <T> T checkNotNull(T reference) {
@@ -45,6 +47,12 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     this.playerInv = checkNotNull(playerInv);
     this.te = te;
 
+    init(); // TODO: Drop this line and add the init() call whenever a Container is constructed
+  }
+
+  // use this if you need to chain it to the new call and care about the exact class
+  @SuppressWarnings("unchecked")
+  public final <X> X init() {
     addSlots();
 
     int x = getPlayerInventoryOffset().x;
@@ -70,6 +78,9 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
       playerSlotLocations.put(slot, loc);
     }
     endHotBarSlot = inventorySlots.size();
+
+    initRan = true;
+    return (X) this;
   }
 
   public @Nonnull Point getPlayerInventoryOffset() {
@@ -86,6 +97,9 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
   @Override
   public boolean canInteractWith(@Nonnull EntityPlayer player) {
+    if (!initRan) {
+      throw new RuntimeException("Ender IO Internal Error 10T (report this to the Ender IO devs)");
+    }
     final S te2 = te;
     if (te2 != null) {
       World world = te2.getWorld();
