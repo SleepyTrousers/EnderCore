@@ -52,6 +52,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
   // use this if you need to chain it to the new call and care about the exact class
   @SuppressWarnings("unchecked")
+  @Nonnull
   public final <X> X init() {
     addSlots();
 
