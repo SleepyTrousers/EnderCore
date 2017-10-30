@@ -32,6 +32,9 @@ public class FluidUtil {
 
   @CapabilityInject(IFluidHandler.class)
   private static final Capability<IFluidHandler> FLUID_HANDLER = null;
+  
+  @CapabilityInject(IFluidHandlerItem.class)
+  private static final Capability<IFluidHandlerItem> FLUID_ITEM_HANDLER = null;
 
   // TODO: Mod BC see if this is still needed once BC updates. Might work with
   // caps.
@@ -50,6 +53,10 @@ public class FluidUtil {
   public static @Nonnull Capability<IFluidHandler> getFluidCapability() {
     return NullHelper.notnullF(FLUID_HANDLER, "IFluidHandler capability is missing");
   }
+  
+  public static @Nonnull Capability<IFluidHandlerItem> getFluidItemCapability() {
+    return NullHelper.notnullF(FLUID_ITEM_HANDLER, "IFluidHandlerItem capability is missing");
+  }
 
   public static @Nullable IFluidHandler getFluidHandlerCapability(@Nullable ICapabilityProvider provider, @Nullable EnumFacing side) {
     if (provider != null && provider.hasCapability(getFluidCapability(), side)) {
@@ -59,7 +66,10 @@ public class FluidUtil {
   }
 
   public static @Nullable IFluidHandler getFluidHandlerCapability(@Nonnull ItemStack stack) {
-    return getFluidHandlerCapability(stack, null);
+    if (stack.hasCapability(getFluidItemCapability(), null)) {
+      return stack.getCapability(getFluidItemCapability(), null);
+    }
+    return null;
   }
 
   public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(@Nonnull final World worldObj, @Nonnull final BlockPos location) {
