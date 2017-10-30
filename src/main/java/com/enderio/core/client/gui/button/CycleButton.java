@@ -41,7 +41,7 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
   public CycleButton(@Nonnull IGuiScreen gui, int id, int x, int y, @Nonnull Class<T> enumClass) {
     super(gui, id, x, y, null);
     modes = NNList.of(enumClass);
-    setMode(mode = modes.get(0));
+    mode = setMode(modes.get(0));
   }
 
   @Override
@@ -70,15 +70,16 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
     setMode(modes.prev(mode));
   }
 
-  public void setMode(@Nonnull T newMode) {
+  public @Nonnull T setMode(@Nonnull T newMode) {
     if (mode == newMode) {
-      return;
+      return mode;
     }
     mode = newMode;
     List<String> tooltip = mode.getTooltipLines();
     setToolTip(tooltip.toArray(new String[tooltip.size()]));
 
     icon = mode.getIcon();
+    return mode;
   }
 
   public @Nonnull T getMode() {
