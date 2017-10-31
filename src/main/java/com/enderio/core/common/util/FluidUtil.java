@@ -1,7 +1,6 @@
 package com.enderio.core.common.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,8 +71,8 @@ public class FluidUtil {
     return null;
   }
 
-  public static Map<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(@Nonnull final World worldObj, @Nonnull final BlockPos location) {
-    final Map<EnumFacing, IFluidHandler> res = new HashMap<EnumFacing, IFluidHandler>();
+  public static EnumMap<EnumFacing, IFluidHandler> getNeighbouringFluidHandlers(@Nonnull final World worldObj, @Nonnull final BlockPos location) {
+    final EnumMap<EnumFacing, IFluidHandler> res = new EnumMap<EnumFacing, IFluidHandler>(EnumFacing.class);
     NNList.FACING.apply(new Callback<EnumFacing>() {
       @Override
       public void apply(@Nonnull EnumFacing dir) {
