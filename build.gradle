@@ -106,7 +106,7 @@ jar {
 task deobfJar(type: Jar) {
     from sourceSets.main.output
     from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
-    classifier = 'dev'
+    classifier = 'deobf'
 }
 
 task apiJar(type: Jar) {
@@ -132,6 +132,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
+			artifact deobfJar
 			artifact sourceJar
             artifact apiJar
         }
