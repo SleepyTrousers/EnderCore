@@ -83,7 +83,7 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
       return;
     }
     mode = newMode;
-    List<String> tooltip = mode.getTooltipLines();
+    List<String> tooltip = newMode.getTooltipLines();
     setToolTip(tooltip.toArray(new String[tooltip.size()]));
 
     icon = newMode.getIcon();

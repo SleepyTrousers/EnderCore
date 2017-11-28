@@ -172,7 +172,8 @@ public class ConfigProcessor {
     return this;
   }
 
-  public <ACTUAL, BASE> ConfigProcessor addAdapters(ITypeAdapter<ACTUAL, BASE>... adaptersIn) {
+  @SafeVarargs
+  public final <ACTUAL, BASE> ConfigProcessor addAdapters(ITypeAdapter<ACTUAL, BASE>... adaptersIn) {
     for (ITypeAdapter<ACTUAL, BASE> adapter : adaptersIn) {
       addAdapter(adapter);
     }

@@ -35,6 +35,7 @@ public class NNList<E> extends NonNullList<E> {
     }
   }
 
+  @SafeVarargs
   public NNList(E... fillWith) {
     super();
     Collections.addAll(this, fillWith);
@@ -182,7 +183,8 @@ public class NNList<E> extends NonNullList<E> {
     return (NNList<X>) EMPTY;
   }
 
-  public void addAll(E... el) {
+  @SafeVarargs
+  public final void addAll(E... el) {
     for (E e : el) {
       add(e);
     }

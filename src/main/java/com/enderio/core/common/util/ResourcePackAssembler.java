@@ -212,7 +212,9 @@ public class ResourcePackAssembler {
         EnderFileUtils.safeDelete(zip);
         writeNewFile(new File(dest.getParent() + "/readme.txt"),
             EnderCore.lang.localize("resourcepack.readme") + "\n\n" + EnderCore.lang.localize("resourcepack.readme2"));
-        defaultResourcePacks.add(new FileResourcePack(dest));
+        try (final FileResourcePack frp = new FileResourcePack(dest)) {
+          defaultResourcePacks.add(frp);
+        }
       } catch (Exception e) {
         EnderCore.logger.error("Failed to inject resource pack for mod {}", modid, e);
       }
