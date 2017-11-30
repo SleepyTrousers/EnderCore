@@ -19,7 +19,7 @@ import net.minecraft.util.math.Vec3d;
 
 public final class BoundingBox extends AxisAlignedBB {
 
-  public static final BoundingBox UNIT_CUBE = new BoundingBox(0, 0, 0, 1, 1, 1);
+  public static final @Nonnull BoundingBox UNIT_CUBE = new BoundingBox(0, 0, 0, 1, 1, 1);
 
   public BoundingBox(@Nonnull BlockPos pos1, @Nonnull BlockPos pos2) {
     super(pos1, pos2);

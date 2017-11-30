@@ -1,7 +1,6 @@
 package com.enderio.core.common.util;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -11,9 +10,9 @@ import net.minecraft.util.text.TextComponentString;
 
 public class ArrayInventory implements IInventory {
 
-  protected ItemStack[] items;
+  protected final @Nonnull ItemStack[] items;
 
-  public ArrayInventory(ItemStack[] items) {
+  public ArrayInventory(@Nonnull ItemStack[] items) {
     this.items = items;
   }
 
@@ -38,7 +37,7 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public void setInventorySlotContents(int slot, @Nullable ItemStack stack) {
+  public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
     items[slot] = stack;
     markDirty();
   }
