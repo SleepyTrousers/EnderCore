@@ -4,6 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
 
@@ -134,6 +135,14 @@ public class NNList<E> extends NonNullList<E> {
     return new ItrImpl<E>(super.iterator());
   }
 
+  /**
+   * Creates a fast iterator for read-only lists. Do not use on lists that may
+   * be changed.
+   */
+  public @Nonnull NNIterator<E> fastIterator() {
+    return new FastItrImpl();
+  }
+
   public static interface NNIterator<E> extends Iterator<E> {
 
     @Override
@@ -167,6 +176,30 @@ public class NNList<E> extends NonNullList<E> {
     @Override
     public void remove() {
       parent.remove();
+    }
+
+  }
+
+  private class FastItrImpl implements NNIterator<E> {
+    int cursor = 0;
+
+    @Override
+    public boolean hasNext() {
+      return cursor != size();
+    }
+
+    @Override
+    public @Nonnull E next() {
+      try {
+        return get(cursor++);
+      } catch (IndexOutOfBoundsException e) {
+        throw new NoSuchElementException();
+      }
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
     }
 
   }
