@@ -433,7 +433,7 @@ public class RenderUtil {
   }
 
   public static void renderGuiTank(@Nullable FluidStack fluid, int capacity, int amount, double x, double y, double zLevel, double width, double height) {
-    if (fluid == null || fluid.getFluid() == null || fluid.amount <= 0) {
+    if (fluid == null || fluid.getFluid() == null || amount <= 0) {
       return;
     }
 
