@@ -30,3 +30,11 @@
 ## translation reports
 resources/assets/enderio/lang/*.lang.txt
 /*.launch
+
+src/\.DS_Store
+
+externalannotations/\.DS_Store
+
+gradle/\.DS_Store
+
+\.DS_Store
