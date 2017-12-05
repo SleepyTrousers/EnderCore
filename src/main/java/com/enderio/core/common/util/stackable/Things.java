@@ -34,6 +34,14 @@ public class Things {
   private static final @Nonnull List<Things> values = new ArrayList<Things>();
 
   public Things(String... names) {
+    init(names);
+  }
+
+  public Things() {
+    // for subclasses
+  }
+
+  protected void init(String... names) {
     for (String string : names) {
       add(string);
     }
