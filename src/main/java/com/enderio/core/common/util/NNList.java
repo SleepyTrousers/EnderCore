@@ -1,6 +1,7 @@
 package com.enderio.core.common.util;
 
 import java.security.InvalidParameterException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,7 @@ public class NNList<E> extends NonNullList<E> {
     super();
   }
 
-  public NNList(List<E> fillWith) {
+  public NNList(Collection<E> fillWith) {
     super();
     addAll(fillWith);
   }
