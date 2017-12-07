@@ -29,6 +29,10 @@ public class GhostSlotHandler {
     return ghostSlots;
   }
 
+  public void add(GhostSlot slot) {
+    ghostSlots.add(slot);
+  }
+
   public GhostSlot getGhostSlotAt(@Nonnull GuiContainerBase guiContainerBase, int mouseX, int mouseY) {
     int mX = mouseX - guiContainerBase.getGuiLeft();
     int mY = mouseY - guiContainerBase.getGuiTop();
