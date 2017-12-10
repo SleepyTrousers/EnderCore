@@ -94,8 +94,11 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
     if (ConfigHandler.allowAutoSmelt) {
       INSTANCE = new EnchantAutoSmelt();
       GameRegistry.register(INSTANCE);
-      FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN + ":autosmelt\">\n<itemStack oreDictionary=\"blockCoal\" number=\"32\"/>\n</enchantment>");
+      FMLInterModComms.sendMessage("enderio", "recipe:enchanter",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\"?><recipes>"
+              + "<recipe name=\"Enchanter: endercore:autosmelt\" required=\"true\" disabled=\"false\"><enchanting>"
+              + "<input name=\"oredict:blockCoal\" amount=\"32\"/><enchantment name=\"" + EnderCore.DOMAIN
+              + ":autosmelt\" costMultiplier=\"1\"/></enchanting></recipe></recipes>");
     }
   }
 

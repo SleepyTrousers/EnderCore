@@ -98,8 +98,11 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
     if (ConfigHandler.allowXPBoost) {
       INSTANCE = new EnchantXPBoost();
       GameRegistry.register(INSTANCE);
-      FMLInterModComms.sendMessage("EnderIO", "recipe:enchanter",
-          "<enchantment name=\"" + EnderCore.DOMAIN + ":xpboost\" >\n<itemStack oreDictionary=\"ingotGold\" number=\"16\"/>\n</enchantment>");
+      FMLInterModComms.sendMessage("enderio", "recipe:enchanter",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\"?><recipes>"
+              + "<recipe name=\"Enchanter: endercore:xpboost\" required=\"true\" disabled=\"false\"><enchanting>"
+              + "<input name=\"oredict:ingotGold\" amount=\"16\"/><enchantment name=\"" + EnderCore.DOMAIN
+              + ":xpboost\" costMultiplier=\"1\"/></enchanting></recipe></recipes>");
     }
   }
 }
