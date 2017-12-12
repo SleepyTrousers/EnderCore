@@ -1,14 +1,9 @@
 package com.enderio.core.common;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import com.enderio.core.common.util.NNList;
 import com.enderio.core.common.util.Scheduler;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -43,20 +38,6 @@ public class CommonProxy {
   }
 
   public void onPreInit(@Nonnull FMLPreInitializationEvent event) {
-  }
-
-  /**
-   * Proxy for Item.getCreativeTab(), which is client-only.
-   */
-  public CreativeTabs getCreativeTab(@Nonnull ItemStack stack) {
-    return null;
-  }
-
-  /**
-   * Proxy for Item.getSubItems(), which is client-only.
-   */
-  public void getSubItems(@Nonnull Item itemIn, @Nullable CreativeTabs tab, @Nonnull NNList<ItemStack> subItems) {
-    subItems.add(new ItemStack(itemIn));
   }
 
 }

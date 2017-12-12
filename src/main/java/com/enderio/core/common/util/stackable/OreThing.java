@@ -93,9 +93,4 @@ class OreThing implements IThing {
     return result;
   }
 
-  @Override
-  public @Nullable Object getRecipeObject() {
-    return name;
-  }
-
 }

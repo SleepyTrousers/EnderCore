@@ -63,9 +63,4 @@ class ResourceThing implements IThing {
     return NNList.<Block> emptyList();
   }
 
-  @Override
-  public @Nullable Object getRecipeObject() {
-    return null;
-  }
-
 }

@@ -57,9 +57,4 @@ class ItemStackThing implements IThing {
     return block != Blocks.AIR ? new NNList<Block>(block) : NNList.<Block> emptyList();
   }
 
-  @Override
-  public @Nullable Object getRecipeObject() {
-    return thing;
-  }
-
 }

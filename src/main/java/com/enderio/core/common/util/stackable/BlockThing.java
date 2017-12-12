@@ -56,9 +56,4 @@ class BlockThing implements IThing {
     return new NNList<Block>(thing);
   }
 
-  @Override
-  public @Nullable Object getRecipeObject() {
-    return thing;
-  }
-
 }

@@ -8,12 +8,17 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.enderio.core.EnderCore;
 import com.enderio.core.common.util.NNList;
+import com.enderio.core.common.util.NNList.NNIterator;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
+import net.minecraft.client.util.RecipeItemHelper;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.oredict.OreDictionary;
@@ -28,7 +33,7 @@ import net.minecraftforge.oredict.OreDictionary;
  * Non-existing things are silently ignored. Adding things in the pre-init phase (i.e. before all modded things exist in the game) is safe.
  *
  */
-public class Things {
+public class Things extends Ingredient {
   static final @Nonnull Map<String, IThing> aliases = new HashMap<String, IThing>();
 
   private static final @Nonnull List<Things> values = new ArrayList<Things>();
@@ -62,8 +67,16 @@ public class Things {
 
   private final @Nonnull List<IThing> things = new ArrayList<IThing>();
 
+  public @Nonnull Things addAll(@Nonnull NNList<String> names) {
+    for (String name : names) {
+      add(name);
+    }
+    return this;
+  }
+
   public @Nonnull Things add(@Nullable Item item) {
     if (item != null) {
+      nameList.add("item:" + item.getRegistryName());
       add(new ItemThing(item));
     }
     return this;
@@ -71,6 +84,7 @@ public class Things {
 
   public @Nonnull Things add(@Nullable ItemStack itemStack) { // sic!
     if (itemStack != null && !itemStack.isEmpty()) {
+      nameList.add("item:" + itemStack.getItem().getRegistryName());
       add(new ItemStackThing(itemStack));
     }
     return this;
@@ -78,6 +92,7 @@ public class Things {
 
   public @Nonnull Things add(@Nullable Block block) {
     if (block != null) {
+      nameList.add("block:" + block.getRegistryName());
       add(new BlockThing(block));
     }
     return this;
@@ -85,6 +100,7 @@ public class Things {
 
   public @Nonnull Things add(@Nullable String name) {
     if (name != null) {
+      nameList.add(name);
       add(new StringThing(name));
     }
     return this;
@@ -92,6 +108,15 @@ public class Things {
 
   public @Nonnull Things add(@Nullable IProducer producer) {
     if (producer != null) {
+      // TODO: Better way to serialize this?
+      Block block = producer.getBlock();
+      if (block != null) {
+        nameList.add("block:" + block.getRegistryName());
+      }
+      Item item = producer.getItem();
+      if (item != null) {
+        nameList.add("item:" + item.getRegistryName());
+      }
       add(new ProducerThing(producer));
     }
     return this;
@@ -105,6 +130,15 @@ public class Things {
 
   public @Nonnull Things add(@Nullable ResourceLocation resourceLocation) {
     if (resourceLocation != null) {
+      if (net.minecraft.block.Block.REGISTRY.containsKey(resourceLocation)) {
+        Block block = net.minecraft.block.Block.REGISTRY.getObject(resourceLocation);
+        nameList.add("block:" + block.getRegistryName());
+      }
+      // this ugly thing seems to be what Forge wants you to use
+      Item item = net.minecraft.item.Item.REGISTRY.getObject(resourceLocation);
+      if (item != null) {
+        nameList.add("item:" + item.getRegistryName());
+      }
       add(new ResourceThing(resourceLocation));
     }
     return this;
@@ -112,6 +146,7 @@ public class Things {
 
   public @Nonnull Things addOredict(@Nullable String name) {
     if (name != null) {
+      nameList.add("oredict:" + name);
       add(new OreThing(name));
     }
     return this;
@@ -119,6 +154,7 @@ public class Things {
 
   public @Nonnull Things add(@Nullable Things otherThings) {
     if (otherThings != null) {
+      nameList.addAll(otherThings.nameList);
       for (IThing thing : otherThings.things) {
         add(thing);
       }
@@ -139,6 +175,7 @@ public class Things {
       itemStackListRaw.clear();
       itemStackList.clear();
       blockList.clear();
+      itemIds.clear();
     }
   }
 
@@ -199,6 +236,9 @@ public class Things {
 
   private final @Nonnull NNList<ItemStack> itemStackListRaw = new NNList<ItemStack>();
 
+  /**
+   * Returns a list of item stacks for this Thing. This does NOT expand items that are defined using the wildcard value for the item damage.
+   */
   public NNList<ItemStack> getItemStacksRaw() {
     if (itemStackListRaw.isEmpty()) {
       for (IThing thing : things) {
@@ -211,8 +251,7 @@ public class Things {
   private final @Nonnull NNList<ItemStack> itemStackList = new NNList<ItemStack>();
 
   /**
-   * Returns a list of item stacks for this Thing. Please note that items that are defined using the wildcard value for the item damage may not return the
-   * complete list on standalone servers
+   * Returns a list of item stacks for this Thing. This expands items that are defined using the wildcard value for the item damage.
    */
   public @Nonnull NNList<ItemStack> getItemStacks() {
     if (itemStackList.isEmpty()) {
@@ -220,7 +259,7 @@ public class Things {
         if (stack.isEmpty()) {
           // NOP
         } else if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-          EnderCore.proxy.getSubItems(stack.getItem(), EnderCore.proxy.getCreativeTab(stack), itemStackList);
+          stack.getItem().getSubItems(CreativeTabs.SEARCH, itemStackList);
         } else {
           itemStackList.add(stack);
         }
@@ -240,15 +279,47 @@ public class Things {
     return blockList;
   }
 
-  public NNList<Object> getRecipeObjects() {
-    NNList<Object> result = new NNList<Object>();
-    for (IThing thing : things) {
-      Object recipeObject = thing.getRecipeObject();
-      if (recipeObject != null) {
-        result.add(recipeObject);
+  private final @Nonnull NNList<String> nameList = new NNList<>();
+
+  public @Nonnull NNList<String> getNameList() {
+    return nameList;
+  }
+
+  // Ingredient
+
+  @Override
+  public @Nonnull ItemStack[] getMatchingStacks() {
+    return getItemStacks().toArray(new ItemStack[0]);
+  }
+
+  @Override
+  public boolean apply(@Nullable ItemStack p_apply_1_) {
+    return contains(p_apply_1_);
+  }
+
+  private final @Nonnull IntList itemIds = new IntArrayList();
+
+  @Override
+  public @Nonnull IntList getValidItemStacksPacked() {
+    if (itemIds.isEmpty()) {
+      for (NNIterator<ItemStack> itr = getItemStacks().fastIterator(); itr.hasNext();) {
+        itemIds.add(RecipeItemHelper.pack(itr.next()));
       }
     }
-    return result;
+    return itemIds;
+  }
+
+  @Override
+  protected void invalidate() {
+    NNList<String> names = nameList.copy();
+    nameList.clear();
+    things.clear();
+    addAll(names);
+  }
+
+  @Override
+  public boolean isSimple() {
+    return false;
   }
 
 }

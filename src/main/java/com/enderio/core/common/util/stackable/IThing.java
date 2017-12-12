@@ -29,6 +29,4 @@ interface IThing {
   @Nonnull
   NNList<Block> getBlocks();
 
-  @Nullable
-  Object getRecipeObject();
 }
