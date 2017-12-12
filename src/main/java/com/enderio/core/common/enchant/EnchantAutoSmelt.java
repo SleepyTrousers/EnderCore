@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
@@ -93,7 +94,7 @@ public class EnchantAutoSmelt extends Enchantment implements IAdvancedEnchant {
   public static void register() {
     if (ConfigHandler.allowAutoSmelt) {
       INSTANCE = new EnchantAutoSmelt();
-      GameRegistry.register(INSTANCE);
+      ForgeRegistries.ENCHANTMENTS.register(INSTANCE); // FIXME
       FMLInterModComms.sendMessage("enderio", "recipe:enchanter",
           "<?xml version=\"1.0\" encoding=\"UTF-8\"?><recipes>"
               + "<recipe name=\"Enchanter: endercore:autosmelt\" required=\"true\" disabled=\"false\"><enchanting>"

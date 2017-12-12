@@ -33,7 +33,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -194,7 +194,7 @@ public class RenderUtil {
     GlStateManager.color(col.x, col.y, col.z);
 
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer tes = tessellator.getBuffer();
+    BufferBuilder tes = tessellator.getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
     tes.pos(x + width, y + height, z).endVertex();
@@ -210,7 +210,7 @@ public class RenderUtil {
     GlStateManager.disableTexture2D();
 
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer tes = tessellator.getBuffer();
+    BufferBuilder tes = tessellator.getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(x, y + height, z).endVertex();
     tes.pos(x + width, y + height, z).endVertex();
@@ -236,7 +236,7 @@ public class RenderUtil {
 
   public static void renderBillboard(@Nonnull Matrix4d lookMat, float minU, float maxU, float minV, float maxV, double size, int brightness) {
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer tes = tessellator.getBuffer();
+    BufferBuilder tes = tessellator.getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
     double s = size / 2;
@@ -304,7 +304,7 @@ public class RenderUtil {
     }
 
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer tes = tessellator.getBuffer();
+    BufferBuilder tes = tessellator.getBuffer();
     if (doBegin) {
       tes.begin(GL11.GL_QUADS, format);
     }
@@ -461,7 +461,7 @@ public class RenderUtil {
         double maxV = icon.getMaxV();
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer tes = tessellator.getBuffer();
+        BufferBuilder tes = tessellator.getBuffer();
         tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         tes.pos(drawX, drawY + drawHeight, 0).tex(minU, minV + (maxV - minV) * drawHeight / 16F).endVertex();
         tes.pos(drawX + drawWidth, drawY + drawHeight, 0).tex(minU + (maxU - minU) * drawWidth / 16F, minV + (maxV - minV) * drawHeight / 16F).endVertex();
@@ -529,7 +529,7 @@ public class RenderUtil {
 
     GlStateManager.color(color.x, color.y, color.z, color.w);
 
-    VertexBuffer tes = Tessellator.getInstance().getBuffer();
+    BufferBuilder tes = Tessellator.getInstance().getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     tes.pos(-padding, -padding, 0).endVertex();
     tes.pos(-padding, height + padding, 0).endVertex();
@@ -563,7 +563,7 @@ public class RenderUtil {
     }
 
     item.hoverStart = 0.0F;
-    Minecraft.getMinecraft().getRenderManager().doRenderEntity(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F, false);
+    Minecraft.getMinecraft().getRenderManager().renderEntity(item, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F, false);
 
     glPopMatrix();
   }
@@ -583,7 +583,7 @@ public class RenderUtil {
     glColor3f(1, 1, 1);
 
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer tes = tessellator.getBuffer();
+    BufferBuilder tes = tessellator.getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
     tes.pos(-scale, -scale, 0).tex(0, 0).endVertex();
     tes.pos(-scale, scale, 0).tex(0, 1).endVertex();
@@ -605,7 +605,7 @@ public class RenderUtil {
   }
 
   public static void renderBoundingBox(@Nonnull final BoundingBox bb) {
-    final VertexBuffer tes = Tessellator.getInstance().getBuffer();
+    final BufferBuilder tes = Tessellator.getInstance().getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
     NNList.FACING.apply(new Callback<EnumFacing>() {
       @Override
@@ -628,7 +628,7 @@ public class RenderUtil {
 
   public static void renderBoundingBox(@Nonnull final BoundingBox bb, final float minU, final float maxU, final float minV, final float maxV) {
 
-    final VertexBuffer tes = Tessellator.getInstance().getBuffer();
+    final BufferBuilder tes = Tessellator.getInstance().getBuffer();
     tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
     NNList.FACING.apply(new Callback<EnumFacing>() {
       @Override
@@ -669,7 +669,7 @@ public class RenderUtil {
     final BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
     final IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(state);
     final Tessellator tesselator = Tessellator.getInstance();
-    final VertexBuffer wr = tesselator.getBuffer();
+    final BufferBuilder wr = tesselator.getBuffer();
     wr.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
     if (translateToOrigin) {
       wr.setTranslation(-pos.getX(), -pos.getY(), -pos.getZ());

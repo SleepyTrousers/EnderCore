@@ -5,7 +5,7 @@ import com.enderio.core.common.util.NullHelper;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class SlabRecipes extends Tweak {
@@ -24,15 +24,19 @@ public class SlabRecipes extends Tweak {
   public void load() {
     registerSlabToBlock();
   }
+  
+  private static void addSlabRecipe(ItemStack stack, String slab) {
+    ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, stack, slab, slab)
+        .setRegistryName(slab + "_to_" + stack.getItem().getRegistryName().getResourcePath()));
+  }
 
   private static void registerSlabToBlock() {
     for (int j = 0; j < slabEndingsWood.length; j++) {
-      GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Blocks.PLANKS, 1, j), "slab" + slabEndingsWood[j], "slab" + slabEndingsWood[j]));
+      addSlabRecipe(new ItemStack(Blocks.PLANKS, 1, j), "slab" + slabEndingsWood[j]);
     }
 
     for (int j = 0; j < slabEndingsStone.length; j++) {
-      GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(NullHelper.notnullM(slabResults[j], "Blocks are missing from the game")),
-          "slab" + slabEndingsStone[j], "slab" + slabEndingsStone[j]));
+      addSlabRecipe(new ItemStack(NullHelper.notnullM(slabResults[j], "Blocks are missing from the game")), "slab" + slabEndingsStone[j]);
     }
   }
 

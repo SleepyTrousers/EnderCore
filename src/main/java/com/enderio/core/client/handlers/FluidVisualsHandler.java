@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -74,8 +74,8 @@ public class FluidVisualsHandler {
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(RES_UNDERFLUID_OVERLAY);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
-        float f = player.getBrightness(event.getRenderPartialTicks());
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
+        float f = player.getBrightness();
         GlStateManager.color(f * fogColorRed, f * fogColorGreen, f * fogColorBlue, 0.5F);
         GlStateManager.enableBlend();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,

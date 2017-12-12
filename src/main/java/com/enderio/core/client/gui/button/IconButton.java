@@ -72,21 +72,18 @@ public class IconButton extends TooltipButton {
    * Draws this button to the screen.
    */
   @Override
-  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
     updateTooltip(mc, mouseX, mouseY);
     if (isVisible()) {
 
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      hovered = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+      hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
       int hoverState = getHoverState(hovered);
       mouseDragged(mc, mouseX, mouseY);
 
       IWidgetIcon background = getIconForHoverState(hoverState);
 
       GL11.glColor3f(1, 1, 1);
-
-      int x = xPosition;
-      int y = yPosition;
 
       GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
       GL11.glEnable(GL11.GL_BLEND);

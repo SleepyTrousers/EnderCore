@@ -21,6 +21,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,7 +59,7 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
   }
 
   public void init() {
-    GameRegistry.register(this);
+    ForgeRegistries.BLOCKS.register(this); // FIXME
   }
 
   public float getFogColorRed() {
@@ -116,9 +117,9 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
 
   @Override
   @SideOnly(Side.CLIENT)
-  public void getSubBlocks(@Nonnull Item itemIn, @Nullable CreativeTabs tab, @Nonnull NonNullList<ItemStack> list) {
+  public void getSubBlocks(@Nullable CreativeTabs tab, @Nonnull NonNullList<ItemStack> list) {
     if (tab != null) {
-      super.getSubBlocks(itemIn, tab, list);
+      super.getSubBlocks(tab, list);
     }
   }
 

@@ -9,10 +9,8 @@ import com.enderio.core.common.util.NullHelper;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.stats.AchievementList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
@@ -73,13 +71,14 @@ public class AutoSmeltHandler {
                     world.spawnEntity(new EntityXPOrb(world, event.getPos().getX(), event.getPos().getY() + 0.5, event.getPos().getZ(), k));
                   }
 
-                  if (furnaceStack.getItem() == Items.IRON_INGOT) {
-                    harvester.addStat(AchievementList.ACQUIRE_IRON);
-                  }
-
-                  if (furnaceStack.getItem() == Items.COOKED_FISH) {
-                    harvester.addStat(AchievementList.COOK_FISH);
-                  }
+                  // TODO is this no longer necessary?
+//                  if (furnaceStack.getItem() == Items.IRON_INGOT) {
+//                    harvester.addStat(AchievementList.ACQUIRE_IRON);
+//                  }
+//
+//                  if (furnaceStack.getItem() == Items.COOKED_FISH) {
+//                    harvester.addStat(AchievementList.COOK_FISH);
+//                  }
                 }
 
                 FMLCommonHandler.instance().firePlayerSmeltedEvent(harvester, furnaceStack);

@@ -41,7 +41,7 @@ public class Util {
   public static @Nullable Block getBlockFromItemId(@Nonnull ItemStack itemId) {
     Item item = itemId.getItem();
     if (item instanceof ItemBlock) {
-      return ((ItemBlock) item).block;
+      return ((ItemBlock) item).getBlock();
     }
     return null;
   }
@@ -253,7 +253,7 @@ public class Util {
 
   public static @Nonnull Vector3d getLookVecEio(@Nonnull EntityPlayer player) {
     Vec3d lv = player.getLookVec();
-    return new Vector3d(lv.xCoord, lv.yCoord, lv.zCoord);
+    return new Vector3d(lv.x, lv.y, lv.z);
   }
 
   // Code adapted from World.rayTraceBlocks to return all
@@ -264,14 +264,14 @@ public class Util {
 
     List<RayTraceResult> result = new ArrayList<RayTraceResult>();
 
-    if (!Double.isNaN(startVec.xCoord) && !Double.isNaN(startVec.yCoord) && !Double.isNaN(startVec.zCoord)) {
-      if (!Double.isNaN(endVec.xCoord) && !Double.isNaN(endVec.yCoord) && !Double.isNaN(endVec.zCoord)) {
-        int i = MathHelper.floor(endVec.xCoord);
-        int j = MathHelper.floor(endVec.yCoord);
-        int k = MathHelper.floor(endVec.zCoord);
-        int l = MathHelper.floor(startVec.xCoord);
-        int i1 = MathHelper.floor(startVec.yCoord);
-        int j1 = MathHelper.floor(startVec.zCoord);
+    if (!Double.isNaN(startVec.x) && !Double.isNaN(startVec.y) && !Double.isNaN(startVec.z)) {
+      if (!Double.isNaN(endVec.x) && !Double.isNaN(endVec.y) && !Double.isNaN(endVec.z)) {
+        int i = MathHelper.floor(endVec.x);
+        int j = MathHelper.floor(endVec.y);
+        int k = MathHelper.floor(endVec.z);
+        int l = MathHelper.floor(startVec.x);
+        int i1 = MathHelper.floor(startVec.y);
+        int j1 = MathHelper.floor(startVec.z);
         BlockPos blockpos = new BlockPos(l, i1, j1);
         IBlockState iblockstate = world.getBlockState(blockpos);
         Block block = iblockstate.getBlock();
@@ -286,7 +286,7 @@ public class Util {
         int k1 = 200;
 
         while (k1-- >= 0) {
-          if (Double.isNaN(startVec.xCoord) || Double.isNaN(startVec.yCoord) || Double.isNaN(startVec.zCoord)) {
+          if (Double.isNaN(startVec.x) || Double.isNaN(startVec.y) || Double.isNaN(startVec.z)) {
             return new ArrayList<RayTraceResult>();
           }
 
@@ -328,20 +328,20 @@ public class Util {
           double d3 = 999.0D;
           double d4 = 999.0D;
           double d5 = 999.0D;
-          double d6 = endVec.xCoord - startVec.xCoord;
-          double d7 = endVec.yCoord - startVec.yCoord;
-          double d8 = endVec.zCoord - startVec.zCoord;
+          double d6 = endVec.x - startVec.x;
+          double d7 = endVec.y - startVec.y;
+          double d8 = endVec.z - startVec.z;
 
           if (flag2) {
-            d3 = (d0 - startVec.xCoord) / d6;
+            d3 = (d0 - startVec.x) / d6;
           }
 
           if (flag) {
-            d4 = (d1 - startVec.yCoord) / d7;
+            d4 = (d1 - startVec.y) / d7;
           }
 
           if (flag1) {
-            d5 = (d2 - startVec.zCoord) / d8;
+            d5 = (d2 - startVec.z) / d8;
           }
 
           if (d3 == -0.0D) {
@@ -360,18 +360,18 @@ public class Util {
 
           if (d3 < d4 && d3 < d5) {
             enumfacing = i > l ? EnumFacing.WEST : EnumFacing.EAST;
-            startVec = new Vec3d(d0, startVec.yCoord + d7 * d3, startVec.zCoord + d8 * d3);
+            startVec = new Vec3d(d0, startVec.y + d7 * d3, startVec.z + d8 * d3);
           } else if (d4 < d5) {
             enumfacing = j > i1 ? EnumFacing.DOWN : EnumFacing.UP;
-            startVec = new Vec3d(startVec.xCoord + d6 * d4, d1, startVec.zCoord + d8 * d4);
+            startVec = new Vec3d(startVec.x + d6 * d4, d1, startVec.z + d8 * d4);
           } else {
             enumfacing = k > j1 ? EnumFacing.NORTH : EnumFacing.SOUTH;
-            startVec = new Vec3d(startVec.xCoord + d6 * d5, startVec.yCoord + d7 * d5, d2);
+            startVec = new Vec3d(startVec.x + d6 * d5, startVec.y + d7 * d5, d2);
           }
 
-          l = MathHelper.floor(startVec.xCoord) - (enumfacing == EnumFacing.EAST ? 1 : 0);
-          i1 = MathHelper.floor(startVec.yCoord) - (enumfacing == EnumFacing.UP ? 1 : 0);
-          j1 = MathHelper.floor(startVec.zCoord) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
+          l = MathHelper.floor(startVec.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
+          i1 = MathHelper.floor(startVec.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
+          j1 = MathHelper.floor(startVec.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
           blockpos = new BlockPos(l, i1, j1);
           IBlockState iblockstate1 = world.getBlockState(blockpos);
           Block block1 = iblockstate1.getBlock();

@@ -292,7 +292,7 @@ public class ConfigProcessor {
     TypeToken<?> t = TypeToken.of(f.getGenericType());
     Class<?> c = f.getType();
     for (ITypeAdapter<?, ?> adapter : adapters) {
-      if ((c.isPrimitive() && c == adapter.getPrimitiveType()) || adapter.getActualType().isAssignableFrom(t)) {
+      if ((c.isPrimitive() && c == adapter.getPrimitiveType()) || adapter.getActualType().isSupertypeOf(t)) {
         return adapter;
       }
     }

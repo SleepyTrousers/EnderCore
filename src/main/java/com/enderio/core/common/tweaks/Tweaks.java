@@ -6,7 +6,8 @@ import java.util.List;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class Tweaks {
   /**
@@ -35,12 +36,16 @@ public class Tweaks {
 
     tweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
       @Override
-      public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.PAPER, 2), Items.BOOK); }
+      public void load() { 
+        ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, new ItemStack(Items.PAPER, 2), Items.BOOK).setRegistryName("book_to_paper")); 
+      }
     });
 
     tweaks.add(new Tweak("shapelessPaperRecipe","Adds a shapeless recipe for paper") {
       @Override
-      public void load() { GameRegistry.addShapelessRecipe(new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS); }
+      public void load() { 
+        ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS).setRegistryName("shapeless_paper")); 
+      }
     });
     // @formatter:on
   }

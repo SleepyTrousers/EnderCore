@@ -41,28 +41,28 @@ public class ItemButton extends GuiButton {
    * Draws this button to the screen.
    */
   @Override
-  public void drawButton(@Nonnull Minecraft par1Minecraft, int par2, int par3) {
+  public void drawButton(@Nonnull Minecraft par1Minecraft, int par2, int par3, float partialTicks) {
     if (visible) {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.hovered = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + width && par3 < this.yPosition + height;
+      this.hovered = par2 >= this.x && par3 >= this.y && par2 < this.x + width && par3 < this.y + height;
       int hoverState = this.getHoverState(this.hovered);
 
       // x, y, u, v, width, height
 
       // top half
-      drawTexturedModalRect(xPosition, yPosition, 0, 46 + hoverState * 20, hwidth, hheight);
-      drawTexturedModalRect(xPosition + hwidth, yPosition, 200 - hwidth, 46 + hoverState * 20, hwidth, hheight);
+      drawTexturedModalRect(x, y, 0, 46 + hoverState * 20, hwidth, hheight);
+      drawTexturedModalRect(x + hwidth, y, 200 - hwidth, 46 + hoverState * 20, hwidth, hheight);
 
       // bottom half
-      drawTexturedModalRect(xPosition, yPosition + hheight, 0, 66 - hheight + (hoverState * 20), hwidth, hheight);
-      drawTexturedModalRect(xPosition + hwidth, yPosition + hheight, 200 - hwidth, 66 - hheight + (hoverState * 20), hwidth, hheight);
+      drawTexturedModalRect(x, y + hheight, 0, 66 - hheight + (hoverState * 20), hwidth, hheight);
+      drawTexturedModalRect(x + hwidth, y + hheight, 200 - hwidth, 66 - hheight + (hoverState * 20), hwidth, hheight);
 
       mouseDragged(par1Minecraft, par2, par3);
 
-      int xLoc = xPosition + hwidth - 8;
-      int yLoc = yPosition + hheight - 10;
+      int xLoc = x + hwidth - 8;
+      int yLoc = y + hheight - 10;
       par1Minecraft.getRenderItem().renderItemIntoGUI(item, xLoc, yLoc);
     }
   }

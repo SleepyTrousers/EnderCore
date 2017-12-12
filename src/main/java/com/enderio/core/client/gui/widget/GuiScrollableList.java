@@ -20,7 +20,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public abstract class GuiScrollableList<T> {
@@ -120,7 +120,7 @@ public abstract class GuiScrollableList<T> {
 
   public abstract int getNumElements();
 
-  protected abstract void drawElement(int elementIndex, int x, int y, int h, @Nonnull VertexBuffer renderer);
+  protected abstract void drawElement(int elementIndex, int x, int y, int h, @Nonnull BufferBuilder renderer);
 
   protected boolean elementClicked(int elementIndex, boolean doubleClick, int elementX, int elementY) {
     return true;
@@ -202,7 +202,7 @@ public abstract class GuiScrollableList<T> {
     GL11.glEnable(GL11.GL_SCISSOR_TEST);
     GL11.glScissor(sx, sy, sw, sh);
 
-    final @Nonnull VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+    final @Nonnull BufferBuilder renderer = Tessellator.getInstance().getBuffer();
     drawContainerBackground(renderer);
 
     final int contentYOffset = this.minY + margin - (int) this.amountScrolled;
@@ -271,7 +271,7 @@ public abstract class GuiScrollableList<T> {
     GlStateManager.shadeModel(GL11.GL_FLAT);
   }
 
-  protected void renderScrollBar(@Nonnull VertexBuffer renderer) {
+  protected void renderScrollBar(@Nonnull BufferBuilder renderer) {
 
     final int contentHeightOverBounds = getContentOverhang();
     if (contentHeightOverBounds > 0) {
@@ -406,7 +406,7 @@ public abstract class GuiScrollableList<T> {
     return minX + width - 6;
   }
 
-  protected void drawContainerBackground(@Nonnull VertexBuffer renderer) {
+  protected void drawContainerBackground(@Nonnull BufferBuilder renderer) {
 
     Vector3f col = ColorUtil.toFloat(2105376);
     GlStateManager.color(col.x, col.y, col.z, 1.0F);

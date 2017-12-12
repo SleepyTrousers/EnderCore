@@ -19,6 +19,7 @@ import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
@@ -97,7 +98,7 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   public static void register() {
     if (ConfigHandler.allowXPBoost) {
       INSTANCE = new EnchantXPBoost();
-      GameRegistry.register(INSTANCE);
+      ForgeRegistries.ENCHANTMENTS.register(INSTANCE); // FIXME
       FMLInterModComms.sendMessage("enderio", "recipe:enchanter",
           "<?xml version=\"1.0\" encoding=\"UTF-8\"?><recipes>"
               + "<recipe name=\"Enchanter: endercore:xpboost\" required=\"true\" disabled=\"false\"><enchanting>"

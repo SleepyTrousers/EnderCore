@@ -58,7 +58,7 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
       if (typeParam0 != null) {
         TypeToken<?> teType = TypeToken.of(ourClass).resolveType(typeParam0);
         final Class<? extends TileEntity> teClass = te.getClass();
-        if (teType.isAssignableFrom(teClass)) {
+        if (teType.isSupertypeOf(teClass)) {
           return (T) te;
         }
       }

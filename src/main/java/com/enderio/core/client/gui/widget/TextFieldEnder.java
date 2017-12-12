@@ -71,8 +71,8 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
   }
 
   public void init(@Nonnull IGuiScreen gui) {
-    xPosition = xOrigin + gui.getGuiLeft();
-    yPosition = yOrigin + gui.getGuiTop();
+    this.x = xOrigin + gui.getGuiLeft();
+    this.y = yOrigin + gui.getGuiTop();
   }
 
   public TextFieldEnder setCharFilter(@Nullable ICharFilter filter) {
@@ -103,7 +103,7 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
   }
 
   public boolean contains(int x, int y) {
-    return x >= xPosition && x < xPosition + width && y >= yPosition && y < yPosition + height;
+    return x >= this.x && x < this.x + width && y >= this.y && y < this.y + height;
   }
 
   @Override

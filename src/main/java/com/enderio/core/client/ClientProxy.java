@@ -48,7 +48,7 @@ public class ClientProxy extends CommonProxy {
   @SuppressWarnings("null")
   @Override
   public void getSubItems(@Nonnull Item itemIn, @Nullable CreativeTabs tab, @Nonnull NNList<ItemStack> subItems) {
-    itemIn.getSubItems(itemIn, tab, subItems);
+    itemIn.getSubItems(tab, subItems);
   }
 
 }

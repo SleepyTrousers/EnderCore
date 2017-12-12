@@ -13,7 +13,7 @@ import com.enderio.core.common.vecmath.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemDye;
 import net.minecraft.util.math.MathHelper;
@@ -89,14 +89,14 @@ public class ColorButton extends IconButton {
   }
 
   @Override
-  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
-    super.drawButton(mc, mouseX, mouseY);
+  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+    super.drawButton(mc, mouseX, mouseY, partialTicks);
     if (visible) {
-      VertexBuffer tes = Tessellator.getInstance().getBuffer();
+      BufferBuilder tes = Tessellator.getInstance().getBuffer();
       tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-      int x = xPosition + 2;
-      int y = yPosition + 2;
+      int x = this.x + 2;
+      int y = this.y + 2;
 
       GlStateManager.disableTexture2D();
       int col = ItemDye.DYE_COLORS[colorIndex];

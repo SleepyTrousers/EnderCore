@@ -62,23 +62,23 @@ public class IIconButton extends GuiButton {
    * Draws this button to the screen.
    */
   @Override
-  public void drawButton(@Nonnull Minecraft par1Minecraft, int mouseX, int mouseY) {
+  public void drawButton(@Nonnull Minecraft par1Minecraft, int mouseX, int mouseY, float partialTicks) {
     if (visible) {
 
       RenderUtil.bindTexture("textures/gui/widgets.png");
       GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-      hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + width && mouseY < this.yPosition + height;
+      hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + width && mouseY < this.y + height;
       int hoverState = getHoverState(hovered);
 
       // x, y, u, v, width, height
 
       // top half
-      drawTexturedModalRect(xPosition, yPosition, 0, 46 + hoverState * 20, hwidth, hheight);
-      drawTexturedModalRect(xPosition + hwidth, yPosition, 200 - hwidth, 46 + hoverState * 20, hwidth, hheight);
+      drawTexturedModalRect(x, y, 0, 46 + hoverState * 20, hwidth, hheight);
+      drawTexturedModalRect(x + hwidth, y, 200 - hwidth, 46 + hoverState * 20, hwidth, hheight);
 
       // bottom half
-      drawTexturedModalRect(xPosition, yPosition + hheight, 0, 66 - hheight + (hoverState * 20), hwidth, hheight);
-      drawTexturedModalRect(xPosition + hwidth, yPosition + hheight, 200 - hwidth, 66 - hheight + (hoverState * 20), hwidth, hheight);
+      drawTexturedModalRect(x, y + hheight, 0, 66 - hheight + (hoverState * 20), hwidth, hheight);
+      drawTexturedModalRect(x + hwidth, y + hheight, 200 - hwidth, 66 - hheight + (hoverState * 20), hwidth, hheight);
 
       mouseDragged(par1Minecraft, mouseX, mouseY);
 
@@ -90,8 +90,8 @@ public class IIconButton extends GuiButton {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         RenderUtil.bindTexture(texture2);
-        int xLoc = xPosition + 2;
-        int yLoc = yPosition + 2;
+        int xLoc = x + 2;
+        int yLoc = y + 2;
         drawTexturedModalRect(xLoc, yLoc, icon2, width - 4, height - 4);
 
         GlStateManager.disableBlend();

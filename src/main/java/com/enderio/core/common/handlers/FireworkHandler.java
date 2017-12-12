@@ -1,5 +1,9 @@
 package com.enderio.core.common.handlers;
 
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.MONTH;
+
 import java.util.Calendar;
 
 import javax.annotation.Nonnull;
@@ -10,31 +14,25 @@ import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.EntityUtil;
 import com.enderio.core.common.util.NullHelper;
 
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.Achievement;
-import net.minecraft.stats.StatisticsManagerServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.event.entity.player.AchievementEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.MONTH;
-
 @Handler
 public class FireworkHandler {
   @SubscribeEvent
-  public void onAchievement(AchievementEvent event) {
-    StatisticsManagerServer file = ((EntityPlayerMP) event.getEntityPlayer()).getStatFile();
-    final @Nonnull Achievement achievement = NullHelper.notnullF(event.getAchievement(), "AchievementEvent.getAchievement()");
-    if (ConfigHandler.betterAchievements && !event.getEntity().world.isRemote && file.canUnlockAchievement(achievement)
-        && !file.hasAchievementUnlocked(achievement)) {
+  public void onAchievement(AdvancementEvent event) {
+    final @Nonnull Advancement advancement = NullHelper.notnullF(event.getAdvancement(), "AdvancementEvent.getAdvancement()");
+    DisplayInfo display = advancement.getDisplay();
+    if (ConfigHandler.betterAchievements && !event.getEntity().world.isRemote && display != null && display.shouldAnnounceToChat()) {
       event.getEntityPlayer().getEntityData().setInteger("fireworksLeft", 9);
       event.getEntityPlayer().getEntityData().setBoolean("fireworkDelay", false);
     }
