@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -80,6 +81,17 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
 
   public @Nonnull T getInv() {
     return inv;
+  }
+
+  @Override
+  @Nonnull
+  public Slot getSlotFromInventory(@Nonnull IInventory invIn, int slotIn) {
+    return NullHelper.notnull(super.getSlotFromInventory(invIn, slotIn), "Logic error, missing slot " + slotIn);
+  }
+
+  @Nonnull
+  public Slot getSlotFromInventory(int slotIn) {
+    return getSlotFromInventory(getInv(), slotIn);
   }
 
   @Override
