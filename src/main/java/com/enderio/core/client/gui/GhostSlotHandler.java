@@ -167,9 +167,7 @@ public class GhostSlotHandler {
         if (slot.isVisible()) {
           if (!stack.isEmpty()) {
             gui.drawFakeItemStack(slot.x + sx, slot.y + sy, stack);
-            GlStateManager.enableAlpha();
             if (slot.shouldDisplayStdOverlay()) {
-
               gui.drawFakeItemStackStdOverlay(slot.x + sx, slot.y + sy, stack);
             }
             if (slot.shouldGrayOut()) {

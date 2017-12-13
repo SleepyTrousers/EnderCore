@@ -444,7 +444,7 @@ public class RenderUtil {
 
     RenderUtil.bindBlockTexture();
     int color = fluid.getFluid().getColor(fluid);
-    GlStateManager.color((color >> 16 & 0xFF) / 0xFF, (color >> 8 & 0xFF) / 0xFF, (color & 0xFF) / 0xFF);
+    GlStateManager.color((color >> 16 & 0xFF) / 255f, (color >> 8 & 0xFF) / 255f, (color & 0xFF) / 255f);
 
     GlStateManager.enableBlend();
     for (int i = 0; i < width; i += 16) {
