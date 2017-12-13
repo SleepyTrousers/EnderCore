@@ -392,6 +392,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   protected void drawFakeItemStack(int x, int y, @Nonnull ItemStack stack) {
     itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+    GlStateManager.enableAlpha();
   }
 
   public void drawFakeItemStackStdOverlay(int x, int y, @Nonnull ItemStack stack) {
