@@ -444,7 +444,7 @@ public class RenderUtil {
 
     RenderUtil.bindBlockTexture();
     int color = fluid.getFluid().getColor(fluid);
-    GL11.glColor3ub((byte) (color >> 16 & 0xFF), (byte) (color >> 8 & 0xFF), (byte) (color & 0xFF));
+    GlStateManager.color((color >> 16 & 0xFF) / 0xFF, (color >> 8 & 0xFF) / 0xFF, (color & 0xFF) / 0xFF);
 
     GlStateManager.enableBlend();
     for (int i = 0; i < width; i += 16) {
@@ -471,6 +471,7 @@ public class RenderUtil {
       }
     }
     GlStateManager.disableBlend();
+    GlStateManager.color(1, 1, 1);
   }
 
   public static void drawBillboardedText(@Nonnull Vector3f pos, @Nonnull String text, float size) {
