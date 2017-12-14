@@ -23,13 +23,6 @@ public class RebuildableThings extends Things {
     init(names);
   }
 
-  public @Nonnull Things addAll(@Nonnull NNList<String> names) {
-    for (String name : names) {
-      add(name);
-    }
-    return this;
-  }
-
   @Override
   public @Nonnull Things add(@Nullable Item item) {
     if (item != null) {
