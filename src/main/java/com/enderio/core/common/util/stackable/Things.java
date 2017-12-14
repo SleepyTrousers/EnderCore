@@ -67,13 +67,6 @@ public class Things extends Ingredient {
 
   private final @Nonnull List<IThing> things = new ArrayList<IThing>();
 
-  public @Nonnull Things addAll(@Nonnull NNList<String> names) {
-    for (String name : names) {
-      add(name);
-    }
-    return this;
-  }
-
   public @Nonnull Things add(@Nullable Item item) {
     if (item != null) {
       nameList.add("item:" + item.getRegistryName());
@@ -339,7 +332,7 @@ public class Things extends Ingredient {
     NNList<String> names = nameList.copy();
     nameList.clear();
     things.clear();
-    addAll(names);
+    add(names);
   }
 
   @Override
