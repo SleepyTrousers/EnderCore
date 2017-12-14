@@ -55,6 +55,11 @@ public class SmartTank extends FluidTank {
     return getFluidAmount() == 0;
   }
 
+  public boolean hasFluid(@Nullable Fluid candidate) {
+    final FluidStack fluid2 = fluid;
+    return !(fluid2 == null || candidate == null || fluid2.amount <= 0 || fluid2.getFluid() != candidate);
+  }
+
   /**
    * Checks if the given fluid can actually be removed from this tank
    * <p>
@@ -161,6 +166,10 @@ public class SmartTank extends FluidTank {
     } else {
       return null;
     }
+  }
+
+  public @Nonnull FluidStack getFluidNN() {
+    return NullHelper.notnull(getFluid(), "Internal Logic Error. Non-Empty tank has no fluid.");
   }
 
   public int getAvailableSpace() {
