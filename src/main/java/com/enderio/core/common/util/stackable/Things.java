@@ -82,9 +82,27 @@ public class Things extends Ingredient {
     return this;
   }
 
-  public Things addAll(NNList<ItemStack> allBuckets) {
-    for (ItemStack itemStack : allBuckets) {
-      add(itemStack);
+  public Things add(NNList<?> list) {
+    for (Object o : list) {
+      if (o instanceof String) {
+        add((String) o);
+      } else if (o instanceof Item) {
+        add((Item) o);
+      } else if (o instanceof Block) {
+        add((Block) o);
+      } else if (o instanceof IProducer) {
+        add((IProducer) o);
+      } else if (o instanceof ItemStack) {
+        add((ItemStack) o);
+      } else if (o instanceof ResourceLocation) {
+        add((ResourceLocation) o);
+      } else if (o instanceof Things) {
+        add((Things) o);
+      } else if (o instanceof NNList) {
+        add((NNList<?>) o);
+      } else {
+        throw new RuntimeException("Class " + o.getClass() + " is not suitable for Things");
+      }
     }
     return this;
   }
