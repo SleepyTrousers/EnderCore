@@ -193,11 +193,11 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   /**
    * Tries to load any block's TileEntity if it exists. Will not create the TileEntity when used in a render thread with the correct IBlockAccess. Will not
-   * cause chunk loads.
+   * cause chunk loads. Also works with interfaces as the class parameter.
    *
    */
   @SuppressWarnings("unchecked")
-  public static @Nullable <Q extends TileEntity> Q getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, Class<Q> teClass) {
+  public static @Nullable <Q> Q getAnyTileEntitySafe(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, Class<Q> teClass) {
     TileEntity te = null;
     if (world instanceof ChunkCache) {
       te = ((ChunkCache) world).getTileEntity(pos, EnumCreateEntityType.CHECK);
@@ -208,6 +208,22 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     } else {
       te = world.getTileEntity(pos);
     }
+    if (teClass == null) {
+      return (Q) te;
+    }
+    if (teClass.isInstance(te)) {
+      return teClass.cast(te);
+    }
+    return null;
+  }
+
+  /**
+   * Tries to load any block's TileEntity if it exists. Not suitable for tasks outside the main thread. Also works with interfaces as the class parameter.
+   *
+   */
+  @SuppressWarnings("unchecked")
+  public static @Nullable <Q> Q getAnyTileEntity(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, Class<Q> teClass) {
+    TileEntity te = world.getTileEntity(pos);
     if (teClass == null) {
       return (Q) te;
     }

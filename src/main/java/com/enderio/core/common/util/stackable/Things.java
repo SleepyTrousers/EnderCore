@@ -82,6 +82,13 @@ public class Things extends Ingredient {
     return this;
   }
 
+  public Things addAll(NNList<ItemStack> allBuckets) {
+    for (ItemStack itemStack : allBuckets) {
+      add(itemStack);
+    }
+    return this;
+  }
+
   public @Nonnull Things add(@Nullable ItemStack itemStack) { // sic!
     if (itemStack != null && !itemStack.isEmpty()) {
       nameList.add("item:" + itemStack.getItem().getRegistryName());
