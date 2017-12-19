@@ -390,7 +390,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     RenderHelper.enableGUIStandardItemLighting();
   }
 
-  protected void drawFakeItemStack(int x, int y, @Nonnull ItemStack stack) {
+  public void drawFakeItemStack(int x, int y, @Nonnull ItemStack stack) {
     itemRender.renderItemAndEffectIntoGUI(stack, x, y);
     GlStateManager.enableAlpha();
   }

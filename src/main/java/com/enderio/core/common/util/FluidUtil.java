@@ -64,7 +64,7 @@ public class FluidUtil {
     return null;
   }
 
-  public static @Nullable IFluidHandler getFluidHandlerCapability(@Nonnull ItemStack stack) {
+  public static @Nullable IFluidHandlerItem getFluidHandlerCapability(@Nonnull ItemStack stack) {
     if (stack.hasCapability(getFluidItemCapability(), null)) {
       return stack.getCapability(getFluidItemCapability(), null);
     }
@@ -96,7 +96,7 @@ public class FluidUtil {
 
     ItemStack copy = stack.copy();
     copy.setCount(1);
-    IFluidHandler handler = getFluidHandlerCapability(copy);
+    IFluidHandlerItem handler = getFluidHandlerCapability(copy);
     if (handler != null) {
       return handler.drain(Fluid.BUCKET_VOLUME, false);
     }
@@ -110,15 +110,19 @@ public class FluidUtil {
   }
 
   public static boolean isFluidContainer(@Nonnull ItemStack stack) {
-    return isFluidContainer(stack, null);
+    return getFluidHandlerCapability(stack) != null;
   }
 
   public static boolean isFluidContainer(@Nonnull ICapabilityProvider provider, @Nullable EnumFacing side) {
+    if (provider instanceof ItemStack) {
+      Log.warn("isFluidContainer(ICapabilityProvider, EnumFacing) is not for ItemStacks");
+      return isFluidContainer((ItemStack) provider);
+    }
     return getFluidHandlerCapability(provider, side) != null;
   }
 
   public static boolean hasEmptyCapacity(@Nonnull ItemStack stack) {
-    IFluidHandler handler = getFluidHandlerCapability(stack);
+    IFluidHandlerItem handler = getFluidHandlerCapability(stack);
     if (handler == null) {
       return false;
     }
@@ -143,7 +147,7 @@ public class FluidUtil {
 
     ItemStack filledStack = target.copy();
     filledStack.setCount(1);
-    IFluidHandler handler = getFluidHandlerCapability(filledStack);
+    IFluidHandlerItem handler = getFluidHandlerCapability(filledStack);
     if (handler == null) {
       return new FluidAndStackResult(ItemStack.EMPTY, null, target, source);
     }
@@ -153,9 +157,7 @@ public class FluidUtil {
       return new FluidAndStackResult(ItemStack.EMPTY, null, target, source);
     }
 
-    if (handler instanceof IFluidHandlerItem) {
-      filledStack = ((IFluidHandlerItem) handler).getContainer();
-    }
+    filledStack = handler.getContainer();
 
     FluidStack resultFluid = source.copy();
     resultFluid.amount = filledAmount;
@@ -180,7 +182,7 @@ public class FluidUtil {
 
     ItemStack emptiedStack = source.copy();
     emptiedStack.setCount(1);
-    IFluidHandler handler = getFluidHandlerCapability(emptiedStack);
+    IFluidHandlerItem handler = getFluidHandlerCapability(emptiedStack);
     if (handler == null) {
       return new FluidAndStackResult(null, ItemStack.EMPTY, target, source);
     }
@@ -199,9 +201,7 @@ public class FluidUtil {
       return new FluidAndStackResult(ItemStack.EMPTY, null, source, target);
     }
 
-    if (handler instanceof IFluidHandlerItem) {
-      emptiedStack = ((IFluidHandlerItem) handler).getContainer();
-    }
+    emptiedStack = handler.getContainer();
 
     ItemStack remainderStack = source.copy();
     remainderStack.shrink(1);
@@ -218,7 +218,7 @@ public class FluidUtil {
     if (source.isEmpty()) {
       return result;
     }
-    IFluidHandler handler = getFluidHandlerCapability(source);
+    IFluidHandlerItem handler = getFluidHandlerCapability(source);
     if (handler == null) {
       return result;
     }
