@@ -21,7 +21,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import net.minecraftforge.fml.relauncher.Side;
 
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
@@ -95,8 +97,29 @@ public class EnderCoreTransformer implements IClassTransformer {
   static final String extendedBlockStorageClass = "net.minecraft.world.chunk.storage.ExtendedBlockStorage";
   static final ObfSafeName isEmptyMethod = new ObfSafeName("isEmpty", "func_76663_a");
 
+  private final boolean inDev = System.getProperty("INDEV") != null;
+
   @Override
   public byte[] transform(String name, String transformedName, byte[] basicClass) {
+
+    if (inDev && FMLLaunchHandler.side() == Side.SERVER) {
+      // Eclipse's compiler suffers from https://bugs.openjdk.java.net/browse/JDK-6695379
+      // Filter out methods that are known to be effected from this in a declared development environment only.
+      // When compiled with a proper compiler, this will not be needed.
+      ClassNode classNode = new ClassNode();
+      ClassReader classReader = new ClassReader(basicClass);
+      classReader.accept(classNode, 0);
+      Iterator<MethodNode> methods = classNode.methods.iterator();
+      while (methods.hasNext()) {
+        MethodNode methodNode = methods.next();
+        if (methodNode.name.equals("getClientGuiElement") && methodNode.desc.contains("GuiScreen")) {
+          methods.remove();
+        }
+      }
+      ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+      classNode.accept(cw);
+      basicClass = cw.toByteArray();
+    }
 
     // "Light data eaten instead of sent to client" fix (MC-80966)
     if (transformedName.equals(extendedBlockStorageClass)) {
