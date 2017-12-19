@@ -15,6 +15,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -253,6 +254,13 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
 
   public Class<? extends T> getTeClass() {
     return teClass;
+  }
+
+  // wrapper because vanilla null-annotations are wrong
+  @SuppressWarnings("null")
+  @Override
+  public @Nonnull Block setCreativeTab(@Nullable CreativeTabs tab) {
+    return super.setCreativeTab(tab);
   }
 
 }
