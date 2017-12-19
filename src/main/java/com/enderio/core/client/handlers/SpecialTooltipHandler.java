@@ -13,6 +13,7 @@ import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
 import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.util.ItemUtil;
+import com.enderio.core.common.util.NNList;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -81,6 +82,50 @@ public class SpecialTooltipHandler {
         addInformation(callback, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
       }
     }
+  }
+
+  public static NNList<String> getAllTooltips(ItemStack stack) {
+    NNList<String> list = new NNList<>();
+
+    if (stack.getItem() instanceof IAdvancedTooltipProvider) {
+      IAdvancedTooltipProvider tt = (IAdvancedTooltipProvider) stack.getItem();
+      tt.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
+      tt.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
+      tt.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
+      return list;
+    } else if (stack.getItem() instanceof IResourceTooltipProvider) {
+      String name = ((IResourceTooltipProvider) stack.getItem()).getUnlocalizedNameForTooltip(stack);
+      addCommonTooltipFromResources(list, name);
+      addBasicTooltipFromResources(list, name);
+      addDetailedTooltipFromResources(list, name);
+      return list;
+    }
+
+    Block blk = Block.getBlockFromItem(stack.getItem());
+    if (blk instanceof IAdvancedTooltipProvider) {
+      IAdvancedTooltipProvider tt = (IAdvancedTooltipProvider) blk;
+      tt.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
+      tt.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
+      tt.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
+      return list;
+    } else if (blk instanceof IResourceTooltipProvider) {
+      IResourceTooltipProvider tt = (IResourceTooltipProvider) blk;
+      String name = tt.getUnlocalizedNameForTooltip(stack);
+      addCommonTooltipFromResources(list, name);
+      addBasicTooltipFromResources(list, name);
+      addDetailedTooltipFromResources(list, name);
+      return list;
+    }
+
+    for (ITooltipCallback callback : callbacks) {
+      if (callback.shouldHandleItem(stack)) {
+        callback.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
+        callback.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
+        callback.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
+      }
+    }
+
+    return list;
   }
 
   public static void addDurabilityTooltip(@Nonnull List<String> toolTip, @Nonnull ItemStack itemStack) {
