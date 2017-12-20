@@ -11,6 +11,9 @@ import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockBeetroot;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockNetherWart;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -69,8 +72,25 @@ public class RightClickCropHandler {
       if (mcblock == null) {
         throw new RuntimeException("invalid block specifier '" + block + "' received in IMV message from another mod");
       }
-      grownState = mcblock.getStateFromMeta(meta);
-      resetState = mcblock.getStateFromMeta(resetMeta);
+      if (mcblock instanceof BlockBeetroot) { // BlockBeetroot extends BlockCrops
+        meta = 3;
+        resetMeta = 0;
+        grownState = mcblock.getDefaultState().withProperty(BlockBeetroot.BEETROOT_AGE, 3);
+        resetState = mcblock.getDefaultState().withProperty(BlockBeetroot.BEETROOT_AGE, 0);
+      } else if (mcblock instanceof BlockCrops) {
+        meta = ((BlockCrops) mcblock).getMaxAge();
+        resetMeta = 0;
+        grownState = mcblock.getDefaultState().withProperty(BlockCrops.AGE, ((BlockCrops) mcblock).getMaxAge());
+        resetState = mcblock.getDefaultState().withProperty(BlockCrops.AGE, 0);
+      } else if (mcblock instanceof BlockNetherWart) {
+        meta = 3;
+        resetMeta = 0;
+        grownState = mcblock.getDefaultState().withProperty(BlockNetherWart.AGE, 3);
+        resetState = mcblock.getDefaultState().withProperty(BlockNetherWart.AGE, 0);
+      } else {
+        grownState = mcblock.getStateFromMeta(meta);
+        resetState = mcblock.getStateFromMeta(resetMeta);
+      }
     }
 
     @Override
