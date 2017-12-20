@@ -189,7 +189,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     JsonConfigReader<LegacyPlantInfo> reader = new JsonConfigReader<LegacyPlantInfo>(new ModToken(EnderCore.class, EnderCore.DOMAIN + "/config"),
         enderConfigFolder.getAbsolutePath() + "/cropConfig.json", LegacyPlantInfo.class);
     for (LegacyPlantInfo i : reader) {
-      i.init();
+      i.init("in configfile 'cropConfig.json'");
       RightClickCropHandler.INSTANCE.addCrop(i);
     }
   }

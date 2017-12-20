@@ -39,7 +39,7 @@ public class RightClickCropHandler {
     @Nonnull
     IBlockState getResetState();
 
-    void init();
+    void init(@Nonnull String source);
   }
 
   public static class LegacyPlantInfo implements IPlantInfo {
@@ -61,18 +61,18 @@ public class RightClickCropHandler {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void init() {
-      seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier received in IMC message from another mod"));
+    public void init(@Nonnull String source) {
+      seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier " + source));
       String[] blockinfo = block.split(":");
       if (blockinfo.length != 2) {
-        throw new RuntimeException("invalid block specifier '" + block + "' received in IMC message from another mod");
+        throw new RuntimeException("invalid block specifier '" + block + "' " + source);
       }
       Block mcblock = ForgeRegistries.BLOCKS
           .getValue(new ResourceLocation(NullHelper.notnullJ(blockinfo[0], "String.split()"), NullHelper.notnullJ(blockinfo[1], "String.split()")));
       if (mcblock == null) {
-        throw new RuntimeException("invalid block specifier '" + block + "' received in IMV message from another mod");
+        throw new RuntimeException("invalid block specifier '" + block + "' " + source);
       }
-      if (mcblock instanceof BlockBeetroot) { // BlockBeetroot extends BlockCrops
+      if (mcblock instanceof BlockBeetroot) { // BlockBeetroot extends BlockCrops, so it needs to be checked first
         meta = 3;
         resetMeta = 0;
         grownState = mcblock.getDefaultState().withProperty(BlockBeetroot.BEETROOT_AGE, 3);

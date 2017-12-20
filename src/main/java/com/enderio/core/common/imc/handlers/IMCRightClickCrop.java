@@ -26,7 +26,7 @@ public class IMCRightClickCrop extends IMCBase {
     }
 
     IPlantInfo plantinfo = new LegacyPlantInfo(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
-    plantinfo.init();
+    plantinfo.init("received in IMC message from " + msg.getSender());
     RightClickCropHandler.INSTANCE.addCrop(plantinfo);
   }
 }
