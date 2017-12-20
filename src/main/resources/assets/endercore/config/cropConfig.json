@@ -2,15 +2,18 @@
 	[
 	{
             "seed":"minecraft:wheat_seeds",
-            "block":"minecraft:wheat"
+            "block":"minecraft:wheat",
+            "meta":7
         },
         {
             "seed":"minecraft:carrot",
-            "block":"minecraft:carrots"
+            "block":"minecraft:carrots",
+            "meta":7
         },
         {
             "seed":"minecraft:potato",
-            "block":"minecraft:potatoes"
+            "block":"minecraft:potatoes",
+            "meta":7
         },
         {
             "seed":"minecraft:beetroot_seeds",

@@ -11,6 +11,9 @@ singleton
 singletonList
  <T:Ljava/lang/Object;>(TT;)Ljava/util/List<TT;>;
  <T:Ljava/lang/Object;>(TT;)L1java/util/List<TT;>;
+singletonMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)L1java/util/Map<TK;TV;>;
 unmodifiableSet
  <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)Ljava/util/Set<TT;>;
  <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)L1java/util/Set<TT;>;
