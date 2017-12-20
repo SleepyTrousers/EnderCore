@@ -1,14 +1,12 @@
 package com.enderio.core.client.gui;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.render.RenderUtil;
 import com.enderio.core.common.util.ItemUtil;
-import com.google.common.collect.Lists;
+import com.enderio.core.common.util.NNList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,7 +14,7 @@ import net.minecraft.item.ItemStack;
 
 public class GhostSlotHandler {
 
-  protected final @Nonnull List<GhostSlot> ghostSlots = Lists.newArrayList();
+  protected final @Nonnull NNList<GhostSlot> ghostSlots = new NNList<GhostSlot>();
   protected @Nullable GhostSlot hoverGhostSlot;
 
   public GhostSlotHandler() {
@@ -25,7 +23,7 @@ public class GhostSlotHandler {
   // GhostSlot managing
 
   @Nonnull
-  public List<GhostSlot> getGhostSlots() {
+  public NNList<GhostSlot> getGhostSlots() {
     return ghostSlots;
   }
 
