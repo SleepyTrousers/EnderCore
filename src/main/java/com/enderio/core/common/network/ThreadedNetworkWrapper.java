@@ -6,7 +6,12 @@ import com.google.common.base.Throwables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
+import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -143,4 +148,32 @@ public class ThreadedNetworkWrapper {
   public void sendToServer(IMessage message) {
     parent.sendToServer(message);
   }
+
+  // see https://github.com/MinecraftForge/MinecraftForge/issues/3677
+  public void sendToAllAround(IMessage packet, BlockPos pos, World world) {
+    if (!(world instanceof WorldServer)) {
+      return;
+    }
+
+    WorldServer worldServer = (WorldServer) world;
+    PlayerChunkMap playerManager = worldServer.getPlayerChunkMap();
+
+    int chunkX = pos.getX() >> 4;
+    int chunkZ = pos.getZ() >> 4;
+
+    for (Object playerObj : world.playerEntities) {
+      if (playerObj instanceof EntityPlayerMP) {
+        EntityPlayerMP player = (EntityPlayerMP) playerObj;
+
+        if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)) {
+          sendTo(packet, player);
+        }
+      }
+    }
+  }
+
+  public void sendToAllAround(IMessage message, TileEntity te) {
+    sendToAllAround(message, te.getPos(), te.getWorld());
+  }
+
 }
