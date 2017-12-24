@@ -35,7 +35,7 @@ public class TooltipButton extends GuiButtonHideable {
     updateTooltipBounds();
   }
 
-  protected void setToolTip(GuiToolTip newToolTip) {
+  public void setToolTip(GuiToolTip newToolTip) {
     boolean addTooltip = false;
     if (toolTip != null) {
       addTooltip = gui.removeToolTip(toolTip);
