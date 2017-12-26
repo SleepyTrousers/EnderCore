@@ -1,0 +1,4 @@
+class net/minecraft/entity/item/EntityTNTPrimed
+EntityTNTPrimed
+ (Lnet/minecraft/world/World;DDDLnet/minecraft/entity/EntityLivingBase;)V
+ (Lnet/minecraft/world/World;DDDL0net/minecraft/entity/EntityLivingBase;)V
