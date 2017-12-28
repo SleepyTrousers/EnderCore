@@ -76,7 +76,7 @@ public abstract class GhostSlot {
   }
 
   /**
-   * Should the items in the slot have their standard overlay (stacksize)?
+   * Should the items in the slot have their standard overlay (stacksize, damage/energy/fluid bar)?
    */
   public boolean shouldDisplayStdOverlay() {
     return displayStdOverlay;

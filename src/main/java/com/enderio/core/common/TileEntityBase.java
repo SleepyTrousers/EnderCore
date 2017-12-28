@@ -9,14 +9,17 @@ import com.enderio.core.common.network.PacketProgress;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public abstract class TileEntityBase extends TileEntity implements ITickable {
 
@@ -206,6 +209,42 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
       IBlockState state = world.getBlockState(pos);
       if (state.hasComparatorInputOverride()) {
         world.updateComparatorOutputLevel(pos, state.getBlock());
+      }
+    }
+  }
+
+  /**
+   * Sends an update packet to all players who have this TileEntity loaded. Needed because inventory changes are not synced in a timely manner unless the player
+   * has the GUI open. And sometimes the rendering needs the inventory...
+   */
+  public void forceUpdatePlayers() {
+    if (!(world instanceof WorldServer)) {
+      return;
+    }
+  
+    WorldServer worldServer = (WorldServer) world;
+    PlayerChunkMap playerManager = worldServer.getPlayerChunkMap();
+    SPacketUpdateTileEntity updatePacket = null;
+  
+    int chunkX = pos.getX() >> 4;
+    int chunkZ = pos.getZ() >> 4;
+  
+    for (EntityPlayer playerObj : world.playerEntities) {
+      if (playerObj instanceof EntityPlayerMP) {
+        EntityPlayerMP player = (EntityPlayerMP) playerObj;
+  
+        if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)) {
+          if (updatePacket == null) {
+            updatePacket = getUpdatePacket();
+            if (updatePacket == null) {
+              return;
+            }
+          }
+          try {
+            player.connection.sendPacket(updatePacket);
+          } catch (Exception e) {
+          }
+        }
       }
     }
   }
