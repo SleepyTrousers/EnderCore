@@ -230,4 +230,12 @@ public class NNList<E> extends NonNullList<E> {
     return super.toArray(a);
   }
 
+  public void removeAllByClass(Class<? extends E> clazz) {
+    for (NNIterator<E> iterator = iterator(); iterator.hasNext();) {
+      if (clazz.isAssignableFrom(iterator.next().getClass())) {
+        iterator.remove();
+      }
+    }
+  }
+
 }
