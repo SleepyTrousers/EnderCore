@@ -224,6 +224,9 @@ public class Things {
 
   private final @Nonnull NNList<ItemStack> itemStackListRaw = new NNList<ItemStack>();
 
+  /**
+   * Returns a list of item stacks for this Thing. Items in this list may have the wildcard meta. List may contain empty stacks.
+   */
   public NNList<ItemStack> getItemStacksRaw() {
     if (itemStackListRaw.isEmpty()) {
       for (IThing thing : things) {
@@ -236,8 +239,9 @@ public class Things {
   private final @Nonnull NNList<ItemStack> itemStackList = new NNList<ItemStack>();
 
   /**
-   * Returns a list of item stacks for this Thing. Please note that items that are defined using the wildcard value for the item damage may not return the
-   * complete list on standalone servers
+   * Returns a list of item stacks for this Thing. Wildcard values are expanded to a full list of all available sub-items. Empty stacks are stripped.
+   * 
+   * Please note that items that are defined using the wildcard value for the item damage may not return the complete list on dedicated servers
    */
   public @Nonnull NNList<ItemStack> getItemStacks() {
     if (itemStackList.isEmpty()) {
@@ -265,6 +269,9 @@ public class Things {
     return blockList;
   }
 
+  /**
+   * Returns a list of objects that are suitable for use with Forge's oredict recipes.
+   */
   public NNList<Object> getRecipeObjects() {
     NNList<Object> result = new NNList<Object>();
     for (IThing thing : things) {
