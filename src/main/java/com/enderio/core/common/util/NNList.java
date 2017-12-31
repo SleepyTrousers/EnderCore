@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 
 public class NNList<E> extends NonNullList<E> {
 
@@ -20,6 +21,20 @@ public class NNList<E> extends NonNullList<E> {
   public static final @Nonnull NNList<EnumFacing> FACING_HORIZONTAL = new NNList<EnumFacing>(EnumFacing.HORIZONTALS);
 
   public static final @Nonnull NNList<BlockRenderLayer> RENDER_LAYER = NNList.of(BlockRenderLayer.class);
+
+  public static final @Nonnull NNList<BlockPos> SHELL = new NNList<>();
+  static {
+    for (int y = -1; y <= 1; y++) {
+      for (int z = -1; z <= 1; z++) {
+        for (int x = -1; x <= 1; x++) {
+          if (x != 0 || y != 0 || z != 0) {
+            SHELL.add(new BlockPos(x, y, z));
+          }
+        }
+      }
+    }
+    Collections.shuffle(SHELL);
+  }
 
   public NNList() {
     super();
