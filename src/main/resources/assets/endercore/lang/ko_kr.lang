@@ -1,0 +1,7 @@
+endercore.tooltip.oreDictNames=광물사전 이름:
+endercore.tooltip.showDetails=<Shift를 누르십시오>
+endercore.tooltip.durability=내구도:
+
+endercore.command.config.result.success=%s설정을 재로딩 완료하였습니다
+endercore.command.config.result.fail=%s설정 재로딩이 실패하였습니다
+endercore.command.config.result.invalid=모드아이디 %s는 정확한 값이 아닙니다.
