@@ -6,13 +6,9 @@ public enum NBTAction {
    */
   SAVE,
   /**
-   * The TE is initially synced to the client.
+   * The TE is synced to the client.
    */
-  SYNC,
-  /**
-   * The TE is updated to the client.
-   */
-  UPDATE,
+  CLIENT,
   /**
    * TE data is written to/read from an item.
    */

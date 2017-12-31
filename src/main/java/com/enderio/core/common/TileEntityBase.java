@@ -102,40 +102,40 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   }
 
   /**
-   * Called when the chunk/block data is sent (client receiving chunks from server). Must have x/y/z tags.
+   * Called when the chunk data is sent (client receiving chunks from server). Must have x/y/z tags.
    */
   @Override
   public final @Nonnull NBTTagCompound getUpdateTag() {
     NBTTagCompound tag = super.getUpdateTag();
-    writeCustomNBT(NBTAction.SYNC, tag);
+    writeCustomNBT(NBTAction.CLIENT, tag);
     return tag;
   }
 
   /**
-   * CLIENT: Called on initial syncing.
+   * CLIENT: Called when chunk data is received (client receiving chunks from server).
    */
   @Override
   public final void handleUpdateTag(@Nonnull NBTTagCompound tag) {
     super.handleUpdateTag(tag);
-    readCustomNBT(NBTAction.SYNC, tag);
+    readCustomNBT(NBTAction.CLIENT, tag);
   }
 
   /**
-   * SERVER: Called when TE is re-synced (via notifyBlockUpdate). No need for x/y/z tags.
+   * SERVER: Called when block data is sent (client receiving blocks from server, via notifyBlockUpdate). No need for x/y/z tags.
    */
   @Override
   public final SPacketUpdateTileEntity getUpdatePacket() {
     NBTTagCompound tag = new NBTTagCompound();
-    writeCustomNBT(NBTAction.UPDATE, tag);
+    writeCustomNBT(NBTAction.CLIENT, tag);
     return new SPacketUpdateTileEntity(getPos(), 1, tag);
   }
 
   /**
-   * CLIENT: Called on re-syncing.
+   * CLIENT: Called when block data is received (client receiving blocks from server, via notifyBlockUpdate).
    */
   @Override
   public final void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
-    readCustomNBT(NBTAction.UPDATE, pkt.getNbtCompound());
+    readCustomNBT(NBTAction.CLIENT, pkt.getNbtCompound());
   }
 
   protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
