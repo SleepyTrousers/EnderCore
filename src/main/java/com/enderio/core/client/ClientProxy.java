@@ -13,7 +13,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 public class ClientProxy extends CommonProxy {
 
@@ -32,7 +34,9 @@ public class ClientProxy extends CommonProxy {
 
   @Override
   public void throwModCompatibilityError(@Nonnull String... msgs) {
-    throw new EnderCoreModConflictException(msgs);
+    EnderCoreModConflictException ex = new EnderCoreModConflictException(msgs);
+    ReflectionHelper.setPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), ex, "customError");
+//    throw ex;
   }
 
   @Override
