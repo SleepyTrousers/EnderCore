@@ -24,7 +24,7 @@ public class CubicBlockIterator extends AbstractBlockIterator {
   }
 
   @Override
-  public BlockPos next() {
+  public @Nonnull BlockPos next() {
     BlockPos ret = new BlockPos(curX, curY, curZ);
     curX = curX == maxX ? minX : curX + 1;
     curY = curX == minX ? curY == maxY ? minY : curY + 1 : curY;
