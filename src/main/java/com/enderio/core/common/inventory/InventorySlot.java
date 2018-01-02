@@ -62,6 +62,10 @@ public class InventorySlot implements IItemHandler {
     this(itemStack, null, null, callback, limit);
   }
 
+  public InventorySlot(@Nullable Predicate<ItemStack> filterIn, int limit) {
+    this(LIE, filterIn, null, null, limit);
+  }
+
   public InventorySlot(@Nullable Predicate<ItemStack> filterIn, @Nullable Predicate<ItemStack> filterOut, int limit) {
     this(LIE, filterIn, filterOut, null, limit);
   }
@@ -210,6 +214,18 @@ public class InventorySlot implements IItemHandler {
     ItemStack oldStack = itemStack;
     itemStack = stack;
     onChange(oldStack, itemStack);
+  }
+
+  public @Nonnull ItemStack get() {
+    return itemStack;
+  }
+
+  public @Nonnull ItemStack getCopy() {
+    return itemStack.copy();
+  }
+
+  public boolean isEmpty() {
+    return itemStack.isEmpty();
   }
 
   public int getMaxStackSize() {
