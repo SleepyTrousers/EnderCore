@@ -45,7 +45,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
       doUpdate();
       if (isProgressTile && !world.isRemote) {
         int curScaled = getProgressScaled(16);
-        if (++ticksSinceLastProgressUpdate >= getProgressUpdateFreq() || curScaled != lastProgressScaled) {
+        if (++ticksSinceLastProgressUpdate >= getProgressUpdateFreq() && curScaled != lastProgressScaled) {
           sendTaskProgressPacket();
           lastProgressScaled = curScaled;
         }
