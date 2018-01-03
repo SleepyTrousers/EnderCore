@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 
 public abstract class AbstractBlockIterator implements Iterable<BlockPos>, Iterator<BlockPos> {
 
-  protected @Nonnull BlockPos base;
+  protected final @Nonnull BlockPos base;
 
   protected AbstractBlockIterator(@Nonnull BlockPos base) {
     this.base = base;
