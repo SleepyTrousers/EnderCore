@@ -53,8 +53,8 @@ public class VScrollbar implements IHideable {
   }
 
   public void adjustPosition() {
-    x = xOrigin + gui.getGuiLeft();
-    y = yOrigin + gui.getGuiTop();
+    x = xOrigin + gui.getGuiRootLeft();
+    y = yOrigin + gui.getGuiRootTop();
     wholeArea = new Rectangle(x, y, EnderWidget.VSCROLL_THUMB_OFF.width, height);
     btnUp = new Rectangle(x, y, EnderWidget.UP_ARROW_OFF.width, EnderWidget.UP_ARROW_OFF.height);
     btnDown = new Rectangle(x, y + Math.max(0, height - EnderWidget.DOWN_ARROW_OFF.height), EnderWidget.DOWN_ARROW_OFF.width,
