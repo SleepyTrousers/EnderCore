@@ -141,23 +141,33 @@ public class UserIdent {
       return true;
     }
     if (obj instanceof UserIdent) {
-      UserIdent other = (UserIdent) obj;
-      if (this.uuid != null && other.uuid != null) {
-        return this.uuid.equals(other.uuid);
-      }
-      return this.uuid_offline.equals(other.uuid_offline);
+      return equals((UserIdent) obj);
     } else if (obj instanceof GameProfile) {
-      GameProfile other = (GameProfile) obj;
-      UUID other_uuid = other.getId();
-      if (this.uuid != null && other_uuid != null) {
-        return this.uuid.equals(other_uuid);
-      }
-      UUID uuid_offline_other = offlineUUID(other.getName());
-      return uuid_offline_other.equals(this.uuid) || this.uuid_offline.equals(uuid_offline_other);
+      return equals((GameProfile) obj);
     } else if (obj instanceof UUID) {
-      return obj.equals(uuid) || obj.equals(uuid_offline);
+      return equals((UUID) obj);
     }
     return false;
+  }
+
+  public boolean equals(UserIdent other) {
+    if (this.uuid != null && other.uuid != null) {
+      return this.uuid.equals(other.uuid);
+    }
+    return this.uuid_offline.equals(other.uuid_offline);
+  }
+
+  public boolean equals(UUID other) {
+    return other.equals(uuid) || other.equals(uuid_offline);
+  }
+
+  public boolean equals(GameProfile other) {
+    UUID other_uuid = other.getId();
+    if (this.uuid != null && other_uuid != null) {
+      return this.uuid.equals(other_uuid);
+    }
+    UUID uuid_offline_other = offlineUUID(other.getName());
+    return uuid_offline_other.equals(this.uuid) || this.uuid_offline.equals(uuid_offline_other);
   }
 
   public void saveToNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
@@ -206,8 +216,8 @@ public class UserIdent {
     }
 
     @Override
-    public boolean equals(Object obj) {
-      return this == obj;
+    public boolean equals(UserIdent other) {
+      return this == other;
     }
 
     @Override
