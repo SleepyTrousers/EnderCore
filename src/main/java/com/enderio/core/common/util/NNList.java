@@ -67,7 +67,7 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   public static @Nonnull <X> NNList<X> wrap(List<X> list) {
-    return new NNList<X>(list, null);
+    return list instanceof NNList ? (NNList<X>) list : new NNList<X>(list, null);
   }
 
   public static @Nonnull <X extends Enum<?>> NNList<X> of(Class<X> e) {
