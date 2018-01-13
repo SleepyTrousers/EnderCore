@@ -89,7 +89,7 @@ public class GhostBackgroundItemSlot extends GhostSlot {
   }
 
   @Override
-  public void putStack(@Nonnull ItemStack stackIn) {
+  public void putStack(@Nonnull ItemStack stackIn, int realsize) {
   }
 
   @Override

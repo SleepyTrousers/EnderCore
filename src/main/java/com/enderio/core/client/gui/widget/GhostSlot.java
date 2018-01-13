@@ -43,11 +43,6 @@ public abstract class GhostSlot {
 
   public abstract @Nonnull ItemStack getStack();
 
-  @Deprecated
-  public void putStack(@Nonnull ItemStack stack) {
-    putStack(stack, stack.getCount());
-  }
-
   public void putStack(@Nonnull ItemStack stack, int realsize) {
     if (updateServer) {
       EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(slot, stack, realsize));
