@@ -10,6 +10,7 @@ import com.google.common.base.Throwables;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.Packet;
 import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
@@ -176,6 +177,10 @@ public class ThreadedNetworkWrapper {
 
   public void sendToServer(IMessage message) {
     getClientParent(message).sendToServer(message);
+  }
+
+  public Packet<?> getPacketFrom(IMessage message) {
+    return getServerParent(message).getPacketFrom(message);
   }
 
   // see https://github.com/MinecraftForge/MinecraftForge/issues/3677

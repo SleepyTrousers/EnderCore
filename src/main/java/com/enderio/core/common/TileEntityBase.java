@@ -20,14 +20,15 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   private final int checkOffset = (int) (Math.random() * 20);
   protected final boolean isProgressTile;
 
-  protected int lastProgressScaled = -1;
-  protected int ticksSinceLastProgressUpdate;
+  protected float lastProgressSent = -1;
+  protected long lastProgressUpdate;
   private long lastUpdate = 0;
 
   public TileEntityBase() {
@@ -43,13 +44,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     if (ConfigHandler.allowExternalTickSpeedup || world.getTotalWorldTime() != lastUpdate) {
       lastUpdate = world.getTotalWorldTime();
       doUpdate();
-      if (isProgressTile && !world.isRemote) {
-        int curScaled = getProgressScaled(16);
-        if (++ticksSinceLastProgressUpdate >= getProgressUpdateFreq() && curScaled != lastProgressScaled) {
-          sendTaskProgressPacket();
-          lastProgressScaled = curScaled;
-        }
-      }
+      sendProgressIf();
     }
   }
 
@@ -57,29 +52,30 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     return (int) (tile.getProgress() * scale);
   }
 
-  public final int getProgressScaled(int scale) {
-    if (isProgressTile) {
-      return getProgressScaled(scale, (IProgressTile) this);
+  private final void sendProgressIf() {
+    // this is only used for players that do not have the GUI open. They do not need a very fine resolution, as they only see the the machine being on or
+    // off and get the sound restarted on progress==0
+    if (isProgressTile && !world.isRemote) {
+      float progress = ((IProgressTile) this).getProgress();
+      boolean send = //
+          progress < lastProgressSent // always send progress if it goes down, e.g. machine goes inactive or new task starts
+              || (lastProgressSent <= 0 && progress > 0) // always send progress if machine goes active
+              || (lastUpdate - lastProgressUpdate) > 60 * 20; // also update every 60 seconds to avoid stale client status
+
+      if (send) {
+        EnderPacketHandler.INSTANCE.sendToAllAround(((IProgressTile) this).getProgressPacket(), this);
+        lastProgressSent = progress;
+        lastProgressUpdate = lastUpdate;
+      }
     }
-    return 0;
   }
 
   protected void doUpdate() {
 
   }
 
-  protected void sendTaskProgressPacket() {
-    if (isProgressTile) {
-      EnderPacketHandler.sendToAllAround(new PacketProgress((IProgressTile) this), this);
-    }
-    ticksSinceLastProgressUpdate = 0;
-  }
-
-  /**
-   * Controls how often progress updates. Has no effect if your TE is not {@link IProgressTile}.
-   */
-  protected int getProgressUpdateFreq() {
-    return 20;
+  public @Nonnull IMessage getProgressPacket() {
+    return new PacketProgress((IProgressTile) this);
   }
 
   /**
@@ -108,6 +104,10 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   public final @Nonnull NBTTagCompound getUpdateTag() {
     NBTTagCompound tag = super.getUpdateTag();
     writeCustomNBT(NBTAction.CLIENT, tag);
+    if (isProgressTile) {
+      // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
+      tag.setFloat("tileprogress", ((IProgressTile) this).getProgress());
+    }
     return tag;
   }
 
@@ -118,6 +118,10 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   public final void handleUpdateTag(@Nonnull NBTTagCompound tag) {
     super.handleUpdateTag(tag);
     readCustomNBT(NBTAction.CLIENT, tag);
+    if (isProgressTile) {
+      // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
+      ((IProgressTile) this).setProgress(tag.getFloat("tileprogress"));
+    }
   }
 
   /**
@@ -127,6 +131,10 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   public final SPacketUpdateTileEntity getUpdatePacket() {
     NBTTagCompound tag = new NBTTagCompound();
     writeCustomNBT(NBTAction.CLIENT, tag);
+    if (isProgressTile) {
+      // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
+      tag.setFloat("tileprogress", ((IProgressTile) this).getProgress());
+    }
     return new SPacketUpdateTileEntity(getPos(), 1, tag);
   }
 
@@ -136,6 +144,10 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   @Override
   public final void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
     readCustomNBT(NBTAction.CLIENT, pkt.getNbtCompound());
+    if (isProgressTile) {
+      // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
+      ((IProgressTile) this).setProgress(pkt.getNbtCompound().getFloat("tileprogress"));
+    }
   }
 
   protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
@@ -247,6 +259,13 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
         }
       }
     }
+  }
+
+  @Override
+  protected void setWorldCreate(@Nonnull World worldIn) {
+    // Forge gives us our World earlier than vanilla. No idea why it doesn't get put into #world but is ignored by default.
+    // Anyway, this is helpful while reading our nbt, so let's use it.
+    setWorld(worldIn);
   }
 
 }

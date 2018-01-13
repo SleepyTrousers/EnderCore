@@ -87,7 +87,7 @@ public abstract class GuiScrollableList<T> {
   }
 
   public @Nullable T getSelectedElement() {
-    return selectedIndex < 0 ? null : getElementAt(selectedIndex);
+    return selectedIndex < 0 || selectedIndex >= getNumElements() ? null : getElementAt(selectedIndex);
   }
 
   public void setSelection(@Nonnull T selection) {

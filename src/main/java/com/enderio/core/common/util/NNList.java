@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -117,13 +118,14 @@ public class NNList<E> extends NonNullList<E> {
     throw new InvalidParameterException();
   }
 
-  public void apply(@Nonnull Callback<E> callback) {
+  public NNList<E> apply(@Nonnull Callback<E> callback) {
     for (E e : this) {
       if (e == null) {
         throw new NullPointerException();
       }
       callback.apply(e);
     }
+    return this;
   }
 
   public static interface Callback<E> {
@@ -233,10 +235,18 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   @SafeVarargs
-  public final void addAll(E... el) {
+  public final NNList<E> addAll(E... el) {
     for (E e : el) {
       add(e);
     }
+    return this;
+  }
+
+  public NNList<E> addIf(@Nullable E e) {
+    if (e != null) {
+      add(e);
+    }
+    return this;
   }
 
   @SuppressWarnings("null")
@@ -245,12 +255,13 @@ public class NNList<E> extends NonNullList<E> {
     return super.toArray(a);
   }
 
-  public void removeAllByClass(Class<? extends E> clazz) {
+  public NNList<E> removeAllByClass(Class<? extends E> clazz) {
     for (NNIterator<E> iterator = iterator(); iterator.hasNext();) {
       if (clazz.isAssignableFrom(iterator.next().getClass())) {
         iterator.remove();
       }
     }
+    return this;
   }
 
 }

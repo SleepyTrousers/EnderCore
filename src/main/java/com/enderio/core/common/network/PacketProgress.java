@@ -21,9 +21,6 @@ public class PacketProgress extends MessageTileEntity<TileEntity> {
   public PacketProgress(@Nonnull IProgressTile tile) {
     super(tile.getTileEntity());
     progress = tile.getProgress();
-    if (progress == 0) {
-      progress = -1;
-    }
   }
 
   @Override

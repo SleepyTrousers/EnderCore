@@ -10,11 +10,14 @@ import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 
 @Deprecated
 public class ContainerEnder<T extends IInventory> extends Container implements GhostSlot.IGhostSlotAware {
@@ -214,6 +217,22 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     if (inv instanceof TileEntityBase) {
       ((TileEntityBase) inv).setGhostSlotContents(slot, stack, realsize);
     }
-
   }
+
+  @Override
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
+    if (inv instanceof TileEntityBase) {
+      // keep in sync with ContainerEnderCap#detectAndSendChanges()
+      final SPacketUpdateTileEntity updatePacket = ((TileEntityBase) inv).getUpdatePacket();
+      if (updatePacket != null) {
+        for (IContainerListener containerListener : listeners) {
+          if (containerListener instanceof EntityPlayerMP) {
+            ((EntityPlayerMP) containerListener).connection.sendPacket(updatePacket);
+          }
+        }
+      }
+    }
+  }
+
 }

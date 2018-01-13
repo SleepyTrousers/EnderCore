@@ -10,10 +10,13 @@ import com.enderio.core.client.gui.widget.GhostSlot;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -233,6 +236,20 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     }
 
     return result;
+  }
+
+  @Override
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
+    // keep in sync with ContainerEnder#detectAndSendChanges()
+    final SPacketUpdateTileEntity updatePacket = te != null ? te.getUpdatePacket() : null;
+    if (updatePacket != null) {
+      for (IContainerListener containerListener : listeners) {
+        if (containerListener instanceof EntityPlayerMP) {
+          ((EntityPlayerMP) containerListener).connection.sendPacket(updatePacket);
+        }
+      }
+    }
   }
 
 }
