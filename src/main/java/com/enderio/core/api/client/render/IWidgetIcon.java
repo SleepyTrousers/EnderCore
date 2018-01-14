@@ -4,6 +4,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IWidgetIcon {
 
@@ -22,6 +24,7 @@ public interface IWidgetIcon {
   IWidgetMap getMap();
 
   @Nonnull
+  @SideOnly(Side.CLIENT)
   default TextureAtlasSprite getAsTextureAtlasSprite() {
     return new TAS(this);
   }
@@ -30,6 +33,7 @@ public interface IWidgetIcon {
    * TextureAtlasSprite that only has the data needed by Slot for a background image. Won't work anywhere where's animation data is needed.
    *
    */
+  @SideOnly(Side.CLIENT)
   static class TAS extends TextureAtlasSprite {
 
     protected TAS(IWidgetIcon icon) {
