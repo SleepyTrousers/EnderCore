@@ -216,7 +216,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   @Override
   public void markDirty() {
-    if (hasWorld()) {
+    if (hasWorld() && world.isBlockLoaded(getPos())) { // we need the loaded check to make sure we don't trigger a chunk load while the chunk is loaded
       world.markChunkDirty(pos, this);
       IBlockState state = world.getBlockState(pos);
       if (state.hasComparatorInputOverride()) {
