@@ -12,6 +12,8 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.common.util.NNList;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -181,27 +183,33 @@ public class Things {
   }
 
   public boolean contains(@Nullable Item item) {
-    for (IThing thing : things) {
-      if (thing.is(item)) {
-        return true;
+    if (item != Items.AIR) {
+      for (IThing thing : things) {
+        if (thing.is(item)) {
+          return true;
+        }
       }
     }
     return false;
   }
 
   public boolean contains(@Nullable ItemStack itemStack) { // sic!
-    for (IThing thing : things) {
-      if (thing.is(itemStack)) {
-        return true;
+    if (itemStack != null && !itemStack.isEmpty()) {
+      for (IThing thing : things) {
+        if (thing.is(itemStack)) {
+          return true;
+        }
       }
     }
     return false;
   }
 
   public boolean contains(@Nullable Block block) {
-    for (IThing thing : things) {
-      if (thing.is(block)) {
-        return true;
+    if (block != Blocks.AIR) {
+      for (IThing thing : things) {
+        if (thing.is(block)) {
+          return true;
+        }
       }
     }
     return false;
