@@ -24,7 +24,7 @@ import net.minecraftforge.items.IItemHandler;
 
 public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEntity> extends Container implements GhostSlot.IGhostSlotAware {
 
-  protected final @Nonnull Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
+  protected final @Nonnull Map<Slot, Point> slotLocations = Maps.newLinkedHashMap();
 
   protected int startPlayerSlot;
   protected int endPlayerSlot;
@@ -66,25 +66,27 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     startPlayerSlot = inventorySlots.size();
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
-        Point loc = new Point(x + j * 18, y + i * 18);
-        Slot slot = new Slot(playerInv, j + i * 9 + 9, loc.x, loc.y);
+        Slot slot = new Slot(playerInv, j + i * 9 + 9, x + j * 18,  y + i * 18);
         addSlotToContainer(slot);
-        playerSlotLocations.put(slot, loc);
       }
     }
     endPlayerSlot = inventorySlots.size();
 
     startHotBarSlot = inventorySlots.size();
     for (int i = 0; i < 9; ++i) {
-      Point loc = new Point(x + i * 18, y + 58);
-      Slot slot = new Slot(playerInv, i, loc.x, loc.y);
+      Slot slot = new Slot(playerInv, i, x + i * 18, y + 58);
       addSlotToContainer(slot);
-      playerSlotLocations.put(slot, loc);
     }
     endHotBarSlot = inventorySlots.size();
 
     initRan = true;
     return (X) this;
+  }
+  
+  @Override
+  protected @Nonnull Slot addSlotToContainer(@Nonnull Slot slotIn) {
+    slotLocations.put(slotIn, new Point(slotIn.xPos, slotIn.yPos));
+    return super.addSlotToContainer(slotIn);
   }
 
   public @Nonnull Point getPlayerInventoryOffset() {
