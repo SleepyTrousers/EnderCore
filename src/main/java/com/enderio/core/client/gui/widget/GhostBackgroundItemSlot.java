@@ -31,10 +31,10 @@ public class GhostBackgroundItemSlot extends GhostSlot {
       this.stacks = null;
     }
     this.parent = parent;
-    this.x = x;
-    this.y = y;
-    this.grayOut = true;
-    this.grayOutLevel = .75f;
+    this.setX(x);
+    this.setY(y);
+    this.setGrayOut(true);
+    this.setGrayOutLevel(.75f);
   }
 
   public GhostBackgroundItemSlot(@Nonnull ItemStack stack, int x, int y) {
@@ -96,6 +96,18 @@ public class GhostBackgroundItemSlot extends GhostSlot {
   public boolean isVisible() {
     final Slot parent2 = parent;
     return parent2 != null ? parent2.xPos >= 0 && parent2.yPos >= 0 && !parent2.getHasStack() && super.isVisible() : super.isVisible();
+  }
+
+  @Override
+  public int getX() {
+    final Slot parent2 = parent;
+    return parent2 != null ? parent2.xPos : super.getX();
+  }
+
+  @Override
+  public int getY() {
+    final Slot parent2 = parent;
+    return parent2 != null ? parent2.yPos : super.getY();
   }
 
 }
