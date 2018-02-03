@@ -4,6 +4,7 @@ import java.lang.reflect.TypeVariable;
 
 import javax.annotation.Nonnull;
 
+import com.enderio.core.EnderCore;
 import com.google.common.reflect.TypeToken;
 
 import io.netty.buffer.ByteBuf;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
 public abstract class MessageTileEntity<T extends TileEntity> implements IMessage {
 
@@ -67,6 +69,14 @@ public abstract class MessageTileEntity<T extends TileEntity> implements IMessag
   }
 
   protected @Nonnull World getWorld(MessageContext ctx) {
-    return ctx.getServerHandler().player.world;
+    if (ctx.side == Side.SERVER) {
+      return ctx.getServerHandler().player.world;
+    } else {
+      final World clientWorld = EnderCore.proxy.getClientWorld();
+      if (clientWorld == null) {
+        throw new NullPointerException("Recieved network packet ouside any world!");
+      }
+      return clientWorld;
+    }
   }
 }
