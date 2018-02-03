@@ -164,9 +164,9 @@ public class GhostSlotHandler {
         ItemStack stack = slot.getStack();
         if (slot.isVisible()) {
           if (!stack.isEmpty()) {
-            gui.drawFakeItemStack(slot.x + sx, slot.y + sy, stack);
+            gui.drawFakeItemStack(slot.getX() + sx, slot.getY() + sy, stack);
             if (slot.shouldDisplayStdOverlay()) {
-              gui.drawFakeItemStackStdOverlay(slot.x + sx, slot.y + sy, stack);
+              gui.drawFakeItemStackStdOverlay(slot.getX() + sx, slot.getY() + sy, stack);
             }
             if (slot.shouldGrayOut()) {
               drawGhostSlotGrayout(gui, slot);
@@ -180,7 +180,7 @@ public class GhostSlotHandler {
       final GhostSlot hoverGhostSlot2 = hoverGhostSlot;
       if (hoverGhostSlot2 != null) {
         // draw hover last to prevent it from affecting rendering of other slots ...
-        gui.drawFakeItemHover(hoverGhostSlot2.x + sx, hoverGhostSlot2.y + sy);
+        gui.drawFakeItemHover(hoverGhostSlot2.getX() + sx, hoverGhostSlot2.getY() + sy);
       }
     } finally {
       gui.drawFakeItemsEnd();
@@ -196,7 +196,7 @@ public class GhostSlotHandler {
     GlStateManager.enableBlend();
     GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
     RenderUtil.bindTexture(gui.getGuiTexture());
-    gui.drawTexturedModalRect(gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, slot.x, slot.y, 16, 16);
+    gui.drawTexturedModalRect(gui.getGuiLeft() + slot.getX(), gui.getGuiTop() + slot.getY(), slot.getX(), slot.getY(), 16, 16);
     GlStateManager.disableBlend();
     GlStateManager.enableDepth();
   }

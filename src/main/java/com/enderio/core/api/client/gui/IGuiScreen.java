@@ -17,16 +17,16 @@ public interface IGuiScreen {
 
   void clearToolTips();
 
-  int getGuiLeft();
+  int getGuiRootLeft();
 
-  int getGuiTop();
+  int getGuiRootTop();
 
-  int getXSize();
+  int getGuiXSize();
 
-  int getYSize();
+  int getGuiYSize();
 
   @Nonnull
-  <T extends GuiButton> T addButton(@Nonnull T button);
+  <T extends GuiButton> T addGuiButton(@Nonnull T button);
 
   void removeButton(@Nonnull GuiButton button);
 

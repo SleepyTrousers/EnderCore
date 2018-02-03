@@ -53,6 +53,13 @@ public class EnderCoreTransformer implements IClassTransformer {
       return EnderCorePlugin.runtimeDeobfEnabled ? srg : deobf;
     }
 
+    public boolean equals(String obj) {
+      if (obj != null) {
+        return obj.equals(deobf) || obj.equals(srg);
+      }
+      return false;
+    }
+
     @Override
     public boolean equals(Object obj) {
       if (obj instanceof String) {

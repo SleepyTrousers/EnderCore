@@ -42,7 +42,7 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
 
   public ContainerItemHandler(@Nonnull InventoryPlayer playerInv, @Nonnull T owner, @Nullable EnumFacing facing) {
     this.owner = checkNotNull(owner);
-    this.inv = checkNotNull(owner.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing));
+    this.inv = checkNotNull(owner.getCapability(checkNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY), facing));
     this.playerInv = checkNotNull(playerInv);
 
     addSlots(this.playerInv);

@@ -1,8 +1,14 @@
 class java/lang/Class
+cast
+ (Ljava/lang/Object;)TT;
+ (Ljava/lang/Object;)T1T;
 getCanonicalName
  ()Ljava/lang/String;
  ()L1java/lang/String;
 getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getSimpleName
  ()Ljava/lang/String;
  ()L1java/lang/String;
 getTypeParameters

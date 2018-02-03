@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IWidgetMap {
 
@@ -18,18 +20,25 @@ public interface IWidgetMap {
   @Nonnull
   ResourceLocation getTexture();
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw);
 
+  @SideOnly(Side.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY);
 
   static class WidgetMapImpl implements IWidgetMap {
@@ -53,36 +62,43 @@ public interface IWidgetMap {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y) {
       render(widget, x, y, false);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw, flipY);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw, flipY);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw) {
       render(widget, x, y, width, height, zLevel, doDraw, false);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
 
       final BufferBuilder tes = Tessellator.getInstance().getBuffer();

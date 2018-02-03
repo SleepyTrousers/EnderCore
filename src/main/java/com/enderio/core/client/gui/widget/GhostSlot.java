@@ -25,33 +25,37 @@ public abstract class GhostSlot {
     void setGhostSlotContents(int slot, @Nonnull ItemStack stack, int realsize);
   }
 
-  public @Nullable TileEntityBase te = null;
-  public int slot = -1;
-  public int x;
-  public int y;
+  @Nullable
+  private TileEntityBase te = null;
+  private int slot = -1;
+  private int x;
+  private int y;
 
-  public boolean visible = true;
-  public boolean grayOut = true;
-  public float grayOutLevel = 0.5f;
-  public boolean displayStdOverlay = false;
-  public int stackSizeLimit = 1;
-  public boolean updateServer = false;
+  private boolean visible = true;
+  private boolean grayOut = true;
+  private float grayOutLevel = 0.5f;
+  private boolean displayStdOverlay = false;
+  private int stackSizeLimit = 1;
+  private boolean updateServer = false;
 
   public boolean isMouseOver(int mx, int my) {
-    return mx >= x && mx < (x + 16) && my >= y && my < (y + 16);
+    return mx >= getX() && mx < (getX() + 16) && my >= getY() && my < (getY() + 16);
   }
 
   public abstract @Nonnull ItemStack getStack();
 
-  @Deprecated
-  public void putStack(@Nonnull ItemStack stack) {
-    putStack(stack, stack.getCount());
+  public void putStack(@Nonnull ItemStack stack, int realsize) {
+    if (shouldUpdateServer()) {
+      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(getSlot(), stack, realsize));
+    }
   }
 
-  public void putStack(@Nonnull ItemStack stack, int realsize) {
-    if (updateServer) {
-      EnderPacketHandler.sendToServer(PacketGhostSlot.setGhostSlotContents(slot, stack, realsize));
-    }
+  public int getSlot() {
+    return slot;
+  }
+
+  public void setSlot(int slot) {
+    this.slot = slot;
   }
 
   /**
@@ -61,11 +65,19 @@ public abstract class GhostSlot {
     return visible;
   }
 
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
+
   /**
    * Should the slot be grayed out?
    */
   public boolean shouldGrayOut() {
     return grayOut;
+  }
+
+  public void setGrayOut(boolean grayOut) {
+    this.grayOut = grayOut;
   }
 
   /**
@@ -75,11 +87,19 @@ public abstract class GhostSlot {
     return grayOutLevel;
   }
 
+  public void setGrayOutLevel(float grayOutLevel) {
+    this.grayOutLevel = grayOutLevel;
+  }
+
   /**
-   * Should the items in the slot have their standard overlay (stacksize)?
+   * Should the items in the slot have their standard overlay (stacksize, damage/energy/fluid bar)?
    */
   public boolean shouldDisplayStdOverlay() {
     return displayStdOverlay;
+  }
+
+  public void setDisplayStdOverlay(boolean displayStdOverlay) {
+    this.displayStdOverlay = displayStdOverlay;
   }
 
   /**
@@ -87,6 +107,42 @@ public abstract class GhostSlot {
    */
   public int getStackSizeLimit() {
     return stackSizeLimit;
+  }
+
+  public void setStackSizeLimit(int stackSizeLimit) {
+    this.stackSizeLimit = stackSizeLimit;
+  }
+
+  public boolean shouldUpdateServer() {
+    return updateServer;
+  }
+
+  public void setUpdateServer(boolean updateServer) {
+    this.updateServer = updateServer;
+  }
+
+  public TileEntityBase getTe() {
+    return te;
+  }
+
+  public void setTe(TileEntityBase te) {
+    this.te = te;
+  }
+
+  public int getX() {
+    return x;
+  }
+
+  public void setX(int x) {
+    this.x = x;
+  }
+
+  public int getY() {
+    return y;
+  }
+
+  public void setY(int y) {
+    this.y = y;
   }
 
 }

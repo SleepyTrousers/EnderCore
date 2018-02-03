@@ -56,6 +56,7 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     if (teClass != null) {
       try {
         T te = teClass.newInstance();
+        te.setWorldCreate(world);
         te.init();
         return te;
       } catch (Exception e) {

@@ -1,5 +1,8 @@
 package com.enderio.core.common.util;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.enderio.core.EnderCore;
 
 import net.minecraft.item.EnumDyeColor;
@@ -46,8 +49,8 @@ public enum DyeColor {
     return DyeColor.values()[ord];
   }
 
-  public static DyeColor getColorFromDye(ItemStack dye) {
-    if (dye == null) {
+  public static @Nullable DyeColor getColorFromDye(@Nonnull ItemStack dye) {
+    if (dye.isEmpty()) {
       return null;
     }
     int[] oreIDs = OreDictionary.getOreIDs(dye);

@@ -62,19 +62,15 @@ public class SpecialTooltipHandler {
     if (evt.getItemStack().getItem() instanceof IAdvancedTooltipProvider) {
       IAdvancedTooltipProvider ttp = (IAdvancedTooltipProvider) evt.getItemStack().getItem();
       addInformation(ttp, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
-      return;
     } else if (evt.getItemStack().getItem() instanceof IResourceTooltipProvider) {
       addInformation((IResourceTooltipProvider) evt.getItemStack().getItem(), evt);
-      return;
-    }
-
-    Block blk = Block.getBlockFromItem(evt.getItemStack().getItem());
-    if (blk instanceof IAdvancedTooltipProvider) {
-      addInformation((IAdvancedTooltipProvider) blk, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
-      return;
-    } else if (blk instanceof IResourceTooltipProvider) {
-      addInformation((IResourceTooltipProvider) blk, evt);
-      return;
+    } else {
+      Block blk = Block.getBlockFromItem(evt.getItemStack().getItem());
+      if (blk instanceof IAdvancedTooltipProvider) {
+        addInformation((IAdvancedTooltipProvider) blk, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), false);
+      } else if (blk instanceof IResourceTooltipProvider) {
+        addInformation((IResourceTooltipProvider) blk, evt);
+      }
     }
 
     for (ITooltipCallback callback : callbacks) {
@@ -92,29 +88,25 @@ public class SpecialTooltipHandler {
       tt.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
       tt.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
       tt.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
-      return list;
     } else if (stack.getItem() instanceof IResourceTooltipProvider) {
       String name = ((IResourceTooltipProvider) stack.getItem()).getUnlocalizedNameForTooltip(stack);
       addCommonTooltipFromResources(list, name);
       addBasicTooltipFromResources(list, name);
       addDetailedTooltipFromResources(list, name);
-      return list;
-    }
-
-    Block blk = Block.getBlockFromItem(stack.getItem());
-    if (blk instanceof IAdvancedTooltipProvider) {
-      IAdvancedTooltipProvider tt = (IAdvancedTooltipProvider) blk;
-      tt.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
-      tt.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
-      tt.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
-      return list;
-    } else if (blk instanceof IResourceTooltipProvider) {
-      IResourceTooltipProvider tt = (IResourceTooltipProvider) blk;
-      String name = tt.getUnlocalizedNameForTooltip(stack);
-      addCommonTooltipFromResources(list, name);
-      addBasicTooltipFromResources(list, name);
-      addDetailedTooltipFromResources(list, name);
-      return list;
+    } else {
+      Block blk = Block.getBlockFromItem(stack.getItem());
+      if (blk instanceof IAdvancedTooltipProvider) {
+        IAdvancedTooltipProvider tt = (IAdvancedTooltipProvider) blk;
+        tt.addCommonEntries(stack, Minecraft.getMinecraft().player, list, false);
+        tt.addBasicEntries(stack, Minecraft.getMinecraft().player, list, false);
+        tt.addDetailedEntries(stack, Minecraft.getMinecraft().player, list, false);
+      } else if (blk instanceof IResourceTooltipProvider) {
+        IResourceTooltipProvider tt = (IResourceTooltipProvider) blk;
+        String name = tt.getUnlocalizedNameForTooltip(stack);
+        addCommonTooltipFromResources(list, name);
+        addBasicTooltipFromResources(list, name);
+        addDetailedTooltipFromResources(list, name);
+      }
     }
 
     for (ITooltipCallback callback : callbacks) {

@@ -109,22 +109,22 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   }
 
   @Override
-  public int getGuiLeft() {
+  public int getGuiRootLeft() {
     return guiLeft;
   }
 
   @Override
-  public int getGuiTop() {
+  public int getGuiRootTop() {
     return guiTop;
   }
 
   @Override
-  public int getXSize() {
+  public int getGuiXSize() {
     return xSize;
   }
 
   @Override
-  public int getYSize() {
+  public int getGuiYSize() {
     return xSize;
   }
 
@@ -154,6 +154,12 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   @Override
   public int getOverlayOffsetX() {
     return 0;
+  }
+
+  @Override
+  @Nonnull
+  public final <T extends GuiButton> T addGuiButton(@Nonnull T button) {
+    return addButton(button);
   }
 
 }

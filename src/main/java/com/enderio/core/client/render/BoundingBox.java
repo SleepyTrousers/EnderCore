@@ -51,7 +51,11 @@ public final class BoundingBox extends AxisAlignedBB {
   }
 
   public boolean contains(@Nonnull BoundingBox other) {
-    return minX >= other.minX && minY <= other.minY && minZ <= other.minZ && maxX >= other.maxX && maxY <= other.maxY && maxZ <= other.maxZ;
+    return minX <= other.minX && minY <= other.minY && minZ <= other.minZ && maxX >= other.maxX && maxY >= other.maxY && maxZ >= other.maxZ;
+  }
+
+  public boolean contains(@Nonnull BlockPos pos) {
+    return minX <= pos.getX() && minY <= pos.getY() && minZ <= pos.getZ() && maxX >= pos.getX() && maxY >= pos.getY() && maxZ >= pos.getZ();
   }
 
   public boolean intersects(@Nonnull BoundingBox other) {

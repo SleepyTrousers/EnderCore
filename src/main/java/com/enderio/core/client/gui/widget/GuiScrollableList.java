@@ -72,9 +72,9 @@ public abstract class GuiScrollableList<T> {
   }
 
   public void onGuiInit(@Nonnull IGuiScreen gui) {
-    minY = originY + gui.getGuiTop();
+    minY = originY + gui.getGuiRootTop();
     maxY = minY + height;
-    minX = originX + gui.getGuiLeft();
+    minX = originX + gui.getGuiRootLeft();
     maxX = minX + width;
   }
 
@@ -87,7 +87,7 @@ public abstract class GuiScrollableList<T> {
   }
 
   public @Nullable T getSelectedElement() {
-    return selectedIndex < 0 ? null : getElementAt(selectedIndex);
+    return selectedIndex < 0 || selectedIndex >= getNumElements() ? null : getElementAt(selectedIndex);
   }
 
   public void setSelection(@Nonnull T selection) {

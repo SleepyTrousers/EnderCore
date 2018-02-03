@@ -1,10 +1,13 @@
 package com.enderio.core.api.client.gui;
 
+import java.awt.Rectangle;
+
 import javax.annotation.Nonnull;
 
 import com.enderio.core.api.client.render.IWidgetIcon;
 
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
 
 public interface ITabPanel {
 
@@ -24,5 +27,10 @@ public interface ITabPanel {
   void keyTyped(char par1, int par2);
 
   void updateScreen();
-
+  
+  /**
+   * @return The location of the texture used for slot backgrounds, etc.
+   */
+  @Nonnull
+  ResourceLocation getTexture();
 }

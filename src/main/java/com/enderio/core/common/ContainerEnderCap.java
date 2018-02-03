@@ -10,10 +10,13 @@ import com.enderio.core.client.gui.widget.GhostSlot;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -21,7 +24,7 @@ import net.minecraftforge.items.IItemHandler;
 
 public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEntity> extends Container implements GhostSlot.IGhostSlotAware {
 
-  protected final @Nonnull Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
+  protected final @Nonnull Map<Slot, Point> slotLocations = Maps.newLinkedHashMap();
 
   protected int startPlayerSlot;
   protected int endPlayerSlot;
@@ -63,25 +66,27 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     startPlayerSlot = inventorySlots.size();
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
-        Point loc = new Point(x + j * 18, y + i * 18);
-        Slot slot = new Slot(playerInv, j + i * 9 + 9, loc.x, loc.y);
+        Slot slot = new Slot(playerInv, j + i * 9 + 9, x + j * 18,  y + i * 18);
         addSlotToContainer(slot);
-        playerSlotLocations.put(slot, loc);
       }
     }
     endPlayerSlot = inventorySlots.size();
 
     startHotBarSlot = inventorySlots.size();
     for (int i = 0; i < 9; ++i) {
-      Point loc = new Point(x + i * 18, y + 58);
-      Slot slot = new Slot(playerInv, i, loc.x, loc.y);
+      Slot slot = new Slot(playerInv, i, x + i * 18, y + 58);
       addSlotToContainer(slot);
-      playerSlotLocations.put(slot, loc);
     }
     endHotBarSlot = inventorySlots.size();
 
     initRan = true;
     return (X) this;
+  }
+  
+  @Override
+  protected @Nonnull Slot addSlotToContainer(@Nonnull Slot slotIn) {
+    slotLocations.put(slotIn, new Point(slotIn.xPos, slotIn.yPos));
+    return super.addSlotToContainer(slotIn);
   }
 
   public @Nonnull Point getPlayerInventoryOffset() {
@@ -233,6 +238,20 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     }
 
     return result;
+  }
+
+  @Override
+  public void detectAndSendChanges() {
+    super.detectAndSendChanges();
+    // keep in sync with ContainerEnder#detectAndSendChanges()
+    final SPacketUpdateTileEntity updatePacket = te != null ? te.getUpdatePacket() : null;
+    if (updatePacket != null) {
+      for (IContainerListener containerListener : listeners) {
+        if (containerListener instanceof EntityPlayerMP) {
+          ((EntityPlayerMP) containerListener).connection.sendPacket(updatePacket);
+        }
+      }
+    }
   }
 
 }

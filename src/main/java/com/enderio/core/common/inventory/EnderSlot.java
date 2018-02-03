@@ -19,7 +19,7 @@ public class EnderSlot extends SlotItemHandler {
     this.type = type;
   }
 
-  protected EnderSlot(@Nonnull EnderInventory.Type type, @Nonnull EnderInventory enderInventory, @Nonnull String ident, int xPosition, int yPosition) {
+  public EnderSlot(@Nonnull EnderInventory.Type type, @Nonnull EnderInventory enderInventory, @Nonnull String ident, int xPosition, int yPosition) {
     super(enderInventory.getSlot(ident), 0, xPosition, yPosition);
     this.type = type;
   }

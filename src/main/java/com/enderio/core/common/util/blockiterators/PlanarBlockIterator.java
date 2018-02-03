@@ -33,10 +33,18 @@ public class PlanarBlockIterator extends CubicBlockIterator {
     super(base, radius);
 
     this.orientation = orientation;
+    switch (orientation) {
+    case EAST_WEST:
+      curZ = base.getZ();
+    case NORTH_SOUTH:
+      curX = base.getX();
+    case HORIZONTAL:
+      curY = base.getY();
+    }
   }
 
   @Override
-  public BlockPos next() {
+  public @Nonnull BlockPos next() {
     BlockPos coord = new BlockPos(curX, curY, curZ);
     switch (orientation) {
     case EAST_WEST:

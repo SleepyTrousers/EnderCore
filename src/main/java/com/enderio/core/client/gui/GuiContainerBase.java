@@ -518,4 +518,30 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     }
   }
 
+  @Override
+  public final int getGuiRootLeft() {
+    return getGuiLeft();
+  }
+
+  @Override
+  public final int getGuiRootTop() {
+    return getGuiTop();
+  }
+
+  @Override
+  public final int getGuiXSize() {
+    return getXSize();
+  }
+
+  @Override
+  public final int getGuiYSize() {
+    return getYSize();
+  }
+
+  @Override
+  @Nonnull
+  public final <T extends GuiButton> T addGuiButton(@Nonnull T button) {
+    return addButton(button);
+  }
+
 }

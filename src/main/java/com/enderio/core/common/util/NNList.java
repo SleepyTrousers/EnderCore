@@ -8,10 +8,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 
 public class NNList<E> extends NonNullList<E> {
 
@@ -20,6 +22,20 @@ public class NNList<E> extends NonNullList<E> {
   public static final @Nonnull NNList<EnumFacing> FACING_HORIZONTAL = new NNList<EnumFacing>(EnumFacing.HORIZONTALS);
 
   public static final @Nonnull NNList<BlockRenderLayer> RENDER_LAYER = NNList.of(BlockRenderLayer.class);
+
+  public static final @Nonnull NNList<BlockPos> SHELL = new NNList<>();
+  static {
+    for (int y = -1; y <= 1; y++) {
+      for (int z = -1; z <= 1; z++) {
+        for (int x = -1; x <= 1; x++) {
+          if (x != 0 || y != 0 || z != 0) {
+            SHELL.add(new BlockPos(x, y, z));
+          }
+        }
+      }
+    }
+    Collections.shuffle(SHELL);
+  }
 
   public NNList() {
     super();
@@ -52,7 +68,7 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   public static @Nonnull <X> NNList<X> wrap(List<X> list) {
-    return new NNList<X>(list, null);
+    return list instanceof NNList ? (NNList<X>) list : new NNList<X>(list, null);
   }
 
   public static @Nonnull <X extends Enum<?>> NNList<X> of(Class<X> e) {
@@ -102,13 +118,14 @@ public class NNList<E> extends NonNullList<E> {
     throw new InvalidParameterException();
   }
 
-  public void apply(@Nonnull Callback<E> callback) {
+  public NNList<E> apply(@Nonnull Callback<E> callback) {
     for (E e : this) {
       if (e == null) {
         throw new NullPointerException();
       }
       callback.apply(e);
     }
+    return this;
   }
 
   public static interface Callback<E> {
@@ -218,16 +235,33 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   @SafeVarargs
-  public final void addAll(E... el) {
+  public final NNList<E> addAll(E... el) {
     for (E e : el) {
       add(e);
     }
+    return this;
+  }
+
+  public NNList<E> addIf(@Nullable E e) {
+    if (e != null) {
+      add(e);
+    }
+    return this;
   }
 
   @SuppressWarnings("null")
   @Override
   public @Nonnull <T> T[] toArray(T[] a) {
     return super.toArray(a);
+  }
+
+  public NNList<E> removeAllByClass(Class<? extends E> clazz) {
+    for (NNIterator<E> iterator = iterator(); iterator.hasNext();) {
+      if (clazz.isAssignableFrom(iterator.next().getClass())) {
+        iterator.remove();
+      }
+    }
+    return this;
   }
 
 }

@@ -1,12 +1,22 @@
 package com.enderio.core.common.network;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.util.Log;
 import com.google.common.base.Throwables;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
+import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -18,7 +28,30 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class ThreadedNetworkWrapper {
 
-  private final SimpleNetworkWrapper parent;
+  private static final @Nonnull Map<Class<? extends IMessage>, SimpleNetworkWrapper> typesClient = new IdentityHashMap<>();
+  private static final @Nonnull Map<Class<? extends IMessage>, SimpleNetworkWrapper> typesServer = new IdentityHashMap<>();
+
+  static synchronized void registerChannelMapping(Class<? extends IMessage> requestMessageType, @Nonnull SimpleNetworkWrapper parent, Side side) {
+    (side == Side.CLIENT ? typesClient : typesServer).put(requestMessageType, parent);
+  }
+
+  private static synchronized SimpleNetworkWrapper getServerParent(IMessage message) {
+    final SimpleNetworkWrapper parent = typesClient.get(message.getClass());
+    if (parent == null) {
+      throw new RuntimeException("Trying to send unregistered network packet: " + message.getClass());
+    }
+    return parent;
+  }
+
+  private static synchronized SimpleNetworkWrapper getClientParent(IMessage message) {
+    final SimpleNetworkWrapper parent = typesServer.get(message.getClass());
+    if (parent == null) {
+      throw new RuntimeException("Trying to send unregistered network packet: " + message.getClass());
+    }
+    return parent;
+  }
+
+  private final @Nonnull SimpleNetworkWrapper parent;
 
   public ThreadedNetworkWrapper(String channelName) {
     parent = new SimpleNetworkWrapper(channelName);
@@ -97,8 +130,13 @@ public class ThreadedNetworkWrapper {
 
   public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(Class<? extends IMessageHandler<REQ, REPLY>> messageHandler,
       Class<REQ> requestMessageType, int discriminator, Side side) {
+    if (messageHandler == requestMessageType) {
+      // we had to many mess-ups with combined handlers using its own fields instead those of the message, so:
+      throw new RuntimeException("Network packet " + requestMessageType + " needs a dedicated handler");
+    }
     if (side == Side.CLIENT && FMLLaunchHandler.side() != Side.CLIENT) {
       parent.registerMessage(new NullHandler<REQ, REPLY>(), requestMessageType, discriminator, side);
+      registerChannelMapping(requestMessageType, parent, side);
       return;
     }
     registerMessage(instantiate(messageHandler), requestMessageType, discriminator, side);
@@ -118,29 +156,58 @@ public class ThreadedNetworkWrapper {
   public <REQ extends IMessage, REPLY extends IMessage> void registerMessage(IMessageHandler<? super REQ, ? extends REPLY> messageHandler,
       Class<REQ> requestMessageType, int discriminator, Side side) {
     parent.registerMessage((Wrapper<REQ, REPLY>) new Wrapper(messageHandler), requestMessageType, discriminator, side);
-  }
-
-  public Packet<?> getPacketFrom(IMessage message) {
-    return parent.getPacketFrom(message);
+    registerChannelMapping(requestMessageType, parent, side);
   }
 
   public void sendToAll(IMessage message) {
-    parent.sendToAll(message);
+    getServerParent(message).sendToAll(message);
   }
 
   public void sendTo(IMessage message, EntityPlayerMP player) {
-    parent.sendTo(message, player);
+    getServerParent(message).sendTo(message, player);
   }
 
   public void sendToAllAround(IMessage message, NetworkRegistry.TargetPoint point) {
-    parent.sendToAllAround(message, point);
+    getServerParent(message).sendToAllAround(message, point);
   }
 
   public void sendToDimension(IMessage message, int dimensionId) {
-    parent.sendToDimension(message, dimensionId);
+    getServerParent(message).sendToDimension(message, dimensionId);
   }
 
   public void sendToServer(IMessage message) {
-    parent.sendToServer(message);
+    getClientParent(message).sendToServer(message);
   }
+
+  public Packet<?> getPacketFrom(IMessage message) {
+    return getServerParent(message).getPacketFrom(message);
+  }
+
+  // see https://github.com/MinecraftForge/MinecraftForge/issues/3677
+  public void sendToAllAround(IMessage packet, BlockPos pos, World world) {
+    if (!(world instanceof WorldServer)) {
+      return;
+    }
+
+    WorldServer worldServer = (WorldServer) world;
+    PlayerChunkMap playerManager = worldServer.getPlayerChunkMap();
+
+    int chunkX = pos.getX() >> 4;
+    int chunkZ = pos.getZ() >> 4;
+
+    for (Object playerObj : world.playerEntities) {
+      if (playerObj instanceof EntityPlayerMP) {
+        EntityPlayerMP player = (EntityPlayerMP) playerObj;
+
+        if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)) {
+          sendTo(packet, player);
+        }
+      }
+    }
+  }
+
+  public void sendToAllAround(IMessage message, TileEntity te) {
+    sendToAllAround(message, te.getPos(), te.getWorld());
+  }
+
 }

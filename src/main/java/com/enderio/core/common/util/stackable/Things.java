@@ -16,6 +16,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.RecipeItemHelper;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
@@ -211,27 +213,33 @@ public class Things extends Ingredient {
   }
 
   public boolean contains(@Nullable Item item) {
-    for (IThing thing : things) {
-      if (thing.is(item)) {
-        return true;
+    if (item != Items.AIR) {
+      for (IThing thing : things) {
+        if (thing.is(item)) {
+          return true;
+        }
       }
     }
     return false;
   }
 
   public boolean contains(@Nullable ItemStack itemStack) { // sic!
-    for (IThing thing : things) {
-      if (thing.is(itemStack)) {
-        return true;
+    if (itemStack != null && !itemStack.isEmpty()) {
+      for (IThing thing : things) {
+        if (thing.is(itemStack)) {
+          return true;
+        }
       }
     }
     return false;
   }
 
   public boolean contains(@Nullable Block block) {
-    for (IThing thing : things) {
-      if (thing.is(block)) {
-        return true;
+    if (block != Blocks.AIR) {
+      for (IThing thing : things) {
+        if (thing.is(block)) {
+          return true;
+        }
       }
     }
     return false;
@@ -255,7 +263,7 @@ public class Things extends Ingredient {
   private final @Nonnull NNList<ItemStack> itemStackListRaw = new NNList<ItemStack>();
 
   /**
-   * Returns a list of item stacks for this Thing. This does NOT expand items that are defined using the wildcard value for the item damage.
+   * Returns a list of item stacks for this Thing. Items in this list may have the wildcard meta. List may contain empty stacks.
    */
   public NNList<ItemStack> getItemStacksRaw() {
     if (itemStackListRaw.isEmpty()) {
@@ -269,7 +277,9 @@ public class Things extends Ingredient {
   private final @Nonnull NNList<ItemStack> itemStackList = new NNList<ItemStack>();
 
   /**
-   * Returns a list of item stacks for this Thing. This expands items that are defined using the wildcard value for the item damage.
+   * Returns a list of item stacks for this Thing. Wildcard values are expanded to a full list of all available sub-items. Empty stacks are stripped.
+   * 
+   * Please note that items that are defined using the wildcard value for the item damage may not return the complete list on dedicated servers
    */
   public @Nonnull NNList<ItemStack> getItemStacks() {
     if (itemStackList.isEmpty()) {

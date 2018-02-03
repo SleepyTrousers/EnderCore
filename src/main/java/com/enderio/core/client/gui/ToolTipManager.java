@@ -16,11 +16,11 @@ public class ToolTipManager {
 
   public static interface ToolTipRenderer {
 
-    int getGuiLeft();
+    int getGuiRootLeft();
 
-    int getGuiTop();
+    int getGuiRootTop();
 
-    int getXSize();
+    int getGuiXSize();
 
     @Nonnull
     FontRenderer getFontRenderer();
@@ -44,7 +44,7 @@ public class ToolTipManager {
 
   protected final void drawTooltips(@Nonnull ToolTipRenderer renderer, int mouseX, int mouseY) {
     for (GuiToolTip toolTip : toolTips) {
-      toolTip.onTick(mouseX - renderer.getGuiLeft(), mouseY - renderer.getGuiTop());
+      toolTip.onTick(mouseX - renderer.getGuiRootLeft(), mouseY - renderer.getGuiRootTop());
       if (toolTip.shouldDraw()) {
         drawTooltip(toolTip, mouseX, mouseY, renderer);
       }
@@ -67,7 +67,7 @@ public class ToolTipManager {
     }
 
     int mX = mouseX;
-    if (mX > renderer.getGuiLeft() + renderer.getXSize() / 2) {
+    if (mX > renderer.getGuiRootLeft() + renderer.getGuiXSize() / 2) {
       int maxWidth = 0;
       NNIterator<String> iterator = formatted.iterator();
       while (iterator.hasNext()) {

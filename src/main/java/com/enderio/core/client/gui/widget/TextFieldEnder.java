@@ -71,8 +71,8 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
   }
 
   public void init(@Nonnull IGuiScreen gui) {
-    this.x = xOrigin + gui.getGuiLeft();
-    this.y = yOrigin + gui.getGuiTop();
+    this.x = xOrigin + gui.getGuiRootLeft();
+    this.y = yOrigin + gui.getGuiRootTop();
   }
 
   public TextFieldEnder setCharFilter(@Nullable ICharFilter filter) {
