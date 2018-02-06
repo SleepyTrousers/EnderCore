@@ -34,10 +34,14 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   protected final @Nullable Class<? extends T> teClass;
 
   protected BlockEnder(@Nullable Class<? extends T> teClass) {
-    this(teClass, new Material(MapColor.IRON));
+    this(teClass, new Material(MapColor.IRON), MapColor.IRON);
   }
 
   protected BlockEnder(@Nullable Class<? extends T> teClass, @Nonnull Material mat) {
+    this(teClass, mat, mat.getMaterialMapColor());
+  }
+
+  protected BlockEnder(@Nullable Class<? extends T> teClass, @Nonnull Material mat, MapColor mapColor) {
     super(mat);
     this.teClass = teClass;
 

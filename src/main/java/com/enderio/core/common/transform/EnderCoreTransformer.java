@@ -313,7 +313,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
       classNode.methods.add(n);
 
-      ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+      ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
       classNode.accept(cw);
       logger
           .info("Transforming " + entityPlayerClass + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
@@ -377,7 +377,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     transformer.transform(methods);
 
-    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS /* | ClassWriter.COMPUTE_FRAMES */);
+    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
     classNode.accept(cw);
     logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
