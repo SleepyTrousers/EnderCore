@@ -7,10 +7,12 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -22,17 +24,20 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import net.minecraftforge.fml.relauncher.Side;
 
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
+import static org.objectweb.asm.Opcodes.ICONST_0;
+import static org.objectweb.asm.Opcodes.ICONST_1;
 import static org.objectweb.asm.Opcodes.IFEQ;
+import static org.objectweb.asm.Opcodes.IFNE;
 import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.IRETURN;
 
-@MCVersion(value = "1.11")
 public class EnderCoreTransformer implements IClassTransformer {
 
   // The EnderCore class cannot be referenced from the transformer,
@@ -238,7 +243,7 @@ public class EnderCoreTransformer implements IClassTransformer {
               toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "renderItemOverlayIntoGUI",
                   "(Lnet/minecraft/item/ItemStack;II)V", false));
 
-              boolean primed = false, applied = false;
+              boolean primed = false, onframe = false, applied = false;
               Label target = null;
               for (int i = 0; i < m.instructions.size(); i++) {
                 AbstractInsnNode next = m.instructions.get(i);
@@ -258,6 +263,10 @@ public class EnderCoreTransformer implements IClassTransformer {
 
                 // (3) insert our callback there
                 if (target != null && next instanceof LabelNode && ((LabelNode) next).getLabel() == target) {
+                  onframe = true;
+                  continue;
+                }
+                if (onframe && next instanceof FrameNode) {
                   m.instructions.insert(next, toAdd);
                   done++;
                   applied = true;
@@ -282,39 +291,39 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     // Elytra flying
     if (transformedName.equals(entityPlayerClass)) {
-      ClassNode classNode = new ClassNode();
+
+      boolean deObf = !EnderCorePlugin.runtimeDeobfEnabled;
+
       ClassReader classReader = new ClassReader(basicClass);
-      classReader.accept(classNode, 0);
+      ClassWriter cw = new ClassWriter(classReader, 0);
 
-      boolean deObf = false;
-      for (MethodNode method : classNode.methods) {
-        if ("onUpdate".equals(method.name)) {
-          deObf = true;
-        }
-      }
+      MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, deObf ? "isElytraFlying" : "func_184613_cA", "()Z", null, null);
+      mv.visitCode();
+      Label l0 = new Label();
+      mv.visitLabel(l0);
+      mv.visitLineNumber(42000, l0);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/entity/EntityLivingBase", deObf ? "isElytraFlying" : "func_184613_cA", "()Z", false);
+      Label l1 = new Label();
+      mv.visitJumpInsn(IFNE, l1);
+      mv.visitVarInsn(ALOAD, 0);
+      mv.visitMethodInsn(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "isElytraFlying", "(Lnet/minecraft/entity/EntityLivingBase;)Z",
+          false);
+      mv.visitJumpInsn(IFNE, l1);
+      mv.visitInsn(ICONST_0);
+      mv.visitInsn(IRETURN);
+      mv.visitLabel(l1);
+      mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+      mv.visitInsn(ICONST_1);
+      mv.visitInsn(IRETURN);
+      Label l2 = new Label();
+      mv.visitLabel(l2);
+      mv.visitLocalVariable("this", "Lnet/minecraft/entity/player/EntityPlayer;", null, l0, l2, 0);
+      mv.visitMaxs(1, 1);
+      mv.visitEnd();
 
-      MethodNode n = new MethodNode(Opcodes.ASM4, Opcodes.ACC_PUBLIC, deObf ? "isElytraFlying" : "func_184613_cA", "()Z", null, null);
+      classReader.accept(cw, 0);
 
-      n.instructions = new InsnList();
-      n.instructions.add(new VarInsnNode(ALOAD, 0));
-      n.instructions
-          .add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "net/minecraft/entity/EntityLivingBase", deObf ? "isElytraFlying" : "func_184613_cA", "()Z", false));
-      LabelNode l1 = new LabelNode(new Label());
-      n.instructions.add(new JumpInsnNode(Opcodes.IFNE, l1));
-      n.instructions.add(new VarInsnNode(ALOAD, 0));
-      n.instructions.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "isElytraFlying",
-          "(Lnet/minecraft/entity/EntityLivingBase;)Z", false));
-      n.instructions.add(new JumpInsnNode(Opcodes.IFNE, l1));
-      n.instructions.add(new InsnNode(Opcodes.ICONST_0));
-      n.instructions.add(new InsnNode(Opcodes.IRETURN));
-      n.instructions.add(l1);
-      n.instructions.add(new InsnNode(Opcodes.ICONST_1));
-      n.instructions.add(new InsnNode(Opcodes.IRETURN));
-
-      classNode.methods.add(n);
-
-      ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-      classNode.accept(cw);
       logger
           .info("Transforming " + entityPlayerClass + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
       return cw.toByteArray();
@@ -350,6 +359,7 @@ public class EnderCoreTransformer implements IClassTransformer {
                   new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/monster/EntityCreeper", deObf ? "setCreeperState" : "func_70829_a", "(I)V", false));
               list.add(new InsnNode(Opcodes.RETURN));
               list.add(ldone);
+              list.add(new FrameNode(Opcodes.F_FULL, 1, new Object[] { "net/minecraft/entity/ai/EntityAICreeperSwell" }, 0, new Object[] {}));
 
               m.instructions.insert(list);
 
@@ -377,7 +387,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     transformer.transform(methods);
 
-    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+    ClassWriter cw = new ClassWriter(0);
     classNode.accept(cw);
     logger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
