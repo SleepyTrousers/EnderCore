@@ -9,27 +9,28 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
-class OreThing implements IThing {
+class OreThing implements IThing.Zwieback {
 
   private final @Nonnull String name;
-  private @Nonnull NNList<ItemStack> ores = new NNList<ItemStack>();
+  private @Nonnull NonNullList<ItemStack> ores = new NNList<ItemStack>();
 
   OreThing(@Nonnull String name) {
     this.name = name;
   }
 
+  @SuppressWarnings("null")
   @Override
   public @Nullable IThing bake() {
-    if (OreDictionary.doesOreNameExist(name)) {
-      ores.clear();
-      ores.addAll(OreDictionary.getOres(name));
-      if (!ores.isEmpty()) {
-        return this;
-      }
-    }
-    return null;
+    ores = OreDictionary.getOres(name);
+    return this;
+  }
+
+  @Override
+  public @Nullable IThing rebake() {
+    return ores.isEmpty() ? null : this;
   }
 
   @Override
@@ -76,7 +77,7 @@ class OreThing implements IThing {
 
   @Override
   public @Nonnull NNList<ItemStack> getItemStacks() {
-    return ores;
+    return NNList.wrap(ores);
   }
 
   @Override
@@ -91,6 +92,10 @@ class OreThing implements IThing {
       }
     }
     return result;
+  }
+
+  public @Nonnull String getName() {
+    return name;
   }
 
 }

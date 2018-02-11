@@ -1,6 +1,7 @@
 package com.enderio.core.common.util.stackable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.enderio.core.common.util.NNList;
 import com.enderio.core.common.util.NNList.NNIterator;
+import com.enderio.core.common.util.stackable.IThing.Zwieback;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -21,9 +23,14 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.crafting.CompoundIngredient;
+import net.minecraftforge.common.crafting.IngredientNBT;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.OreIngredient;
 
 /**
  * This class is a way to hold lists of configurable items and blocks.
@@ -52,12 +59,13 @@ public class Things extends Ingredient {
     for (String string : names) {
       add(string);
     }
-    if (inPreInit) {
+    if (beforeLoadComplete) {
       values.add(this);
     }
   }
 
   private static boolean inPreInit = true;
+  private static boolean beforeLoadComplete = true;
 
   public static void init(@Nullable FMLInitializationEvent event) {
     inPreInit = false;
@@ -67,7 +75,25 @@ public class Things extends Ingredient {
     values.clear();
   }
 
+  public static void init(@Nullable FMLLoadCompleteEvent event) {
+    beforeLoadComplete = false;
+    for (Things element : values) {
+      element.doublebake();
+    }
+    values.clear();
+  }
+
   private final @Nonnull List<IThing> things = new ArrayList<IThing>();
+  private NBTTagCompound nbt = null;
+  private int size = 1;
+
+  public void setNbt(NBTTagCompound nbt) {
+    this.nbt = nbt;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
+  }
 
   public @Nonnull Things add(@Nullable Item item) {
     if (item != null) {
@@ -191,12 +217,16 @@ public class Things extends Ingredient {
     }
     if (baked != null) {
       things.add(baked);
-      itemList.clear();
-      itemStackListRaw.clear();
-      itemStackList.clear();
-      blockList.clear();
-      itemIds.clear();
+      cleanCachedValues();
     }
+  }
+
+  private void cleanCachedValues() {
+    itemList.clear();
+    itemStackListRaw.clear();
+    itemStackList.clear();
+    blockList.clear();
+    itemIds.clear();
   }
 
   private void bake() {
@@ -208,6 +238,23 @@ public class Things extends Ingredient {
       } else {
         things.remove(i);
         i--;
+      }
+    }
+    cleanCachedValues();
+  }
+
+  private void doublebake() {
+    for (int i = 0; i < things.size(); i++) {
+      IThing thing = things.get(i);
+      if (thing instanceof Zwieback) {
+        IThing bakedThing = ((Zwieback) thing).rebake();
+        if (bakedThing != null) {
+          things.set(i, bakedThing);
+        } else {
+          things.remove(i);
+          i--;
+        }
+        cleanCachedValues();
       }
     }
   }
@@ -226,7 +273,7 @@ public class Things extends Ingredient {
   public boolean contains(@Nullable ItemStack itemStack) { // sic!
     if (itemStack != null && !itemStack.isEmpty()) {
       for (IThing thing : things) {
-        if (thing.is(itemStack)) {
+        if (thing.is(itemStack) && (nbt == null || nbt.equals(itemStack.getTagCompound()))) {
           return true;
         }
       }
@@ -249,6 +296,24 @@ public class Things extends Ingredient {
     return things.isEmpty();
   }
 
+  public boolean isValid() {
+    return !getItemStacksRaw().isEmpty();
+  }
+
+  public boolean isPotentiallyValid() {
+    if (isValid()) {
+      return true;
+    }
+    if (beforeLoadComplete) {
+      for (IThing thing : things) {
+        if (thing instanceof Zwieback) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private final @Nonnull NNList<Item> itemList = new NNList<Item>();
 
   public NNList<Item> getItems() {
@@ -266,12 +331,29 @@ public class Things extends Ingredient {
    * Returns a list of item stacks for this Thing. Items in this list may have the wildcard meta. List may contain empty stacks.
    */
   public NNList<ItemStack> getItemStacksRaw() {
-    if (itemStackListRaw.isEmpty()) {
+    if (itemStackListRaw.isEmpty() || beforeLoadComplete) {
+      itemStackListRaw.clear();
       for (IThing thing : things) {
         itemStackListRaw.addAll(thing.getItemStacks());
       }
+      applyNBT(itemStackListRaw);
     }
     return itemStackListRaw;
+  }
+
+  private void applyNBT(NNList<ItemStack> list) {
+    if (nbt != null || size > 1) {
+      for (int i = 0; i < list.size(); i++) {
+        ItemStack stack = list.get(i).copy();
+        if (nbt != null) {
+          stack.setTagCompound(nbt.copy());
+        }
+        if (size > 1) {
+          stack.setCount(size);
+        }
+        list.set(i, stack);
+      }
+    }
   }
 
   private final @Nonnull NNList<ItemStack> itemStackList = new NNList<ItemStack>();
@@ -282,7 +364,8 @@ public class Things extends Ingredient {
    * Please note that items that are defined using the wildcard value for the item damage may not return the complete list on dedicated servers
    */
   public @Nonnull NNList<ItemStack> getItemStacks() {
-    if (itemStackList.isEmpty()) {
+    if (itemStackList.isEmpty() || beforeLoadComplete) {
+      itemStackList.clear();
       for (ItemStack stack : getItemStacksRaw()) {
         if (stack.isEmpty()) {
           // NOP
@@ -292,8 +375,14 @@ public class Things extends Ingredient {
           itemStackList.add(stack);
         }
       }
+      applyNBT(itemStackList);
     }
     return itemStackList;
+  }
+
+  public @Nonnull ItemStack getItemStack() {
+    NNList<ItemStack> itemStacks = getItemStacks();
+    return itemStacks.isEmpty() ? ItemStack.EMPTY : itemStacks.get(0);
   }
 
   private final @Nonnull NNList<Block> blockList = new NNList<Block>();
@@ -348,6 +437,103 @@ public class Things extends Ingredient {
   @Override
   public boolean isSimple() {
     return false;
+  }
+
+  @SuppressWarnings("null")
+  public @Nonnull Ingredient asIngredient() {
+    NNList<Ingredient> ings = new NNList<>();
+    for (IThing thing : things) {
+      if (thing instanceof OreThing) {
+        if (nbt != null) {
+          ings.add(new OreIngredientNBT(((OreThing) thing).getName(), nbt));
+        } else {
+          ings.add(new OreIngredient(((OreThing) thing).getName()) {
+            @Override
+            public String toString() {
+              return "OreIngredient " + Arrays.toString(getMatchingStacks());
+            }
+          });
+        }
+      } else {
+        NNList<ItemStack> sublist = new NNList<>();
+        for (ItemStack stack : thing.getItemStacks()) {
+          if (stack.isEmpty()) {
+            // NOP
+          } else if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
+            stack.getItem().getSubItems(CreativeTabs.SEARCH, sublist);
+          } else {
+            sublist.add(stack);
+          }
+        }
+        applyNBT(sublist);
+        for (ItemStack itemStack : sublist) {
+          if (nbt != null) {
+            ings.add(new IngredientNBT(itemStack) {
+              @Override
+              public String toString() {
+                return "IngredientNBT " + Arrays.toString(getMatchingStacks());
+              }
+            });
+          } else {
+            ings.add(new Ingredient(itemStack) {
+              @Override
+              public String toString() {
+                return "Ingredient " + Arrays.toString(getMatchingStacks());
+              }
+            });
+          }
+        }
+      }
+    }
+
+    if (ings.isEmpty()) {
+      return this;
+    } else if (ings.size() == 1) {
+      return ings.get(0);
+    } else {
+      return new CompoundIngredient(ings) {
+        @Override
+        public String toString() {
+          return "CompoundIngredient " + Arrays.toString(getMatchingStacks());
+        }
+      };
+    }
+  }
+
+  private static class OreIngredientNBT extends OreIngredient {
+
+    private final @Nonnull NBTTagCompound nbt;
+
+    public OreIngredientNBT(@Nonnull String ore, @Nonnull NBTTagCompound nbt) {
+      super(ore);
+      this.nbt = nbt;
+    }
+
+    @Override
+    public boolean apply(@Nullable ItemStack input) {
+      return super.apply(input) && input != null && nbt.equals(input.getTagCompound());
+    }
+
+    @Override
+    @Nonnull
+    public ItemStack[] getMatchingStacks() {
+      final ItemStack[] matchingStacks = super.getMatchingStacks();
+      for (ItemStack itemStack : matchingStacks) {
+        itemStack.setTagCompound(nbt.copy());
+      }
+      return matchingStacks;
+    }
+
+    @Override
+    public boolean isSimple() {
+      return false;
+    }
+
+    @Override
+    public String toString() {
+      return "OreIngredientNBT(" + nbt + ") " + Arrays.toString(getMatchingStacks());
+    }
+
   }
 
 }

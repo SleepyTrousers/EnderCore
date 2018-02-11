@@ -13,7 +13,7 @@ interface IThing {
 
   @Nullable
   IThing bake();
-  
+
   boolean is(@Nullable Item item);
 
   boolean is(@Nullable ItemStack itemStack);
@@ -28,5 +28,12 @@ interface IThing {
 
   @Nonnull
   NNList<Block> getBlocks();
+
+  public static interface Zwieback extends IThing {
+
+    @Nullable
+    IThing rebake();
+
+  }
 
 }

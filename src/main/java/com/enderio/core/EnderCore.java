@@ -45,6 +45,7 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -148,6 +149,11 @@ public class EnderCore implements IEnderMod {
 
     CompatRegistry.INSTANCE.handle(event);
     ConfigHandler.instance().loadRightClickCrops();
+  }
+
+  @EventHandler
+  public void loadComplete(@Nonnull FMLLoadCompleteEvent event) {
+    Things.init(event);
   }
 
   @EventHandler
