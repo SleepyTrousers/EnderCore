@@ -197,7 +197,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
           slot.putStack(in);
           slot.onSlotChanged();
           par1ItemStack.shrink(in.getCount());
-          result = true;
+          result = in.getCount() > 0; // Sanity check for slots which have a 0-size limit, if this stack count is zero then no items were inserted and we should return false.
           break;
         }
 
