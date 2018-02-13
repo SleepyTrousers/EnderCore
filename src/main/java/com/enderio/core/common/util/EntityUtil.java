@@ -12,7 +12,6 @@ import com.enderio.core.common.vecmath.Vector3d;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -105,11 +104,7 @@ public class EntityUtil {
   public static @Nonnull NNList<ResourceLocation> getAllRegisteredMobNames() {
     NNList<ResourceLocation> result = new NNList<ResourceLocation>();
     for (ResourceLocation entityName : EntityList.getEntityNameList()) {
-      final Class<? extends Entity> clazz = EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()"));
-      if (NullHelper.untrust(clazz) == null) {
-        Log.warn(
-            "net.minecraft.entity.EntityList.getClass(ResourceLocation) is marked @Nonnull but it returned null for the registered entity " + entityName + ".");
-      } else if (EntityLiving.class.isAssignableFrom(clazz)) {
+      if (EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()")) != null) {
         result.add(entityName);
       }
     }
