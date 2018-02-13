@@ -352,7 +352,9 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     int mx = realMx = par1;
     int my = realMy = par2;
 
+    this.drawDefaultBackground();
     super.drawScreen(mx, my, par3);
+    this.renderHoveredToolTip(mx, my);
 
     if (draggingScrollbar == null) {
       ghostSlotHandler.drawGhostSlotToolTip(this, par1, par2);
