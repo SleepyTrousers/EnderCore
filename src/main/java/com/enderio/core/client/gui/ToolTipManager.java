@@ -66,20 +66,7 @@ public class ToolTipManager {
       }
     }
 
-    int mX = mouseX;
-    if (mX > renderer.getGuiRootLeft() + renderer.getGuiXSize() / 2) {
-      int maxWidth = 0;
-      NNIterator<String> iterator = formatted.iterator();
-      while (iterator.hasNext()) {
-        String s = iterator.next();
-        int w = renderer.getFontRenderer().getStringWidth(s);
-        if (w > maxWidth) {
-          maxWidth = w;
-        }
-      }
-      mX -= maxWidth + 18;
-    }
-    renderer.drawHoveringToolTipText(formatted, mX, mouseY, renderer.getFontRenderer());
+    renderer.drawHoveringToolTipText(formatted, mouseX, mouseY, renderer.getFontRenderer());
   }
 
 }
