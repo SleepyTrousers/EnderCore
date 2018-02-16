@@ -87,7 +87,7 @@ public class WorldCache<I> {
         generateIDs();
         return;
       }
-      if (tag.hasKey("ItemData")) {
+      if (tag != null && tag.hasKey("ItemData")) {
         // name <-> id mappings
         NBTTagList list = tag.getTagList("ItemData", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < list.tagCount(); i++) {

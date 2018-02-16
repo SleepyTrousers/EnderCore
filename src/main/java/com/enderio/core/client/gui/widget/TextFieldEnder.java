@@ -102,8 +102,8 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
     }
   }
 
-  public boolean contains(int x, int y) {
-    return x >= this.x && x < this.x + width && y >= this.y && y < this.y + height;
+  public boolean contains(int mouseX, int mouseY) {
+    return mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height;
   }
 
   @Override

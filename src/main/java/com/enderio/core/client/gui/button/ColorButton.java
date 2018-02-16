@@ -38,8 +38,8 @@ public class ColorButton extends IconButton {
   }
 
   @Override
-  public boolean mousePressedButton(@Nonnull Minecraft mc, int x, int y, int button) {
-    boolean result = button == 1 && super.checkMousePress(mc, x, y);
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
+    boolean result = button == 1 && super.checkMousePress(mc, mouseX, mouseY);
     if (result) {
       prevColor();
     }
@@ -95,18 +95,18 @@ public class ColorButton extends IconButton {
       BufferBuilder tes = Tessellator.getInstance().getBuffer();
       tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-      int x = this.x + 2;
-      int y = this.y + 2;
+      int xAdj = this.x + 2;
+      int yAdj = this.y + 2;
 
       GlStateManager.disableTexture2D();
       int col = ItemDye.DYE_COLORS[colorIndex];
       Vector3f c = ColorUtil.toFloat(col);
       GlStateManager.color(c.x, c.y, c.z);
 
-      tes.pos(x, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
-      tes.pos(x + width - 4, y + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
-      tes.pos(x + width - 4, y + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
-      tes.pos(x, y + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(xAdj, yAdj + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(xAdj + width - 4, yAdj + height - 4, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(xAdj + width - 4, yAdj + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
+      tes.pos(xAdj, yAdj + 0, zLevel).color(c.x, c.y, c.z, 1).endVertex();
 
       Tessellator.getInstance().draw();
       GlStateManager.enableTexture2D();

@@ -51,21 +51,21 @@ public class IconButton extends TooltipButton {
    *
    * @param mc
    *          The MC instance
-   * @param x
+   * @param mouseX
    *          X coordinate of mouse click
-   * @param y
+   * @param mouseY
    *          Y coordinate of mouse click
    * @param button
    *          the mouse button - only called for button {@literal >}= 1
    * @return true if the mouse click is handled
    */
-  public boolean mousePressedButton(@Nonnull Minecraft mc, int x, int y, int button) {
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
     return false;
   }
 
-  protected boolean checkMousePress(@Nonnull Minecraft mc, int x, int y) {
+  protected boolean checkMousePress(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     // call super here so that we only get the area check
-    return super.mousePressed(mc, x, y);
+    return super.mousePressed(mc, mouseX, mouseY);
   }
 
   /**

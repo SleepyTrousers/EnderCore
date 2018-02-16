@@ -116,7 +116,7 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
     if (event.getModID().equals(modid)) {
       EnderCore.logger.info("Reloading all configs for modid: " + modid);
-      if (Minecraft.getMinecraft().world == null) {
+      if (NullHelper.untrust(Minecraft.getMinecraft().world) == null) {
         reloadNonIngameConfigs();
       }
       reloadIngameConfigs();

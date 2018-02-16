@@ -1,5 +1,7 @@
 package com.enderio.core.common.tweaks;
 
+import javax.annotation.Nonnull;
+
 import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.block.Block;
@@ -24,10 +26,10 @@ public class SlabRecipes extends Tweak {
   public void load() {
     registerSlabToBlock();
   }
-  
-  private static void addSlabRecipe(ItemStack stack, String slab) {
+
+  private static void addSlabRecipe(@Nonnull ItemStack stack, @Nonnull String slab) {
     ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, stack, slab, slab)
-        .setRegistryName(slab + "_to_" + stack.getItem().getRegistryName().getResourcePath()));
+        .setRegistryName(slab + "_to_" + NullHelper.notnullM(stack.getItem().getRegistryName(), "found unregistered item").getResourcePath()));
   }
 
   private static void registerSlabToBlock() {
