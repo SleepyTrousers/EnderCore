@@ -39,7 +39,7 @@ public class RightClickCropHandler {
     @Nonnull
     IBlockState getResetState();
 
-    void init(@Nonnull String source);
+    boolean init(@Nonnull String source);
   }
 
   public static class LegacyPlantInfo implements IPlantInfo {
@@ -47,6 +47,7 @@ public class RightClickCropHandler {
     public String block;
     public int meta = 7;
     public int resetMeta = 0;
+    public boolean optional;
 
     private transient @Nonnull ItemStack seedStack = ItemStack.EMPTY;
     private transient @Nonnull IBlockState grownState = Blocks.AIR.getDefaultState();
@@ -61,7 +62,7 @@ public class RightClickCropHandler {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void init(@Nonnull String source) {
+    public boolean init(@Nonnull String source) {
       seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier " + source));
       String[] blockinfo = block.split(":");
       if (blockinfo.length != 2) {
@@ -70,7 +71,11 @@ public class RightClickCropHandler {
       Block mcblock = ForgeRegistries.BLOCKS
           .getValue(new ResourceLocation(NullHelper.notnullJ(blockinfo[0], "String.split()"), NullHelper.notnullJ(blockinfo[1], "String.split()")));
       if (mcblock == null) {
-        throw new RuntimeException("invalid block specifier '" + block + "' " + source);
+        if (optional) {
+          return false;
+        } else {
+          throw new RuntimeException("invalid block specifier '" + block + "' " + source);
+        }
       }
       if (mcblock instanceof BlockBeetroot) { // BlockBeetroot extends BlockCrops, so it needs to be checked first
         meta = 3;
@@ -91,6 +96,7 @@ public class RightClickCropHandler {
         grownState = mcblock.getStateFromMeta(meta);
         resetState = mcblock.getStateFromMeta(resetMeta);
       }
+      return true;
     }
 
     @Override
@@ -159,7 +165,12 @@ public class RightClickCropHandler {
         ItemStack stack = event.getDrops().get(i);
         if (stack.getItem() == currentPlant.getSeed().getItem()
             && (currentPlant.getSeed().getItemDamage() == OreDictionary.WILDCARD_VALUE || stack.getItemDamage() == currentPlant.getSeed().getItemDamage())) {
-          event.getDrops().remove(i);
+          System.out.println("Removing one " + stack);
+          stack.shrink(1);
+          if (stack.isEmpty()) {
+            System.out.println("Removing item");
+            event.getDrops().remove(i);
+          }
           break;
         }
       }
