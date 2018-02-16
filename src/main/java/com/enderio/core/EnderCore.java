@@ -21,8 +21,6 @@ import com.enderio.core.common.command.CommandReloadConfigs;
 import com.enderio.core.common.command.CommandScoreboardInfo;
 import com.enderio.core.common.compat.CompatRegistry;
 import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.enchant.EnchantAutoSmelt;
-import com.enderio.core.common.enchant.EnchantXPBoost;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.util.EnderFileUtils;
@@ -50,7 +48,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, dependencies = "after:ttCore", guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
+@Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
 
   public static final @Nonnull String MODID = "endercore";
@@ -114,9 +112,6 @@ public class EnderCore implements IEnderMod {
 
     CompatRegistry.INSTANCE.handle(event);
     OreDict.registerVanilla();
-
-    EnchantXPBoost.register();
-    EnchantAutoSmelt.register();
 
     proxy.onPreInit(event);
   }

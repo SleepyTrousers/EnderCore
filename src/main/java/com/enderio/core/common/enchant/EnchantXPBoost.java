@@ -18,10 +18,12 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@EventBusSubscriber(modid = EnderCore.MODID)
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
 
   private static EnchantXPBoost INSTANCE;
@@ -91,14 +93,25 @@ public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {
   }
 
   @Override
+  public boolean canApply(@Nonnull ItemStack stack) {
+    return ConfigHandler.allowXPBoost && super.canApply(stack);
+  }
+
+  @Override
+  public boolean canApplyAtEnchantingTable(@Nonnull ItemStack stack) {
+    return ConfigHandler.allowXPBoost && super.canApplyAtEnchantingTable(stack);
+  }
+
+  @Override
   public @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack) {
     return new String[] { EnderCore.lang.localize("enchantment.xpboost.tooltip", false) };
   }
 
-  public static void register() {
+  @SubscribeEvent
+  public static void register(@Nonnull RegistryEvent.Register<Enchantment> event) {
     if (ConfigHandler.allowXPBoost) {
       INSTANCE = new EnchantXPBoost();
-      ForgeRegistries.ENCHANTMENTS.register(INSTANCE); // FIXME
+      event.getRegistry().register(INSTANCE);
       FMLInterModComms.sendMessage("enderio", "recipe:xml",
           "<?xml version=\"1.0\" encoding=\"UTF-8\"?><recipes>"
               + "<recipe name=\"Enchanter: endercore:xpboost\" required=\"true\" disabled=\"false\"><enchanting>"
