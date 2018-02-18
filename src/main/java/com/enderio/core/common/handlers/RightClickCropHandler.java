@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.util.ItemUtil;
 import com.enderio.core.common.util.NullHelper;
+import com.enderio.core.common.util.stackable.Things;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -49,9 +49,12 @@ public class RightClickCropHandler {
     public int resetMeta = 0;
     public boolean optional;
 
-    private transient @Nonnull ItemStack seedStack = ItemStack.EMPTY;
+    private transient @Nonnull Things seedStack = new Things();
     private transient @Nonnull IBlockState grownState = Blocks.AIR.getDefaultState();
     private transient @Nonnull IBlockState resetState = Blocks.AIR.getDefaultState();
+
+    public LegacyPlantInfo() { // for json de-serialization
+    }
 
     public LegacyPlantInfo(String seed, String block, int meta, int resetMeta) {
       this.seed = seed;
@@ -60,10 +63,24 @@ public class RightClickCropHandler {
       this.resetMeta = resetMeta;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean init(@Nonnull String source) {
-      seedStack = ItemUtil.parseStringIntoItemStack(NullHelper.notnull(seed, "invalid item specifier " + source));
+      seedStack.add(seed);
+      if (!seedStack.isValid()) {
+        // some blocks and items share the same id but you cannot make an itemstack from the block.
+        // if that is the case here, we can rescue this with a bit of bad code
+        try {
+          seedStack.add("item:" + seed);
+        } catch (Exception e) {
+        }
+        if (!seedStack.isValid()) {
+          if (optional) {
+            return false;
+          } else {
+            throw new RuntimeException("invalid item specifier '" + seed + "' " + source);
+          }
+        }
+      }
       String[] blockinfo = block.split(":");
       if (blockinfo.length != 2) {
         throw new RuntimeException("invalid block specifier '" + block + "' " + source);
@@ -102,7 +119,7 @@ public class RightClickCropHandler {
     @Override
     @Nonnull
     public ItemStack getSeed() {
-      return seedStack;
+      return seedStack.getItemStack();
     }
 
     @Override
