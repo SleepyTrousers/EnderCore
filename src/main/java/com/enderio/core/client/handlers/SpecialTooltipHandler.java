@@ -6,18 +6,18 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.lwjgl.input.Keyboard;
+
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
 import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.util.ItemUtil;
 import com.enderio.core.common.util.NNList;
-import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -51,8 +51,8 @@ public class SpecialTooltipHandler {
       return;
     }
 
-    final ITooltipFlag flag = NullHelper.first(evt.getFlags(), ITooltipFlag.TooltipFlags.NORMAL);
-    boolean doDurability = showDurability(flag.isAdvanced());
+    final boolean flag = showAdvancedTooltips();
+    boolean doDurability = showDurability(evt.getFlags().isAdvanced());
 
     if (doDurability) {
       addDurabilityTooltip(getTooltip(evt), evt.getItemStack());
@@ -134,7 +134,7 @@ public class SpecialTooltipHandler {
     }
   }
 
-  public static void addInformation(@Nonnull IResourceTooltipProvider item, @Nonnull ItemTooltipEvent evt, @Nonnull ITooltipFlag flag) {
+  public static void addInformation(@Nonnull IResourceTooltipProvider item, @Nonnull ItemTooltipEvent evt, boolean flag) {
     addInformation(item, evt.getItemStack(), evt.getEntityPlayer(), getTooltip(evt), flag);
   }
 
@@ -147,9 +147,9 @@ public class SpecialTooltipHandler {
   }
 
   public static void addInformation(@Nonnull IResourceTooltipProvider tt, @Nonnull ItemStack itemstack, @Nullable EntityPlayer entityplayer,
-      @Nonnull List<String> list, @Nonnull ITooltipFlag flag) {
+      @Nonnull List<String> list, boolean flag) {
     String name = tt.getUnlocalizedNameForTooltip(itemstack);
-    if (flag.isAdvanced()) {
+    if (flag) {
       addCommonTooltipFromResources(list, name);
       addDetailedTooltipFromResources(list, name);
     } else {
@@ -162,9 +162,9 @@ public class SpecialTooltipHandler {
   }
 
   public static void addInformation(@Nonnull IAdvancedTooltipProvider tt, @Nonnull ItemStack itemstack, @Nullable EntityPlayer entityplayer,
-      @Nonnull List<String> list, @Nonnull ITooltipFlag flag) {
+      @Nonnull List<String> list, boolean flag) {
     tt.addCommonEntries(itemstack, entityplayer, list, false);
-    if (flag.isAdvanced()) {
+    if (flag) {
       tt.addDetailedEntries(itemstack, entityplayer, list, false);
     } else {
       tt.addBasicEntries(itemstack, entityplayer, list, false);
@@ -246,6 +246,10 @@ public class SpecialTooltipHandler {
   }
 
   private SpecialTooltipHandler() {
+  }
+
+  public static boolean showAdvancedTooltips() {
+    return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
   }
 
 }
