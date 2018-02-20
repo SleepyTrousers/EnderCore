@@ -141,11 +141,18 @@ public class NNList<E> extends NonNullList<E> {
         return true;
       }
     }
-    return false;
+    return callback.finish();
   }
 
   public static interface ShortCallback<E> {
     boolean apply(@Nonnull E e);
+
+    /**
+     * This is called if the callback did not signal <code>true</code> for any element to determine the final result of the run.
+     */
+    default boolean finish() {
+      return false;
+    }
   }
 
   @Override
@@ -154,8 +161,7 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   /**
-   * Creates a fast iterator for read-only lists. Do not use on lists that may
-   * be changed.
+   * Creates a fast iterator for read-only lists. Do not use on lists that may be changed.
    */
   public @Nonnull NNIterator<E> fastIterator() {
     return new FastItrImpl();
