@@ -98,4 +98,9 @@ class OreThing implements IThing.Zwieback {
     return name;
   }
 
+  @Override
+  public String toString() {
+    return String.format("OreThing [name=%s, ores=%s]", name, ores);
+  }
+
 }

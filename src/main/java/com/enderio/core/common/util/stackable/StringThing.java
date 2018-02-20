@@ -130,4 +130,9 @@ class StringThing implements IThing {
     return NNList.<Block> emptyList();
   }
 
+  @Override
+  public String toString() {
+    return String.format("StringThing [name=%s]", name);
+  }
+
 }

@@ -60,4 +60,9 @@ class ProducerThing implements IThing {
     return NNList.<Block> emptyList();
   }
 
+  @Override
+  public String toString() {
+    return String.format("ProducerThing []");
+  }
+
 }

@@ -54,4 +54,9 @@ class ItemThing implements IThing {
     return block != Blocks.AIR ? new NNList<Block>(block) : NNList.<Block> emptyList();
   }
 
+  @Override
+  public String toString() {
+    return String.format("ItemThing [thing=%s]", thing);
+  }
+
 }

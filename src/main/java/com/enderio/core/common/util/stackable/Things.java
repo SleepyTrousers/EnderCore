@@ -536,4 +536,22 @@ public class Things extends Ingredient {
 
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("Things [");
+    builder.append("things=");
+    builder.append(things);
+    builder.append(", ");
+    builder.append("size=");
+    builder.append(size);
+    builder.append(", ");
+    if (nbt != null) {
+      builder.append("nbt=");
+      builder.append(nbt);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

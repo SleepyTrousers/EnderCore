@@ -32,8 +32,7 @@ class ItemStackThing implements IThing {
   @Override
   public boolean is(@Nullable ItemStack itemStack) {
     return itemStack != null && !itemStack.isEmpty() && thing.getItem() == itemStack.getItem()
-        && (!thing.getHasSubtypes() || thing.getItemDamage() == OreDictionary.WILDCARD_VALUE || thing.getMetadata() == itemStack
-            .getMetadata());
+        && (!thing.getHasSubtypes() || thing.getItemDamage() == OreDictionary.WILDCARD_VALUE || thing.getMetadata() == itemStack.getMetadata());
   }
 
   @Override
@@ -55,6 +54,11 @@ class ItemStackThing implements IThing {
   public @Nonnull NNList<Block> getBlocks() {
     Block block = Block.getBlockFromItem(thing.getItem());
     return block != Blocks.AIR ? new NNList<Block>(block) : NNList.<Block> emptyList();
+  }
+
+  @Override
+  public String toString() {
+    return String.format("ItemStackThing [thing=%s]", thing);
   }
 
 }

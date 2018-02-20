@@ -63,4 +63,9 @@ class ResourceThing implements IThing {
     return NNList.<Block> emptyList();
   }
 
+  @Override
+  public String toString() {
+    return String.format("ResourceThing [resourceLocation=%s]", resourceLocation);
+  }
+
 }

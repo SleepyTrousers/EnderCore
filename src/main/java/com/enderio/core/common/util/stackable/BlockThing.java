@@ -56,4 +56,9 @@ class BlockThing implements IThing {
     return new NNList<Block>(thing);
   }
 
+  @Override
+  public String toString() {
+    return String.format("BlockThing [thing=%s]", thing);
+  }
+
 }
