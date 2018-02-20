@@ -182,10 +182,8 @@ public class RightClickCropHandler {
         ItemStack stack = event.getDrops().get(i);
         if (stack.getItem() == currentPlant.getSeed().getItem()
             && (currentPlant.getSeed().getItemDamage() == OreDictionary.WILDCARD_VALUE || stack.getItemDamage() == currentPlant.getSeed().getItemDamage())) {
-          System.out.println("Removing one " + stack);
           stack.shrink(1);
           if (stack.isEmpty()) {
-            System.out.println("Removing item");
             event.getDrops().remove(i);
           }
           break;
