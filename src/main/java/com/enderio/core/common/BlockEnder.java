@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
 import com.enderio.core.common.util.FluidUtil;
-import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -16,7 +15,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -95,10 +93,6 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
     return false;
   }
 
-  public boolean doNormalDrops(IBlockAccess world, BlockPos pos) {
-    return true;
-  }
-
   @Override
   public boolean removedByPlayer(@Nonnull IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player, boolean willHarvest) {
     if (willHarvest) {
@@ -115,40 +109,48 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   @Override
-  public void getDrops(@Nonnull NonNullList<ItemStack> drops, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune) {
-    if (doNormalDrops(world, pos)) {
-      super.getDrops(drops, world, pos, state, fortune);
-    } else {
-      drops.add(getNBTDrop(world, pos, getTileEntity(world, pos)));
+  public final void getDrops(@Nonnull NonNullList<ItemStack> drops, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state,
+      int fortune) {
+    final T te = getTileEntity(world, pos);
+    final ItemStack drop = getNBTDrop(world, pos, state, fortune, te);
+    if (drop != null) {
+      drops.add(drop);
     }
+    getExtraDrops(drops, world, pos, state, fortune, te);
   }
 
-  public ItemStack getNBTDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te) {
-    int meta = damageDropped(world.getBlockState(pos));
-    ItemStack itemStack = new ItemStack(this, 1, meta);
+  public @Nullable ItemStack getNBTDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune, @Nullable T te) {
+    ItemStack itemStack = new ItemStack(this, 1, damageDropped(state));
     processDrop(world, pos, te, itemStack);
     return itemStack;
   }
 
-  protected void processDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te, @Nonnull ItemStack drop) {
+  protected final void processDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nullable T te, @Nonnull ItemStack drop) {
     if (te != null) {
-      final NBTTagCompound tag = new NBTTagCompound();
-      te.writeCustomNBT(NBTAction.ITEM, tag);
-      if (!tag.hasNoTags()) {
-        drop.setTagCompound(tag);
-      }
+      te.writeCustomNBT(drop);
     }
   }
 
+  public void getExtraDrops(@Nonnull NonNullList<ItemStack> drops, @Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune,
+      @Nullable T te) {
+  }
+
   @Override
-  public void onBlockPlacedBy(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer,
+  public final void onBlockPlacedBy(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer,
       @Nonnull ItemStack stack) {
-    if (stack.hasTagCompound()) {
-      T te = getTileEntity(worldIn, pos);
-      if (te != null) {
-        te.readCustomNBT(NBTAction.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
-      }
+    onBlockPlaced(worldIn, pos, state, placer, stack);
+    T te = getTileEntity(worldIn, pos);
+    if (te != null) {
+      te.readCustomNBT(stack);
+      onBlockPlaced(worldIn, pos, state, placer, te);
     }
+  }
+
+  public void onBlockPlaced(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer,
+      @Nonnull ItemStack stack) {
+  }
+
+  public void onBlockPlaced(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase placer, @Nonnull T te) {
   }
 
   /**

@@ -6,6 +6,7 @@ import com.enderio.core.api.common.util.IProgressTile;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.network.PacketProgress;
+import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -150,7 +151,21 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
   }
 
+  protected void writeCustomNBT(@Nonnull ItemStack stack) {
+    final NBTTagCompound tag = new NBTTagCompound();
+    writeCustomNBT(NBTAction.ITEM, tag);
+    if (!tag.hasNoTags()) {
+      stack.setTagCompound(tag);
+    }
+  }
+
   protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
+
+  protected void readCustomNBT(@Nonnull ItemStack stack) {
+    if (stack.hasTagCompound()) {
+      readCustomNBT(NBTAction.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
+    }
+  }
 
   protected abstract void readCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
 
@@ -233,18 +248,18 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     if (!(world instanceof WorldServer)) {
       return;
     }
-  
+
     WorldServer worldServer = (WorldServer) world;
     PlayerChunkMap playerManager = worldServer.getPlayerChunkMap();
     SPacketUpdateTileEntity updatePacket = null;
-  
+
     int chunkX = pos.getX() >> 4;
     int chunkZ = pos.getZ() >> 4;
-  
+
     for (EntityPlayer playerObj : world.playerEntities) {
       if (playerObj instanceof EntityPlayerMP) {
         EntityPlayerMP player = (EntityPlayerMP) playerObj;
-  
+
         if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)) {
           if (updatePacket == null) {
             updatePacket = getUpdatePacket();
