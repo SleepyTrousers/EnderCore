@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -267,6 +268,77 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   @Override
   public @Nonnull Block setCreativeTab(@Nullable CreativeTabs tab) {
     return super.setCreativeTab(tab);
+  }
+
+  public void setShape(IShape<T> shape) {
+    this.shape = shape;
+  }
+
+  @Override
+  public final @Nonnull BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos,
+      @Nonnull EnumFacing face) {
+    if (shape != null) {
+      T te = getTileEntitySafe(worldIn, pos);
+      if (te != null) {
+        return shape.getBlockFaceShape(worldIn, state, pos, face, te);
+      } else {
+        return shape.getBlockFaceShape(worldIn, state, pos, face);
+      }
+    }
+    return super.getBlockFaceShape(worldIn, state, pos, face);
+  }
+
+  private IShape<T> shape = null;
+
+  public static interface IShape<T> {
+    @Nonnull
+    BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing face);
+
+    default @Nonnull BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos,
+        @Nonnull EnumFacing face, @Nonnull T te) {
+      return getBlockFaceShape(worldIn, state, pos, face);
+    }
+  }
+
+  protected @Nonnull IShape<T> mkShape(@Nonnull BlockFaceShape allFaces) {
+    return new IShape<T>() {
+      @Override
+      @Nonnull
+      public BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing face) {
+        return allFaces;
+      }
+    };
+  }
+
+  protected @Nonnull IShape<T> mkShape(@Nonnull BlockFaceShape upDown, @Nonnull BlockFaceShape allSides) {
+    return new IShape<T>() {
+      @Override
+      @Nonnull
+      public BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing face) {
+        return face == EnumFacing.UP || face == EnumFacing.DOWN ? upDown : allSides;
+      }
+    };
+  }
+
+  protected @Nonnull IShape<T> mkShape(@Nonnull BlockFaceShape down, @Nonnull BlockFaceShape up, @Nonnull BlockFaceShape allSides) {
+    return new IShape<T>() {
+      @Override
+      @Nonnull
+      public BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing face) {
+        return face == EnumFacing.UP ? up : face == EnumFacing.DOWN ? down : allSides;
+      }
+    };
+  }
+
+  protected @Nonnull IShape<T> mkShape(@Nonnull BlockFaceShape... faces) {
+    return new IShape<T>() {
+      @SuppressWarnings("null")
+      @Override
+      @Nonnull
+      public BlockFaceShape getBlockFaceShape(@Nonnull IBlockAccess worldIn, @Nonnull IBlockState state, @Nonnull BlockPos pos, @Nonnull EnumFacing face) {
+        return faces[face.ordinal()];
+      }
+    };
   }
 
 }
