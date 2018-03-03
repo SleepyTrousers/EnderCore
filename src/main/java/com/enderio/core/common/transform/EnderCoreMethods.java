@@ -2,8 +2,6 @@ package com.enderio.core.common.transform;
 
 import javax.annotation.Nonnull;
 
-import com.enderio.core.common.config.ConfigHandler;
-import com.enderio.core.common.event.AnvilMaxCostEvent;
 import com.enderio.core.common.event.ItemGUIRenderEvent;
 
 import net.minecraft.block.material.Material;
@@ -25,13 +23,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 public class EnderCoreMethods {
-
-  public static int getMaxAnvilCost(Object source) {
-    int maxCost = ConfigHandler.invisibleMode == 1 ? 40 : ConfigHandler.anvilMaxLevel;
-    AnvilMaxCostEvent event = new AnvilMaxCostEvent(source, maxCost);
-    MinecraftForge.EVENT_BUS.post(event);
-    return event.getMaxAnvilCost();
-  }
 
   // copied from ContainerFurnace, changes marked
   public static @Nonnull ItemStack transferStackInSlot(@Nonnull ContainerFurnace inv, @Nonnull EntityPlayer playerIn, int index) {

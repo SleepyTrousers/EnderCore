@@ -174,7 +174,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   }
 
   protected void updateBlock() {
-    if (hasWorld()) {
+    if (hasWorld() && world.isBlockLoaded(getPos())) {
       IBlockState bs = world.getBlockState(getPos());
       world.notifyBlockUpdate(pos, bs, bs, 3);
     }

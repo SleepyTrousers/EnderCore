@@ -66,11 +66,6 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   public static int showDurabilityTooltips = 1;
 
   @Config
-  @Comment("The max amount of XP levels an anvil recipe can use.")
-  @InvisIgnore
-  public static int anvilMaxLevel = 40;
-
-  @Config
   @Comment("The way the game should have been made (Yes this is the fireworks thing).")
   public static boolean betterAchievements = false;
 

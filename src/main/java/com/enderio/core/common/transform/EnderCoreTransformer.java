@@ -15,7 +15,6 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -86,12 +85,6 @@ public class EnderCoreTransformer implements IClassTransformer {
     abstract void transform(Iterator<MethodNode> methods);
   }
 
-  static final String anvilContainerClass = "net.minecraft.inventory.ContainerRepair";
-  static final ObfSafeName anvilContainerMethod = new ObfSafeName("updateRepairOutput", "func_82848_d");
-
-  static final String anvilGuiClass = "net.minecraft.client.gui.GuiRepair";
-  static final ObfSafeName anvilGuiMethod = new ObfSafeName("drawGuiContainerForegroundLayer", "func_146979_b");
-
   static final String containerFurnaceClass = "net.minecraft.inventory.ContainerFurnace";
   static final ObfSafeName containerFurnaceMethod = new ObfSafeName("transferStackInSlot", "func_82846_b");
   static final String containerFurnaceMethodSig = "(Lnet/minecraft/inventory/ContainerFurnace;Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;";
@@ -151,37 +144,6 @@ public class EnderCoreTransformer implements IClassTransformer {
           }
           if (!done) {
             logger.info("Transforming failed.");
-          }
-        }
-      });
-    }
-
-    // Anvil max level
-    if (transformedName.equals(anvilContainerClass) || transformedName.equals(anvilGuiClass)) {
-      // 1.10 tested and works
-      return transform(basicClass, transformedName, transformedName.equals(anvilContainerClass) ? anvilContainerMethod : anvilGuiMethod, new Transform() {
-        @Override
-        void transform(Iterator<MethodNode> methods) {
-          int done = 0;
-          while (methods.hasNext()) {
-            MethodNode m = methods.next();
-            if (anvilContainerMethod.equals(m.name) || anvilGuiMethod.equals(m.name)) {
-              for (int i = 0; i < m.instructions.size(); i++) {
-                AbstractInsnNode next = m.instructions.get(i);
-
-                next = m.instructions.get(i);
-                if (next instanceof IntInsnNode && ((IntInsnNode) next).operand == 40) {
-                  m.instructions.set(next, new VarInsnNode(ALOAD, 0));
-                  next = m.instructions.get(i);
-                  m.instructions.insert(next, new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "getMaxAnvilCost",
-                      "(Ljava/lang/Object;)I", false));
-                  done++;
-                }
-              }
-            }
-          }
-          if (done > 2 || done < 1) {
-            logger.info("Transforming failed. (" + done + ")");
           }
         }
       });

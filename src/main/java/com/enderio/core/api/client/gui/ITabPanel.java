@@ -31,4 +31,5 @@ public interface ITabPanel {
    */
   @Nonnull
   ResourceLocation getTexture();
+
 }
