@@ -12,6 +12,7 @@ import com.enderio.core.common.vecmath.Vector3d;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityFireworkRocket;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
@@ -104,11 +105,20 @@ public class EntityUtil {
   public static @Nonnull NNList<ResourceLocation> getAllRegisteredMobNames() {
     NNList<ResourceLocation> result = new NNList<ResourceLocation>();
     for (ResourceLocation entityName : EntityList.getEntityNameList()) {
-      if (EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()")) != null) {
+      final Class<? extends Entity> clazz = EntityList.getClass(NullHelper.notnullF(entityName, "EntityList.getEntityNameList()"));
+      if (clazz != null && EntityLiving.class.isAssignableFrom(clazz)) {
         result.add(entityName);
       }
     }
     return result;
+  }
+
+  public static boolean isRegisteredMob(ResourceLocation entityName) {
+    if (entityName != null) {
+      final Class<? extends Entity> clazz = EntityList.getClass(entityName);
+      return clazz != null && EntityLiving.class.isAssignableFrom(clazz);
+    }
+    return false;
   }
 
   private EntityUtil() {
