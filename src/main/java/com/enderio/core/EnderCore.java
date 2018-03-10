@@ -2,9 +2,15 @@ package com.enderio.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nonnull;
 
@@ -34,7 +40,10 @@ import com.google.common.collect.Sets;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.chunkio.ChunkIOExecutor;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -47,6 +56,7 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 @Mod(modid = EnderCore.MODID, name = EnderCore.NAME, version = EnderCore.VERSION, guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
@@ -149,6 +159,29 @@ public class EnderCore implements IEnderMod {
   @EventHandler
   public void loadComplete(@Nonnull FMLLoadCompleteEvent event) {
     Things.init(event);
+
+    ThreadPoolExecutor fixedChunkExecutor = new ThreadPoolExecutor(1, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+        new ThreadFactory() {
+          private AtomicInteger count = new AtomicInteger(1);
+
+          @Override
+          public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r, "Chunk I/O Executor Thread-" + count.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+          }
+        }) {
+
+      @Override
+      protected void afterExecute(Runnable r, Throwable t) {
+        FMLLog.log.error("Unhandled exception loading chunk:", t);
+      }
+    };
+    try {
+      EnumHelper.setFailsafeFieldValue(ReflectionHelper.findField(ChunkIOExecutor.class, "pool"), null, fixedChunkExecutor);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @EventHandler
