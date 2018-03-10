@@ -2,7 +2,6 @@ package com.enderio.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -39,6 +38,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import net.minecraft.command.CommandHandler;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.chunkio.ChunkIOExecutor;
 import net.minecraftforge.common.util.EnumHelper;
@@ -173,8 +173,21 @@ public class EnderCore implements IEnderMod {
         }) {
 
       @Override
+      @SuppressWarnings({ "unchecked", "rawtypes" })
       protected void afterExecute(Runnable r, Throwable t) {
-        FMLLog.log.error("Unhandled exception loading chunk:", t);
+        if (t != null) {
+          try {
+            FMLLog.log.error("Unhandled exception loading chunk:", t);
+            Object queuedChunk = ReflectionHelper.getPrivateValue((Class) r.getClass(), (Object) r, "chunkInfo");
+            Class cls = queuedChunk.getClass();
+            FMLLog.log.error(queuedChunk);
+            int x = (Integer) ReflectionHelper.getPrivateValue(cls, queuedChunk, "x");
+            int z = (Integer) ReflectionHelper.getPrivateValue(cls, queuedChunk, "z");
+            FMLLog.log.error(CrashReportCategory.getCoordinateInfo(x << 4, 64, z << 4));
+          } catch (Throwable t2) {
+            FMLLog.log.error(t2);
+          }
+        }
       }
     };
     try {
