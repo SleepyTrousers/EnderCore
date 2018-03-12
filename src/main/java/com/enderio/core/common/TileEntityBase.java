@@ -226,7 +226,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    *          The stack that should be placed, null to clear
    * @param realsize
    */
-  public void setGhostSlotContents(int slot, ItemStack stack, int realsize) {
+  public void setGhostSlotContents(int slot, @Nonnull ItemStack stack, int realsize) {
   }
 
   @Override
