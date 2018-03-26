@@ -30,7 +30,9 @@ public interface IGuiScreen {
 
   void removeButton(@Nonnull GuiButton button);
 
-  int getOverlayOffsetX();
+  int getOverlayOffsetXLeft();
+
+  int getOverlayOffsetXRight();
 
   void doActionPerformed(@Nonnull GuiButton but) throws IOException;
 

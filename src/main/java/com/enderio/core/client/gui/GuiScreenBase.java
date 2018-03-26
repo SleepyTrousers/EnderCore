@@ -152,7 +152,12 @@ public abstract class GuiScreenBase extends GuiScreen implements ToolTipRenderer
   }
 
   @Override
-  public int getOverlayOffsetX() {
+  public int getOverlayOffsetXLeft() {
+    return 0;
+  }
+
+  @Override
+  public int getOverlayOffsetXRight() {
     return 0;
   }
 
