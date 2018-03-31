@@ -23,6 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
@@ -129,7 +130,8 @@ public class SpecialTooltipHandler {
       return;
     }
     Item item = itemStack.getItem();
-    if (item instanceof ItemTool || item instanceof ItemArmor || item instanceof ItemSword || item instanceof ItemHoe || item instanceof ItemBow) {
+    if (item instanceof ItemTool || item instanceof ItemArmor || item instanceof ItemSword || item instanceof ItemHoe || item instanceof ItemBow
+        || item instanceof ItemShears) {
       toolTip.add(ItemUtil.getDurabilityString(itemStack));
     }
   }
