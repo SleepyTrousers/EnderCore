@@ -121,13 +121,13 @@ public class EnderCore implements IEnderMod {
     Handlers.preInit(event);
 
     CompatRegistry.INSTANCE.handle(event);
-    OreDict.registerVanilla();
 
     proxy.onPreInit(event);
   }
 
   @EventHandler
   public void init(@Nonnull FMLInitializationEvent event) {
+    OreDict.registerVanilla();
     Things.init(event);
     EnderPacketHandler.init();
 
