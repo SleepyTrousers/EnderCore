@@ -194,6 +194,7 @@ public class GhostSlotHandler {
   protected void drawGhostSlotGrayout(@Nonnull GuiContainerBase gui, @Nonnull GhostSlot slot) {
     GlStateManager.disableDepth();
     GlStateManager.enableBlend();
+    GlStateManager.disableLighting();
     GlStateManager.color(1.0F, 1.0F, 1.0F, slot.getGrayOutLevel());
     RenderUtil.bindTexture(gui.getGuiTexture());
     gui.drawTexturedModalRect(gui.getGuiLeft() + slot.getX(), gui.getGuiTop() + slot.getY(), slot.getX(), slot.getY(), 16, 16);
