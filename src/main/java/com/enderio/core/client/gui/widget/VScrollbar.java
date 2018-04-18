@@ -12,8 +12,9 @@ import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.client.render.EnderWidget;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 public class VScrollbar implements IHideable {
@@ -111,10 +112,10 @@ public class VScrollbar implements IHideable {
       }
 
       Minecraft.getMinecraft().getTextureManager().bindTexture(EnderWidget.TEXTURE);
-      GL11.glPushAttrib(GL11.GL_ENABLE_BIT); // TODO
-      GL11.glEnable(GL11.GL_BLEND); // TODO
-      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); // TODO
-      GL11.glColor3f(1, 1, 1); // TODO
+      GL11.glPushAttrib(GL11.GL_ENABLE_BIT); // TODO waiting on forge for a bug fix of pushAtrrib
+      GlStateManager.enableBlend();
+      GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+      GlStateManager.color(1, 1, 1);
 
       final BufferBuilder renderer = Tessellator.getInstance().getBuffer();
       renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -136,7 +137,7 @@ public class VScrollbar implements IHideable {
       }
 
       Tessellator.getInstance().draw();
-      GL11.glPopAttrib(); // TODO
+      GL11.glPopAttrib(); // TODO waiting on forge for a bugfix
     }
   }
 
