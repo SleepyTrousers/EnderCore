@@ -41,4 +41,11 @@ public class RoundRobinIterator<T> implements Iterable<T>, Iterator<T> {
   public void remove() {
   }
 
+  /**
+   * Used to reset the iterator to its initial state
+   */
+  public void reset() {
+    index = -1;
+  }
+
 }
