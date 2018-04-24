@@ -6,6 +6,7 @@ import java.util.List;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
@@ -47,6 +48,13 @@ public class Tweaks {
         ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS).setRegistryName("shapeless_paper")); 
       }
     });
-    // @formatter:on
+
+    tweaks.add(new Tweak("fluidContainerBottles","Makes water bottles normal fluid containers") {
+      @Override
+      public void load() { 
+        MinecraftForge.EVENT_BUS.register(BottleFluidCapability.class); 
+      }
+    });
+// @formatter:on
   }
 }
