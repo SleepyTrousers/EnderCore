@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.EnderCore;
+import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.init.Items;
 import net.minecraft.init.PotionTypes;
@@ -24,8 +25,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class BottleFluidCapability implements IFluidHandlerItem, ICapabilityProvider {
 
   private static final ResourceLocation KEY = new ResourceLocation(EnderCore.DOMAIN, "bottle");
-
-  private static final int AMOUNT = 333;
 
   private @Nonnull ItemStack container;
 
@@ -56,12 +55,12 @@ public class BottleFluidCapability implements IFluidHandlerItem, ICapabilityProv
       @Override
       @Nullable
       public FluidStack getContents() {
-        return isFull() ? new FluidStack(FluidRegistry.WATER, AMOUNT) : null;
+        return isFull() ? new FluidStack(FluidRegistry.WATER, ConfigHandler.waterBottleAmount) : null;
       }
 
       @Override
       public int getCapacity() {
-        return AMOUNT;
+        return ConfigHandler.waterBottleAmount;
       }
 
       @Override
@@ -88,39 +87,39 @@ public class BottleFluidCapability implements IFluidHandlerItem, ICapabilityProv
 
   @Override
   public int fill(FluidStack resource, boolean doFill) {
-    if (container.getCount() != 1 || !isEmpty() || resource == null || resource.getFluid() != FluidRegistry.WATER || resource.amount < AMOUNT) {
+    if (container.getCount() != 1 || !isEmpty() || resource == null || resource.getFluid() != FluidRegistry.WATER || resource.amount < ConfigHandler.waterBottleAmount) {
       return 0;
     } else {
       if (doFill) {
         fill();
       }
-      return AMOUNT;
+      return ConfigHandler.waterBottleAmount;
     }
   }
 
   @Override
   @Nullable
   public FluidStack drain(FluidStack resource, boolean doDrain) {
-    if (container.getCount() != 1 || !isFull() || resource == null || resource.getFluid() != FluidRegistry.WATER || resource.amount < AMOUNT) {
+    if (container.getCount() != 1 || !isFull() || resource == null || resource.getFluid() != FluidRegistry.WATER || resource.amount < ConfigHandler.waterBottleAmount) {
       return null;
     } else {
       if (doDrain) {
         empty();
       }
-      return new FluidStack(FluidRegistry.WATER, AMOUNT);
+      return new FluidStack(FluidRegistry.WATER, ConfigHandler.waterBottleAmount);
     }
   }
 
   @Override
   @Nullable
   public FluidStack drain(int maxDrain, boolean doDrain) {
-    if (container.getCount() != 1 || !isFull() || maxDrain < AMOUNT) {
+    if (container.getCount() != 1 || !isFull() || maxDrain < ConfigHandler.waterBottleAmount) {
       return null;
     } else {
       if (doDrain) {
         empty();
       }
-      return new FluidStack(FluidRegistry.WATER, AMOUNT);
+      return new FluidStack(FluidRegistry.WATER, ConfigHandler.waterBottleAmount);
     }
   }
 
