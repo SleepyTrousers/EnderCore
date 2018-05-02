@@ -24,6 +24,7 @@ import com.enderio.core.common.tweaks.Tweaks;
 
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fluids.Fluid;
 
 public class ConfigHandler extends AbstractConfigHandler implements ITweakConfigHandler, IReloadCallback {
 
@@ -114,6 +115,11 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
     return INSTANCE;
   }
 
+  @Config
+  @Comment("Amount of water in mB that a water bottle contains")
+  @Range(min = 1, max = 1000)
+  public static int waterBottleAmount = Fluid.BUCKET_VOLUME / 3 /* net.minecraft.block.BlockCauldron.LEVEL */;
+
   protected ConfigHandler() {
     super(EnderCore.MODID);
   }
@@ -158,13 +164,13 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   @Override
   public void callback(@Nonnull ConfigProcessor inst) {
-    Tweaks.loadIngameTweaks();
+    reloadAllConfigs();
   }
 
   @Override
   public boolean addBooleanFor(Tweak tweak) {
     activateSection("tweaks");
-    boolean ret = getValue(tweak.getName(), tweak.getComment(), true);
+    boolean ret = getValue(tweak.getName(), tweak.getComment(), true, tweak.getRestartReq());
     return invisibleMode == 1 ? false : ret;
   }
 

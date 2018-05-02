@@ -129,14 +129,14 @@ public abstract class AbstractConfigHandler implements IConfigHandler {
     if (event.getModID().equals(modid)) {
       EnderCore.logger.info("Reloading ingame configs for modid: " + modid);
       loadConfigFile();
-      reloadIngameConfigs();
+      reloadAllConfigs();
       event.setSuccessful();
       saveConfigFile();
     }
   }
 
   // convenience for reloading all configs
-  private void reloadAllConfigs() {
+  protected final void reloadAllConfigs() {
     reloadNonIngameConfigs();
     reloadIngameConfigs();
   }
