@@ -154,9 +154,9 @@ public class RightClickCropHandler {
       return;
     }
 
-    BlockPos pos = event.getPos();
-    IBlockState blockState = event.getWorld().getBlockState(pos);
     if (event.getEntityPlayer().getHeldItemMainhand().isEmpty() || !event.getEntityPlayer().isSneaking()) {
+      BlockPos pos = event.getPos();
+      IBlockState blockState = event.getWorld().getBlockState(pos);
       for (IPlantInfo info : plants) {
         if (info.getGrownState() == blockState) {
           if (event.getWorld().isRemote) {
