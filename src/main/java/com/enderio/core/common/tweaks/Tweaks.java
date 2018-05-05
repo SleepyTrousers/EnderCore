@@ -1,7 +1,11 @@
 package com.enderio.core.common.tweaks;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.enderio.core.common.config.AbstractConfigHandler.RestartReqs;
+import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -11,38 +15,56 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class Tweaks {
-  /**
-   * As of yet unused, but might be nice in the future to have a list
-   */
-  private static final List<Tweak> tweaks = new ArrayList<Tweak>();
 
-  public static void loadIngameTweaks() {
+  private static final Set<Tweak> ingameTweaks = new HashSet<Tweak>();
+  private static final Set<Tweak> permanentTweaks = new HashSet<Tweak>();
+  
+  static {
     // @formatter:off
-    tweaks.add(new Tweak("changeBoatStackSize", "Makes boats stack to 16") {
+    
+    // Tweaks that can be turned on/off at will
+    ingameTweaks.add(new Tweak("changeBoatStackSize", "Makes boats stack to 16", RestartReqs.NONE) {
       @Override
       public void load() { Items.BOAT.setMaxStackSize(16); }
+      
+      @Override
+      public void unload() { Items.BOAT.setMaxStackSize(1); }
     });
 
-    tweaks.add(new Tweak("fixPackedIceTool", "Allows packed ice to be mined with a pickaxe") {
+    ingameTweaks.add(new Tweak("fixPackedIceTool", "Allows packed ice to be mined with a pickaxe", RestartReqs.NONE) {
       @Override
       public void load() { Blocks.PACKED_ICE.setHarvestLevel("pickaxe", 0); }
+      
+      @Override
+      @SuppressWarnings("null")
+      public void unload() { Blocks.PACKED_ICE.setHarvestLevel(null, -1); }
     });
-    // @formatter:on
-  }
+    
+    ingameTweaks.add(new Tweak("fluidContainerBottles","Makes water bottles normal fluid containers") {
+      @Override
+      public void load() { 
+        MinecraftForge.EVENT_BUS.register(BottleFluidCapability.class); 
+      }
+      
+      @Override
+      protected void unload() {
+        MinecraftForge.EVENT_BUS.unregister(BottleFluidCapability.class);
+      }
+    });
+    
+    ingameTweaks.add(new InfiniBow());
+    
+    // Tweaks that require a reboot to be toggled
+    permanentTweaks.add(new SlabRecipes());
 
-  public static void loadNonIngameTweaks() {
-    // @formatter:off
-    tweaks.add(new SlabRecipes());
-    tweaks.add(new InfiniBow());
-
-    tweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
+    permanentTweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
       @Override
       public void load() { 
         ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, new ItemStack(Items.PAPER, 2), Items.BOOK).setRegistryName("book_to_paper")); 
       }
     });
 
-    tweaks.add(new Tweak("shapelessPaperRecipe","Adds a shapeless recipe for paper") {
+    permanentTweaks.add(new Tweak("shapelessPaperRecipe", "Adds a shapeless recipe for paper") {
       @Override
       public void load() { 
         ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, new ItemStack(Items.PAPER, 3), Items.REEDS, Items.REEDS, Items.REEDS).setRegistryName("shapeless_paper")); 
@@ -56,5 +78,23 @@ public class Tweaks {
       }
     });
 // @formatter:on
+  }
+
+  public static void loadIngameTweaks() {
+    load(ingameTweaks);
+  }
+
+  public static void loadNonIngameTweaks() {
+    load(permanentTweaks);
+  }
+  
+  private static void load(Collection<Tweak> tweaks) {
+    for (Tweak tweak : tweaks) {
+      if (ConfigHandler.instance().addBooleanFor(tweak)) {
+        tweak.enable();
+      } else {
+        tweak.disable();
+      }
+    }
   }
 }

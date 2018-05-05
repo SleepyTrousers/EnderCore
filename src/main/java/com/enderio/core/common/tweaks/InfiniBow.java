@@ -1,5 +1,6 @@
 package com.enderio.core.common.tweaks;
 
+import com.enderio.core.common.config.AbstractConfigHandler.RestartReqs;
 import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -15,12 +16,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class InfiniBow extends Tweak {
 
   public InfiniBow() {
-    super("infinibow", "Makes bows with Infinity enchant able to be fired with no arrows in the inventory.");
+    super("infinibow", "Makes bows with Infinity enchant able to be fired with no arrows in the inventory.", RestartReqs.NONE);
   }
 
   @Override
   public void load() {
     MinecraftForge.EVENT_BUS.register(this);
+  }
+  
+  @Override
+  public void unload() {
+    MinecraftForge.EVENT_BUS.unregister(this);
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)

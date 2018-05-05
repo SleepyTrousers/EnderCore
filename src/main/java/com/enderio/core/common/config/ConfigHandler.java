@@ -164,13 +164,13 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
 
   @Override
   public void callback(@Nonnull ConfigProcessor inst) {
-    Tweaks.loadIngameTweaks();
+    reloadAllConfigs();
   }
 
   @Override
   public boolean addBooleanFor(Tweak tweak) {
     activateSection("tweaks");
-    boolean ret = getValue(tweak.getName(), tweak.getComment(), true);
+    boolean ret = getValue(tweak.getName(), tweak.getComment(), true, tweak.getRestartReq());
     return invisibleMode == 1 ? false : ret;
   }
 
