@@ -696,33 +696,60 @@ public class RenderUtil {
     Minecraft.getMinecraft().getRenderItem().renderItem(stack, model);
   }
 
+  @Nonnull
+  private static final Vector4f FULL_UVS = new Vector4f(0, 0, 1, 1);
+
   public static void addBakedQuads(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex) {
-    addBakedQuads(quads, bb, tex, null);
+    addBakedQuads(quads, bb, FULL_UVS, tex);
+  }
+  
+  public static void addBakedQuads(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull Vector4f uvs, @Nonnull TextureAtlasSprite tex) {
+    addBakedQuads(quads, bb, uvs, tex, null);
+  }
+  
+  public static void addBakedQuads(@Nonnull final List<BakedQuad> quads, @Nonnull final BoundingBox bb, @Nonnull final TextureAtlasSprite tex,
+      final Vector4f color) {
+    addBakedQuads(quads, bb, FULL_UVS, tex, color);
   }
 
-  public static void addBakedQuads(@Nonnull final List<BakedQuad> quads, @Nonnull final BoundingBox bb, @Nonnull final TextureAtlasSprite tex,
+  public static void addBakedQuads(@Nonnull final List<BakedQuad> quads, @Nonnull final BoundingBox bb, @Nonnull Vector4f uvs, @Nonnull final TextureAtlasSprite tex,
       final Vector4f color) {
     NNList.FACING.apply(new Callback<EnumFacing>() {
       @Override
       public void apply(@Nonnull EnumFacing face) {
-        addBakedQuadForFace(quads, bb, tex, face, null, false, false, true, color);
+        addBakedQuadForFace(quads, bb, tex, face, uvs, null, false, false, true, color);
       }
     });
   }
 
   public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face) {
-    addBakedQuadForFace(quads, bb, tex, face, false, false);
+    addBakedQuadForFace(quads, bb, tex, face, FULL_UVS);
+  }
+  
+  public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face,
+      @Nonnull Vector4f uvs) {
+    addBakedQuadForFace(quads, bb, tex, face, uvs, false, false);
   }
 
   public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face,
       boolean rotateUV, boolean flipU) {
+    addBakedQuadForFace(quads, bb, tex, face, FULL_UVS, rotateUV, flipU);
+  }
+  
+  public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face,
+      @Nonnull Vector4f uvs, boolean rotateUV, boolean flipU) {
     addBakedQuadForFace(quads, bb, tex, face, null, rotateUV, flipU, true, null);
+  }
+  
+  public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face,
+      @Nullable VertexTransform xform, boolean rotateUV, boolean flipU, boolean recolor, @Nullable Vector4f color) {
+    addBakedQuadForFace(quads, bb, tex, face, FULL_UVS, null, rotateUV, flipU, recolor, color);
   }
 
   public static void addBakedQuadForFace(@Nonnull List<BakedQuad> quads, @Nonnull BoundingBox bb, @Nonnull TextureAtlasSprite tex, @Nonnull EnumFacing face,
-      @Nullable VertexTransform xform, boolean rotateUV, boolean flipU, boolean recolor, @Nullable Vector4f color) {
+      @Nonnull Vector4f uvs, @Nullable VertexTransform xform, boolean rotateUV, boolean flipU, boolean recolor, @Nullable Vector4f color) {
     UnpackedBakedQuad.Builder builder = new UnpackedBakedQuad.Builder(DefaultVertexFormats.ITEM);
-    List<Vertex> corners = bb.getCornersWithUvForFace(face);
+    List<Vertex> corners = bb.getCornersWithUvForFace(face, uvs.x, uvs.z, uvs.y, uvs.w);
     builder.setQuadOrientation(face);
     builder.setTexture(tex);
     for (Vertex v : corners) {
