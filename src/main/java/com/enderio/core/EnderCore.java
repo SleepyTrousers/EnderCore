@@ -28,6 +28,7 @@ import com.enderio.core.common.compat.CompatRegistry;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
+import com.enderio.core.common.transform.EnderCorePlugin;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.NullHelper;
 import com.enderio.core.common.util.PermanentCache;
@@ -103,6 +104,7 @@ public class EnderCore implements IEnderMod {
 
   @EventHandler
   public void preInit(@Nonnull FMLPreInitializationEvent event) {
+    EnderCorePlugin.instance().loadPatchSources();
 
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
