@@ -752,6 +752,16 @@ public class RenderUtil {
     List<Vertex> corners = bb.getCornersWithUvForFace(face, uvs.x, uvs.z, uvs.y, uvs.w);
     builder.setQuadOrientation(face);
     builder.setTexture(tex);
+    if (rotateUV) {
+      Vector2f vec = corners.get(corners.size() - 1).uv;
+      for (int i = corners.size() - 2; i >= 0; i--) {
+        Vertex vert = corners.get(i);
+        Vector2f temp = vert.uv;
+        vert.uv = vec;
+        vec = temp;
+      }
+      corners.get(corners.size() - 1).uv = vec;
+    }
     for (Vertex v : corners) {
       if (v != null) {
         if (xform != null) {
@@ -760,13 +770,8 @@ public class RenderUtil {
         if (recolor) {
           v.color = color;
         }
-        if (rotateUV) {
-          float u = v.uv.x;
-          v.uv.x = v.uv.y;
-          v.uv.y = u;
-        }
         if (flipU) {
-          v.uv.x = 1 - v.uv.x;
+          v.uv.x = uvs.z - v.uv.x;
         }
         putVertexData(builder, v, face.getDirectionVec(), tex);
       }
