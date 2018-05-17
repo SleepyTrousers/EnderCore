@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Type;
 
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModAPIManager;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
 import net.minecraftforge.fml.common.discovery.ModDiscoverer;
@@ -21,6 +25,10 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 //we want deobf no matter what
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class EnderCorePlugin implements IFMLLoadingPlugin {
+  
+  static final Logger mainLogger = LogManager.getLogger("EnderCore ASM");
+  static final Logger mixinLogger = LogManager.getLogger("EnderCore Mixins");
+
   public static boolean runtimeDeobfEnabled = false;
   
   private static EnderCorePlugin instance;
@@ -36,7 +44,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     void initialize() {
       try {
         Class<?> cls = Class.forName(source);
-        System.out.println("[EnderCore ASM] Force loaded source for interface patch: " + cls);
+        cls.getName(); // Make sure it's loaded
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -82,8 +90,16 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       
       Set<ASMData> data = asmData.getAll(SimpleMixin.class.getName());
       for (ASMData d : data) {
-        System.out.println("Found annotation mixin: " + d.getClassName());
-        addInterfacePatch(((Type) d.getAnnotationInfo().get("value")).getClassName(), d.getClassName());
+        mixinLogger.info("Found annotation mixin: {}", d.getClassName());
+        @SuppressWarnings("unchecked")
+        List<String> dependencies = (List<String>) d.getAnnotationInfo().get("dependencies");
+        List<String> missingDependencies = dependencies.stream().filter(m -> !Loader.isModLoaded(m) && !ModAPIManager.INSTANCE.hasAPI(m)).collect(Collectors.toList());
+        if (missingDependencies.size() == 0) {
+          addInterfacePatch(((Type) d.getAnnotationInfo().get("value")).getClassName(), d.getClassName());
+          mixinLogger.info("Registered mixin.");
+        } else {
+          mixinLogger.info("Skipping mixin due to missing dependencies: {}", missingDependencies);
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();

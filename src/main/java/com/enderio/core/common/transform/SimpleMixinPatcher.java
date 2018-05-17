@@ -1,18 +1,10 @@
 package com.enderio.core.common.transform;
 
-import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
-import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
-import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
-
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -25,9 +17,14 @@ import com.enderio.core.common.transform.EnderCorePlugin.InterfacePatchData;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import static com.enderio.core.common.transform.EnderCorePlugin.mixinLogger;
+import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
+import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
+import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
+import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+
 public class SimpleMixinPatcher implements IClassTransformer {
-  
-  public static final Logger logger = LogManager.getLogger();
   
   private final EnderCorePlugin plugin = EnderCorePlugin.instance();
   
@@ -43,13 +40,14 @@ public class SimpleMixinPatcher implements IClassTransformer {
       }
       if (d.source.equals(transformedName)) {
         capturedSources.put(transformedName, targetClass);
+        mixinLogger.info("Found mixin source class data for {}.", transformedName);
         break;
       }
     }
     if (data != null) {
       byte[] sourceClass = capturedSources.get(data.source);
       if (sourceClass == null) {
-        logger.error("[EnderCore ASM] Skipping interface patch due to unloaded class: " + data.source);
+        mixinLogger.error("Skipping mixin patch due to unloaded class: " + data.source);
       } else {
         ClassNode targetNode = new ClassNode();
         ClassReader targetReader = new ClassReader(targetClass);
@@ -92,7 +90,7 @@ public class SimpleMixinPatcher implements IClassTransformer {
 
         ClassWriter cw = new ClassWriter(COMPUTE_MAXS | COMPUTE_FRAMES);
         targetNode.accept(cw);
-        logger.info("Patched interfaces from {} onto {}.", data.source, data.target);
+        mixinLogger.info("Patched mixin {} onto {}.", data.source, data.target);
         return cw.toByteArray();
       }
     }

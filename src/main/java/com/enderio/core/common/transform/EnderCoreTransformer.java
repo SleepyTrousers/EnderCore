@@ -2,8 +2,6 @@ package com.enderio.core.common.transform;
 
 import java.util.Iterator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -25,6 +23,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
+import static com.enderio.core.common.transform.EnderCorePlugin.mainLogger;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.ICONST_0;
@@ -38,12 +37,6 @@ import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
 import static org.objectweb.asm.Opcodes.IRETURN;
 
 public class EnderCoreTransformer implements IClassTransformer {
-
-  // The EnderCore class cannot be referenced from the transformer,
-  // as it improperly triggers classloading of FML event classes.
-  // The solution is to copy the logger into this class, instead of referencing
-  // the static 'logger' field from EnderCore
-  public static final Logger logger = LogManager.getLogger("EnderCore");
 
   protected static class ObfSafeName {
     final String deobf, srg;
@@ -143,7 +136,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            logger.info("Transforming failed.");
+            mainLogger.info("Transforming failed.");
           }
         }
       });
@@ -172,7 +165,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            logger.info("Transforming failed.");
+            mainLogger.info("Transforming failed.");
           }
         }
       });
@@ -236,16 +229,16 @@ public class EnderCoreTransformer implements IClassTransformer {
                 }
               }
               if (!applied) {
-                logger.info("Transforming failed. Applying ersatz patch...");
+                mainLogger.info("Transforming failed. Applying ersatz patch...");
                 m.instructions.insert(toAdd);
-                logger.warn("Ersatz patch applied, things may break!");
+                mainLogger.warn("Ersatz patch applied, things may break!");
                 done++;
               }
               break;
             }
           }
           if (done != 2) {
-            logger.info("Transforming failed.");
+            mainLogger.info("Transforming failed.");
           }
         }
       });
@@ -286,7 +279,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
       classReader.accept(cw, 0);
 
-      logger
+      mainLogger
           .info("Transforming " + entityPlayerClass + " finished, added " + (deObf ? "isElytraFlying()" : "func_184613_cA()") + " overriding EntityLivingBase");
       return cw.toByteArray();
     }
@@ -329,7 +322,7 @@ public class EnderCoreTransformer implements IClassTransformer {
             }
           }
           if (!done) {
-            logger.info("Transforming failed.");
+            mainLogger.info("Transforming failed.");
           }
         }
       });
@@ -339,7 +332,7 @@ public class EnderCoreTransformer implements IClassTransformer {
   }
 
   protected final static byte[] transform(byte[] classBytes, String className, ObfSafeName methodName, Transform transformer) {
-    logger.info("Transforming Class [" + className + "], Method [" + methodName.getName() + "]");
+    mainLogger.info("Transforming Class [" + className + "], Method [" + methodName.getName() + "]");
 
     ClassNode classNode = new ClassNode();
     ClassReader classReader = new ClassReader(classBytes);
@@ -351,7 +344,7 @@ public class EnderCoreTransformer implements IClassTransformer {
 
     ClassWriter cw = new ClassWriter(0);
     classNode.accept(cw);
-    logger.info("Transforming " + className + " Finished.");
+    mainLogger.info("Transforming " + className + " Finished.");
     return cw.toByteArray();
   }
 

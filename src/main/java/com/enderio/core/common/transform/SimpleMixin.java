@@ -28,5 +28,7 @@ import java.lang.annotation.Target;
 public @interface SimpleMixin {
   
   Class<?> value();
+  
+  String[] dependencies() default {};
 
 }
