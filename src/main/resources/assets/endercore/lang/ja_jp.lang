@@ -1,0 +1,27 @@
+endercore.tooltip.oreDictNames=鉱石辞書名：
+endercore.tooltip.showDetails=<Shift で詳細表示>
+endercore.tooltip.durability=耐久値：
+
+endercore.command.config.result.success=%s の設定を再読み込みしました
+endercore.command.config.result.fail=%s の設定の再読み込みに失敗しました
+endercore.command.config.result.invalid=Mod ID %s は有効ではありません
+
+enchantment.xpboost=経験値増量
+endercore.enchantment.xpboost.tooltip=Mob を倒した際のドロップ経験値量を増加。
+
+enchantment.autosmelt=自動製錬
+endercore.enchantment.autosmelt.tooltip=採掘したものを自動的に製錬する。
+
+endercore.celebrate=ハッピーニューイヤー！
+
+endercore.resourcepack.readme=これは、ゲーム内のリソースとして実際に使用されるファイルです。
+endercore.resourcepack.readme2=作成・削除は Mod により行われるため、編集はしないでください。
+
+endercore.chat.invis.warn.1=EnderCore は現在、%3$sにより%1$s凍結モード%2$sとなっています
+endercore.chat.invis.warn.2=そのため、%1$sこの Mod がゲームに追加する機能は有効になりません%2$s
+endercore.chat.invis.warn.3=ただし、設定から強制的に有効化することは可能です
+endercore.chat.invis.warn.4=この警告は、設定が変更されない限り、一度だけ表示されます
+endercore.chat.invis.reason.1=Mod「%s」の要求
+endercore.chat.invis.reason.2=設定
+
+endercore.config.title=Ender Core
