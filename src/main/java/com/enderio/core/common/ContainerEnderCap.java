@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
-import com.enderio.core.common.inventory.EnderSlot;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,9 +25,6 @@ import net.minecraftforge.items.IItemHandler;
 public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEntity> extends Container implements GhostSlot.IGhostSlotAware {
 
   protected final @Nonnull Map<Slot, Point> slotLocations = Maps.newLinkedHashMap();
-
-  // TODO Make a wrapper for normal slots to be EnderSlots
-  protected final @Nonnull Map<EnderSlot, Point> enderSlotLocations = Maps.newLinkedHashMap();
 
   protected int startPlayerSlot;
   protected int endPlayerSlot;
@@ -85,12 +81,6 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
     initRan = true;
     return (X) this;
-  }
-
-  @Nonnull
-  public Slot addEnderSlotToContainer(@Nonnull EnderSlot slotIn) {
-    enderSlotLocations.put(slotIn, new Point(slotIn.xPos, slotIn.yPos));
-    return addSlotToContainer(slotIn);
   }
   
   @Override
@@ -262,11 +252,6 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         }
       }
     }
-  }
-
-  @Nonnull
-  public Map<EnderSlot, Point> getEnderSlotLocations() {
-    return enderSlotLocations;
   }
 
 }
