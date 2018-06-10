@@ -26,6 +26,10 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
   protected final @Nonnull Map<Slot, Point> slotLocations = Maps.newLinkedHashMap();
 
+  public Map<Slot, Point> getSlotLocations() {
+    return slotLocations;
+  }
+
   protected int startPlayerSlot;
   protected int endPlayerSlot;
   protected int startHotBarSlot;
@@ -66,7 +70,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     startPlayerSlot = inventorySlots.size();
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
-        Slot slot = new Slot(playerInv, j + i * 9 + 9, x + j * 18,  y + i * 18);
+        Slot slot = new Slot(playerInv, j + i * 9 + 9, x + j * 18, y + i * 18);
         addSlotToContainer(slot);
       }
     }
@@ -82,7 +86,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     initRan = true;
     return (X) this;
   }
-  
+
   @Override
   protected @Nonnull Slot addSlotToContainer(@Nonnull Slot slotIn) {
     slotLocations.put(slotIn, new Point(slotIn.xPos, slotIn.yPos));
