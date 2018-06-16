@@ -1,6 +1,7 @@
 package com.enderio.core.common.util;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -9,6 +10,8 @@ import java.util.NoSuchElementException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.Validate;
 
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -38,16 +41,16 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   public NNList() {
-    super();
+    this(new ArrayList<E>(), null);
   }
 
   public NNList(Collection<E> fillWith) {
-    super();
+    this();
     addAll(fillWith);
   }
 
   public NNList(int size, @Nonnull E fillWith) {
-    super();
+    this();
     for (int i = 0; i < size; i++) {
       add(fillWith);
     }
@@ -55,12 +58,14 @@ public class NNList<E> extends NonNullList<E> {
 
   @SafeVarargs
   public NNList(E... fillWith) {
-    super();
+    this();
     Collections.addAll(this, fillWith);
   }
 
   protected NNList(List<E> list, E defaultElement) {
     super(list, defaultElement);
+    this.delegate = list;
+    this.defaultElement = defaultElement;
   }
 
   public @Nonnull NNList<E> copy() {
@@ -85,9 +90,9 @@ public class NNList<E> extends NonNullList<E> {
    *           if the given element is not part of the list.
    */
   public @Nonnull E next(E current) {
-    for (int i = 0; i < size(); i++) {
+    for (int i = 0; i < delegate.size(); i++) {
       if (get(i) == current) {
-        if (i + 1 < size()) {
+        if (i + 1 < delegate.size()) {
           return get(i + 1);
         } else {
           return get(0);
@@ -106,12 +111,12 @@ public class NNList<E> extends NonNullList<E> {
    *           if the given element is not part of the list.
    */
   public @Nonnull E prev(E current) {
-    for (int i = 0; i < size(); i++) {
+    for (int i = 0; i < delegate.size(); i++) {
       if (get(i) == current) {
         if (i > 0) {
           return get(i - 1);
         } else {
-          return get(size() - 1);
+          return get(delegate.size() - 1);
         }
       }
     }
@@ -119,7 +124,7 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   public NNList<E> apply(@Nonnull Callback<E> callback) {
-    for (E e : this) {
+    for (E e : delegate) {
       if (e == null) {
         throw new NullPointerException();
       }
@@ -133,7 +138,7 @@ public class NNList<E> extends NonNullList<E> {
   }
 
   public boolean apply(@Nonnull ShortCallback<E> callback) {
-    for (E e : this) {
+    for (E e : delegate) {
       if (e == null) {
         throw new NullPointerException();
       }
@@ -157,7 +162,7 @@ public class NNList<E> extends NonNullList<E> {
 
   @Override
   public @Nonnull NNIterator<E> iterator() {
-    return new ItrImpl<E>(super.iterator());
+    return new ItrImpl<E>(delegate.iterator());
   }
 
   /**
@@ -209,7 +214,7 @@ public class NNList<E> extends NonNullList<E> {
 
     @Override
     public boolean hasNext() {
-      return cursor != size();
+      return cursor != delegate.size();
     }
 
     @Override
@@ -228,12 +233,7 @@ public class NNList<E> extends NonNullList<E> {
 
   }
 
-  private static final @Nonnull NNList<Object> EMPTY = new NNList<Object>() {
-    @Override
-    public void add(int p_add_1_, Object p_add_2_) {
-      throw new UnsupportedOperationException();
-    }
-  };
+  private static final @Nonnull NNList<Object> EMPTY = new NNList<Object>(Collections.emptyList(), null);
 
   @SuppressWarnings("unchecked")
   public static @Nonnull <X> NNList<X> emptyList() {
@@ -258,16 +258,58 @@ public class NNList<E> extends NonNullList<E> {
   @SuppressWarnings("null")
   @Override
   public @Nonnull <T> T[] toArray(T[] a) {
-    return super.toArray(a);
+    return delegate.toArray(a);
   }
 
   public NNList<E> removeAllByClass(Class<? extends E> clazz) {
-    for (NNIterator<E> iterator = iterator(); iterator.hasNext();) {
+    for (Iterator<E> iterator = delegate.iterator(); iterator.hasNext();) {
       if (clazz.isAssignableFrom(iterator.next().getClass())) {
         iterator.remove();
       }
     }
     return this;
+  }
+
+  // The following replaces all super methods to use our own storage
+
+  private final List<E> delegate;
+  private final E defaultElement;
+
+  @Override
+  @Nonnull
+  public E get(int p_get_1_) {
+    return NullHelper.notnull(delegate.get(p_get_1_), "Unexpect 'null' object in NNList");
+  }
+
+  @Override
+  public @Nonnull E set(int p_set_1_, E p_set_2_) {
+    return NullHelper.notnull(delegate.set(p_set_1_, Validate.notNull(p_set_2_)), "Unexpect 'null' object in NNList");
+  }
+
+  @Override
+  public void add(int p_add_1_, E p_add_2_) {
+    delegate.add(p_add_1_, Validate.notNull(p_add_2_));
+  }
+
+  @Override
+  public @Nonnull E remove(int p_remove_1_) {
+    return NullHelper.notnull(delegate.remove(p_remove_1_), "Unexpect 'null' object in NNList");
+  }
+
+  @Override
+  public int size() {
+    return delegate.size();
+  }
+
+  @Override
+  public void clear() {
+    if (defaultElement == null) {
+      removeRange(0, delegate.size());
+    } else {
+      for (int i = 0; i < delegate.size(); ++i) {
+        delegate.set(i, defaultElement);
+      }
+    }
   }
 
 }
