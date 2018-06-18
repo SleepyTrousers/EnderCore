@@ -3,8 +3,10 @@ package com.enderio.core.api.common.enchant;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.enderio.core.EnderCore;
 import com.google.common.base.Predicate;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -40,6 +42,8 @@ public interface IAdvancedEnchant {
    * @param stack
    * @return a list of <code>String</code>s to be bulleted under the enchantment
    */
-  public @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack);
+  default @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack) {
+    return EnderCore.lang.splitList(EnderCore.lang.localizeExact("description." + ((Enchantment) this).getName()));
+  }
 
 }
