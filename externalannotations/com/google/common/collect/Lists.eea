@@ -1,0 +1,7 @@
+class com/google/common/collect/Lists
+newArrayList
+ <E:Ljava/lang/Object;>()Ljava/util/ArrayList<TE;>;
+ <E:Ljava/lang/Object;>()L1java/util/ArrayList<TE;>;
+newArrayList
+ <E:Ljava/lang/Object;>([TE;)Ljava/util/ArrayList<TE;>;
+ <E:Ljava/lang/Object;>([TE;)L1java/util/ArrayList<TE;>;
