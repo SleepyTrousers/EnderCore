@@ -222,11 +222,11 @@ public class Things extends Ingredient {
   }
 
   private void cleanCachedValues() {
-    itemList.clear();
-    itemStackListRaw.clear();
-    itemStackList.clear();
-    blockList.clear();
-    itemIds.clear();
+    itemList = null;
+    itemStackListRaw = null;
+    itemStackList = null;
+    blockList = null;
+    itemIds = null;
   }
 
   private void bake() {
@@ -314,31 +314,34 @@ public class Things extends Ingredient {
     return false;
   }
 
-  private final @Nonnull NNList<Item> itemList = new NNList<Item>();
+  private @Nullable NNList<Item> itemList = null;
 
-  public NNList<Item> getItems() {
-    if (itemList.isEmpty()) {
+  public @Nonnull NNList<Item> getItems() {
+    NNList<Item> list = itemList;
+    if (list == null || list.isEmpty() || beforeLoadComplete) {
+      list = new NNList<>();
       for (IThing thing : things) {
-        itemList.addAll(thing.getItems());
+        list.addAll(thing.getItems());
       }
     }
-    return itemList;
+    return itemList = list;
   }
 
-  private final @Nonnull NNList<ItemStack> itemStackListRaw = new NNList<ItemStack>();
+  private @Nullable NNList<ItemStack> itemStackListRaw = null;
 
   /**
    * Returns a list of item stacks for this Thing. Items in this list may have the wildcard meta. List may contain empty stacks.
    */
-  public NNList<ItemStack> getItemStacksRaw() {
-    if (itemStackListRaw.isEmpty() || beforeLoadComplete) {
-      itemStackListRaw.clear();
+  public @Nonnull NNList<ItemStack> getItemStacksRaw() {
+    NNList<ItemStack> list = itemStackListRaw;
+    if (list == null || list.isEmpty() || beforeLoadComplete) {
+      list = new NNList<>();
       for (IThing thing : things) {
-        itemStackListRaw.addAll(thing.getItemStacks());
+        list.addAll(thing.getItemStacks());
       }
-      applyNBT(itemStackListRaw);
+      applyNBT(list);
     }
-    return itemStackListRaw;
+    return itemStackListRaw = list;
   }
 
   private void applyNBT(NNList<ItemStack> list) {
@@ -356,7 +359,7 @@ public class Things extends Ingredient {
     }
   }
 
-  private final @Nonnull NNList<ItemStack> itemStackList = new NNList<ItemStack>();
+  private @Nullable NNList<ItemStack> itemStackList = null;
 
   /**
    * Returns a list of item stacks for this Thing. Wildcard values are expanded to a full list of all available sub-items. Empty stacks are stripped.
@@ -364,20 +367,21 @@ public class Things extends Ingredient {
    * Please note that items that are defined using the wildcard value for the item damage may not return the complete list on dedicated servers
    */
   public @Nonnull NNList<ItemStack> getItemStacks() {
-    if (itemStackList.isEmpty() || beforeLoadComplete) {
-      itemStackList.clear();
+    NNList<ItemStack> list = itemStackList;
+    if (list == null || list.isEmpty() || beforeLoadComplete) {
+      list = new NNList<>();
       for (ItemStack stack : getItemStacksRaw()) {
         if (stack.isEmpty()) {
           // NOP
         } else if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-          stack.getItem().getSubItems(CreativeTabs.SEARCH, itemStackList);
+          stack.getItem().getSubItems(CreativeTabs.SEARCH, list);
         } else {
-          itemStackList.add(stack);
+          list.add(stack);
         }
       }
-      applyNBT(itemStackList);
+      applyNBT(list);
     }
-    return itemStackList;
+    return itemStackList = list;
   }
 
   public @Nonnull ItemStack getItemStack() {
@@ -385,15 +389,17 @@ public class Things extends Ingredient {
     return itemStacks.isEmpty() ? ItemStack.EMPTY : itemStacks.get(0);
   }
 
-  private final @Nonnull NNList<Block> blockList = new NNList<Block>();
+  private @Nullable NNList<Block> blockList = null;
 
   public @Nonnull NNList<Block> getBlocks() {
-    if (blockList.isEmpty()) {
+    NNList<Block> list = blockList;
+    if (list == null || list.isEmpty() || beforeLoadComplete) {
+      list = new NNList<>();
       for (IThing thing : things) {
-        blockList.addAll(thing.getBlocks());
+        list.addAll(thing.getBlocks());
       }
     }
-    return blockList;
+    return blockList = list;
   }
 
   private final @Nonnull NNList<String> nameList = new NNList<>();
@@ -414,16 +420,18 @@ public class Things extends Ingredient {
     return contains(p_apply_1_);
   }
 
-  private final @Nonnull IntList itemIds = new IntArrayList();
+  private @Nullable IntList itemIds = null;
 
   @Override
   public @Nonnull IntList getValidItemStacksPacked() {
-    if (itemIds.isEmpty()) {
+    IntList list = itemIds;
+    if (list == null || list.isEmpty() || beforeLoadComplete) {
+      list = new IntArrayList();
       for (NNIterator<ItemStack> itr = getItemStacks().fastIterator(); itr.hasNext();) {
-        itemIds.add(RecipeItemHelper.pack(itr.next()));
+        list.add(RecipeItemHelper.pack(itr.next()));
       }
     }
-    return itemIds;
+    return itemIds = list;
   }
 
   @Override

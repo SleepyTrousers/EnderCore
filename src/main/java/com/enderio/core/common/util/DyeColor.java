@@ -41,12 +41,12 @@ public enum DyeColor {
 
   };
 
-  public static DyeColor getNext(DyeColor col) {
+  public static @Nonnull DyeColor getNext(@Nonnull DyeColor col) {
     int ord = col.ordinal() + 1;
     if (ord >= DyeColor.values().length) {
       ord = 0;
     }
-    return DyeColor.values()[ord];
+    return NullHelper.first(DyeColor.values()[ord], DyeColor.BLACK);
   }
 
   public static @Nullable DyeColor getColorFromDye(@Nonnull ItemStack dye) {
@@ -76,11 +76,11 @@ public enum DyeColor {
     return ItemDye.DYE_COLORS[ordinal()];
   }
 
-  public String getName() {
+  public @Nonnull String getName() {
     return EnumDyeColor.values()[ordinal()].getName();
   }
 
-  public String getLocalisedName() {
+  public @Nonnull String getLocalisedName() {
     return EnderCore.lang.localizeExact(NullHelper.notnull(DYE_ORE_UNLOCAL_NAMES[ordinal()], "Data corruption"), false);
   }
 
