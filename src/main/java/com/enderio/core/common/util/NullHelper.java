@@ -9,36 +9,36 @@ public final class NullHelper {
   }
 
   @Nonnull
-  public final static <P> P notnull(@Nullable P o, @Nonnull String message) {
+  public final static <P> P notnull(@Nullable P o, @Nonnull Object... message) {
     if (o == null) {
       throw new NullPointerException(
-          "Houston we have a problem: '" + message + "'. " + "Please report that on our bugtracker unless you are using some old version. Thank you.");
+          "Houston we have a problem: '" + join(message) + "'. " + "Please report that on our bugtracker unless you are using some old version. Thank you.");
     }
     return o;
   }
 
   @Nonnull
-  public final static <P> P notnullJ(@Nullable P o, @Nonnull String message) {
+  public final static <P> P notnullJ(@Nullable P o, @Nonnull Object... message) {
     if (o == null) {
       throw new NullPointerException(
-          "There was a problem with Java: The call '" + message + "' returned null even though it should not be able to do that. Is your Java broken?");
+          "There was a problem with Java: The call '" + join(message) + "' returned null even though it should not be able to do that. Is your Java broken?");
     }
     return o;
   }
 
   @Nonnull
-  public final static <P> P notnullM(@Nullable P o, @Nonnull String message) {
+  public final static <P> P notnullM(@Nullable P o, @Nonnull Object... message) {
     if (o == null) {
-      throw new NullPointerException("There was a problem with Minecraft: The call '" + message
+      throw new NullPointerException("There was a problem with Minecraft: The call '" + join(message)
           + "' returned null even though it should not be able to do that. Is your Minecraft broken? Did some other mod break it?");
     }
     return o;
   }
 
   @Nonnull
-  public final static <P> P notnullF(@Nullable P o, @Nonnull String message) {
+  public final static <P> P notnullF(@Nullable P o, @Nonnull Object... message) {
     if (o == null) {
-      throw new NullPointerException("There was a problem with Forge: The call '" + message
+      throw new NullPointerException("There was a problem with Forge: The call '" + join(message)
           + "' returned null even though it should not be able to do that. Is your Forge broken? Did some other mod break it?");
     }
     return o;
@@ -46,10 +46,10 @@ public final class NullHelper {
 
   @SuppressWarnings({ "null", "unused" })
   @Nonnull
-  public final static <P> P untrusted(@Nonnull P o, @Nonnull String message) {
+  public final static <P> P untrusted(@Nonnull P o, @Nonnull Object... message) {
     if (o == null) {
       throw new NullPointerException(
-          "There was a problem with Minecraft: The call '" + message + "' returned null even though it says it is not be able to do that. " //
+          "There was a problem with Minecraft: The call '" + join(message) + "' returned null even though it says it is not be able to do that. " //
               + "Your Minecraft is broken. This mod is NOT(!) the cause of this crash!");
     }
     return o;
@@ -73,4 +73,11 @@ public final class NullHelper {
     throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
   }
 
+  private static String join(@Nonnull Object... data) {
+    StringBuilder b = new StringBuilder();
+    for (Object object : data) {
+      b.append(object);
+    }
+    return b.toString();
+  }
 }
