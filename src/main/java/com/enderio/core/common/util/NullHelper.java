@@ -8,6 +8,36 @@ public final class NullHelper {
   private NullHelper() {
   }
 
+  // bouncers for binary compatibility
+  // TODO 1.13 remove
+
+  @Nonnull
+  public final static <P> P notnull(@Nullable P o, @Nonnull String message) {
+    return notnull(o, (Object) message);
+  }
+
+  @Nonnull
+  public final static <P> P notnullJ(@Nullable P o, @Nonnull String message) {
+    return notnullJ(o, (Object) message);
+  }
+
+  @Nonnull
+  public final static <P> P notnullM(@Nullable P o, @Nonnull String message) {
+    return notnullM(o, (Object) message);
+  }
+
+  @Nonnull
+  public final static <P> P notnullF(@Nullable P o, @Nonnull String message) {
+    return notnullF(o, (Object) message);
+  }
+
+  @Nonnull
+  public final static <P> P untrusted(@Nonnull P o, @Nonnull String message) {
+    return untrusted(o, (Object) message);
+  }
+
+  //
+
   @Nonnull
   public final static <P> P notnull(@Nullable P o, @Nonnull Object... message) {
     if (o == null) {
@@ -63,9 +93,13 @@ public final class NullHelper {
     return o;
   }
 
+  /**
+   * Returns the first non-<code>null</code> parameter or thrown a
+   * {@link NullPointerException} if there is none.
+   */
   @SafeVarargs
   public final static @Nonnull <P> P first(@Nullable P... o) {
-    for (P on : notnullJ(o, "... param is null")) {
+    for (P on : notnull(o, (Object) "... param is null")) {
       if (on != null) {
         return on;
       }
