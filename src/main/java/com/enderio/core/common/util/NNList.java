@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -79,6 +81,10 @@ public class NNList<E> extends NonNullList<E> {
   public static @Nonnull <X extends Enum<?>> NNList<X> of(Class<X> e) {
     NNList<X> list = new NNList<X>(e.getEnumConstants());
     return list;
+  }
+  
+  public static @Nonnull <T> Collector<T, ?, NNList<T>> collector() {
+    return NullHelper.notnullJ(Collectors.toCollection(NNList::new), "Collectors.toCollection");
   }
 
   /**
