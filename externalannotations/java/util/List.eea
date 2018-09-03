@@ -1,4 +1,4 @@
 class java/util/List
 toArray
  <T:Ljava/lang/Object;>([TT;)[TT;
- <T:Ljava/lang/Object;>([TT;)[T1T;
+ <T:Ljava/lang/Object;>([TT;)[1T1T;

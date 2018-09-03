@@ -1,12 +1,15 @@
 package com.enderio.core.common;
 
 import java.awt.Point;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -93,6 +96,11 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     return super.addSlotToContainer(slotIn);
   }
 
+  @SuppressWarnings("null")
+  public @Nonnull List<net.minecraft.inventory.Slot> getPlayerSlots() {
+    return inventorySlots.stream().filter(x -> x.inventory == playerInv).collect(Collectors.toList());
+  }
+
   public @Nonnull Point getPlayerInventoryOffset() {
     return new Point(0, 54);
   }
@@ -103,6 +111,10 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
   public @Nullable S getTileEntity() {
     return te;
+  }
+
+  public @Nonnull S getTileEntityNN() {
+    return NullHelper.notnull(te, "Internal logic error, TE-less GUI accessing TE");
   }
 
   @Override
