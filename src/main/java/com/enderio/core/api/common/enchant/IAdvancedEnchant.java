@@ -43,7 +43,9 @@ public interface IAdvancedEnchant {
    * @return a list of <code>String</code>s to be bulleted under the enchantment
    */
   default @Nonnull String[] getTooltipDetails(@Nonnull ItemStack stack) {
-    return EnderCore.lang.splitList(EnderCore.lang.localizeExact("description." + ((Enchantment) this).getName()));
+    final String unloc = "description." + ((Enchantment) this).getName();
+    final String loc = EnderCore.lang.localizeExact(unloc);
+    return unloc.equals(loc) ? new String[0] : EnderCore.lang.splitList(loc);
   }
 
 }
