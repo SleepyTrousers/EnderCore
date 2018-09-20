@@ -1,5 +1,9 @@
 package com.enderio.core.common;
 
+/**
+ * @deprecated Moved to AutoSave
+ */
+@Deprecated
 public enum NBTAction {
   /**
    * The TE is saved to/loaded from the save file.

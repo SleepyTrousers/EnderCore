@@ -159,6 +159,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
   }
 
+  @Deprecated
   protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
 
   protected void readCustomNBT(@Nonnull ItemStack stack) {
@@ -167,6 +168,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
     }
   }
 
+  @Deprecated
   protected abstract void readCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
 
   public boolean canPlayerAccess(EntityPlayer player) {
