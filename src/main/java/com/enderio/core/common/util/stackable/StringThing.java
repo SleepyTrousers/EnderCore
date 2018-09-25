@@ -48,6 +48,7 @@ class StringThing implements IThing {
     }
     int meta = -1;
     if (ident.contains(":")) {
+      allowOreDict = false;
       String[] split = ident.split(":", 3);
       if (split != null && split.length >= 2) {
         if (split[0] != null && !split[0].trim().isEmpty()) {
