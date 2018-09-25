@@ -209,16 +209,16 @@ public class Things extends Ingredient {
   }
 
   private void add(@Nullable IThing thing) {
-    IThing baked;
-    if (!inPreInit && thing != null) {
-      baked = thing.bake();
-    } else {
-      baked = thing;
+    if (thing != null) {
+      if (!inPreInit) {
+        for (IThing baked : thing.bake()) {
+          things.add(baked);
+        }
+      } else {
+        things.add(thing);
+      }
     }
-    if (baked != null) {
-      things.add(baked);
-      cleanCachedValues();
-    }
+    cleanCachedValues();
   }
 
   private void cleanCachedValues() {
@@ -230,16 +230,14 @@ public class Things extends Ingredient {
   }
 
   private void bake() {
-    for (int i = 0; i < things.size(); i++) {
-      IThing thing = things.get(i);
-      IThing bakedThing = thing.bake();
-      if (bakedThing != null) {
-        things.set(i, bakedThing);
-      } else {
-        things.remove(i);
-        i--;
+    NNList<IThing> temp = new NNList<>();
+    for (IThing thing : things) {
+      for (IThing baked : thing.bake()) {
+        temp.add(baked);
       }
     }
+    things.clear();
+    things.addAll(temp);
     cleanCachedValues();
   }
 

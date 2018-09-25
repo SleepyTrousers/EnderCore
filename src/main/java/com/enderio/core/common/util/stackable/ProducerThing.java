@@ -18,7 +18,7 @@ class ProducerThing implements IThing {
   }
 
   @Override
-  public @Nullable IThing bake() {
+  public @Nonnull NNList<IThing> bake() {
     Block block = producer.getBlock();
     if (block != null) {
       return new BlockThing(block).bake();
@@ -27,7 +27,7 @@ class ProducerThing implements IThing {
     if (item != null) {
       return new ItemThing(item).bake();
     }
-    return null;
+    return NNList.emptyList();
   }
 
   @Override

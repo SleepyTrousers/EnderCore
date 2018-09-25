@@ -11,8 +11,8 @@ import net.minecraft.item.ItemStack;
 
 interface IThing {
 
-  @Nullable
-  IThing bake();
+  @Nonnull
+  NNList<IThing> bake();
 
   boolean is(@Nullable Item item);
 

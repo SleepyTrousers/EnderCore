@@ -19,8 +19,8 @@ class BlockThing implements IThing {
   }
 
   @Override
-  public @Nullable IThing bake() {
-    return this;
+  public @Nonnull NNList<IThing> bake() {
+    return new NNList<>(this);
   }
 
   @Override

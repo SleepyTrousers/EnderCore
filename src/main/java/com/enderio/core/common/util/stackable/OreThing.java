@@ -23,9 +23,9 @@ class OreThing implements IThing.Zwieback {
 
   @SuppressWarnings("null")
   @Override
-  public @Nullable IThing bake() {
+  public @Nonnull NNList<IThing> bake() {
     ores = OreDictionary.getOres(name);
-    return this;
+    return new NNList<>(this);
   }
 
   @Override

@@ -19,7 +19,7 @@ class ResourceThing implements IThing {
   }
 
   @Override
-  public @Nullable IThing bake() {
+  public @Nonnull NNList<IThing> bake() {
     // this ugly thing seems to be what Forge wants you to use
     if (net.minecraft.block.Block.REGISTRY.containsKey(resourceLocation)) {
       Block block = net.minecraft.block.Block.REGISTRY.getObject(resourceLocation);
@@ -30,7 +30,7 @@ class ResourceThing implements IThing {
     if (item != null) {
       return new ItemThing(item).bake();
     }
-    return null;
+    return NNList.emptyList();
   }
 
   @Override

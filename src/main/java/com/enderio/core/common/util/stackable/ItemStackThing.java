@@ -20,8 +20,8 @@ class ItemStackThing implements IThing {
   }
 
   @Override
-  public @Nullable IThing bake() {
-    return thing.isEmpty() ? null : this;
+  public @Nonnull NNList<IThing> bake() {
+    return thing.isEmpty() ? NNList.emptyList() : new NNList<>(this);
   }
 
   @Override

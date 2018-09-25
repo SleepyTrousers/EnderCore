@@ -17,29 +17,34 @@ class StringThing implements IThing {
   private final @Nonnull String name;
 
   StringThing(@Nullable String name) {
-    this.name = name != null ? name : "";
+    this.name = name != null ? NullHelper.notnullJ(name.trim(), "String.trim()") : "";
   }
 
   @Override
-  public @Nullable IThing bake() {
-    if (name.trim().isEmpty()) {
-      return null;
+  public @Nonnull NNList<IThing> bake() {
+    if (name.isEmpty()) {
+      return NNList.emptyList();
     }
     if (Things.aliases.containsKey(name)) {
       return Things.aliases.get(name).bake();
     }
+
+    if (name.contains(",") || name.contains("+") || name.contains("-")) {
+      return compound();
+    }
+
     @Nonnull
     String mod = "minecraft", ident = name;
     boolean allowItem = true, allowBlock = true, allowOreDict = true;
     if (ident.startsWith("item:")) {
       allowBlock = allowOreDict = false;
-      ident = ident.substring("item:".length());
+      ident = NullHelper.notnullJ(ident.substring("item:".length()), "String.substring()");
     } else if (ident.startsWith("block:")) {
       allowItem = allowOreDict = false;
-      ident = ident.substring("block:".length());
+      ident = NullHelper.notnullJ(ident.substring("block:".length()), "String.substring()");
     } else if (ident.startsWith("oredict:")) {
       allowBlock = allowItem = false;
-      ident = ident.substring("oredict:".length());
+      ident = NullHelper.notnullJ(ident.substring("oredict:".length()), "String.substring()");
     }
     int meta = -1;
     if (ident.contains(":")) {
@@ -60,7 +65,7 @@ class StringThing implements IThing {
             try {
               meta = Integer.parseInt(split[2]);
             } catch (NumberFormatException e) {
-              return null;
+              return NNList.emptyList();
             }
           }
         }
@@ -97,7 +102,29 @@ class StringThing implements IThing {
         return new ItemStackThing(new ItemStack(block, 1, meta)).bake();
       }
     }
-    return null;
+    return NNList.emptyList();
+  }
+
+  private @Nonnull NNList<IThing> compound() {
+    NNList<IThing> positive = new NNList<>(), negative = new NNList<>();
+
+    for (String split : name.split(",\\s*")) {
+      if (split.startsWith("-")) {
+        negative.addAll(new StringThing(split.substring(1)).bake());
+      } else if (split.startsWith("+")) {
+        positive.addAll(new StringThing(split.substring(1)).bake());
+      } else {
+        positive.addAll(new StringThing(split).bake());
+      }
+    }
+
+    if (negative.isEmpty()) {
+      return positive;
+    } else if (positive.isEmpty()) {
+      return NNList.emptyList();
+    } else {
+      return new NNList<>(new ExclusionThing(positive, negative));
+    }
   }
 
   @Override
