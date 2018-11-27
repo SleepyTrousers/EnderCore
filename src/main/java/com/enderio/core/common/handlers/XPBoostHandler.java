@@ -34,7 +34,7 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 @Handler
 public class XPBoostHandler {
 
-  private static final Method getExperiencePoints = ReflectionHelper.findMethod(EntityLivingBase.class, "getExperiencePoints", "func_70693_a", 
+  private static final Method getExperiencePoints = ReflectionHelper.findMethod(EntityLivingBase.class, "getExperiencePoints", "func_70693_a",
       EntityPlayer.class);
 
   private static final @Nonnull String NBT_KEY = "endercore:xpboost";
@@ -45,10 +45,9 @@ public class XPBoostHandler {
     Entity killer = event.getSource().getTrueSource();
 
     if (!entity.world.isRemote && killer != null) {
-      if (killer instanceof EntityPlayer && !(killer instanceof FakePlayer)) {
+      if (killer instanceof EntityPlayer) {
         scheduleXP(entity, getXPBoost(entity, (EntityPlayer) killer));
-      } else if (killer instanceof EntityArrow && ((EntityArrow) killer).shootingEntity instanceof EntityPlayer
-          && !(((EntityArrow) killer).shootingEntity instanceof FakePlayer)) {
+      } else if (killer instanceof EntityArrow) {
         NBTTagCompound tag = killer.getEntityData();
         if (tag.hasKey(NBT_KEY) && tag.getInteger(NBT_KEY) >= 0) {
           int level = tag.getInteger(NBT_KEY);
@@ -63,33 +62,28 @@ public class XPBoostHandler {
   public static void handleArrowFire(EntityJoinWorldEvent event) {
     if (event.getEntity() instanceof EntityArrow) {
       EntityArrow arrow = (EntityArrow) event.getEntity();
-      if (arrow.shootingEntity instanceof EntityPlayer) {
-        arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(((EntityPlayer) arrow.shootingEntity).getHeldItemMainhand()));
-      }
+      arrow.getEntityData().setInteger(NBT_KEY, getXPBoostLevel(arrow.shootingEntity));
     }
   }
 
   @SubscribeEvent
   public static void handleBlockBreak(BreakEvent event) {
-    ItemStack held = event.getPlayer().getHeldItemMainhand();
-    if (!held.isEmpty() && !(event.getPlayer() instanceof FakePlayer)) {
-      int level = getXPBoostLevel(held);
-      int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
+    int level = getXPBoostLevel(event.getPlayer());
 
-      if (level >= 0) {
-        final @Nonnull IBlockState state = NullHelper.notnullF(event.getState(), "BreakEvent.getState()");
-        final @Nonnull World world = NullHelper.notnullF(event.getWorld(), "BreakEvent.getWorld()");
-        final @Nonnull BlockPos pos = NullHelper.notnullF(event.getPos(), "BreakEvent.getPos()");
-        int xp = state.getBlock().getExpDrop(state, world, pos, fortune);
-        if (xp > 0) {
-          world.spawnEntity(new EntityXPOrb(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, getXPBoost(xp, level)));
-        }
+    if (level >= 0) {
+      final @Nonnull IBlockState state = NullHelper.notnullF(event.getState(), "BreakEvent.getState()");
+      final @Nonnull World world = NullHelper.notnullF(event.getWorld(), "BreakEvent.getWorld()");
+      final @Nonnull BlockPos pos = NullHelper.notnullF(event.getPos(), "BreakEvent.getPos()");
+      final int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, event.getPlayer().getHeldItemMainhand());
+      final int xp = state.getBlock().getExpDrop(state, world, pos, fortune);
+      if (xp > 0) {
+        world.spawnEntity(new EntityXPOrb(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, getXPBoost(xp, level)));
       }
     }
   }
 
   private static int getXPBoost(EntityLivingBase killed, EntityPlayer player) {
-    return getXPBoost(killed, player, getXPBoostLevel(player.getHeldItemMainhand()));
+    return getXPBoost(killed, player, getXPBoostLevel(player));
   }
 
   private static int getXPBoost(EntityLivingBase killed, EntityPlayer player, int level) {
@@ -108,7 +102,11 @@ public class XPBoostHandler {
     return Math.round(xp * ((float) Math.log10(level + 1) * 2));
   }
 
-  private static int getXPBoostLevel(@Nonnull ItemStack weapon) {
+  private static int getXPBoostLevel(Entity player) {
+    if (player == null || !(player instanceof EntityPlayer) || player instanceof FakePlayer) {
+      return -1;
+    }
+    ItemStack weapon = ((EntityLivingBase) player).getHeldItemMainhand();
     if (weapon.isEmpty()) {
       return -1;
     }
