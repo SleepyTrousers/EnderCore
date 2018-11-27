@@ -8,6 +8,7 @@ import com.enderio.core.EnderCore;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.oredict.OreDictionary;
 
 public enum DyeColor {
@@ -65,8 +66,8 @@ public enum DyeColor {
     return null;
   }
 
-  public static DyeColor fromIndex(int index) {
-    return DyeColor.values()[index];
+  public static @Nonnull DyeColor fromIndex(int index) {
+    return NullHelper.first(DyeColor.values()[MathHelper.clamp(index, 0, DyeColor.values().length - 1)], DyeColor.BLACK);
   }
 
   private DyeColor() {
