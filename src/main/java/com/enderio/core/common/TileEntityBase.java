@@ -154,7 +154,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   protected void writeCustomNBT(@Nonnull ItemStack stack) {
     final NBTTagCompound tag = new NBTTagCompound();
     writeCustomNBT(NBTAction.ITEM, tag);
-    if (!tag.hasNoTags()) {
+    if (!tag.isEmpty()) {
       stack.setTagCompound(tag);
     }
   }
@@ -183,7 +183,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   }
 
   protected boolean isPoweredRedstone() {
-    return hasWorld() && world.isBlockLoaded(getPos()) ? world.isBlockIndirectlyGettingPowered(getPos()) > 0 : false;
+    return hasWorld() && world.isBlockLoaded(getPos()) ? world.getRedstonePowerFromNeighbors(getPos()) > 0 : false;
   }
 
   /**

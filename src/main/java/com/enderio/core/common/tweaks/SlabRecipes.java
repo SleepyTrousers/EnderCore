@@ -29,7 +29,7 @@ public class SlabRecipes extends Tweak {
 
   private static void addSlabRecipe(@Nonnull ItemStack stack, @Nonnull String slab) {
     ForgeRegistries.RECIPES.register(new ShapelessOreRecipe(null, stack, slab, slab)
-        .setRegistryName(slab + "_to_" + NullHelper.notnullM(stack.getItem().getRegistryName(), "found unregistered item").getResourcePath()));
+        .setRegistryName(slab + "_to_" + NullHelper.notnullM(stack.getItem().getRegistryName(), "found unregistered item").getPath()));
   }
 
   private static void registerSlabToBlock() {

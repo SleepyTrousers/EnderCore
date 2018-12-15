@@ -31,7 +31,7 @@ public class VertexRotationFacing extends VertexRotation {
   }
 
   public EnumFacing rotate(@Nonnull EnumFacing dir) {
-    if (dir.getFrontOffsetY() != 0) {
+    if (dir.getYOffset() != 0) {
       return dir;
     }
     if (getAngle() == ROTATION_AMOUNT) {
