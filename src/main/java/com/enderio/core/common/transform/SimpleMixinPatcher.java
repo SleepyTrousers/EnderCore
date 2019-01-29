@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LocalVariableNode;
@@ -16,6 +18,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import com.enderio.core.common.transform.EnderCorePlugin.InterfacePatchData;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -31,6 +35,7 @@ public class SimpleMixinPatcher implements IClassTransformer {
   private final EnderCorePlugin plugin = EnderCorePlugin.instance();
   
   private final Map<String, byte[]> capturedSources = new HashMap<>();
+  private final Multimap<String, InterfacePatchData> interfaceTargets = HashMultimap.create();
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] targetClass) {
@@ -44,13 +49,36 @@ public class SimpleMixinPatcher implements IClassTransformer {
         mixinLogger.info("Found mixin source class data for {}.", transformedName);
       }
     }
+    if (patches.isEmpty() && interfaceTargets.isEmpty()) {
+      return targetClass;
+    }
+
+    ClassNode targetNode = new ClassNode();
+    ClassReader targetReader = new ClassReader(targetClass);
+    targetReader.accept(targetNode, 0);
+    
+    // If this is a directly targeted interface, track it for later
+    if (!patches.isEmpty() && (targetNode.access & Opcodes.ACC_INTERFACE) != 0) {
+      interfaceTargets.putAll(targetNode.name, patches);
+      mixinLogger.info("Found interface target {}", transformedName);
+      return targetClass;
+    }
+    
+    // Check for tracked interfaces on this class, if we know of any
+    if (!interfaceTargets.isEmpty()) {
+      int patchCount = patches.size();
+      targetNode.interfaces.stream()
+                           .map(interfaceTargets::get)
+                           .filter(Objects::nonNull)
+                           .forEach(patches::addAll);
+      if (patches.size() > patchCount) {
+        int count = patches.size() - patchCount;
+        mixinLogger.info("Found {} {} to apply to class {} from implemented interfaces: {}", count, count > 1 ? "patches" : "patch", transformedName, targetNode.interfaces.stream().filter(interfaceTargets::containsKey).toArray());
+      }
+    }
+    
     if (!patches.isEmpty()) {
-      
       mixinLogger.info("Patching {} mixins onto class {}", patches.size(), transformedName);
-      
-      ClassNode targetNode = new ClassNode();
-      ClassReader targetReader = new ClassReader(targetClass);
-      targetReader.accept(targetNode, 0);
       
       for (InterfacePatchData data : patches) {
         byte[] sourceClass = capturedSources.get(data.source);
