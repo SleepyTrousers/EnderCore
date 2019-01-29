@@ -12,6 +12,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +22,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -118,6 +120,27 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
       drops.add(drop);
     }
     getExtraDrops(drops, world, pos, state, fortune, te);
+  }
+
+  /**
+   * @deprecated override {@link #processPickBlock(IBlockState, RayTraceResult, World, BlockPos, EntityPlayer, ItemStack)} instead if possible
+   */
+  @Override
+  @Deprecated
+  public @Nonnull ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
+      @Nonnull EntityPlayer player) {
+    if (player.capabilities.isCreativeMode && GuiScreen.isCtrlKeyDown()) {
+      ItemStack nbtDrop = getNBTDrop(world, pos, state, 0, getTileEntity(world, pos));
+      if (nbtDrop != null) {
+        return nbtDrop;
+      }
+    }
+    return processPickBlock(state, target, world, pos, player, super.getPickBlock(state, target, world, pos, player));
+  }
+
+  protected @Nonnull ItemStack processPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
+      @Nonnull EntityPlayer player, @Nonnull ItemStack pickBlock) {
+    return pickBlock;
   }
 
   public @Nullable ItemStack getNBTDrop(@Nonnull IBlockAccess world, @Nonnull BlockPos pos, @Nonnull IBlockState state, int fortune, @Nullable T te) {

@@ -29,7 +29,7 @@ class StringThing implements IThing {
       return Things.aliases.get(name).bake();
     }
 
-    if (name.contains(",") || name.contains("+") || name.contains("-")) {
+    if (name.contains(",") || name.startsWith("+") || name.startsWith("-")) {
       return compound();
     }
 

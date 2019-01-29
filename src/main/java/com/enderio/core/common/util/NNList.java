@@ -82,7 +82,11 @@ public class NNList<E> extends NonNullList<E> {
     NNList<X> list = new NNList<X>(e.getEnumConstants());
     return list;
   }
-  
+
+  public static <X extends Enum<?>> void addAllEnum(NNList<? super X> list, Class<X> e) {
+    list.addAll(e.getEnumConstants());
+  }
+
   public static @Nonnull <T> Collector<T, ?, NNList<T>> collector() {
     return NullHelper.notnullJ(Collectors.toCollection(NNList::new), "Collectors.toCollection");
   }

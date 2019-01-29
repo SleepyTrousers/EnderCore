@@ -117,7 +117,7 @@ public class InventorySlot implements IItemHandler {
     }
     if (slot == 0 && filterIn.apply(stack)) {
       if (itemStack.isEmpty()) {
-        int max = Math.min(limit, stack.getMaxStackSize());
+        int max = Math.min(getMaxStackSize(), stack.getMaxStackSize());
         if (!simulate) {
           itemStack = stack.copy();
         }
@@ -136,7 +136,7 @@ public class InventorySlot implements IItemHandler {
         return result;
       }
       if (ItemUtil.areStackMergable(itemStack, stack)) {
-        int max = Math.min(limit, stack.getMaxStackSize());
+        int max = Math.min(getMaxStackSize(), stack.getMaxStackSize());
         int target = itemStack.getCount() + stack.getCount();
         if (target <= max) {
           if (!simulate) {
@@ -147,14 +147,16 @@ public class InventorySlot implements IItemHandler {
           return LIE;
         }
         int tomove = max - itemStack.getCount();
-        if (!simulate) {
-          ItemStack oldStack = itemStack.copy();
-          itemStack.setCount(max);
-          onChange(oldStack, itemStack);
+        if (tomove > 0) {
+          if (!simulate) {
+            ItemStack oldStack = itemStack.copy();
+            itemStack.setCount(max);
+            onChange(oldStack, itemStack);
+          }
+          ItemStack result = stack.copy();
+          result.shrink(tomove);
+          return result;
         }
-        ItemStack result = stack.copy();
-        result.shrink(tomove);
-        return result;
       }
     }
     return stack;

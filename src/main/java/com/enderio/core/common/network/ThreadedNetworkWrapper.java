@@ -54,6 +54,9 @@ public class ThreadedNetworkWrapper {
   private final @Nonnull SimpleNetworkWrapper parent;
 
   public ThreadedNetworkWrapper(String channelName) {
+    if (channelName.length() > 20) {
+      throw new RuntimeException("Channel name '" + channelName + "' is too long for Forge. Maximum length supported is 20 characters.");
+    }
     parent = new SimpleNetworkWrapper(channelName);
   }
 

@@ -11,9 +11,15 @@ import net.minecraft.util.math.BlockPos;
 public class MagnetUtil {
 
   private static final @Nonnull String PREVENT_REMOTE_MOVEMENT = "PreventRemoteMovement";
+  private static final @Nonnull String ALLOW_MACHINE_MOVEMENT = "AllowMachineRemoteMovement";
   public static final @Nonnull String EC_PULLER_TAG = "ECpuller";
 
+  @Deprecated
   public static boolean shouldAttract(@Nullable BlockPos pullerPos, @Nullable Entity entity) {
+    return shouldAttract(pullerPos, entity, false);
+  }
+
+  public static boolean shouldAttract(@Nullable BlockPos pullerPos, @Nullable Entity entity, boolean isMachine) {
 
     if (entity == null || entity.isDead) {
       return false;
@@ -25,7 +31,7 @@ public class MagnetUtil {
     @Nonnull
     NBTTagCompound data = entity.getEntityData();
 
-    if (isReservedByOthers(data)) {
+    if (isReservedByOthers(data, isMachine)) {
       return false;
     }
 
@@ -81,16 +87,26 @@ public class MagnetUtil {
     data.removeTag(EC_PULLER_TAG);
   }
 
+  @Deprecated
   public static boolean isReserved(@Nonnull Entity entity) {
-    return isReservedByUs(entity.getEntityData()) || isReservedByOthers(entity.getEntityData());
+    return isReserved(entity, false);
+  }
+
+  public static boolean isReserved(@Nonnull Entity entity, boolean isMachine) {
+    return isReservedByUs(entity.getEntityData()) || isReservedByOthers(entity.getEntityData(), isMachine);
   }
 
   public static boolean isReservedByUs(@Nonnull NBTTagCompound data) {
     return data.hasKey(EC_PULLER_TAG);
   }
 
+  @Deprecated
   public static boolean isReservedByOthers(@Nonnull NBTTagCompound data) {
-    return data.hasKey(PREVENT_REMOTE_MOVEMENT);
+    return isReservedByOthers(data, false);
+  }
+
+  public static boolean isReservedByOthers(@Nonnull NBTTagCompound data, boolean isMachine) {
+    return data.hasKey(PREVENT_REMOTE_MOVEMENT) && (!isMachine || !data.hasKey(ALLOW_MACHINE_MOVEMENT));
   }
 
 }

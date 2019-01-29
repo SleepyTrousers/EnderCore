@@ -6,6 +6,7 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.common.vecmath.Vector3f;
 
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
@@ -155,6 +156,31 @@ public class ItemUtil {
       return false;
     }
     return ItemStack.areItemStackTagsEqual(s1, s2);
+  }
+
+  /**
+   * Tries to put an item into the player's inventory as if it was picked up in the world.
+   * <p>
+   * Note: Needs to be called server-side.
+   * 
+   * @param player
+   *          The player
+   * @param itemstack
+   *          The item to pick up
+   * @return The remaining stack. Empty when all was picked up.
+   */
+  public static @Nonnull ItemStack fakeItemPickup(@Nonnull EntityPlayer player, @Nonnull ItemStack itemstack) {
+    if (!player.world.isRemote) {
+      EntityItem entityItem = new EntityItem(player.world, player.posX, player.posY, player.posZ, itemstack);
+      entityItem.onCollideWithPlayer(player);
+      if (entityItem.isDead) {
+        return ItemStack.EMPTY;
+      } else {
+        entityItem.setDead();
+        return entityItem.getItem();
+      }
+    }
+    return itemstack;
   }
 
 }
