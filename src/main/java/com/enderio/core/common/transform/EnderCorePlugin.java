@@ -2,6 +2,7 @@ package com.enderio.core.common.transform;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,8 @@ import javax.annotation.Nonnull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Type;
+
+import com.google.common.base.MoreObjects;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModAPIManager;
@@ -92,7 +95,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       for (ASMData d : data) {
         mixinLogger.info("Found annotation mixin: {}", d.getClassName());
         @SuppressWarnings("unchecked")
-        List<String> dependencies = (List<String>) d.getAnnotationInfo().get("dependencies");
+        List<String> dependencies = MoreObjects.firstNonNull((List<String>) d.getAnnotationInfo().get("dependencies"), Collections.emptyList());
         List<String> missingDependencies = dependencies.stream().filter(m -> !Loader.isModLoaded(m) && !ModAPIManager.INSTANCE.hasAPI(m)).collect(Collectors.toList());
         if (missingDependencies.size() == 0) {
           addInterfacePatch(((Type) d.getAnnotationInfo().get("value")).getClassName(), d.getClassName());
