@@ -44,12 +44,10 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       this.target = target;
     }
     
-    void initialize() {
+    void initialize(String clazz) {
       try {
-        Class<?> cls = Class.forName(source);
+        Class<?> cls = Class.forName(clazz);
         cls.getName(); // Make sure it's loaded
-        cls = Class.forName(target);
-        cls.getName();
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
@@ -74,18 +72,11 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     return inst;
   }
   
-  public void addMixin(String source, String target) {
-    addMixin(new MixinData(source, target));
-  }
-  
-  private void addMixin(MixinData mixin) {
-    mixins.add(mixin);
-    mixin.initialize();
-  }
-  
   public void loadMixinSources() {
     List<MixinData> fromAnnotations = findAnnotationMixins();
-    fromAnnotations.forEach(this::addMixin);
+    fromAnnotations.forEach(mixins::add);
+    fromAnnotations.forEach(m -> m.initialize(m.source));
+    fromAnnotations.forEach(m -> m.initialize(m.target));
   }
   
   private List<MixinData> findAnnotationMixins() {
