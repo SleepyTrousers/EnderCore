@@ -82,6 +82,12 @@ public class SimpleMixinPatcher implements IClassTransformer {
     }
     
     if (!patches.isEmpty()) {
+      
+      if (targetNode.visibleAnnotations != null && (targetNode.visibleAnnotations.stream().anyMatch(n -> n.desc.contains("com/enderio/core/common/transform/SimpleMixin")))) {
+        mixinLogger.info("Not mixing into class {} because it is itself a mixin", transformedName);
+        return targetClass;
+      }
+      
       mixinLogger.info("Patching {} mixins onto class {}", patches.size(), transformedName);
       
       for (MixinData data : patches) {
