@@ -112,8 +112,7 @@ public class UserIdent {
   }
 
   private static @Nonnull UUID offlineUUID(@Nullable String playerName) {
-    UUID result = UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(Charsets.UTF_8));
-    return result;
+    return NullHelper.notnullJ(UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(Charsets.UTF_8)), "UUID.nameUUIDFromBytes()");
   }
 
   UserIdent(@Nullable UUID uuid, @Nullable String playerName) {
@@ -172,7 +171,7 @@ public class UserIdent {
 
   public void saveToNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
     if (uuid != null) {
-      nbt.setString(prefix + ".uuid", uuid.toString());
+      nbt.setString(prefix + ".uuid", "" + uuid.toString());
     }
     nbt.setString(prefix + ".login", playerName);
   }

@@ -1,12 +1,12 @@
 package com.enderio.core.common.fluid;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.api.common.util.ITankAccess;
+import com.enderio.core.common.util.NNList;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -62,7 +62,7 @@ public class TankAccessFluidWrapper implements IFluidWrapper {
   @Override
   @Nonnull
   public List<ITankInfoWrapper> getTankInfoWrappers() {
-    return Collections.<ITankInfoWrapper> emptyList();
+    return NNList.emptyList();
   }
 
 }

@@ -7,7 +7,6 @@ import javax.annotation.Nonnull;
 
 import com.enderio.core.client.gui.widget.GuiToolTip;
 import com.enderio.core.common.util.NNList;
-import com.enderio.core.common.util.NNList.NNIterator;
 import com.google.common.collect.Sets;
 
 import net.minecraft.client.gui.FontRenderer;
