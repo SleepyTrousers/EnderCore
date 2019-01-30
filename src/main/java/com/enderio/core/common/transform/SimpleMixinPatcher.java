@@ -5,17 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.enderio.core.common.transform.EnderCorePlugin.InterfacePatchData;
+import com.enderio.core.common.transform.EnderCorePlugin.MixinData;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -31,11 +36,15 @@ public class SimpleMixinPatcher implements IClassTransformer {
   private final EnderCorePlugin plugin = EnderCorePlugin.instance();
   
   private final Map<String, byte[]> capturedSources = new HashMap<>();
+  private final Multimap<String, MixinData> interfaceTargets = HashMultimap.create();
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] targetClass) {
-    List<InterfacePatchData> patches = new ArrayList<>();
-    for (InterfacePatchData d : plugin.ifacePatches) {
+    if (targetClass == null) {
+      return targetClass;
+    }
+    List<MixinData> patches = new ArrayList<>();
+    for (MixinData d : plugin.mixins) {
       if (d.target.equals(transformedName)) {
         patches.add(d);
       }
@@ -44,15 +53,38 @@ public class SimpleMixinPatcher implements IClassTransformer {
         mixinLogger.info("Found mixin source class data for {}.", transformedName);
       }
     }
+    if (patches.isEmpty() && interfaceTargets.isEmpty()) {
+      return targetClass;
+    }
+
+    ClassNode targetNode = new ClassNode();
+    ClassReader targetReader = new ClassReader(targetClass);
+    targetReader.accept(targetNode, 0);
+    
+    // If this is a directly targeted interface, track it for later
+    if (!patches.isEmpty() && (targetNode.access & Opcodes.ACC_INTERFACE) != 0) {
+      interfaceTargets.putAll(targetNode.name, patches);
+      mixinLogger.info("Found interface target {}", transformedName);
+      return targetClass;
+    }
+    
+    // Check for tracked interfaces on this class, if we know of any
+    if (!interfaceTargets.isEmpty()) {
+      int patchCount = patches.size();
+      targetNode.interfaces.stream()
+                           .map(interfaceTargets::get)
+                           .filter(Objects::nonNull)
+                           .forEach(patches::addAll);
+      if (patches.size() > patchCount) {
+        int count = patches.size() - patchCount;
+        mixinLogger.info("Found {} {} to apply to class {} from implemented interfaces: {}", count, count > 1 ? "patches" : "patch", transformedName, targetNode.interfaces.stream().filter(interfaceTargets::containsKey).toArray());
+      }
+    }
+    
     if (!patches.isEmpty()) {
-      
       mixinLogger.info("Patching {} mixins onto class {}", patches.size(), transformedName);
       
-      ClassNode targetNode = new ClassNode();
-      ClassReader targetReader = new ClassReader(targetClass);
-      targetReader.accept(targetNode, 0);
-      
-      for (InterfacePatchData data : patches) {
+      for (MixinData data : patches) {
         byte[] sourceClass = capturedSources.get(data.source);
         if (sourceClass == null) {
           mixinLogger.error("Skipping mixin patch due to unloaded class: " + data.source);
@@ -62,14 +94,16 @@ public class SimpleMixinPatcher implements IClassTransformer {
           ClassReader sourceReader = new ClassReader(sourceClass);
           sourceReader.accept(sourceNode, 0);
           
+          Type targetType = Type.getObjectType(targetNode.name);
+          
           for (MethodNode m : sourceNode.methods) {
             ListIterator<AbstractInsnNode> instructions = m.instructions.iterator();
             while (instructions.hasNext()) {
               AbstractInsnNode node = instructions.next();
               if (node instanceof MethodInsnNode) {
                 MethodInsnNode call = (MethodInsnNode) node;
-                if (call.owner.replace('/', '.').equals(data.source)) {
-                  call.owner = data.target.replace('.', '/');
+                if (Type.getObjectType(call.owner).getClassName().equals(data.source)) {
+                  call.owner = targetType.getInternalName();
                   if (call.getOpcode() == INVOKEINTERFACE) {
                     call.setOpcode(INVOKEVIRTUAL);
                     call.itf = false;
@@ -80,20 +114,29 @@ public class SimpleMixinPatcher implements IClassTransformer {
             
             if (m.localVariables.size() > 0) {
               LocalVariableNode n = m.localVariables.get(0);
-              n.desc = "L" + data.target.replace('.', '/') + ";";
+              n.desc = targetType.getDescriptor();
             }
           }
           
-          targetNode.interfaces.addAll(sourceNode.interfaces.stream()
+          List<String> newInterfaces = sourceNode.interfaces.stream()
               .filter(s -> !targetNode.interfaces.contains(s))
-              .collect(Collectors.toList()));
+              .collect(Collectors.toList());
           
-          targetNode.methods.addAll(sourceNode.methods.stream()
+          if (!newInterfaces.isEmpty()) {
+            targetNode.interfaces.addAll(newInterfaces);
+            mixinLogger.info("Added {} new {}: {}", newInterfaces.size(), newInterfaces.size() == 1 ? "interface" : "interfaces", newInterfaces);
+          }
+
+          List<MethodNode> newMethods = sourceNode.methods.stream()
               .filter(m -> !m.name.equals("<init>"))
               .filter(m -> (m.access & ACC_ABSTRACT) == 0)
-              .collect(Collectors.toList()));
+              .filter(m -> targetNode.methods.stream().filter(m2 -> m2.name.equals(m.name) && m2.desc.equals(m.desc)).count() == 0)
+              .collect(Collectors.toList());
           
-          mixinLogger.info("Added methods and interfaces from class {}", data.source);
+          if (!newMethods.isEmpty()) {
+            targetNode.methods.addAll(newMethods);
+            mixinLogger.info("Added {} new {}: {}", newMethods.size(), newMethods.size() == 1 ? "method" : "methods", newMethods.stream().map(m -> m.name + m.desc).toArray());
+          }
         }
       }
 

@@ -80,6 +80,10 @@ public class EnderCore implements IEnderMod {
   public final @Nonnull List<IConfigHandler> configs = Lists.newArrayList();
 
   private final @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
+  
+  public EnderCore() {
+    EnderCorePlugin.instance().loadMixinSources();
+  }
 
   /**
    * Call this method BEFORE preinit (construction phase) to request that EnderCore start in invisible mode. This will disable ANY gameplay features unless the
@@ -104,8 +108,6 @@ public class EnderCore implements IEnderMod {
 
   @EventHandler
   public void preInit(@Nonnull FMLPreInitializationEvent event) {
-    EnderCorePlugin.instance().loadPatchSources();
-
     ConfigHandler.configFolder = event.getModConfigurationDirectory();
     ConfigHandler.enderConfigFolder = new File(ConfigHandler.configFolder.getPath() + "/" + MODID);
     ConfigHandler.configFile = new File(ConfigHandler.enderConfigFolder.getPath() + "/" + event.getSuggestedConfigurationFile().getName());

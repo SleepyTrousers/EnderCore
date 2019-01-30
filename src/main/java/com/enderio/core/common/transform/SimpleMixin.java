@@ -2,9 +2,12 @@ package com.enderio.core.common.transform;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import com.enderio.core.common.transform.SimpleMixin.SimpleMixinList;
 
 /**
  * Marks a class which should be "mixed-in" to another at runtime. This can be
@@ -24,11 +27,21 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(SimpleMixinList.class)
 @Documented
 public @interface SimpleMixin {
   
   Class<?> value();
   
   String[] dependencies() default {};
+  
+  @Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @Documented
+  public @interface SimpleMixinList {
+    
+    SimpleMixin[] value();
+    
+  }
 
 }
