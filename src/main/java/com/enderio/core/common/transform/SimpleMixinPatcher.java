@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LocalVariableNode;
@@ -39,6 +40,9 @@ public class SimpleMixinPatcher implements IClassTransformer {
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] targetClass) {
+    if (targetClass == null) {
+      return targetClass;
+    }
     List<InterfacePatchData> patches = new ArrayList<>();
     for (InterfacePatchData d : plugin.ifacePatches) {
       if (d.target.equals(transformedName)) {
@@ -90,14 +94,16 @@ public class SimpleMixinPatcher implements IClassTransformer {
           ClassReader sourceReader = new ClassReader(sourceClass);
           sourceReader.accept(sourceNode, 0);
           
+          Type targetType = Type.getObjectType(targetNode.name);
+          
           for (MethodNode m : sourceNode.methods) {
             ListIterator<AbstractInsnNode> instructions = m.instructions.iterator();
             while (instructions.hasNext()) {
               AbstractInsnNode node = instructions.next();
               if (node instanceof MethodInsnNode) {
                 MethodInsnNode call = (MethodInsnNode) node;
-                if (call.owner.replace('/', '.').equals(data.source)) {
-                  call.owner = data.target.replace('.', '/');
+                if (Type.getObjectType(call.owner).getClassName().equals(data.source)) {
+                  call.owner = targetType.getInternalName();
                   if (call.getOpcode() == INVOKEINTERFACE) {
                     call.setOpcode(INVOKEVIRTUAL);
                     call.itf = false;
@@ -108,20 +114,29 @@ public class SimpleMixinPatcher implements IClassTransformer {
             
             if (m.localVariables.size() > 0) {
               LocalVariableNode n = m.localVariables.get(0);
-              n.desc = "L" + data.target.replace('.', '/') + ";";
+              n.desc = Type.getObjectType(targetNode.name).getDescriptor();
             }
           }
           
-          targetNode.interfaces.addAll(sourceNode.interfaces.stream()
+          List<String> newInterfaces = sourceNode.interfaces.stream()
               .filter(s -> !targetNode.interfaces.contains(s))
-              .collect(Collectors.toList()));
+              .collect(Collectors.toList());
           
-          targetNode.methods.addAll(sourceNode.methods.stream()
+          if (!newInterfaces.isEmpty()) {
+            targetNode.interfaces.addAll(newInterfaces);
+            mixinLogger.info("Added {} new {}: {}", newInterfaces.size(), newInterfaces.size() == 1 ? "interface" : "interfaces", newInterfaces);
+          }
+
+          List<MethodNode> newMethods = sourceNode.methods.stream()
               .filter(m -> !m.name.equals("<init>"))
               .filter(m -> (m.access & ACC_ABSTRACT) == 0)
-              .collect(Collectors.toList()));
+              .filter(m -> targetNode.methods.stream().filter(m2 -> m2.name.equals(m.name) && m2.desc.equals(m.desc)).count() == 0)
+              .collect(Collectors.toList());
           
-          mixinLogger.info("Added methods and interfaces from class {}", data.source);
+          if (!newMethods.isEmpty()) {
+            targetNode.methods.addAll(newMethods);
+            mixinLogger.info("Added {} new {}: {}", newMethods.size(), newMethods.size() == 1 ? "method" : "methods", newMethods.stream().map(m -> m.name + m.desc).toArray());
+          }
         }
       }
 
