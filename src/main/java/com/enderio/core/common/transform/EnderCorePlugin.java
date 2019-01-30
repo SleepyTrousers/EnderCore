@@ -36,25 +36,27 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
   
   private static EnderCorePlugin instance;
   
-  static class InterfacePatchData {
-    public final String target, source;
+  static class MixinData {
+    public final String source, target;
 
-    InterfacePatchData(String target, String source) {
-      this.target = target;
+    MixinData(String source, String target) {
       this.source = source;
+      this.target = target;
     }
     
     void initialize() {
       try {
         Class<?> cls = Class.forName(source);
         cls.getName(); // Make sure it's loaded
+        cls = Class.forName(target);
+        cls.getName();
       } catch (ClassNotFoundException e) {
         throw new RuntimeException(e);
       }
     }
   }
   
-  List<InterfacePatchData> ifacePatches = new ArrayList<>();
+  List<MixinData> mixins = new ArrayList<>();
   
   public EnderCorePlugin() {
     if (instance != null) {
@@ -72,18 +74,22 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     return inst;
   }
   
-  public void addInterfacePatch(String target, String source) {
-    InterfacePatchData data = new InterfacePatchData(target, source);
-    ifacePatches.add(data);
+  public void addMixin(String source, String target) {
+    addMixin(new MixinData(source, target));
   }
   
-  public void loadPatchSources() {
-    findAnnotationPatches();
-    
-    ifacePatches.forEach(InterfacePatchData::initialize);
+  private void addMixin(MixinData mixin) {
+    mixins.add(mixin);
+    mixin.initialize();
   }
   
-  private void findAnnotationPatches() {
+  public void loadMixinSources() {
+    List<MixinData> fromAnnotations = findAnnotationMixins();
+    fromAnnotations.forEach(this::addMixin);
+  }
+  
+  private List<MixinData> findAnnotationMixins() {
+    List<MixinData> ret = new ArrayList<>();
     try {
       Field fDiscoverer = Loader.class.getDeclaredField("discoverer");
       fDiscoverer.setAccessible(true);
@@ -98,7 +104,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
         List<String> dependencies = MoreObjects.firstNonNull((List<String>) d.getAnnotationInfo().get("dependencies"), Collections.emptyList());
         List<String> missingDependencies = dependencies.stream().filter(m -> !Loader.isModLoaded(m) && !ModAPIManager.INSTANCE.hasAPI(m)).collect(Collectors.toList());
         if (missingDependencies.size() == 0) {
-          addInterfacePatch(((Type) d.getAnnotationInfo().get("value")).getClassName(), d.getClassName());
+          ret.add(new MixinData(d.getClassName(), ((Type) d.getAnnotationInfo().get("value")).getClassName()));
           mixinLogger.info("Registered mixin.");
         } else {
           mixinLogger.info("Skipping mixin due to missing dependencies: {}", missingDependencies);
@@ -107,6 +113,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return ret;
   }
 
   @Override

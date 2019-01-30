@@ -18,7 +18,7 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.enderio.core.common.transform.EnderCorePlugin.InterfacePatchData;
+import com.enderio.core.common.transform.EnderCorePlugin.MixinData;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -36,15 +36,15 @@ public class SimpleMixinPatcher implements IClassTransformer {
   private final EnderCorePlugin plugin = EnderCorePlugin.instance();
   
   private final Map<String, byte[]> capturedSources = new HashMap<>();
-  private final Multimap<String, InterfacePatchData> interfaceTargets = HashMultimap.create();
+  private final Multimap<String, MixinData> interfaceTargets = HashMultimap.create();
 
   @Override
   public byte[] transform(String name, String transformedName, byte[] targetClass) {
     if (targetClass == null) {
       return targetClass;
     }
-    List<InterfacePatchData> patches = new ArrayList<>();
-    for (InterfacePatchData d : plugin.ifacePatches) {
+    List<MixinData> patches = new ArrayList<>();
+    for (MixinData d : plugin.mixins) {
       if (d.target.equals(transformedName)) {
         patches.add(d);
       }
@@ -84,7 +84,7 @@ public class SimpleMixinPatcher implements IClassTransformer {
     if (!patches.isEmpty()) {
       mixinLogger.info("Patching {} mixins onto class {}", patches.size(), transformedName);
       
-      for (InterfacePatchData data : patches) {
+      for (MixinData data : patches) {
         byte[] sourceClass = capturedSources.get(data.source);
         if (sourceClass == null) {
           mixinLogger.error("Skipping mixin patch due to unloaded class: " + data.source);
@@ -114,7 +114,7 @@ public class SimpleMixinPatcher implements IClassTransformer {
             
             if (m.localVariables.size() > 0) {
               LocalVariableNode n = m.localVariables.get(0);
-              n.desc = Type.getObjectType(targetNode.name).getDescriptor();
+              n.desc = targetType.getDescriptor();
             }
           }
           
