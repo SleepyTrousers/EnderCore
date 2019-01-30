@@ -258,6 +258,13 @@ public class NNList<E> extends NonNullList<E> {
     return this;
   }
 
+  public static <E, L extends List<E>> L addIf(@Nonnull L list, @Nullable E e) {
+    if (e != null) {
+      list.add(e);
+    }
+    return list;
+  }
+
   public NNList<E> addIf(@Nullable E e) {
     if (e != null) {
       add(e);
