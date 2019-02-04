@@ -3,6 +3,7 @@ package com.enderio.core.common.transform;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +19,7 @@ import com.google.common.base.MoreObjects;
 
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModAPIManager;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
 import net.minecraftforge.fml.common.discovery.ModDiscoverer;
@@ -52,9 +54,30 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
         throw new RuntimeException(e);
       }
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + source.hashCode();
+      result = prime * result + target.hashCode();
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      MixinData other = (MixinData) obj;
+      return source.equals(other.source) && target.equals(other.target);
+    }
   }
   
-  List<MixinData> mixins = new ArrayList<>();
+  Set<MixinData> mixins = new LinkedHashSet<>();
   
   public EnderCorePlugin() {
     if (instance != null) {
@@ -80,6 +103,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
   }
   
   private List<MixinData> findAnnotationMixins() {
+    final ModContainer active = Loader.instance().activeModContainer();
     List<MixinData> ret = new ArrayList<>();
     try {
       Field fDiscoverer = Loader.class.getDeclaredField("discoverer");
@@ -90,6 +114,9 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       
       Set<ASMData> data = asmData.getAll(SimpleMixin.class.getName());
       for (ASMData d : data) {
+        if (!d.getCandidate().getContainedMods().contains(active)) {
+          continue;
+        }
         mixinLogger.info("Found annotation mixin: {}", d.getClassName());
         @SuppressWarnings("unchecked")
         List<String> dependencies = MoreObjects.firstNonNull((List<String>) d.getAnnotationInfo().get("dependencies"), Collections.emptyList());
