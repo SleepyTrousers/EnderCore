@@ -95,15 +95,22 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     return inst;
   }
   
-  public void loadMixinSources() {
-    List<MixinData> fromAnnotations = findAnnotationMixins();
+  public void loadMixinSources(Object mod) {
+    loadMixinSources(mod.getClass().getPackage());
+  }
+  
+  public void loadMixinSources(Package filter) {
+    loadMixinSources(filter.getName());
+  }
+  
+  public void loadMixinSources(String packageFilter) {
+    List<MixinData> fromAnnotations = findAnnotationMixins(packageFilter);
     fromAnnotations.forEach(mixins::add);
     fromAnnotations.forEach(m -> m.initialize(m.source));
     fromAnnotations.forEach(m -> m.initialize(m.target));
   }
   
-  private List<MixinData> findAnnotationMixins() {
-    final ModContainer active = Loader.instance().activeModContainer();
+  private List<MixinData> findAnnotationMixins(String packageFilter) {
     List<MixinData> ret = new ArrayList<>();
     try {
       Field fDiscoverer = Loader.class.getDeclaredField("discoverer");
@@ -114,7 +121,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       
       Set<ASMData> data = asmData.getAll(SimpleMixin.class.getName());
       for (ASMData d : data) {
-        if (!d.getCandidate().getContainedMods().contains(active)) {
+        if (!d.getClassName().startsWith(packageFilter)) {
           continue;
         }
         mixinLogger.info("Found annotation mixin: {}", d.getClassName());

@@ -82,7 +82,7 @@ public class EnderCore implements IEnderMod {
   private final @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
   
   public EnderCore() {
-    EnderCorePlugin.instance().loadMixinSources();
+    EnderCorePlugin.instance().loadMixinSources(this);
   }
 
   /**
