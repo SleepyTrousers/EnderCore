@@ -146,7 +146,7 @@ public class SimpleMixinPatcher implements IClassTransformer {
         }
       }
 
-      ClassWriter cw = new ClassWriter(COMPUTE_MAXS);
+      ClassWriter cw = new NoClassloadClassWriter(COMPUTE_MAXS | COMPUTE_FRAMES);
       targetNode.accept(cw);
       mixinLogger.info("Successfully patched.");
       return cw.toByteArray();
