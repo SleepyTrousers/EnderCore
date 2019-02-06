@@ -8,6 +8,7 @@ import com.enderio.core.common.util.FluidUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
@@ -52,6 +53,13 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   @Override
   public boolean hasTileEntity(@Nonnull IBlockState state) {
     return teClass != null;
+  }
+
+  @Override
+  public @Nonnull EnumPushReaction getMobilityFlag(@Nonnull IBlockState state) {
+    // Some mods coremod vanilla to ignore this condition, so let's try to enforce it.
+    // If this doesn't work, we need code to blow up the block when it detects it was moved...
+    return teClass != null ? EnumPushReaction.BLOCK : super.getMobilityFlag(state);
   }
 
   @Override
