@@ -26,17 +26,17 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 
 @MCVersion("1.12.2")
-//we want deobf no matter what
+// we want deobf no matter what
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class EnderCorePlugin implements IFMLLoadingPlugin {
-  
+
   static final Logger mainLogger = LogManager.getLogger("EnderCore ASM");
   static final Logger mixinLogger = LogManager.getLogger("EnderCore Mixins");
 
   public static boolean runtimeDeobfEnabled = false;
-  
+
   private static EnderCorePlugin instance;
-  
+
   static class MixinData {
     public final String source, target;
 
@@ -44,7 +44,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       this.source = source;
       this.target = target;
     }
-    
+
     void initialize(String clazz) {
       try {
         Class<?> cls = Class.forName(clazz);
@@ -75,16 +75,16 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       return source.equals(other.source) && target.equals(other.target);
     }
   }
-  
+
   Set<MixinData> mixins = new LinkedHashSet<>();
-  
+
   public EnderCorePlugin() {
     if (instance != null) {
       throw new IllegalStateException("EnderCorePlugin was instantiated twice?");
     }
     instance = this;
   }
-  
+
   @Nonnull
   public static EnderCorePlugin instance() {
     EnderCorePlugin inst = instance;
@@ -93,31 +93,31 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
     }
     return inst;
   }
-  
+
   public void loadMixinSources(Object mod) {
     loadMixinSources(mod.getClass().getPackage());
   }
-  
+
   public void loadMixinSources(Package filter) {
     loadMixinSources(filter.getName());
   }
-  
+
   public void loadMixinSources(String packageFilter) {
     List<MixinData> fromAnnotations = findAnnotationMixins(packageFilter);
     fromAnnotations.forEach(mixins::add);
     fromAnnotations.forEach(m -> m.initialize(m.source));
     fromAnnotations.forEach(m -> m.initialize(m.target));
   }
-  
+
   private List<MixinData> findAnnotationMixins(String packageFilter) {
     List<MixinData> ret = new ArrayList<>();
     try {
       Field fDiscoverer = Loader.class.getDeclaredField("discoverer");
       fDiscoverer.setAccessible(true);
-      
+
       ModDiscoverer discoverer = (ModDiscoverer) fDiscoverer.get(Loader.instance());
       ASMDataTable asmData = discoverer.getASMTable();
-      
+
       Set<ASMData> data = asmData.getAll(SimpleMixin.class.getName());
       for (ASMData d : data) {
         if (!d.getClassName().startsWith(packageFilter)) {
@@ -125,8 +125,9 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
         }
         mixinLogger.info("Found annotation mixin: {}", d.getClassName());
         @SuppressWarnings("unchecked")
-        List<String> dependencies = MoreObjects.firstNonNull((List<String>) d.getAnnotationInfo().get("dependencies"), Collections.emptyList());
-        List<String> missingDependencies = dependencies.stream().filter(m -> !Loader.isModLoaded(m) && !ModAPIManager.INSTANCE.hasAPI(m)).collect(Collectors.toList());
+        List<String> dependencies = MoreObjects.firstNonNull((List<String>) d.getAnnotationInfo().get("dependencies"), Collections.<String> emptyList());
+        List<String> missingDependencies = dependencies.stream().filter(m -> !Loader.isModLoaded(m) && !ModAPIManager.INSTANCE.hasAPI(m))
+            .collect(Collectors.toList());
         if (missingDependencies.size() == 0) {
           ret.add(new MixinData(d.getClassName(), ((Type) d.getAnnotationInfo().get("value")).getClassName()));
           mixinLogger.info("Registered mixin.");
@@ -142,9 +143,7 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
 
   @Override
   public String[] getASMTransformerClass() {
-    return new String[] { 
-        "com.enderio.core.common.transform.EnderCoreTransformer",
-        "com.enderio.core.common.transform.SimpleMixinPatcher" };
+    return new String[] { "com.enderio.core.common.transform.EnderCoreTransformer", "com.enderio.core.common.transform.SimpleMixinPatcher" };
   }
 
   @Override
