@@ -73,7 +73,7 @@ public class NoClassloadClassWriter extends ClassWriter {
       if (DEBUG) logger.info("Comparing {} to {}", class2.superName, class1.name);
     } while (!class2.superName.equals(class1.name));
 
-    return type1;
+    return class1.name;
   }
   
   private ClassNode getClassNode(String name) {
