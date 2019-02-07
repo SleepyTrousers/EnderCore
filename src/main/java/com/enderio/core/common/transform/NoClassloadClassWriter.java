@@ -34,12 +34,12 @@ public class NoClassloadClassWriter extends ClassWriter {
 
   @Override
   protected String getCommonSuperClass(String type1, String type2) {
-    String res = _getCommonSuperClass(type1, type2);
+    String res = getCommonSuperClassImpl(type1, type2);
     if (DEBUG) logger.info("Common supertype of {} and {}: {}", type1, type2, res);
     return res;
   }
   
-  protected String _getCommonSuperClass(String type1, String type2) {
+  private String getCommonSuperClassImpl(String type1, String type2) {
     if (type1.equals(OBJECT) || type2.equals(OBJECT)) { // Short circuit, don't bother loading Object from disk or cache
       return OBJECT;
     }
@@ -68,7 +68,7 @@ public class NoClassloadClassWriter extends ClassWriter {
       class1 = getClassNode(class1.superName);
       if (class1 == null || class1.superName == null) {
         if (DEBUG) logger.info("Reached object or null, recursing with {} and {}", type1, class2.superName);
-        return _getCommonSuperClass(type1, class2.superName);
+        return getCommonSuperClassImpl(type1, class2.superName);
       }
       if (DEBUG) logger.info("Comparing {} to {}", class2.superName, class1.name);
     } while (!class2.superName.equals(class1.name));
@@ -92,7 +92,7 @@ public class NoClassloadClassWriter extends ClassWriter {
       e.printStackTrace();
       return null;
     }
-    cr.accept(cn, 0);
+    cr.accept(cn, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
     nodeCache.put(name, cn);
     return cn;
   }
