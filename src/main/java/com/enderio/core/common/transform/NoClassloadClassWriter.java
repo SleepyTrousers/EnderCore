@@ -11,9 +11,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.common.asm.transformers.DeobfuscationTransformer;
@@ -21,12 +21,42 @@ import net.minecraftforge.fml.common.asm.transformers.deobf.FMLDeobfuscatingRema
 
 public class NoClassloadClassWriter extends ClassWriter {
   
+  private static class ClassInfo extends ClassVisitor {
+    
+    public int access;
+    public String name, superName;
+    
+    public ClassInfo() {
+      super(Opcodes.ASM5);
+    }
+    
+    @Override
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+      super.visit(version, access, name, signature, superName, interfaces);
+      this.access = access;
+      this.name = name;
+      this.superName = superName;
+    }
+    
+    boolean isValid() {
+      return name != null && superName != null;
+    }
+    
+    boolean isSuper(ClassInfo other) {
+      return superName.equals(other.name);
+    }
+    
+    boolean isInterface() {
+      return (access & Opcodes.ACC_INTERFACE) != 0;
+    }
+  }
+  
   private static final Logger logger = LogManager.getLogger();
   
   private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("legacy.debugClassLoading", "false"));
   private static final String OBJECT = "java/lang/Object";
   
-  private static final Map<String, ClassNode> nodeCache = new HashMap<>();
+  private static final Map<String, ClassInfo> nodeCache = new HashMap<>();
 
   public NoClassloadClassWriter(int flags) {
     super(flags);
@@ -34,54 +64,65 @@ public class NoClassloadClassWriter extends ClassWriter {
 
   @Override
   protected String getCommonSuperClass(String type1, String type2) {
-    String res = getCommonSuperClassImpl(type1, type2);
-    if (DEBUG) logger.info("Common supertype of {} and {}: {}", type1, type2, res);
-    return res;
-  }
-  
-  private String getCommonSuperClassImpl(String type1, String type2) {
     if (type1.equals(OBJECT) || type2.equals(OBJECT)) { // Short circuit, don't bother loading Object from disk or cache
       return OBJECT;
     }
     
-    ClassNode class1 = getClassNode(type1);
-    ClassNode class2 = getClassNode(type2);
+    ClassInfo class1 = getClassInfo(type1);
+    ClassInfo class2 = getClassInfo(type2);
     
+    if (class1 == null || class2 == null) {
+      if (DEBUG) logger.info("Class info was null");
+      return OBJECT;
+    }
+    
+    String res = getCommonSuperClass(class1, class2);
+    if (DEBUG) logger.info("Common supertype of {} and {}: {}", type1, type2, res);
+    return res;
+  }
+  
+  private String getCommonSuperClass(ClassInfo class1, ClassInfo class2) {
     if (class1 == null || class1.superName == null || class2 == null || class2.superName == null) {
       if (DEBUG) logger.info("Input was Object or null");
       return OBJECT;
     }
 
-    if (class1.superName.equals(type2)) {
+    if (class1.isSuper(class2)) {
       if (DEBUG) logger.info("type1 super == type2");
-      return type2;
-    } else if (class2.superName.equals(type1)) {
+      return class2.name;
+    } else if (class2.isSuper(class1)) {
       if (DEBUG) logger.info("type2 super == type1");
-      return type1;
-    } else if ((class1.access & Opcodes.ACC_INTERFACE) != 0 || (class2.access & Opcodes.ACC_INTERFACE) != 0) {
+      return class1.name;
+    } else if (class1.isInterface() || class2.isInterface()) {
       if (DEBUG) logger.info("Input was interface");
       return OBJECT;
     }
 
     if (DEBUG) logger.info("Walking hierarchy");
+    ClassInfo parent = class1;
     do {
-      class1 = getClassNode(class1.superName);
+      class1 = getClassInfo(class1.superName);
       if (class1 == null || class1.superName == null) {
-        if (DEBUG) logger.info("Reached object or null, recursing with {} and {}", type1, class2.superName);
-        return getCommonSuperClassImpl(type1, class2.superName);
+        if (DEBUG) logger.info("Reached object or null, recursing with {} and {}", parent.name, class2.superName);
+        class2 = getClassInfo(class2.superName);
+        if (class2 == null || !class2.isValid()) {
+          logger.info("Class 2 super was object or null");
+          return OBJECT;
+        }
+        return getCommonSuperClass(parent, class2);
       }
       if (DEBUG) logger.info("Comparing {} to {}", class2.superName, class1.name);
-    } while (!class2.superName.equals(class1.name));
+    } while (!class2.isSuper(class1));
 
     return class1.name;
   }
   
-  private ClassNode getClassNode(String name) {
-    ClassNode cn = nodeCache.get(name);
+  private ClassInfo getClassInfo(String name) {
+    ClassInfo cn = nodeCache.get(name);
     if (cn != null) {
       return cn;
     }
-    cn = new ClassNode();
+    cn = new ClassInfo();
     ClassReader cr;
     try {
       cr = new ClassReader(getClassBytes(name));
