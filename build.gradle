@@ -95,11 +95,30 @@ eclipse.classpath.file {
 }
 */
 
+task coreJar(type: Jar) {
+    from(sourceSets.main.output) {
+        include 'com/enderio/core/common/transform/**'
+    }
+    manifest {
+        attributes 'FMLCorePlugin': "com.enderio.core.common.transform.EnderCorePlugin"
+        attributes 'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}:core"
+    }
+    classifier 'core'
+}
+
+reobf {
+    coreJar { mappingType = 'SEARGE' }
+}
+
 jar {
     from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude 'com/enderio/core/common/transform/**'
+    from(coreJar.archivePath.absolutePath) {
+        include '*'
+        into ("META-INF/libraries")
+    }
     manifest {
-        attributes 'FMLCorePlugin': 'com.enderio.core.common.transform.EnderCorePlugin'
-		attributes 'FMLCorePluginContainsFMLMod': 'true'
+        attributes 'ContainedDeps': coreJar.archivePath.name
     }
 }
 
@@ -132,9 +151,10 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
 
-			artifact deobfJar
-			artifact sourceJar
+            artifact deobfJar
+            artifact sourceJar
             artifact apiJar
+            artifact coreJar
         }
     }
 
@@ -229,6 +249,15 @@ task signJar(type: SignJar, dependsOn: reobfJar) {
     keyPass = '123456'
 }
 
+task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
+    inputFile = coreJar.archivePath
+    outputFile = coreJar.archivePath
+    keyStore = 'ecstore.jks'
+    alias = 'signFiles'
+    storePass = '123456'
+    keyPass = '123456'
+}
+
 task rmKeyStore(type: Delete) {
   delete 'ecstore.jks'
 }
@@ -236,6 +265,9 @@ task rmKeyStore(type: Delete) {
 build.dependsOn rmKeyStore
 rmKeyStore.dependsOn signJar
 signJar.dependsOn mkKeyStore
+signCoreJar.dependsOn mkKeyStore
+jar.dependsOn signCoreJar
+
 
 tasks.curseforge.enabled = !dev && project.hasProperty('curseforge_key')
     
