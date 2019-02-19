@@ -27,7 +27,7 @@ public class SlabRecipes2 extends Tweak {
 
   @Override
   public boolean enabledByDefault() {
-    false;
+    return false;
   }
 
   private static void registerSlabToBlock() {
