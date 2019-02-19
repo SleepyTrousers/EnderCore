@@ -9,13 +9,13 @@ import net.minecraftforge.fml.common.LoaderState;
 public abstract class Tweak {
   private final String name, comment;
   private final RestartReqs restartReq;
-  
+
   private boolean enabled;
 
   public Tweak(String key, String comment) {
     this(key, comment, RestartReqs.REQUIRES_MC_RESTART);
   }
-  
+
   public Tweak(String key, String comment, RestartReqs restartReq) {
     this.name = key;
     this.comment = comment;
@@ -33,15 +33,21 @@ public abstract class Tweak {
   public RestartReqs getRestartReq() {
     return restartReq;
   }
-  
-  protected void load() {}
-  
-  protected void unload() {}
-  
+
+  public boolean enabledByDefault() {
+    return true;
+  }
+
+  protected void load() {
+  }
+
+  protected void unload() {
+  }
+
   private boolean checkGameState() {
-    return restartReq == RestartReqs.NONE ||
-        (restartReq == RestartReqs.REQUIRES_WORLD_RESTART && FMLCommonHandler.instance().getMinecraftServerInstance() == null) ||
-        !Loader.instance().hasReachedState(LoaderState.AVAILABLE);
+    return restartReq == RestartReqs.NONE
+        || (restartReq == RestartReqs.REQUIRES_WORLD_RESTART && FMLCommonHandler.instance().getMinecraftServerInstance() == null)
+        || !Loader.instance().hasReachedState(LoaderState.AVAILABLE);
   }
 
   public final void enable() {
@@ -50,7 +56,7 @@ public abstract class Tweak {
       enabled = true;
     }
   }
-  
+
   public final void disable() {
     if (enabled && checkGameState()) {
       unload();

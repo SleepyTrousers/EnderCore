@@ -18,6 +18,7 @@ public class Tweaks {
 
   private static final Set<Tweak> ingameTweaks = new HashSet<Tweak>();
   private static final Set<Tweak> permanentTweaks = new HashSet<Tweak>();
+  private static final Set<Tweak> lateTweaks = new HashSet<Tweak>();
 
   static {
     // @formatter:off
@@ -54,6 +55,9 @@ public class Tweaks {
 
     ingameTweaks.add(new InfiniBow());
 
+    // Tweaks that require a reboot to be toggled and need to be loaded late
+    lateTweaks.add(new SlabRecipes2());
+
     // Tweaks that require a reboot to be toggled
     permanentTweaks.add(new SlabRecipes());
 
@@ -80,6 +84,10 @@ public class Tweaks {
 
   public static void loadNonIngameTweaks() {
     load(permanentTweaks);
+  }
+
+  public static void loadLateTweaks() {
+    load(lateTweaks);
   }
 
   private static void load(Collection<Tweak> tweaks) {

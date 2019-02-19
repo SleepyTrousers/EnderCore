@@ -170,7 +170,7 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   @Override
   public boolean addBooleanFor(Tweak tweak) {
     activateSection("tweaks");
-    boolean ret = getValue(tweak.getName(), tweak.getComment(), true, tweak.getRestartReq());
+    boolean ret = getValue(tweak.getName(), tweak.getComment(), tweak.enabledByDefault(), tweak.getRestartReq());
     return invisibleMode == 1 ? false : ret;
   }
 

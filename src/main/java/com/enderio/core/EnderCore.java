@@ -29,6 +29,7 @@ import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.imc.IMCRegistry;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.transform.EnderCorePlugin;
+import com.enderio.core.common.tweaks.Tweaks;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.NullHelper;
 import com.enderio.core.common.util.PermanentCache;
@@ -80,7 +81,7 @@ public class EnderCore implements IEnderMod {
   public final @Nonnull List<IConfigHandler> configs = Lists.newArrayList();
 
   private final @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
-  
+
   public EnderCore() {
     EnderCorePlugin.instance().loadMixinSources(this);
   }
@@ -152,6 +153,7 @@ public class EnderCore implements IEnderMod {
 
   @EventHandler
   public void postInit(@Nonnull FMLPostInitializationEvent event) {
+    Tweaks.loadLateTweaks();
     for (IConfigHandler c : configs) {
       c.postInitHook();
     }
