@@ -84,8 +84,13 @@ public class Tweaks {
 
   public static void loadNonIngameTweaks() {
     load(permanentTweaks);
+    for (Tweak tweak : lateTweaks) {
+      // need to put that in earlier than loadLateTweaks()
+      ConfigHandler.instance().addBooleanFor(tweak);
+    }
   }
 
+  // this needs to run after all other mods had the chance to add their recipes
   public static void loadLateTweaks() {
     load(lateTweaks);
   }
