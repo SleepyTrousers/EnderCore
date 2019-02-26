@@ -60,6 +60,7 @@ public class Tweaks {
 
     // Tweaks that require a reboot to be toggled
     permanentTweaks.add(new SlabRecipes());
+    permanentTweaks.add(new BottleFluidCapability.BottleTweak());
 
     permanentTweaks.add(new Tweak("bookToPaperRecipe", "Adds shapeless recipe from 1 book to 2 paper") {
       @Override

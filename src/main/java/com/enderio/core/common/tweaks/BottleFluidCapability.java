@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.EnderCore;
+import com.enderio.core.common.config.AbstractConfigHandler.RestartReqs;
 import com.enderio.core.common.config.ConfigHandler;
 
 import net.minecraft.init.Items;
@@ -12,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -139,20 +141,36 @@ public class BottleFluidCapability implements IFluidHandlerItem, ICapabilityProv
   public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
     return hasCapability(capability, facing) ? CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY.cast(this) : null;
   }
+  
+  public static class BottleTweak extends Tweak {
 
-  @SubscribeEvent
-  public static void attachCapabilities(@Nonnull AttachCapabilitiesEvent<ItemStack> evt) {
-    if (evt.getCapabilities().containsKey(KEY)) {
-      return;
+    public BottleTweak() {
+      super("bottleFluidHandler", "If this tweak is enabled, vanilla bottles will act as fluid handlers for all automation.", RestartReqs.REQUIRES_WORLD_RESTART);
     }
-    final ItemStack stack = evt.getObject();
-    if (stack == null) {
-      return;
+    
+    @Override
+    protected void load() {
+      MinecraftForge.EVENT_BUS.register(this);
     }
-    if (stack.getItem() == Items.GLASS_BOTTLE || stack.getItem() == Items.POTIONITEM) {
-      BottleFluidCapability cap = new BottleFluidCapability(stack);
-      evt.addCapability(KEY, cap);
+    
+    @Override
+    protected void unload() {
+      MinecraftForge.EVENT_BUS.unregister(this);
+    }
+    
+    @SubscribeEvent
+    public void attachCapabilities(@Nonnull AttachCapabilitiesEvent<ItemStack> evt) {
+      if (evt.getCapabilities().containsKey(KEY)) {
+        return;
+      }
+      final ItemStack stack = evt.getObject();
+      if (stack == null) {
+        return;
+      }
+      if (stack.getItem() == Items.GLASS_BOTTLE || stack.getItem() == Items.POTIONITEM) {
+        BottleFluidCapability cap = new BottleFluidCapability(stack);
+        evt.addCapability(KEY, cap);
+      }
     }
   }
-
 }
