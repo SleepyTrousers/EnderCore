@@ -56,7 +56,7 @@ public class Tweaks {
     ingameTweaks.add(new InfiniBow());
 
     // Tweaks that require a reboot to be toggled and need to be loaded late
-    lateTweaks.add(new SlabRecipes2());
+    lateTweaks.add(new SlabRecipesAutomatic());
 
     // Tweaks that require a reboot to be toggled
     permanentTweaks.add(new SlabRecipes());
