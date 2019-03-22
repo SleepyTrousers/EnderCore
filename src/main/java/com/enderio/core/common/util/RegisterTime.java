@@ -1,22 +1,22 @@
 package com.enderio.core.common.util;
 
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
 public enum RegisterTime {
-  PREINIT(FMLPreInitializationEvent.class),
-  INIT(FMLInitializationEvent.class),
-  POSTINIT(FMLPostInitializationEvent.class);
+  SETUP(FMLCommonSetupEvent.class),
+  PREIMC(InterModEnqueueEvent.class),
+  POSTIMC(InterModProcessEvent.class);
 
-  private Class<? extends FMLStateEvent> clazz;
+  private Class<? extends ModLifecycleEvent> clazz;
 
-  private RegisterTime(Class<? extends FMLStateEvent> clazz) {
+  private RegisterTime(Class<? extends ModLifecycleEvent> clazz) {
     this.clazz = clazz;
   }
 
-  public static RegisterTime timeFor(FMLStateEvent event) {
+  public static RegisterTime timeFor(ModLifecycleEvent event) {
     for (RegisterTime time : values()) {
       if (time.clazz == event.getClass()) {
         return time;

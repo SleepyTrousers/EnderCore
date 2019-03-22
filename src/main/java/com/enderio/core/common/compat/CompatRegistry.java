@@ -12,8 +12,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.util.RegisterTime;
 
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
 public enum CompatRegistry {
   INSTANCE;
@@ -92,7 +92,7 @@ public enum CompatRegistry {
     compatMap.put(new Registration(times, modids), clazz);
   }
 
-  public void handle(FMLStateEvent event) {
+  public void handle(ModLifecycleEvent event) {
     RegisterTime time = RegisterTime.timeFor(event);
     state = time;
     for (Registration r : compatMap.keySet()) {
@@ -104,7 +104,7 @@ public enum CompatRegistry {
 
   private static boolean allModsLoaded(String[] modids) {
     for (String s : modids) {
-      if (!Loader.isModLoaded(s)) {
+      if (!ModList.get().isLoaded(s)) {
         return false;
       }
     }

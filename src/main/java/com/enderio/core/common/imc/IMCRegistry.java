@@ -5,8 +5,8 @@ import java.util.List;
 import com.enderio.core.common.imc.handlers.IMCRightClickCrop;
 import com.google.common.collect.Lists;
 
-import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
+import net.minecraftforge.fml.InterModComms.IMCMessage;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 
 public class IMCRegistry {
   public interface IIMC {
@@ -39,13 +39,9 @@ public class IMCRegistry {
     handlers.add(handler);
   }
 
-  public void handleEvent(IMCEvent event) {
+  public void handleEvent(InterModProcessEvent event) {
     for (IIMC handler : handlers) {
-      for (IMCMessage msg : event.getMessages()) {
-        if (msg.key.equals(handler.getKey())) {
-          handler.act(msg);
-        }
-      }
+      event.getIMCStream().filter(msg -> msg.getMethod().equals(handler.getKey())).forEach(handler::act);
     }
   }
 

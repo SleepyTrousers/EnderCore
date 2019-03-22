@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[25,)"
+issueTrackerURL="https://github.com/SleepyTrousers/EnderCore/issues"
+displayURL="https://github.com/SleepyTrousers/EnderCore/"
+authors="tterrag, CrazyPants, HenryLoenwind"
+
+[[mods]]
+modId="endercore"
+version="${file.jarVersion}"
+displayName="EnderCore"
+description="Library mod used by EnderIO, EnderZoo, and others"

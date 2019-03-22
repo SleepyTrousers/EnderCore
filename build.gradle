@@ -1,18 +1,21 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = "http://files.minecraftforge.net/maven" }
-        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
+		mavenLocal()
     }
-    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT' }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.102'
+    }
 }
 
 plugins {
-    id "com.matthewprenger.cursegradle" version "1.0.7"
+//    id "com.matthewprenger.cursegradle" version "1.0.7"
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 ext.buildnumber = 0
@@ -39,12 +42,53 @@ if (project.hasProperty('mod_appendix')) {
 }
 
 minecraft {
-    mappings = "snapshot_20171212"
-    version = "${minecraft_version}-${forge_version}"
-    runDir = 'run'
+    mappings channel: 'snapshot', version: '20190321-1.13.2'
+    
+    //accessTransformer = file('my_at.cfg')
 
-    replace "@VERSION@", project.version
-    replaceIn "EnderCore.java"
+    // default run configurations.
+    // these can be tweaked, removed, or duplicated as needed.
+	runs {
+        client {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:' + minecraft_version + '-' + forge_version
 }
 
 configurations {
@@ -64,19 +108,21 @@ sourceSets {
 }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    // this will ensure that this task is redone when the versions change.
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', minecraft_version
 
+    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        include '**/*.properties'
-
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        include 'META_INF/mods.toml'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion': minecraft_version
     }
 
+    // copy everything else except the mods.toml
     from(sourceSets.main.resources.srcDirs) {
-        exclude '**/*.info'
-        exclude '**/*.properties'
+        exclude 'META_INF/mods.toml'
     }
 }
 
@@ -107,7 +153,7 @@ task coreJar(type: Jar) {
 }
 
 reobf {
-    coreJar { mappingType = 'SEARGE' }
+    coreJar
 }
 
 jar {
@@ -118,7 +164,14 @@ jar {
         into ("META-INF/libraries")
     }
     manifest {
-        attributes 'ContainedDeps': coreJar.archivePath.name
+        attributes(["Specification-Title": "blur",
+                    "Specification-Vendor": "tterrag",
+                    "Specification-Version": "25.0", // We are version 1 of the modlauncher specification
+                    "Implementation-Title": project.name,
+                    "Implementation-Version": "${version}",
+                    "Implementation-Vendor" :"tterrag",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    'ContainedDeps': coreJar.archivePath.name],)
     }
 }
 
@@ -143,7 +196,7 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-build.dependsOn apiJar, sourceJar, deobfJar, javadoc
+build.dependsOn apiJar, deobfJar, javadoc
 
 publishing {
     tasks.publish.dependsOn 'build'
@@ -152,7 +205,6 @@ publishing {
             from components.java
 
             artifact deobfJar
-            artifact sourceJar
             artifact apiJar
             artifact coreJar
         }
@@ -234,7 +286,7 @@ String getCN() {
     def rand = new Random()
     return firsts[rand.nextInt(firsts.size())] + ' ' + lasts[rand.nextInt(lasts.size())]
 }
-
+/*
 task mkKeyStore(type:Exec) {
    workingDir projectDir
    commandLine 'keytool', '-genkey', '-alias', 'signFiles', '-keystore', 'ecstore.jks', '-storepass', '123456', '-noprompt', '-dname', 'CN='+getCN(), '-keypass', '123456'
@@ -267,8 +319,8 @@ rmKeyStore.dependsOn signJar
 signJar.dependsOn mkKeyStore
 signCoreJar.dependsOn mkKeyStore
 jar.dependsOn signCoreJar
-
-
+*/
+/*
 tasks.curseforge.enabled = !dev && project.hasProperty('curseforge_key')
     
 curseforge {
@@ -287,3 +339,4 @@ curseforge {
         addArtifact(apiJar)
     }
 }
+*/
