@@ -131,11 +131,10 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   /**
-   * @deprecated override {@link #processPickBlock(IBlockState, RayTraceResult, World, BlockPos, EntityPlayer, ItemStack)} instead if possible
+   * override {@link #processPickBlock(IBlockState, RayTraceResult, World, BlockPos, EntityPlayer, ItemStack)} instead if possible
    */
   @Override
-  @Deprecated
-  public @Nonnull ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
+  public final @Nonnull ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
       @Nonnull EntityPlayer player) {
     if (player.capabilities.isCreativeMode && GuiScreen.isCtrlKeyDown()) {
       ItemStack nbtDrop = getNBTDrop(world, pos, state, 0, getTileEntity(world, pos));
