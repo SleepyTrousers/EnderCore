@@ -27,8 +27,8 @@ import com.enderio.core.common.command.CommandScoreboardInfo;
 import com.enderio.core.common.compat.CompatRegistry;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.imc.IMCRegistry;
+import com.enderio.core.common.mixin.SimpleMixinLoader;
 import com.enderio.core.common.network.EnderPacketHandler;
-import com.enderio.core.common.transform.EnderCorePlugin;
 import com.enderio.core.common.tweaks.Tweaks;
 import com.enderio.core.common.util.EnderFileUtils;
 import com.enderio.core.common.util.NullHelper;
@@ -83,7 +83,7 @@ public class EnderCore implements IEnderMod {
   private final @Nonnull Set<String> invisibleRequesters = Sets.newHashSet();
 
   public EnderCore() {
-    EnderCorePlugin.instance().loadMixinSources(this);
+    SimpleMixinLoader.loadMixinSources(this);
   }
 
   /**
