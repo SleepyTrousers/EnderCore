@@ -167,18 +167,10 @@ public class EnderCoreMethods {
     return flag;
   }
 
-  public static interface IOverlayRenderAware {
-    public void renderItemOverlayIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition);
-  }
-
-  public static interface IUnderlayRenderAware {
-    public void renderItemAndEffectIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition);
-  }
-
   public static void renderItemOverlayIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition) {
     if (!stack.isEmpty()) {
-      if (stack.getItem() instanceof IOverlayRenderAware) {
-        ((IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
+      if (stack.getItem() instanceof com.enderio.core.common.interfaces.IOverlayRenderAware) {
+        ((com.enderio.core.common.interfaces.IOverlayRenderAware) stack.getItem()).renderItemOverlayIntoGUI(stack, xPosition, yPosition);
       }
       MinecraftForge.EVENT_BUS.post(new ItemGUIRenderEvent.Post(stack, xPosition, yPosition));
     }
@@ -186,22 +178,18 @@ public class EnderCoreMethods {
 
   public static void renderItemAndEffectIntoGUI(@Nonnull ItemStack stack, int xPosition, int yPosition) {
     if (!stack.isEmpty()) {
-      if (stack.getItem() instanceof IUnderlayRenderAware) {
-        ((IUnderlayRenderAware) stack.getItem()).renderItemAndEffectIntoGUI(stack, xPosition, yPosition);
+      if (stack.getItem() instanceof com.enderio.core.common.interfaces.IUnderlayRenderAware) {
+        ((com.enderio.core.common.interfaces.IUnderlayRenderAware) stack.getItem()).renderItemAndEffectIntoGUI(stack, xPosition, yPosition);
       }
       MinecraftForge.EVENT_BUS.post(new ItemGUIRenderEvent.Pre(stack, xPosition, yPosition));
     }
   }
 
-  public static interface IElytraFlyingProvider {
-    public boolean isElytraFlying(@Nonnull EntityLivingBase entity, @Nonnull ItemStack itemstack, boolean shouldStop);
-  }
-
   // Note: isRiding() and isInWater() are cheap getters, isInLava() is an expensive volumetric search
   public static boolean isElytraFlying(@Nonnull EntityLivingBase entity) {
     ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-    if (itemstack.getItem() instanceof IElytraFlyingProvider) {
-      return ((IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack,
+    if (itemstack.getItem() instanceof com.enderio.core.common.interfaces.IElytraFlyingProvider) {
+      return ((com.enderio.core.common.interfaces.IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack,
           entity.onGround || entity.isRiding() || entity.isInWater() || isInLavaSafe(entity));
     }
     return false;
@@ -239,24 +227,27 @@ public class EnderCoreMethods {
     return false;
   }
 
-  public static interface ICreeperTarget {
-    /**
-     * Determine if the given creeper should blow up when nearby.
-     * <p>
-     * Note that the creeper stills tracks the target, even if this returns false.
-     *
-     * @param swellingCreeper
-     *          The creeper that wants to explode
-     * @return True if the creeper is allowed to explode, false otherwise.
-     */
-    boolean isCreeperTarget(@Nonnull EntityCreeper swellingCreeper);
-  }
-
   public static boolean isCreeperTarget(@Nonnull EntityCreeper swellingCreeper, @Nonnull EntityLivingBase entitylivingbase) {
-    if (entitylivingbase instanceof ICreeperTarget) {
-      return ((ICreeperTarget) entitylivingbase).isCreeperTarget(swellingCreeper);
+    if (entitylivingbase instanceof com.enderio.core.common.interfaces.ICreeperTarget) {
+      return ((com.enderio.core.common.interfaces.ICreeperTarget) entitylivingbase).isCreeperTarget(swellingCreeper);
     }
     return true;
+  }
+
+  @Deprecated
+  public interface ICreeperTarget extends com.enderio.core.common.interfaces.ICreeperTarget {
+  }
+
+  @Deprecated
+  public interface IElytraFlyingProvider extends com.enderio.core.common.interfaces.IElytraFlyingProvider {
+  }
+
+  @Deprecated
+  public interface IOverlayRenderAware extends com.enderio.core.common.interfaces.IOverlayRenderAware {
+  }
+
+  @Deprecated
+  public interface IUnderlayRenderAware extends com.enderio.core.common.interfaces.IUnderlayRenderAware {
   }
 
 }
