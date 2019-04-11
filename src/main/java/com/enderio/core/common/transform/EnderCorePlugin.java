@@ -3,6 +3,7 @@ package com.enderio.core.common.transform;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,9 @@ public class EnderCorePlugin implements IFMLLoadingPlugin {
       ModDiscoverer discoverer = (ModDiscoverer) fDiscoverer.get(Loader.instance());
       ASMDataTable asmData = discoverer.getASMTable();
 
-      Set<ASMData> data = asmData.getAll(SimpleMixin.class.getName());
+      Set<ASMData> data = new HashSet<>();
+      data.addAll(asmData.getAll(com.enderio.core.common.mixin.SimpleMixin.class.getName()));
+      data.addAll(asmData.getAll(com.enderio.core.common.transform.SimpleMixin.class.getName()));
       for (ASMData d : data) {
         if (!d.getClassName().startsWith(packageFilter)) {
           continue;
