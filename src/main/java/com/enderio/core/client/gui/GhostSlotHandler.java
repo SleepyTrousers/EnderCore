@@ -202,15 +202,12 @@ public class GhostSlotHandler {
     GlStateManager.enableDepth();
   }
 
-  protected void drawGhostSlotToolTip(@Nonnull GuiContainerBase gui, int mouseX, int mouseY) {
+  protected boolean drawGhostSlotToolTip(@Nonnull GuiContainerBase gui, int mouseX, int mouseY) {
     final GhostSlot hoverGhostSlot2 = hoverGhostSlot;
-    if (hoverGhostSlot2 != null && !gui.mc.player.inventory.getItemStack().isEmpty()) {
-      ItemStack stack = hoverGhostSlot2.getStack();
-      if (!stack.isEmpty()) {
-        gui.renderToolTip(stack, mouseX, mouseY);
-      }
+    if (hoverGhostSlot2 != null) {
+      return hoverGhostSlot2.drawGhostSlotToolTip(gui, mouseX, mouseY);
     }
-
+    return false;
   }
 
 }

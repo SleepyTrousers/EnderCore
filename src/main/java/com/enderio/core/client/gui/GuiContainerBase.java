@@ -26,6 +26,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -354,12 +355,29 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
     this.drawDefaultBackground();
     super.drawScreen(mx, my, par3);
-    this.renderHoveredToolTip(mx, my);
 
+    // try to only draw one tooltip...
     if (draggingScrollbar == null) {
-      ghostSlotHandler.drawGhostSlotToolTip(this, par1, par2);
-      ttMan.drawTooltips(this, par1, par2);
+      if (!renderHoveredToolTip2(mx, my)) {
+        if (!ghostSlotHandler.drawGhostSlotToolTip(this, par1, par2)) {
+          ttMan.drawTooltips(this, par1, par2);
+        }
+      }
     }
+  }
+
+  /**
+   * See {@link #renderHoveredToolTip(int, int)} but with a feedback return value
+   */
+  protected boolean renderHoveredToolTip2(int p_191948_1_, int p_191948_2_) {
+    if (mc.player.inventory.getItemStack().isEmpty()) {
+      final Slot slotUnderMouse = getSlotUnderMouse();
+      if (slotUnderMouse != null && slotUnderMouse.getHasStack()) {
+        renderToolTip(slotUnderMouse.getStack(), p_191948_1_, p_191948_2_);
+        return true;
+      }
+    }
+    return false;
   }
 
   // copied from super with hate
