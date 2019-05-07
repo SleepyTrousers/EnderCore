@@ -51,7 +51,7 @@ public class Camera {
     return false;
   }
 
-  public Vector2d getScreenPoint(Vector3d point3d) {
+  public Vector3d getScreenPoint(Vector3d point3d) {
     Vector4d transPoint = new Vector4d(point3d.x, point3d.y, point3d.z, 1);
 
     viewMatrix.transform(transPoint);
@@ -59,7 +59,7 @@ public class Camera {
 
     int halfWidth = viewport.width / 2;
     int halfHeight = viewport.height / 2;
-    Vector2d screenPos = new Vector2d(transPoint.x, transPoint.y);
+    Vector3d screenPos = new Vector3d(transPoint.x, transPoint.y, transPoint.z);
     screenPos.scale(1 / transPoint.w);
     screenPos.x = screenPos.x * halfWidth + halfWidth;
     screenPos.y = -screenPos.y * halfHeight + halfHeight;
