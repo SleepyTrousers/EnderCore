@@ -67,22 +67,6 @@ public class Camera {
     return screenPos;
   }
 
-  public Vector3d getScreenPoint3D(Vector3d point3d) {
-    Vector4d transPoint = new Vector4d(point3d.x, point3d.y, point3d.z, 1);
-
-    viewMatrix.transform(transPoint);
-    projectionMatrix.transform(transPoint);
-
-    int halfWidth = viewport.width / 2;
-    int halfHeight = viewport.height / 2;
-    Vector3d screenPos = new Vector3d(transPoint.x, transPoint.y, transPoint.z);
-    screenPos.scale(1 / transPoint.w);
-    screenPos.x = screenPos.x * halfWidth + halfWidth;
-    screenPos.y = -screenPos.y * halfHeight + halfHeight;
-
-    return screenPos;
-  }
-
   public void setViewport(Rectangle viewport) {
     if (viewport != null) {
       setViewport(viewport.x, viewport.y, viewport.width, viewport.height);
