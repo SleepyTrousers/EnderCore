@@ -157,7 +157,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
           int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
-          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
+          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getItemStackLimit(par1ItemStack));
           if (mergedSize <= maxStackSize) {
             par1ItemStack.setCount(0);
             itemstack1.setCount(mergedSize);
@@ -192,12 +192,13 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
 
         if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
           ItemStack in = par1ItemStack.copy();
-          in.setCount(Math.min(in.getCount(), slot.getSlotStackLimit()));
+          in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
 
           slot.putStack(in);
           slot.onSlotChanged();
           par1ItemStack.shrink(in.getCount());
-          result = in.getCount() > 0; // Sanity check for slots which have a 0-size limit, if this stack count is zero then no items were inserted and we should return false.
+          result = in.getCount() > 0; // Sanity check for slots which have a 0-size limit, if this stack count is zero then no items were inserted and we should
+                                      // return false.
           break;
         }
 
