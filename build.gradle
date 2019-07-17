@@ -259,7 +259,7 @@ task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
 }
 
 task rmKeyStorePre(type: Delete) {
-  delete 'eiostore.jks'
+  delete 'ecstore.jks'
 }
 task rmKeyStore(type: Delete) {
   delete 'ecstore.jks'
