@@ -1,5 +1,7 @@
 package com.enderio.core.common.util;
 
+import java.util.function.Supplier;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -105,6 +107,74 @@ public final class NullHelper {
       }
     }
     throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
+  }
+
+  @SafeVarargs
+  public final static @Nonnull <P> P first(@Nonnull Supplier<P>... o) {
+    for (Supplier<P> on : notnull(o, (Object) "... param is null")) {
+      P p = notnull(on, (Object) "... param value is null").get();
+      if (p != null) {
+        return p;
+      }
+    }
+    throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
+  }
+
+  @SafeVarargs
+  public final static @Nullable <P> P firstOrNull(@Nonnull Supplier<P>... o) {
+    for (Supplier<P> on : notnull(o, (Object) "... param is null")) {
+      P p = notnull(on, (Object) "... param value is null").get();
+      if (p != null) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  public final static @Nullable <P> P firstWithDefault(@Nonnull NNList<Supplier<P>> o, @Nullable P d) {
+    for (Supplier<P> on : o) {
+      P p = notnull(on, (Object) "NNList.get() is null").get();
+      if (p != null) {
+        return p;
+      }
+    }
+    return d;
+  }
+
+  @SafeVarargs
+  public final static @Nonnull <P> P first(@Nullable P value, @Nonnull Supplier<P>... o) {
+    if (value != null) {
+      return value;
+    }
+    for (Supplier<P> on : notnull(o, (Object) "... param is null")) {
+      P p = notnull(on, (Object) "... param value is null").get();
+      if (p != null) {
+        return p;
+      }
+    }
+    throw new NullPointerException("Houston we have a problem. Please report that on our bugtracker unless you are using some old version. Thank you.");
+  }
+
+  public final static @Nullable <P> P firstWithDefault(@Nullable P value, @Nonnull Supplier<P> on, @Nullable P d) {
+    if (value != null) {
+      return value;
+    }
+    P p = notnull(on, (Object) "... param value is null").get();
+    if (p != null) {
+      return p;
+    }
+    return d;
+  }
+
+  @SafeVarargs
+  public final static @Nullable <P> P firstWithDefault(@Nullable P d, @Nonnull Supplier<P>... o) {
+    for (Supplier<P> on : notnull(o, (Object) "... param is null")) {
+      P p = notnull(on, (Object) "... param value is null").get();
+      if (p != null) {
+        return p;
+      }
+    }
+    return d;
   }
 
   private static String join(@Nonnull Object... data) {
