@@ -229,8 +229,8 @@ String getChangelogText() {
 }
 
 String getCN() {
-    def firsts = ['Donald', 'Lex', 'Mike', 'Arthur', 'Bridget', 'Dorian', 'Ford', 'Guy', 'James', 'Jessica', 'John', 'Michael', 'Robinson', 'Zaphod', 'Bell', 'Penelope']
-    def lasts = ['Duck', 'Luthor', 'Meyers', 'Dent', 'Jones', 'Gray', 'Prefect', 'Montag', 'Moriarty', 'Rabbit', 'Watson', 'Smith', 'Corleone', 'Crusoe', 'Beeblebrox', 'Cranel', 'Akk']
+    def firsts = ['Donald', 'Lex', 'Mike', 'Arthur', 'Bridget', 'Dorian', 'Ford', 'Guy', 'James', 'Jessica', 'John', 'Michael', 'Robinson', 'Zaphod', 'Bell', 'Penelope', 'PTerry', 'Adam', 'Anathema']
+    def lasts = ['Duck', 'Luthor', 'Meyers', 'Dent', 'Jones', 'Gray', 'Prefect', 'Montag', 'Moriarty', 'Rabbit', 'Watson', 'Smith', 'Corleone', 'Crusoe', 'Beeblebrox', 'Cranel', 'Akk', 'Young', 'Device']
     def rand = new Random()
     return firsts[rand.nextInt(firsts.size())] + ' ' + lasts[rand.nextInt(lasts.size())]
 }
@@ -258,6 +258,9 @@ task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
     keyPass = '123456'
 }
 
+task rmKeyStorePre(type: Delete) {
+  delete 'eiostore.jks'
+}
 task rmKeyStore(type: Delete) {
   delete 'ecstore.jks'
 }
@@ -266,6 +269,7 @@ build.dependsOn rmKeyStore
 rmKeyStore.dependsOn signJar
 signJar.dependsOn mkKeyStore
 signCoreJar.dependsOn mkKeyStore
+mkKeyStore.dependsOn rmKeyStorePre
 jar.dependsOn signCoreJar
 
 
