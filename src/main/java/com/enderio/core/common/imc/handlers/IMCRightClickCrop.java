@@ -5,6 +5,7 @@ import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.IPlantInfo;
 import com.enderio.core.common.handlers.RightClickCropHandler.LegacyPlantInfo;
 import com.enderio.core.common.imc.IMCRegistry.IMCBase;
+import com.enderio.core.common.util.Log;
 
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 
@@ -21,7 +22,8 @@ public class IMCRightClickCrop extends IMCBase {
 
     String[] data = msg.getStringValue().split("\\|");
 
-    if (data.length != 3) {
+    if (data.length != 4) {
+      Log.error("Got invalid right click crop IMC, incorrect number of arguments: " + msg.getStringValue());
       return;
     }
 

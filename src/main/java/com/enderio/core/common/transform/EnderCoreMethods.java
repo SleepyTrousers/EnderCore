@@ -190,7 +190,8 @@ public class EnderCoreMethods {
     ItemStack itemstack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
     if (itemstack.getItem() instanceof com.enderio.core.common.interfaces.IElytraFlyingProvider) {
       return ((com.enderio.core.common.interfaces.IElytraFlyingProvider) itemstack.getItem()).isElytraFlying(entity, itemstack,
-          entity.onGround || entity.isRiding() || entity.isInWater() || isInLavaSafe(entity));
+          entity.onGround || ((entity instanceof EntityPlayer) && ((EntityPlayer) entity).capabilities.isFlying) || entity.isRiding() || entity.isInWater()
+              || isInLavaSafe(entity));
     }
     return false;
   }

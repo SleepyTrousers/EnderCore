@@ -13,6 +13,12 @@ public class RoundRobinIterator<T> implements Iterable<T>, Iterator<T> {
     this.itOver = itOver;
   }
 
+  private RoundRobinIterator(int index, int currentCount, List<T> itOver) {
+    this.index = index;
+    this.currentCount = currentCount;
+    this.itOver = itOver;
+  }
+
   @Override
   public Iterator<T> iterator() {
     currentCount = 0;
@@ -46,6 +52,10 @@ public class RoundRobinIterator<T> implements Iterable<T>, Iterator<T> {
    */
   public void reset() {
     index = -1;
+  }
+
+  public RoundRobinIterator<T> copy() {
+    return new RoundRobinIterator<>(index, currentCount, itOver);
   }
 
 }

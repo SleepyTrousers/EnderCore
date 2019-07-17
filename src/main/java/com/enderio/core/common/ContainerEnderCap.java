@@ -201,7 +201,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
           int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
-          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
+          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getItemStackLimit(par1ItemStack));
           if (mergedSize <= maxStackSize) {
             par1ItemStack.setCount(0);
             itemstack1.setCount(mergedSize);
@@ -236,7 +236,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
 
         if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
           ItemStack in = par1ItemStack.copy();
-          in.setCount(Math.min(in.getCount(), slot.getSlotStackLimit()));
+          in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
 
           slot.putStack(in);
           slot.onSlotChanged();
