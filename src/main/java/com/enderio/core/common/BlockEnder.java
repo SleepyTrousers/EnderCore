@@ -131,13 +131,15 @@ public abstract class BlockEnder<T extends TileEntityBase> extends Block {
   }
 
   /**
-   * override {@link #processPickBlock(IBlockState, RayTraceResult, World, BlockPos, EntityPlayer, ItemStack)} instead if possible
+   * override {@link #processPickBlock(IBlockState, RayTraceResult, World, BlockPos, EntityPlayer, ItemStack)} instead if possible.
+   * <p>
+   * 
+   * "Called when a player uses 'pick block'" (client-side) and by mods that don't know about getDrops() on the server...
    */
-  // TODO: 1.13 add 'final'
   @Override
-  public @Nonnull ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
+  public final @Nonnull ItemStack getPickBlock(@Nonnull IBlockState state, @Nonnull RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos,
       @Nonnull EntityPlayer player) {
-    if (player.capabilities.isCreativeMode && GuiScreen.isCtrlKeyDown()) {
+    if (player.world.isRemote && player.capabilities.isCreativeMode && GuiScreen.isCtrlKeyDown()) {
       ItemStack nbtDrop = getNBTDrop(world, pos, state, 0, getTileEntity(world, pos));
       if (nbtDrop != null) {
         return nbtDrop;
