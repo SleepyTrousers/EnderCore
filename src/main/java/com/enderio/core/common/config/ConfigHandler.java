@@ -67,6 +67,11 @@ public class ConfigHandler extends AbstractConfigHandler implements ITweakConfig
   public static int showDurabilityTooltips = 1;
 
   @Config
+  @Comment("Show description for enchantments in tooltips.")
+  @NoSync
+  public static boolean showEnchantmentTooltips = true;
+
+  @Config
   @Comment("The way the game should have been made (Yes this is the fireworks thing).")
   public static boolean betterAchievements = false;
 
