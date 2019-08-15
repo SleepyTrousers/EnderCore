@@ -19,11 +19,11 @@ public interface IProducer {
   };
 
   default @Nonnull Block getBlockNN() {
-    return NullHelper.notnull(getBlock(), "Block ", this, " is unexpectedly missing");
+    return NullHelper.notnull(getBlock(), "Block ", this, " is unexpectedly missing").delegate.get();
   }
 
   default @Nonnull Item getItemNN() {
-    return NullHelper.notnull(getItem(), "Item ", this, " is unexpectedly missing");
+    return NullHelper.notnull(getItem(), "Item ", this, " is unexpectedly missing").delegate.get();
   }
 
 }

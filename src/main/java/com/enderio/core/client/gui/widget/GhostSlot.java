@@ -39,6 +39,7 @@ public abstract class GhostSlot {
   private int stackSizeLimit = 1;
   private boolean updateServer = false;
   private boolean drawStdTooltip = true;
+  private boolean drawFakeHover = true;
 
   public boolean isMouseOver(int mx, int my) {
     return mx >= getX() && mx < (getX() + 16) && my >= getY() && my < (getY() + 16);
@@ -168,6 +169,14 @@ public abstract class GhostSlot {
       }
     }
     return false;
+  }
+
+  public boolean shouldDrawFakeHover() {
+    return drawFakeHover;
+  }
+
+  public void setdrawFakeHover(boolean drawFakeHover) {
+    this.drawFakeHover = drawFakeHover;
   }
 
 }

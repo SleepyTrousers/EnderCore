@@ -35,7 +35,7 @@ public class GhostSlotHandler {
     int mX = mouseX - guiContainerBase.getGuiLeft();
     int mY = mouseY - guiContainerBase.getGuiTop();
     for (GhostSlot slot : ghostSlots) {
-      if (slot.isVisible() && slot.isMouseOver(mX, mY)) {
+      if (slot.isVisible() && slot.isMouseOver(mX, mY) && slot.shouldDrawFakeHover()) {
         return slot;
       }
     }
@@ -178,7 +178,7 @@ public class GhostSlotHandler {
         }
       }
       final GhostSlot hoverGhostSlot2 = hoverGhostSlot;
-      if (hoverGhostSlot2 != null) {
+      if (hoverGhostSlot2 != null && hoverGhostSlot2.shouldDrawFakeHover()) {
         // draw hover last to prevent it from affecting rendering of other slots ...
         gui.drawFakeItemHover(hoverGhostSlot2.getX() + sx, hoverGhostSlot2.getY() + sy);
       }

@@ -36,6 +36,7 @@ public class GhostBackgroundItemSlot extends GhostSlot {
     this.setGrayOut(true);
     this.setGrayOutLevel(.75f);
     this.setDrawStdTooltip(false);
+    this.setdrawFakeHover(false);
   }
 
   public GhostBackgroundItemSlot(@Nonnull ItemStack stack, int x, int y) {
