@@ -60,10 +60,19 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     init(); // TODO: Drop this line and add the init() call whenever a Container is constructed
   }
 
+  public ContainerEnderCap(@Nonnull InventoryPlayer playerInv, @Nonnull T itemHandler, @Nullable S te, boolean unused) {
+    inv = checkNotNull(itemHandler);
+    this.playerInv = checkNotNull(playerInv);
+    this.te = te;
+  }
+
   // use this if you need to chain it to the new call and care about the exact class
   @SuppressWarnings("unchecked")
   @Nonnull
   public final <X> X init() {
+    if (initRan) {
+      throw new RuntimeException("Ender IO Internal Error 10T (report this to the Ender IO devs)");
+    }
     addSlots();
 
     int x = getPlayerInventoryOffset().x;
