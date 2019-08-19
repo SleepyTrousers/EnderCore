@@ -205,7 +205,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
+        if (slot.isEnabled() && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
             && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
@@ -243,7 +243,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
+        if (slot.isEnabled() && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
           ItemStack in = par1ItemStack.copy();
           in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
 
