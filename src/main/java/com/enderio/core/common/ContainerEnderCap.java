@@ -178,6 +178,8 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
       } else {
         slot.onSlotChanged();
       }
+
+      slot.onTake(p_82846_1_, itemstack1);
     }
 
     return itemstack;
