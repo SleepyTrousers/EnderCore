@@ -24,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEntity> extends Container implements GhostSlot.IGhostSlotAware {
 
@@ -180,6 +181,14 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
       }
 
       slot.onTake(p_82846_1_, itemstack1);
+      if (p_82846_1_.world.isRemote) {
+        ItemStack itemstack2 = slot.getStack();
+        if (itemstack2.getCount() == itemstack.getCount()) {
+          // it seems this slot depends on the server executing the move. Return a different value on client and server to force a sync after the move is
+          // executed.
+          return ItemStack.EMPTY;
+        }
+      }
     }
 
     return itemstack;
@@ -207,7 +216,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (slot.isEnabled() && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
+        if (isSlotEnabled(slot) && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
             && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
@@ -245,7 +254,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (slot.isEnabled() && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
+        if (isSlotEnabled(slot) && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
           ItemStack in = par1ItemStack.copy();
           in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
 
@@ -279,6 +288,25 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         }
       }
     }
+  }
+
+  private boolean isSlotEnabled(Slot slot) {
+    return slot != null && (!(slot instanceof ContainerEnder.BaseSlot) || ((ContainerEnder.BaseSlot) slot).isEnabled())
+        && (!(slot instanceof BaseSlotItemHandler) || ((BaseSlotItemHandler) slot).isEnabled());
+  }
+
+  public static abstract class BaseSlotItemHandler extends SlotItemHandler {
+
+    public BaseSlotItemHandler(@Nonnull IItemHandler itemHandler, int index, int xPosition, int yPosition) {
+      super(itemHandler, index, xPosition, yPosition);
+    }
+
+    @Override
+    public boolean isEnabled() {
+      // don't super here, super is sided
+      return true;
+    }
+
   }
 
 }

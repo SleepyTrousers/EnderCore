@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
+import com.enderio.core.common.ContainerEnderCap.BaseSlotItemHandler;
 import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
@@ -152,7 +153,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
+        if (isSlotEnabled(slot) && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
             && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
@@ -190,7 +191,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
         slot = this.inventorySlots.get(checkIndex);
         itemstack1 = slot.getStack();
 
-        if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
+        if (isSlotEnabled(slot) && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
           ItemStack in = par1ItemStack.copy();
           in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
 
@@ -234,6 +235,25 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
         }
       }
     }
+  }
+
+  private boolean isSlotEnabled(Slot slot) {
+    return slot != null && (!(slot instanceof ContainerEnder.BaseSlot) || ((ContainerEnder.BaseSlot) slot).isEnabled())
+        && (!(slot instanceof BaseSlotItemHandler) || ((BaseSlotItemHandler) slot).isEnabled());
+  }
+
+  public static abstract class BaseSlot extends Slot {
+
+    public BaseSlot(@Nonnull IInventory inventoryIn, int index, int xPosition, int yPosition) {
+      super(inventoryIn, index, xPosition, yPosition);
+    }
+
+    @Override
+    public boolean isEnabled() {
+      // don't super here, super is sided
+      return true;
+    }
+
   }
 
 }

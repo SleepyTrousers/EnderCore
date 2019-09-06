@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+@Deprecated // not used by anyone, so probably should be used without good reason?
 public abstract class ContainerItemHandler<T extends ICapabilityProvider> extends Container implements GhostSlot.IGhostSlotAware {
 
   protected final @Nonnull Map<Slot, Point> playerSlotLocations = Maps.newLinkedHashMap();
@@ -82,14 +83,14 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
   public @Nonnull Point getUpgradeOffset() {
     return new Point(12, 60);
   }
-  
-  public @Nonnull T getOwner() {
-		return owner;
-	}
 
-	public @Nonnull IItemHandler getInv() {
-		return inv;
-	}
+  public @Nonnull T getOwner() {
+    return owner;
+  }
+
+  public @Nonnull IItemHandler getInv() {
+    return inv;
+  }
 
   @Override
   public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer p_82846_1_, int p_82846_2_) {
