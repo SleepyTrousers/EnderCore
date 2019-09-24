@@ -538,6 +538,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   public void onGuiClosed() {
+    super.onGuiClosed();
     for (IGuiOverlay overlay : overlays) {
       overlay.guiClosed();
     }
