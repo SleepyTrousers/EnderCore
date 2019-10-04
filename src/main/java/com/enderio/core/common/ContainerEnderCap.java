@@ -1,6 +1,8 @@
 package com.enderio.core.common;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -157,35 +159,26 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   }
 
   @Override
-  public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer p_82846_1_, int p_82846_2_) {
+  public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer player, int fromSlotId) {
     ItemStack itemstack = ItemStack.EMPTY;
-    Slot slot = this.inventorySlots.get(p_82846_2_);
+    Slot slot = inventorySlots.get(fromSlotId);
 
     if (slot != null && slot.getHasStack()) {
-      ItemStack itemstack1 = slot.getStack();
-      itemstack = itemstack1.copy();
+      ItemStack stackToMove = slot.getStack();
+      itemstack = stackToMove.copy();
 
-      int minPlayerSlot = inventorySlots.size() - playerInv.mainInventory.size();
-      if (p_82846_2_ < minPlayerSlot) {
-        if (!this.mergeItemStack(itemstack1, minPlayerSlot, this.inventorySlots.size(), true)) {
-          return ItemStack.EMPTY;
-        }
-      } else if (!this.mergeItemStack(itemstack1, 0, minPlayerSlot, false)) {
+      if (!mergeItemStack(stackToMove, mapSlotToTargets(fromSlotId))) {
         return ItemStack.EMPTY;
       }
 
-      if (itemstack1.isEmpty()) {
-        slot.putStack(ItemStack.EMPTY);
-      } else {
-        slot.onSlotChanged();
-      }
+      slot.onSlotChanged();
+      slot.onTake(player, stackToMove);
 
-      slot.onTake(p_82846_1_, itemstack1);
-      if (p_82846_1_.world.isRemote) {
+      if (player.world.isRemote) {
         ItemStack itemstack2 = slot.getStack();
         if (itemstack2.getCount() == itemstack.getCount()) {
           // it seems this slot depends on the server executing the move. Return a different value on client and server to force a sync after the move is
-          // executed.
+          // executed. And to prevent the client from going into an infinite loop...
           return ItemStack.EMPTY;
         }
       }
@@ -195,81 +188,75 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   }
 
   /**
-   * Added validation of slot input
+   * Creates a mapping for shift-clicks from a slot ID (the on that was shift-clicked) to a list of {@link Slot}s (the ones that can be inserted into).
+   * <p>
+   * Please note that the "try to fill up stacks" logic will look at <em>all</em> slots before the "move into empty slot" logic runs.
+   * 
+   * @param fromSlotId
+   *          The slot that was clicked
+   * @return slots the item can go in order of preference
+   */
+  protected @Nonnull Collection<Slot> mapSlotToTargets(int fromSlotId) {
+    List<Slot> result = new ArrayList<>();
+    if (fromSlotId < startPlayerSlot) {
+      for (int i = startPlayerSlot; i < inventorySlots.size(); i++) {
+        result.add(0, inventorySlots.get(i));
+      }
+    } else {
+      for (int i = 0; i < startPlayerSlot; i++) {
+        result.add(inventorySlots.get(i));
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @deprecated unused, see {@link #mergeItemStack(ItemStack, Collection)}
    */
   @Override
-  protected boolean mergeItemStack(@Nonnull ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reversOrder) {
+  @Deprecated
+  protected final boolean mergeItemStack(@Nonnull ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reversOrder) {
+    return false;
+  }
 
+  protected boolean mergeItemStack(ItemStack stackToMove, Collection<Slot> targets) {
     boolean result = false;
-    int checkIndex = fromIndex;
 
-    if (reversOrder) {
-      checkIndex = toIndex - 1;
-    }
-
-    Slot slot;
-    ItemStack itemstack1;
-
-    if (par1ItemStack.isStackable()) {
-
-      while (!par1ItemStack.isEmpty() && (!reversOrder && checkIndex < toIndex || reversOrder && checkIndex >= fromIndex)) {
-        slot = this.inventorySlots.get(checkIndex);
-        itemstack1 = slot.getStack();
-
-        if (isSlotEnabled(slot) && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
-            && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
-            && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
-
-          int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
-          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getItemStackLimit(par1ItemStack));
-          if (mergedSize <= maxStackSize) {
-            par1ItemStack.setCount(0);
-            itemstack1.setCount(mergedSize);
-            slot.onSlotChanged();
-            result = true;
-          } else if (itemstack1.getCount() < maxStackSize) {
-            par1ItemStack.shrink(maxStackSize - itemstack1.getCount());
-            itemstack1.setCount(maxStackSize);
-            slot.onSlotChanged();
-            result = true;
+    if (stackToMove.isStackable()) {
+      for (Slot slot : targets) {
+        if (isSlotEnabled(slot) && slot.getHasStack()) {
+          ItemStack stackInSlot = slot.getStack();
+          if (stackInSlot.getItem() == stackToMove.getItem() && (!stackToMove.getHasSubtypes() || stackToMove.getItemDamage() == stackInSlot.getItemDamage())
+              && ItemStack.areItemStackTagsEqual(stackToMove, stackInSlot) && slot.isItemValid(stackToMove) && stackToMove != stackInSlot) {
+            int mergedSize = stackInSlot.getCount() + stackToMove.getCount();
+            int maxStackSize = Math.min(stackToMove.getMaxStackSize(), slot.getItemStackLimit(stackToMove));
+            if (mergedSize <= maxStackSize) {
+              stackToMove.setCount(0);
+              stackInSlot.setCount(mergedSize);
+              slot.onSlotChanged();
+              return true;
+            } else if (stackInSlot.getCount() < maxStackSize) {
+              stackToMove.shrink(maxStackSize - stackInSlot.getCount());
+              stackInSlot.setCount(maxStackSize);
+              slot.onSlotChanged();
+              result = true;
+            }
           }
         }
-
-        if (reversOrder) {
-          --checkIndex;
-        } else {
-          ++checkIndex;
-        }
       }
     }
 
-    if (!par1ItemStack.isEmpty()) {
-      if (reversOrder) {
-        checkIndex = toIndex - 1;
-      } else {
-        checkIndex = fromIndex;
-      }
-
-      while (!reversOrder && checkIndex < toIndex || reversOrder && checkIndex >= fromIndex) {
-        slot = this.inventorySlots.get(checkIndex);
-        itemstack1 = slot.getStack();
-
-        if (isSlotEnabled(slot) && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
-          ItemStack in = par1ItemStack.copy();
-          in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
-
-          slot.putStack(in);
-          slot.onSlotChanged();
-          par1ItemStack.shrink(in.getCount());
-          result = true;
-          break;
+    for (Slot slot : targets) {
+      if (isSlotEnabled(slot) && !slot.getHasStack() && slot.isItemValid(stackToMove)) {
+        ItemStack in = stackToMove.copy();
+        in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(stackToMove)));
+        slot.putStack(in);
+        slot.onSlotChanged();
+        stackToMove.shrink(in.getCount());
+        if (stackToMove.isEmpty()) {
+          return true;
         }
-
-        if (reversOrder) {
-          --checkIndex;
-        } else {
-          ++checkIndex;
-        }
+        result = true;
       }
     }
 
@@ -290,7 +277,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     }
   }
 
-  private boolean isSlotEnabled(Slot slot) {
+  protected boolean isSlotEnabled(Slot slot) {
     return slot != null && (!(slot instanceof ContainerEnder.BaseSlot) || ((ContainerEnder.BaseSlot) slot).isEnabled())
         && (!(slot instanceof BaseSlotItemHandler) || ((BaseSlotItemHandler) slot).isEnabled());
   }
