@@ -159,6 +159,23 @@ public class ItemUtil {
   }
 
   /**
+   * Checks if items, meta and NBT are equal.
+   *
+   * @param s1
+   * @param s2
+   * @return True if the two stacks are equal, false otherwise.
+   */
+  public static boolean areStacksEqualIgnoringDamage(@Nonnull ItemStack s1, @Nonnull ItemStack s2) {
+    if (s1.isEmpty() || s2.isEmpty()) {
+      return false;
+    }
+    if (!s1.isItemEqualIgnoreDurability(s2)) {
+      return false;
+    }
+    return ItemStack.areItemStackTagsEqual(s1, s2);
+  }
+
+  /**
    * Tries to put an item into the player's inventory as if it was picked up in the world.
    * <p>
    * Note: Needs to be called server-side.
