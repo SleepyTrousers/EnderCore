@@ -143,6 +143,7 @@ public class NNList<E> extends NonNullList<E> {
     return this;
   }
 
+  @FunctionalInterface
   public static interface Callback<E> {
     void apply(@Nonnull E e);
   }
@@ -159,6 +160,7 @@ public class NNList<E> extends NonNullList<E> {
     return callback.finish();
   }
 
+  @FunctionalInterface
   public static interface ShortCallback<E> {
     boolean apply(@Nonnull E e);
 
