@@ -171,6 +171,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
         return ItemStack.EMPTY;
       }
 
+      slot.putStack(stackToMove); // slot may not be tracking the stack it handed out
       slot.onSlotChanged();
       slot.onTake(player, stackToMove);
 
