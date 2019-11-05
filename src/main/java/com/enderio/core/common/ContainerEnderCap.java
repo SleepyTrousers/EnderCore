@@ -175,13 +175,10 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
       slot.onSlotChanged();
       slot.onTake(player, stackToMove);
 
-      if (player.world.isRemote) {
-        ItemStack itemstack2 = slot.getStack();
-        if (itemstack2.getCount() == itemstack.getCount()) {
-          // it seems this slot depends on the server executing the move. Return a different value on client and server to force a sync after the move is
-          // executed. And to prevent the client from going into an infinite loop...
-          return ItemStack.EMPTY;
-        }
+      if (player.world.isRemote && ItemStack.areItemsEqual(slot.getStack(), itemstack)) {
+        // it seems this slot depends on the server executing the move. Return a different value on client and server to force a sync after the move is
+        // executed. And to prevent the client from going into an infinite loop...
+        return ItemStack.EMPTY;
       }
     }
 
