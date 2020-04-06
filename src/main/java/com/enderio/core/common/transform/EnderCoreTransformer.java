@@ -87,6 +87,9 @@ public class EnderCoreTransformer implements IClassTransformer {
   static final ObfSafeName renderItemAndEffectIntoGUI = new ObfSafeName("renderItemAndEffectIntoGUI", "func_184391_a");
   static final ObfSafeName renderItemDisplayName = new ObfSafeName("renderItemAndEffectIntoGUI, renderItemOverlayIntoGUI", "func_180453_a, func_184391_a");
 
+  static final String itemFrameClass = "net.minecraft.entity.item.EntityItemFrame";
+  static final ObfSafeName processInitialInteractMethod = new ObfSafeName("processInitialInteract", "func_184230_a");
+
   static final String entityPlayerClass = "net.minecraft.entity.player.EntityPlayer";
 
   static final String entityAICreeperSwellClass = "net.minecraft.entity.ai.EntityAICreeperSwell";
@@ -167,6 +170,28 @@ public class EnderCoreTransformer implements IClassTransformer {
           if (!done) {
             mainLogger.info("Transforming failed.");
           }
+        }
+      });
+    }
+
+    // ItemFrame firing ItemDestroyed Event bug patch
+    if (transformedName.equals(itemFrameClass)) {
+      return transform(basicClass, itemFrameClass, processInitialInteractMethod, new Transform() {
+        @Override
+        void transform(Iterator<MethodNode> methods) {
+          while (methods.hasNext()) {
+            MethodNode m = methods.next();
+            if (processInitialInteractMethod.equals(m.name)) {
+              InsnList toAdd = new InsnList();
+              toAdd.add(new VarInsnNode(ALOAD, 1));
+              toAdd.add(new VarInsnNode(ALOAD, 2));
+              toAdd.add(new MethodInsnNode(INVOKESTATIC, "com/enderio/core/common/transform/EnderCoreMethods", "processInitialInteract",
+                  "(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/EnumHand;)V", false));
+              m.instructions.insert(toAdd);
+              return;
+            }
+          }
+          mainLogger.info("Transforming failed.");
         }
       });
     }

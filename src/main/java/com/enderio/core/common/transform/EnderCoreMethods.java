@@ -3,6 +3,7 @@ package com.enderio.core.common.transform;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.common.event.ItemGUIRenderEvent;
+import com.enderio.core.common.interfaces.INotDestroyedInItemFrames;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -16,6 +17,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -233,6 +235,16 @@ public class EnderCoreMethods {
       return ((com.enderio.core.common.interfaces.ICreeperTarget) entitylivingbase).isCreeperTarget(swellingCreeper);
     }
     return true;
+  }
+
+  public static void processInitialInteract(EntityPlayer player, EnumHand hand) {
+    if (!player.world.isRemote && !player.capabilities.isCreativeMode) {
+      ItemStack itemstack = player.getHeldItem(hand);
+      if (itemstack.getItem() instanceof INotDestroyedInItemFrames) {
+        // The calling code got stored getHeldItem() before calling us and will check that stack when determining if something happened to it
+        player.setHeldItem(hand, itemstack.copy());
+      }
+    }
   }
 
   @Deprecated
