@@ -12,6 +12,7 @@ import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vertex;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -56,6 +57,22 @@ public final class BoundingBox extends AxisAlignedBB {
 
   public boolean contains(@Nonnull BlockPos pos) {
     return minX <= pos.getX() && minY <= pos.getY() && minZ <= pos.getZ() && maxX >= pos.getX() && maxY >= pos.getY() && maxZ >= pos.getZ();
+  }
+
+  /**
+   * Returns <code>true</code> if the given entity's location point is within the bounding box.
+   */
+  public boolean contains(@Nonnull Entity entity) {
+    return minX <= entity.posX && minY <= entity.posY && minZ <= entity.posZ && maxX >= entity.posX && maxY >= entity.posY && maxZ >= entity.posZ;
+  }
+
+  /**
+   * Returns <code>true</code> if the given entity's bounding box intersects with the bounding box.
+   * <p>
+   * Note that this checks Entity#getEntityBoundingBox.
+   */
+  public boolean intersects(@Nonnull Entity entity) {
+    return intersects(entity.getEntityBoundingBox());
   }
 
   public boolean intersects(@Nonnull BoundingBox other) {
