@@ -1,6 +1,7 @@
 package com.enderio.core.client.handlers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -14,7 +15,6 @@ import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.util.ItemUtil;
 import com.enderio.core.common.util.NNList;
-import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,7 @@ public class SpecialTooltipHandler {
     boolean shouldHandleItem(@Nonnull ItemStack item);
   }
 
-  private static final @Nonnull List<ITooltipCallback> callbacks = Lists.newArrayList();
+  private static final @Nonnull List<ITooltipCallback> callbacks = new ArrayList<>();
 
   public static void addCallback(@Nonnull ITooltipCallback callback) {
     callbacks.add(callback);
@@ -196,17 +196,28 @@ public class SpecialTooltipHandler {
   }
 
   public static void addDetailedTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
-    addTooltipFromResources(list, unlocalizedName.concat(".tooltip.detailed.line"));
+    addMultilineTooltip(list, unlocalizedName, ".tooltip.detailed");
   }
 
   public static void addBasicTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
-    addTooltipFromResources(list, unlocalizedName.concat(".tooltip.basic.line"));
+    addMultilineTooltip(list, unlocalizedName, ".tooltip.basic");
   }
 
   public static void addCommonTooltipFromResources(@Nonnull List<String> list, @Nonnull String unlocalizedName) {
-    addTooltipFromResources(list, unlocalizedName.concat(".tooltip.common.line"));
+    addMultilineTooltip(list, unlocalizedName, ".tooltip.common");
   }
 
+  public static void addMultilineTooltip(@Nonnull List<String> list, @Nonnull String... keyParts) {
+    String key = String.join("", keyParts);
+    if (EnderCore.lang.canLocalizeExact(key + ".line1")) {
+      // compat
+      addTooltipFromResources(list, key + ".line");
+    } else if (EnderCore.lang.canLocalizeExact(key)) {
+      list.addAll(Arrays.asList(EnderCore.lang.localizeListExact(key)));
+    }
+  }
+
+  @Deprecated
   public static void addTooltipFromResources(@Nonnull List<String> list, @Nullable /* for String.concat() */ String keyBase) {
     boolean done = false;
     int line = 1;
