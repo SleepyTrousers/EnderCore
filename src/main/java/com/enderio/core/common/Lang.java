@@ -117,6 +117,17 @@ public class Lang {
   }
 
   /**
+   * Splits the localized text on "|" into a String[].
+   *
+   * @param unloc
+   *          The unlocalized string.
+   * @return A localized list of strings.
+   */
+  public @Nonnull String[] localizeListExact(@Nonnull String unloc) {
+    return splitList(localizeExact(unloc));
+  }
+
+  /**
    * Localizes all strings in a list, using the prefix.
    *
    * @param unloc

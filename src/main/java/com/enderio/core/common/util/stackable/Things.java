@@ -295,7 +295,14 @@ public class Things extends Ingredient {
   }
 
   public boolean isValid() {
-    return !getItemStacksRaw().isEmpty();
+    if (inPreInit) {
+      Things temp = new Things();
+      temp.add(this.getNameList());
+      temp.bake();
+      return !temp.getItemStacksRaw().isEmpty();
+    } else {
+      return !getItemStacksRaw().isEmpty();
+    }
   }
 
   public boolean isPotentiallyValid() {
