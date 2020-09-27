@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,13 @@ public class NNList<E> extends NonNullList<E> {
     this();
     for (int i = 0; i < size; i++) {
       add(fillWith);
+    }
+  }
+
+  public NNList(int size, @Nonnull Supplier<E> fillWith) {
+    this();
+    for (int i = 0; i < size; i++) {
+      add(fillWith.get());
     }
   }
 
