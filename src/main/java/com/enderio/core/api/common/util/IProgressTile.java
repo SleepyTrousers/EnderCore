@@ -5,11 +5,10 @@ import javax.annotation.Nullable;
 
 import com.enderio.core.common.network.EnderPacketHandler;
 
-import net.minecraft.network.Packet;
+import net.minecraft.network.IPacket;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public interface IProgressTile {
 
@@ -21,20 +20,13 @@ public interface IProgressTile {
    * @param progress
    *          The % progress.
    */
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void setProgress(float progress);
 
   @Nonnull
   TileEntity getTileEntity();
 
   @Nonnull
-  IMessage getProgressPacket();
-
-  public static @Nullable Packet<?> getProgressPacket(Object o) {
-    if (o instanceof IProgressTile) {
-      return EnderPacketHandler.INSTANCE.getPacketFrom(((IProgressTile) o).getProgressPacket());
-    }
-    return null;
-  }
+  IPacket getProgressPacket();
 
 }

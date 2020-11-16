@@ -2,11 +2,9 @@ package com.enderio.core.common.util;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 
 public class ArrayInventory implements IInventory {
 
@@ -48,7 +46,7 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public boolean isUsableByPlayer(@Nonnull EntityPlayer var1) {
+  public boolean isUsableByPlayer(@Nonnull PlayerEntity var1) {
     return true;
   }
 
@@ -62,7 +60,7 @@ public class ArrayInventory implements IInventory {
 
   }
 
-  @Override
+  /*@Override
   public @Nonnull String getName() {
     return "ArrayInventory";
   }
@@ -74,8 +72,8 @@ public class ArrayInventory implements IInventory {
 
   @Override
   public @Nonnull ITextComponent getDisplayName() {
-    return new TextComponentString(getName());
-  }
+    return new StringTextComponent(getName());
+  }*/
 
   @Override
   public @Nonnull ItemStack removeStackFromSlot(int index) {
@@ -85,14 +83,15 @@ public class ArrayInventory implements IInventory {
   }
 
   @Override
-  public void openInventory(@Nonnull EntityPlayer player) {
+  public void openInventory(@Nonnull PlayerEntity player) {
   }
 
   @Override
-  public void closeInventory(@Nonnull EntityPlayer player) {
+  public void closeInventory(@Nonnull PlayerEntity player) {
   }
 
-  @Override
+
+  /*@Override
   public int getField(int id) {
     return 0;
   }
@@ -104,7 +103,7 @@ public class ArrayInventory implements IInventory {
   @Override
   public int getFieldCount() {
     return 0;
-  }
+  }*/
 
   @Override
   public void clear() {

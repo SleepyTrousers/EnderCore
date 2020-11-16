@@ -6,9 +6,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class CompoundCapabilityProvider implements ICapabilityProvider {
 
@@ -24,23 +25,20 @@ public class CompoundCapabilityProvider implements ICapabilityProvider {
     }
   }
 
+  @Nonnull
   @Override
-  public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
+  public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
     for (ICapabilityProvider prov : providers) {
-      if (prov.hasCapability(capability, facing)) {
-        return true;
-      }
+      return prov.getCapability(cap, side);
     }
-    return false;
+    return null;
   }
 
+  @Nonnull
   @Override
-  public @Nullable <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+  public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
     for (ICapabilityProvider prov : providers) {
-      T res = prov.getCapability(capability, facing);
-      if (res != null) {
-        return res;
-      }
+      return prov.getCapability(cap);
     }
     return null;
   }

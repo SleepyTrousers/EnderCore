@@ -8,7 +8,7 @@ import com.enderio.core.common.util.Scheduler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy extends CommonProxy {
 
@@ -22,18 +22,18 @@ public class ClientProxy extends CommonProxy {
 
   @Override
   public @Nonnull World getClientWorld() {
-    return Minecraft.getMinecraft().world;
+    return Minecraft.getInstance().world;
   }
 
   @Override
   public void throwModCompatibilityError(@Nonnull String... msgs) {
-    EnderCoreModConflictException ex = new EnderCoreModConflictException(msgs);
+    AbstractLoadingException ex = new AbstractLoadingException(msgs);
 //    ReflectionHelper.setPrivateValue(FMLClientHandler.class, FMLClientHandler.instance(), ex, "customError");
     throw ex;
   }
 
   @Override
-  public void onPreInit(@Nonnull FMLPreInitializationEvent event) {
+  public void setup(@Nonnull FMLCommonSetupEvent event) {
     IconUtil.instance.init();
   }
 

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import com.enderio.core.client.gui.widget.GuiToolTip;
+import com.enderio.core.client.gui.widget.TooltipWidget;
 import com.enderio.core.common.util.NNList;
 import com.google.common.collect.Sets;
 
@@ -27,13 +27,13 @@ public class ToolTipManager {
     void drawHoveringToolTipText(@Nonnull List<String> par1List, int par2, int par3, @Nonnull FontRenderer font);
   }
 
-  private final @Nonnull Set<GuiToolTip> toolTips = Sets.newHashSet();
+  private final @Nonnull Set<TooltipWidget> toolTips = Sets.newHashSet();
 
-  public void addToolTip(@Nonnull GuiToolTip toolTip) {
+  public void addToolTip(@Nonnull TooltipWidget toolTip) {
     toolTips.add(toolTip);
   }
 
-  public boolean removeToolTip(@Nonnull GuiToolTip toolTip) {
+  public boolean removeToolTip(@Nonnull TooltipWidget toolTip) {
     return toolTips.remove(toolTip);
   }
 
@@ -42,7 +42,7 @@ public class ToolTipManager {
   }
 
   protected final void drawTooltips(@Nonnull ToolTipRenderer renderer, int mouseX, int mouseY) {
-    for (GuiToolTip toolTip : toolTips) {
+    for (TooltipWidget toolTip : toolTips) {
       toolTip.onTick(mouseX - renderer.getGuiRootLeft(), mouseY - renderer.getGuiRootTop());
       if (toolTip.shouldDraw()) {
         drawTooltip(toolTip, mouseX, mouseY, renderer);
@@ -50,7 +50,7 @@ public class ToolTipManager {
     }
   }
 
-  protected void drawTooltip(@Nonnull GuiToolTip toolTip, int mouseX, int mouseY, @Nonnull ToolTipRenderer renderer) {
+  protected void drawTooltip(@Nonnull TooltipWidget toolTip, int mouseX, int mouseY, @Nonnull ToolTipRenderer renderer) {
     List<String> list = toolTip.getToolTipText();
     if (list.isEmpty()) {
       return;

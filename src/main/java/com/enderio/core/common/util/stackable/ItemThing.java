@@ -6,9 +6,8 @@ import javax.annotation.Nullable;
 import com.enderio.core.common.util.NNList;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 
 class ItemThing implements IThing {
@@ -36,8 +35,7 @@ class ItemThing implements IThing {
 
   @Override
   public boolean is(@Nullable Block block) {
-    return block != null && (Item.getItemFromBlock(block) == thing || Block.getBlockFromItem(thing) == block
-        || (thing instanceof ItemBlockSpecial && ((ItemBlockSpecial) thing).getBlock() == block));
+    return block != null && (Item.getItemFromBlock(block) == thing || Block.getBlockFromItem(thing) == block);
   }
 
   @Override
@@ -53,9 +51,6 @@ class ItemThing implements IThing {
   @Override
   public @Nonnull NNList<Block> getBlocks() {
     Block block = Block.getBlockFromItem(thing);
-    if (block == Blocks.AIR && thing instanceof ItemBlockSpecial) {
-      block = ((ItemBlockSpecial) thing).getBlock();
-    }
     return block != Blocks.AIR ? new NNList<Block>(block) : NNList.<Block> emptyList();
   }
 

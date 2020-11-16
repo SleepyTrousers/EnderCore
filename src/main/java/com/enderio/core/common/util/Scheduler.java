@@ -6,21 +6,18 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.Handlers.Handler.Inst;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 /**
  * Convenience helper to schedule events to happen in the future.
  */
-@Handler(getInstFrom = Inst.METHOD)
+@Mod.EventBusSubscriber
 public class Scheduler {
 
   /**
@@ -79,42 +76,20 @@ public class Scheduler {
    * @param task
    *          The {@link Runnable} to be run when the delay is up
    *
-   * @see #schedule(int, Runnable, Side)
+   * @see #schedule(int, Runnable, Dist)
    */
   public void schedule(int delay, Runnable task) {
-    schedule(delay, task, Side.SERVER);
+    schedule(delay, task, Dist.DEDICATED_SERVER);
   }
 
-  /**
-   * Schedules a task to be called later
-   *
-   * @param delay
-   *          The amount of ticks to delay the call
-   * @param task
-   *          The {@link Runnable} to be run when the delay is up
-   * @param side
-   *          The side to schedule the task on.
-   *          <p>
-   *          Note: passing in {@link Side#CLIENT} on a dedicated server will work, but your task will never be called. Please avoid doing this to save
-   *          processing.
-   */
-  public void schedule(int delay, Runnable task, Side side) {
+
+  public void schedule(int delay, Runnable task, Dist side) {
     schedule(new Task(delay, task), side);
   }
 
-  /**
-   * Schedules a task to be called later
-   *
-   * @param task
-   *          The {@link ITask} to be run at the next tick
-   * @param side
-   *          The side to schedule the task on.
-   *          <p>
-   *          Note: passing in {@link Side#CLIENT} on a dedicated server will work, but your task will never be called. Please avoid doing this to save
-   *          processing.
-   */
-  public void schedule(ITask task, Side side) {
-    if (side == Side.SERVER) {
+
+  public void schedule(ITask task, Dist side) {
+    if (side == Dist.DEDICATED_SERVER) {
       serverQueue.add(task);
     } else if (clientQueue != null) {
       clientQueue.add(task);
@@ -136,8 +111,8 @@ public class Scheduler {
    * For internal use only. Do not call.
    */
   @SubscribeEvent
-  public void onServerTick(ServerTickEvent event) {
-    if (event.phase == Phase.END) {
+  public void onServerTick(TickEvent.ServerTickEvent event) {
+    if (event.phase == TickEvent.Phase.END) {
       runTasks(serverQueue);
     }
   }
@@ -145,12 +120,12 @@ public class Scheduler {
   /**
    * For internal use only. Do not call.
    */
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   @SubscribeEvent
-  public void onClientTick(ClientTickEvent event) {
-    if (event.phase == Phase.END) {
+  public void onClientTick(TickEvent.ClientTickEvent event) {
+    if (event.phase == TickEvent.Phase.END) {
       runTasks(clientQueue);
-      if (!serverQueue.isEmpty() && !Minecraft.getMinecraft().isIntegratedServerRunning()) {
+      if (!serverQueue.isEmpty() && !Minecraft.getInstance().isIntegratedServerRunning()) {
         serverQueue.clear();
       }
     }

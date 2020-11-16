@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Charsets;
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.UsernameCache;
 
 public class UserIdent {
@@ -169,18 +169,18 @@ public class UserIdent {
     return uuid_offline_other.equals(this.uuid) || this.uuid_offline.equals(uuid_offline_other);
   }
 
-  public void saveToNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
+  public void saveToNbt(@Nonnull CompoundNBT nbt, @Nonnull String prefix) {
     if (uuid != null) {
-      nbt.setString(prefix + ".uuid", "" + uuid.toString());
+      nbt.putString(prefix + ".uuid", "" + uuid.toString());
     }
-    nbt.setString(prefix + ".login", playerName);
+    nbt.putString(prefix + ".login", playerName);
   }
 
-  public static boolean existsInNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
-    return nbt.hasKey(prefix + ".uuid") || nbt.hasKey(prefix + ".login");
+  public static boolean existsInNbt(@Nonnull CompoundNBT nbt, @Nonnull String prefix) {
+    return nbt.contains(prefix + ".uuid") || nbt.contains(prefix + ".login");
   }
 
-  public static @Nonnull UserIdent readfromNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
+  public static @Nonnull UserIdent readfromNbt(@Nonnull CompoundNBT nbt, @Nonnull String prefix) {
     @Nonnull
     String suuid = nbt.getString(prefix + ".uuid");
     @Nonnull
@@ -220,8 +220,8 @@ public class UserIdent {
     }
 
     @Override
-    public void saveToNbt(@Nonnull NBTTagCompound nbt, @Nonnull String prefix) {
-      nbt.setString(prefix + ".uuid", NOBODY_MARKER);
+    public void saveToNbt(@Nonnull CompoundNBT nbt, @Nonnull String prefix) {
+      nbt.putString(prefix + ".uuid", NOBODY_MARKER);
     }
 
   }

@@ -9,67 +9,66 @@ import java.util.Calendar;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.EnderCore;
-import com.enderio.core.common.Handlers.Handler;
-import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.util.EntityUtil;
 import com.enderio.core.common.util.NullHelper;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@Handler
-public class FireworkHandler {
+@Mod.EventBusSubscriber
+class FireworkHandler {
   @SubscribeEvent
   public void onAchievement(AdvancementEvent event) {
     final @Nonnull Advancement advancement = NullHelper.notnullF(event.getAdvancement(), "AdvancementEvent.getAdvancement()");
     DisplayInfo display = advancement.getDisplay();
-    if (ConfigHandler.betterAchievements && !event.getEntity().world.isRemote && display != null && display.shouldAnnounceToChat()) {
-      event.getEntityPlayer().getEntityData().setInteger("fireworksLeft", 9);
-      event.getEntityPlayer().getEntityData().setBoolean("fireworkDelay", false);
+    // TODO: Config:
+//    if (ConfigHandler.betterAchievements && !event.getEntity().world.isRemote && display != null && display.shouldAnnounceToChat()) {
+    if (!event.getEntity().world.isRemote && display != null && display.shouldAnnounceToChat()) {
+      event.getPlayer().getPersistentData().putInt("fireworksLeft", 9);
+      event.getPlayer().getPersistentData().putBoolean("fireworkDelay", false);
     }
   }
 
   @SubscribeEvent
-  public void onPlayerTick(PlayerTickEvent event) {
-    if(!ConfigHandler.newYearsFireworks) {
-      return;
-    }
+  public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    // TODO: Config:
+//    if(!ConfigHandler.newYearsFireworks) {
+//      return;
+//    }
     
-    EntityPlayer player = event.player;
+    PlayerEntity player = event.player;
 
-    if (!player.world.isRemote && event.phase == Phase.END) {
-      if (player.world.getTotalWorldTime() % 100 == 0) {
+    if (!player.world.isRemote && event.phase == TickEvent.Phase.END) {
+      if (player.world.getGameTime() % 100 == 0) {
         Calendar cal = Calendar.getInstance();
         if (cal.get(DAY_OF_MONTH) == 1 && cal.get(MONTH) == JANUARY
-            && !player.getEntityData().getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG).getBoolean("celebrated")) {
-          player.getEntityData().setInteger("fireworksLeft", 15);
-          player.getEntityData().setBoolean("fireworkDelay", false);
-          NBTTagCompound tag = player.getEntityData().getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
-          tag.setBoolean("celebrated", true);
-          player.getEntityData().setTag(EntityPlayer.PERSISTED_NBT_TAG, tag);
-          player.sendMessage(new TextComponentString(TextFormatting.AQUA + EnderCore.lang.localize("celebrate")));
+            && !player.getPersistentData().getBoolean("celebrated")) {
+          player.getPersistentData().putInt("fireworksLeft", 15);
+          player.getPersistentData().putBoolean("fireworkDelay", false);
+          player.getPersistentData().putBoolean("celebrated", false);
+          player.sendMessage(new StringTextComponent(TextFormatting.AQUA + EnderCore.lang.localize("celebrate")), Util.DUMMY_UUID);
         }
       }
 
-      int fireworksLeft = player.getEntityData().getInteger("fireworksLeft");
-      if (fireworksLeft > 0 && (!player.getEntityData().getBoolean("fireworkDelay") || player.world.getTotalWorldTime() % 20 == 0)) {
-        BlockPos pos = new BlockPos(player).up(2);
-        EntityUtil.spawnFirework(pos, player.world.provider.getDimension(), 12);
-        player.getEntityData().setInteger("fireworksLeft", fireworksLeft - 1);
+      int fireworksLeft = player.getPersistentData().getInt("fireworksLeft");
+      if (fireworksLeft > 0 && (!player.getPersistentData().getBoolean("fireworkDelay") || player.world.getGameTime() % 20 == 0)) {
+        BlockPos pos = player.getPosition().up(2);
+        EntityUtil.spawnFirework(pos, player.world, 12);
+        player.getPersistentData().putInt("fireworksLeft", fireworksLeft - 1);
 
         if (fireworksLeft > 5) {
-          player.getEntityData().setBoolean("fireworkDelay", true);
+          player.getPersistentData().putBoolean("fireworkDelay", true);
         } else {
-          player.getEntityData().setBoolean("fireworkDelay", false);
+          player.getPersistentData().putBoolean("fireworkDelay", false);
         }
       }
     }

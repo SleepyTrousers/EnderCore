@@ -6,14 +6,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
+import net.minecraft.client.resources.I18n;
 
-import net.minecraft.util.text.translation.I18n;
 
 @SuppressWarnings("deprecation")
 public class Lang {
 
-  private static final @Nonnull String REGEX = "\\" + '|';
-  public static final char CHAR = '|';
+  private static final @Nonnull String REGEX = "\\n";
+  public static final char CHAR = '\n';
 
   private final @Nonnull String prefix;
 
@@ -77,7 +77,7 @@ public class Lang {
    * @return A localized string.
    */
   public @Nonnull String localizeExact(@Nonnull String unloc, @Nonnull Object... args) {
-    return I18n.translateToLocalFormatted(unloc, args);
+    return I18n.format(unloc, args);
   }
 
   /**
@@ -89,7 +89,7 @@ public class Lang {
    * @return A localized string.
    */
   public @Nonnull String localizeExact(@Nonnull String unloc) {
-    return I18n.translateToLocal(unloc);
+    return I18n.format(unloc);
   }
 
   /**
@@ -114,17 +114,6 @@ public class Lang {
    */
   public @Nonnull String[] localizeList(@Nonnull String unloc) {
     return splitList(localize(unloc));
-  }
-
-  /**
-   * Splits the localized text on "|" into a String[].
-   *
-   * @param unloc
-   *          The unlocalized string.
-   * @return A localized list of strings.
-   */
-  public @Nonnull String[] localizeListExact(@Nonnull String unloc) {
-    return splitList(localizeExact(unloc));
   }
 
   /**
@@ -189,6 +178,6 @@ public class Lang {
    * @return True if there is a localization mapped, false otherwise.
    */
   public boolean canLocalizeExact(@Nonnull String unloc) {
-    return I18n.canTranslate(unloc);
+    return I18n.hasKey(unloc);
   }
 }

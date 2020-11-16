@@ -10,10 +10,11 @@ import com.enderio.core.api.client.gui.IHideable;
 import com.google.common.base.Strings;
 
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-public class TextFieldEnder extends GuiTextField implements IHideable {
+public class TextFieldEnder extends TextFieldWidget implements IHideable {
 
   public interface ICharFilter {
 
@@ -52,19 +53,19 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
 
   static {
     try {
-      canLoseFocus = ReflectionHelper.findField(GuiTextField.class, "canLoseFocus", "field_146212_n", "n");
+      canLoseFocus = ObfuscationReflectionHelper.findField(TextFieldWidget.class, "canLoseFocus");
       canLoseFocus.setAccessible(true);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  public TextFieldEnder(@Nonnull FontRenderer fnt, int x, int y, int width, int height) {
-    this(fnt, x, y, width, height, null);
+  public TextFieldEnder(@Nonnull FontRenderer fnt, int x, int y, int width, int height, ITextComponent title) {
+    this(fnt, x, y, width, height, title, null);
   }
 
-  public TextFieldEnder(@Nonnull FontRenderer fnt, int x, int y, int width, int height, @Nullable ICharFilter charFilter) {
-    super(0, fnt, x, y, width, height);
+  public TextFieldEnder(@Nonnull FontRenderer fnt, int x, int y, int width, int height, ITextComponent title, @Nullable ICharFilter charFilter) {
+    super(fnt, x, y, width, height, title);
     xOrigin = x;
     yOrigin = y;
     filter = charFilter;
@@ -80,11 +81,13 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
     return this;
   }
 
+
+
   @Override
-  public boolean textboxKeyTyped(char c, int key) {
+  public boolean charTyped(char codePoint, int modifiers) {
     final ICharFilter filter2 = filter;
-    if (filter2 == null || filter2.passesFilter(this, c) || isSpecialChar(c, key)) {
-      return super.textboxKeyTyped(c, key);
+    if (filter2 == null || filter2.passesFilter(this, codePoint) || isSpecialChar(codePoint, modifiers)) {
+      return super.charTyped(codePoint, modifiers);
     }
     return false;
   }
@@ -102,7 +105,7 @@ public class TextFieldEnder extends GuiTextField implements IHideable {
     }
   }
 
-  public boolean contains(int mouseX, int mouseY) {
+  public boolean contains(double mouseX, double mouseY) {
     return mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height;
   }
 

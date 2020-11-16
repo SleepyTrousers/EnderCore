@@ -4,6 +4,8 @@ import java.awt.Rectangle;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.util.Util;
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -13,7 +15,6 @@ import com.enderio.core.client.render.EnderWidget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
@@ -104,18 +105,18 @@ public class VScrollbar implements IHideable {
       }
 
       if (scrollDir != 0) {
-        long time = Minecraft.getSystemTime();
+        long time = Util.milliTime();
         if (timeNextScroll - time <= 0) {
           timeNextScroll = time + 100;
           scrollBy(scrollDir);
         }
       }
 
-      Minecraft.getMinecraft().getTextureManager().bindTexture(EnderWidget.TEXTURE);
+      Minecraft.getInstance().getTextureManager().bindTexture(EnderWidget.TEXTURE);
       GL11.glPushAttrib(GL11.GL_ENABLE_BIT); // TODO waiting on forge for a bug fix of pushAtrrib
-      GlStateManager.enableBlend();
-      GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-      GlStateManager.color(1, 1, 1);
+      RenderSystem.enableBlend();
+      RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+      RenderSystem.color3f(1, 1, 1);
 
       final BufferBuilder renderer = Tessellator.getInstance().getBuffer();
       renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -141,7 +142,7 @@ public class VScrollbar implements IHideable {
     }
   }
 
-  public boolean mouseClicked(int mX, int mY, int button) {
+  public boolean mouseClicked(double mX, double mY, int button) {
     if (button == 0) {
       if (getScrollMax() > 0 && thumbArea.contains(mX, mY)) {
         int thumbPos = getThumbPosition();
@@ -156,35 +157,35 @@ public class VScrollbar implements IHideable {
 
       scrollDir = (pressedDown ? 1 : 0) - (pressedUp ? 1 : 0);
       if (scrollDir != 0) {
-        timeNextScroll = Minecraft.getSystemTime() + 200;
+        timeNextScroll = Util.milliTime() + 200;
         scrollBy(scrollDir);
       }
     }
     return isDragActive();
   }
 
-  public boolean mouseClickMove(int mX, int mY, int button, long time) {
+  public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
     if (pressedThumb) {
-      int pos = mY - (thumbArea.y + EnderWidget.VSCROLL_THUMB_OFF.height / 2);
+      double pos = mouseY - (thumbArea.y + EnderWidget.VSCROLL_THUMB_OFF.height / 2);
       int len = thumbArea.height - EnderWidget.VSCROLL_THUMB_OFF.height;
       if (len > 0) {
-        setScrollPos(Math.round(pos * (float) getScrollMax() / len));
+        setScrollPos((int) Math.round(pos * (float) getScrollMax() / len));
       }
       return true;
     }
     return false;
   }
 
-  public void mouseMovedOrUp(int mX, int mY, int button) {
+  public void mouseReleased(double mX, double mY, int button) {
     pressedUp = false;
     pressedDown = false;
     pressedThumb = false;
     scrollDir = 0;
   }
 
-  public void mouseWheel(int mX, int mY, int delta) {
+  public void mouseScrolled(double mX, double mY, double delta) {
     if (!isDragActive()) {
-      scrollBy(-Integer.signum(delta));
+      scrollBy(-Integer.signum((int) Math.round(delta))); // TODO: Ugly, maybe just write a sign func?
     }
   }
 

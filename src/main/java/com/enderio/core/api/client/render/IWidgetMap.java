@@ -2,6 +2,8 @@ package com.enderio.core.api.client.render;
 
 import javax.annotation.Nonnull;
 
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.client.render.RenderUtil;
@@ -10,8 +12,6 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IWidgetMap {
 
@@ -20,25 +20,25 @@ public interface IWidgetMap {
   @Nonnull
   ResourceLocation getTexture();
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw);
 
-  @SideOnly(Side.CLIENT)
+  @OnlyIn(Dist.CLIENT)
   void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY);
 
   static class WidgetMapImpl implements IWidgetMap {
@@ -62,43 +62,43 @@ public interface IWidgetMap {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y) {
       render(widget, x, y, false);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, boolean doDraw, boolean flipY) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), 0, doDraw, flipY);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double zLevel, boolean doDraw, boolean flipY) {
       render(widget, x, y, widget.getWidth(), widget.getHeight(), zLevel, doDraw, flipY);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw) {
       render(widget, x, y, width, height, zLevel, doDraw, false);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void render(@Nonnull IWidgetIcon widget, double x, double y, double width, double height, double zLevel, boolean doDraw, boolean flipY) {
 
       final BufferBuilder tes = Tessellator.getInstance().getBuffer();
@@ -107,10 +107,10 @@ public interface IWidgetMap {
         tes.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
       }
 
-      double minU = (double) widget.getX() / getSize();
-      double maxU = (double) (widget.getX() + widget.getWidth()) / getSize();
-      double minV = (double) widget.getY() / getSize();
-      double maxV = (double) (widget.getY() + widget.getHeight()) / getSize();
+      float minU = (float) widget.getX() / getSize();
+      float maxU = (float) (widget.getX() + widget.getWidth()) / getSize();
+      float minV = (float) widget.getY() / getSize();
+      float maxV = (float) (widget.getY() + widget.getHeight()) / getSize();
 
       if (flipY) {
         tes.pos(x, y + height, zLevel).tex(minU, minV).endVertex();

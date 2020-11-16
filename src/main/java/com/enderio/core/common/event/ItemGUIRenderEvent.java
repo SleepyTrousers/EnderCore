@@ -3,7 +3,7 @@ package com.enderio.core.common.event;
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.eventbus.api.Event;
 
 /**
  * Fired when an item is rendered into the GUI

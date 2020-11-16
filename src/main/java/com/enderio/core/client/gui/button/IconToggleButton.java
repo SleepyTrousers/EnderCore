@@ -11,8 +11,8 @@ public class IconToggleButton extends IIconButton {
 
   private boolean selected = false;
 
-  public IconToggleButton(@Nonnull FontRenderer fr, int id, int x, int y, @Nullable TextureAtlasSprite icon, @Nullable ResourceLocation texture) {
-    super(fr, id, x, y, icon, texture);
+  public IconToggleButton(@Nonnull FontRenderer fr, int x, int y, @Nullable TextureAtlasSprite icon, @Nullable ResourceLocation texture) {
+    super(fr, x, y, icon, texture);
   }
 
   public boolean isSelected() {
@@ -24,13 +24,9 @@ public class IconToggleButton extends IIconButton {
   }
 
   @Override
-  public int getHoverState(boolean par1) {
-    int result = 1;
-    if (!enabled || selected) {
-      result = 0;
-    } else if (par1) {
-      result = 2;
-    }
-    return result;
+  public boolean isHovered() {
+    if (selected)
+      return false;
+    return super.isHovered();
   }
 }

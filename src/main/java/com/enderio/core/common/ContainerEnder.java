@@ -1,24 +1,31 @@
 package com.enderio.core.common;
 
 import java.awt.Point;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.common.ContainerEnderCap.BaseSlotItemHandler;
 import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.IContainerListener;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 @Deprecated
 public class ContainerEnder<T extends IInventory> extends Container implements GhostSlot.IGhostSlotAware {
@@ -31,7 +38,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
   protected final int endHotBarSlot;
 
   private final @Nonnull T inv;
-  private final @Nonnull InventoryPlayer playerInv;
+  private final @Nonnull PlayerInventory playerInv;
 
   @Nonnull
   private static <T> T checkNotNull(T reference) {
@@ -41,7 +48,8 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     return reference;
   }
 
-  public ContainerEnder(@Nonnull InventoryPlayer playerInv, @Nonnull T inv) {
+  public ContainerEnder(@Nullable ContainerType<?> type, int id, @Nonnull PlayerInventory playerInv, @Nonnull T inv) {
+    super(type, id);
     this.inv = checkNotNull(inv);
     this.playerInv = checkNotNull(playerInv);
 
@@ -56,7 +64,7 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
       for (int j = 0; j < 9; ++j) {
         Point loc = new Point(x + j * 18, y + i * 18);
         Slot slot = new Slot(this.playerInv, j + i * 9 + 9, loc.x, loc.y);
-        addSlotToContainer(slot);
+        addSlot(slot);
         playerSlotLocations.put(slot, loc);
       }
     }
@@ -66,13 +74,13 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     for (int i = 0; i < 9; ++i) {
       Point loc = new Point(x + i * 18, y + 58);
       Slot slot = new Slot(this.playerInv, i, loc.x, loc.y);
-      addSlotToContainer(slot);
+      addSlot(slot);
       playerSlotLocations.put(slot, loc);
     }
     endHotBarSlot = inventorySlots.size();
   }
 
-  protected void addSlots(@Nonnull InventoryPlayer playerInventory) {
+  protected void addSlots(@Nonnull PlayerInventory playerInventory) {
   }
 
   public @Nonnull Point getPlayerInventoryOffset() {
@@ -87,33 +95,34 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     return inv;
   }
 
-  @Override
-  @Nonnull
-  public Slot getSlotFromInventory(@Nonnull IInventory invIn, int slotIn) {
-    return NullHelper.notnull(super.getSlotFromInventory(invIn, slotIn), "Logic error, missing slot " + slotIn);
-  }
+//  @Override
+//  @Nonnull
+//  public Slot getSlotFromInventory(@Nonnull IInventory invIn, int slotIn) {
+//    return NullHelper.notnull(super.getSlotFromInventory(invIn, slotIn), "Logic error, missing slot " + slotIn);
+//  }
+//
+//  @Nonnull
+//  public Slot getSlotFromInventory(int slotIn) {
+//    return getSlotFromInventory(getInv(), slotIn);
+//  }
 
-  @Nonnull
-  public Slot getSlotFromInventory(int slotIn) {
-    return getSlotFromInventory(getInv(), slotIn);
-  }
-
-  @Override
-  public boolean canInteractWith(@Nonnull EntityPlayer player) {
-    return getInv().isUsableByPlayer(player);
-  }
 
   @Override
-  public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer p_82846_1_, int p_82846_2_) {
+  public boolean canInteractWith(PlayerEntity playerIn) {
+    return getInv().isUsableByPlayer(playerIn);
+  }
+
+  @Override
+  public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
-    Slot slot = this.inventorySlots.get(p_82846_2_);
+    Slot slot = this.inventorySlots.get(index);
 
     if (slot != null && slot.getHasStack()) {
       ItemStack itemstack1 = slot.getStack();
       itemstack = itemstack1.copy();
 
       int minPlayerSlot = inventorySlots.size() - playerInv.mainInventory.size();
-      if (p_82846_2_ < minPlayerSlot) {
+      if (index < minPlayerSlot) {
         if (!this.mergeItemStack(itemstack1, minPlayerSlot, this.inventorySlots.size(), true)) {
           return ItemStack.EMPTY;
         }
@@ -126,6 +135,12 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
       } else {
         slot.onSlotChanged();
       }
+
+      if (itemstack1.getCount() == itemstack.getCount()) {
+        return ItemStack.EMPTY;
+      }
+
+      slot.onTake(playerIn, itemstack1);
     }
 
     return itemstack;
@@ -135,83 +150,88 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
    * Added validation of slot input
    */
   @Override
-  protected boolean mergeItemStack(@Nonnull ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reversOrder) {
-
-    boolean result = false;
-    int checkIndex = fromIndex;
-
-    if (reversOrder) {
-      checkIndex = toIndex - 1;
+  protected boolean mergeItemStack(@Nonnull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection) {
+    boolean flag = false;
+    int i = startIndex;
+    if (reverseDirection) {
+      i = endIndex - 1;
     }
 
-    Slot slot;
-    ItemStack itemstack1;
-
-    if (par1ItemStack.isStackable()) {
-
-      while (!par1ItemStack.isEmpty() && (!reversOrder && checkIndex < toIndex || reversOrder && checkIndex >= fromIndex)) {
-        slot = this.inventorySlots.get(checkIndex);
-        itemstack1 = slot.getStack();
-
-        if (isSlotEnabled(slot) && !itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
-            && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
-            && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
-
-          int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
-          int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getItemStackLimit(par1ItemStack));
-          if (mergedSize <= maxStackSize) {
-            par1ItemStack.setCount(0);
-            itemstack1.setCount(mergedSize);
-            slot.onSlotChanged();
-            result = true;
-          } else if (itemstack1.getCount() < maxStackSize) {
-            par1ItemStack.shrink(maxStackSize - itemstack1.getCount());
-            itemstack1.setCount(maxStackSize);
-            slot.onSlotChanged();
-            result = true;
+    if (stack.isStackable()) {
+      while(!stack.isEmpty()) {
+        if (reverseDirection) {
+          if (i < startIndex) {
+            break;
           }
-        }
-
-        if (reversOrder) {
-          --checkIndex;
-        } else {
-          ++checkIndex;
-        }
-      }
-    }
-
-    if (!par1ItemStack.isEmpty()) {
-      if (reversOrder) {
-        checkIndex = toIndex - 1;
-      } else {
-        checkIndex = fromIndex;
-      }
-
-      while (!reversOrder && checkIndex < toIndex || reversOrder && checkIndex >= fromIndex) {
-        slot = this.inventorySlots.get(checkIndex);
-        itemstack1 = slot.getStack();
-
-        if (isSlotEnabled(slot) && itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
-          ItemStack in = par1ItemStack.copy();
-          in.setCount(Math.min(in.getCount(), slot.getItemStackLimit(par1ItemStack)));
-
-          slot.putStack(in);
-          slot.onSlotChanged();
-          par1ItemStack.shrink(in.getCount());
-          result = in.getCount() > 0; // Sanity check for slots which have a 0-size limit, if this stack count is zero then no items were inserted and we should
-                                      // return false.
+        } else if (i >= endIndex) {
           break;
         }
 
-        if (reversOrder) {
-          --checkIndex;
+        Slot slot = this.inventorySlots.get(i);
+        ItemStack itemstack = slot.getStack();
+        if (!itemstack.isEmpty() && areItemsAndTagsEqual(stack, itemstack)) {
+          int j = itemstack.getCount() + stack.getCount();
+          int maxSize = Math.min(slot.getSlotStackLimit(), stack.getMaxStackSize());
+          if (j <= maxSize) {
+            stack.setCount(0);
+            itemstack.setCount(j);
+            slot.onSlotChanged();
+            flag = true;
+          } else if (itemstack.getCount() < maxSize) {
+            stack.shrink(maxSize - itemstack.getCount());
+            itemstack.setCount(maxSize);
+            slot.onSlotChanged();
+            flag = true;
+          }
+        }
+
+        if (reverseDirection) {
+          --i;
         } else {
-          ++checkIndex;
+          ++i;
         }
       }
     }
 
-    return result;
+    if (!stack.isEmpty()) {
+      if (reverseDirection) {
+        i = endIndex - 1;
+      } else {
+        i = startIndex;
+      }
+
+      while(true) {
+        if (reverseDirection) {
+          if (i < startIndex) {
+            break;
+          }
+        } else if (i >= endIndex) {
+          break;
+        }
+
+        Slot slot1 = this.inventorySlots.get(i);
+        ItemStack itemstack1 = slot1.getStack();
+        if (itemstack1.isEmpty() && slot1.isItemValid(stack)) {
+          if (stack.getCount() > slot1.getSlotStackLimit()) {
+            slot1.putStack(stack.split(slot1.getSlotStackLimit()));
+          } else {
+            slot1.putStack(stack.split(stack.getCount()));
+          }
+
+          slot1.onSlotChanged();
+          flag = true;
+          break;
+        }
+
+        if (reverseDirection) {
+          --i;
+        } else {
+          ++i;
+        }
+      }
+    }
+
+    return flag;
   }
 
   @Override
@@ -221,16 +241,36 @@ public class ContainerEnder<T extends IInventory> extends Container implements G
     }
   }
 
+  private static final Field listeners;
+
+  static {
+    try {
+      listeners = ObfuscationReflectionHelper.findField(Container.class, "listeners");
+      listeners.setAccessible(true);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected List<IContainerListener> getListeners() {
+    try {
+      Object val = listeners.get(this);
+      return (List<IContainerListener>) val;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Override
   public void detectAndSendChanges() {
     super.detectAndSendChanges();
     if (inv instanceof TileEntityBase) {
       // keep in sync with ContainerEnderCap#detectAndSendChanges()
-      final SPacketUpdateTileEntity updatePacket = ((TileEntityBase) inv).getUpdatePacket();
+      final SUpdateTileEntityPacket updatePacket = ((TileEntityBase) inv).getUpdatePacket();
       if (updatePacket != null) {
-        for (IContainerListener containerListener : listeners) {
-          if (containerListener instanceof EntityPlayerMP) {
-            ((EntityPlayerMP) containerListener).connection.sendPacket(updatePacket);
+        for (IContainerListener containerListener : getListeners()) {
+          if (containerListener instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity) containerListener).connection.sendPacket(updatePacket);
           }
         }
       }

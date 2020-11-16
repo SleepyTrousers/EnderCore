@@ -6,11 +6,14 @@ import javax.annotation.Nullable;
 import com.enderio.core.common.util.NNList;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Items;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.RegistryKey;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Map;
 
 class BlockThing implements IThing {
 
@@ -27,13 +30,10 @@ class BlockThing implements IThing {
     if (item != Items.AIR) {
       return item;
     }
-    for (Item candidate : Item.REGISTRY) {
-      if (candidate instanceof ItemBlockSpecial && ((ItemBlockSpecial) candidate).getBlock() == block) {
-        return candidate;
-      }
-      if (candidate instanceof ItemBlock && ((ItemBlock) candidate).getBlock() == block) {
-        // "bad data" case, but mods may produce it...
-        return candidate;
+    for (Map.Entry<RegistryKey<Item>, Item>  candidate : ForgeRegistries.ITEMS.getEntries()) {
+      Item blockItem = candidate.getValue();
+      if (blockItem instanceof BlockItem && ((BlockItem) blockItem).getBlock() == block) {
+        return blockItem;
       }
     }
     return null;

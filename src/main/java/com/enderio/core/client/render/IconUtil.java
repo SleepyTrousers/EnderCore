@@ -6,20 +6,21 @@ import javax.annotation.Nonnull;
 
 import com.enderio.core.EnderCore;
 
+import com.sun.prism.TextureMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class IconUtil {
 
   public static interface IIconProvider {
 
-    public void registerIcons(@Nonnull TextureMap register);
+    public void registerIcons(@Nonnull AtlasTexture register);
 
   }
 
@@ -50,10 +51,12 @@ public class IconUtil {
     addIconProvider(new IIconProvider() {
 
       @Override
-      public void registerIcons(@Nonnull TextureMap register) {
-        whiteTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "white"));
-        errorTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "error"));
-        blankTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "blank"));
+      public void registerIcons(@Nonnull AtlasTexture register) {
+
+        //TODO
+//        whiteTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "white"));
+//        errorTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "error"));
+//        blankTexture = register.registerSprite(new ResourceLocation(EnderCore.MODID, "blank"));
       }
 
     });
@@ -62,17 +65,18 @@ public class IconUtil {
   @SubscribeEvent
   public void onIconLoad(TextureStitchEvent.Pre event) {
     for (IIconProvider reg : iconProviders) {
-      final TextureMap map = event.getMap();
+      final AtlasTexture map = event.getMap();
       if (map != null) {
         reg.registerIcons(map);
       }
     }
   }
 
-  @SuppressWarnings("null") // don't trust modded models to not do stupid things...
-  public static @Nonnull TextureAtlasSprite getIconForItem(@Nonnull Item item, int meta) {
-    final TextureAtlasSprite icon = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta);
-    return icon != null ? icon : Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite();
-  }
+  // TODO
+//  @SuppressWarnings("null") // don't trust modded models to not do stupid things...
+//  public static @Nonnull TextureAtlasSprite getIconForItem(@Nonnull Item item, int meta) {
+//    final TextureAtlasSprite icon = Minecraft.getInstance().getItemRenderer().getItemModelMesher().getParticleIcon(item, meta);
+//    return icon != null ? icon : Minecraft.getInstance().getTextureMapBlocks().getMissingSprite();
+//  }
 
 }

@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.enderio.core.api.client.render.IWidgetIcon;
 
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
 
 public interface ITabPanel {
@@ -18,7 +18,7 @@ public interface ITabPanel {
 
   void render(float par1, int par2, int par3);
 
-  void actionPerformed(@Nonnull GuiButton guiButton);
+  void actionPerformed(@Nonnull Button guiButton);
 
   void mouseClicked(int x, int y, int par3);
 

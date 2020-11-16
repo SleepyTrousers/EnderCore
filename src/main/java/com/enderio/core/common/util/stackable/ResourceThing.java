@@ -9,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
 class ResourceThing implements IThing {
 
@@ -20,15 +21,11 @@ class ResourceThing implements IThing {
 
   @Override
   public @Nonnull NNList<IThing> bake() {
-    // this ugly thing seems to be what Forge wants you to use
-    if (net.minecraft.block.Block.REGISTRY.containsKey(resourceLocation)) {
-      Block block = net.minecraft.block.Block.REGISTRY.getObject(resourceLocation);
-      return new BlockThing(block).bake();
+    if (ForgeRegistries.BLOCKS.containsKey(resourceLocation)) {
+      return new BlockThing(ForgeRegistries.BLOCKS.getValue(resourceLocation)).bake();
     }
-    // this ugly thing seems to be what Forge wants you to use
-    Item item = net.minecraft.item.Item.REGISTRY.getObject(resourceLocation);
-    if (item != null) {
-      return new ItemThing(item).bake();
+    if (ForgeRegistries.ITEMS.containsKey(resourceLocation)) {
+      return new ItemThing(ForgeRegistries.ITEMS.getValue(resourceLocation)).bake();
     }
     return NNList.emptyList();
   }
