@@ -4,14 +4,8 @@ import java.util.ArrayList;
 
 import javax.annotation.Nonnull;
 
-import com.enderio.core.EnderCore;
-
-import com.sun.prism.TextureMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
