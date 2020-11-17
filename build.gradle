@@ -181,17 +181,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 build.dependsOn apiJar, srcJar, javadoc
 
-task("uploadJars", dependsOn: "build") {
-    description = "uploads JARs"
-    apply plugin: "maven"
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "file://${project.projectDir}/mcmodsrepo")
-            }
-        }
-    }
-}
 
 publishing {
     tasks.publish.dependsOn 'build'
@@ -206,6 +195,14 @@ publishing {
     repositories {
         if (project.hasProperty('mavendir')) {
             maven { url mavendir }
+        } else if (project.hasProperty('mavenURL')) {
+            maven {
+                url mavenURL
+                credentials {
+                    username System.getenv('MAVEN_USER')
+                    password System.getenv('MAVEN_PASS')
+                }
+            }
         } else {
             mavenLocal()
         }
@@ -295,19 +292,3 @@ curseforge {
     }
 }
 
-configurations {
-    deployerJars
-}
-
-dependencies {
-    deployerJars "org.apache.maven.wagon:wagon-ssh:3.4.1"
-}
-
-uploadArchives {
-    repositories.mavenDeployer {
-        configuration = configurations.deployerJars
-        repository(url: project.mavenURL) {
-            authentication(userName: System.getenv('MAVEN_USER'), password: System.getenv('MAVEN_PASS'))
-        }
-    }
-}
