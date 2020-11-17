@@ -12,11 +12,9 @@ import com.enderio.core.common.vecmath.Vector3d;
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vertex;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public final class BoundingBox extends AxisAlignedBB {
 
@@ -59,22 +57,6 @@ public final class BoundingBox extends AxisAlignedBB {
     return minX <= pos.getX() && minY <= pos.getY() && minZ <= pos.getZ() && maxX >= pos.getX() && maxY >= pos.getY() && maxZ >= pos.getZ();
   }
 
-  /**
-   * Returns <code>true</code> if the given entity's location point is within the bounding box.
-   */
-  public boolean contains(@Nonnull Entity entity) {
-    return minX <= entity.posX && minY <= entity.posY && minZ <= entity.posZ && maxX >= entity.posX && maxY >= entity.posY && maxZ >= entity.posZ;
-  }
-
-  /**
-   * Returns <code>true</code> if the given entity's bounding box intersects with the bounding box.
-   * <p>
-   * Note that this checks Entity#getEntityBoundingBox.
-   */
-  public boolean intersects(@Nonnull Entity entity) {
-    return intersects(entity.getEntityBoundingBox());
-  }
-
   public boolean intersects(@Nonnull BoundingBox other) {
     return other.maxX > this.minX && other.minX < this.maxX
         ? (other.maxY > this.minY && other.minY < this.maxY ? other.maxZ > this.minZ && other.minZ < this.maxZ : false) : false;
@@ -114,14 +96,14 @@ public final class BoundingBox extends AxisAlignedBB {
   /**
    * Returns the vertices of the corners for the specified face in counter clockwise order.
    */
-  public @Nonnull List<Vertex> getCornersWithUvForFace(@Nonnull EnumFacing face) {
+  public @Nonnull List<Vertex> getCornersWithUvForFace(@Nonnull Direction face) {
     return getCornersWithUvForFace(face, 0, 1, 0, 1);
   }
 
   /**
    * Returns the vertices of the corners for the specified face in counter clockwise order.
    */
-  public @Nonnull NNList<Vertex> getCornersWithUvForFace(@Nonnull EnumFacing face, float minU, float maxU, float minV, float maxV) {
+  public @Nonnull NNList<Vertex> getCornersWithUvForFace(@Nonnull Direction face, float minU, float maxU, float minV, float maxV) {
     NNList<Vertex> result = new NNList<Vertex>();
     switch (face) {
     case NORTH:
@@ -168,7 +150,7 @@ public final class BoundingBox extends AxisAlignedBB {
   /**
    * Returns the vertices of the corners for the specified face in counter clockwise order, starting with the top left.
    */
-  public @Nonnull List<Vector3f> getCornersForFace(@Nonnull EnumFacing face) {
+  public @Nonnull List<Vector3f> getCornersForFace(@Nonnull Direction face) {
     List<Vector3f> result = new ArrayList<Vector3f>(4);
     switch (face) {
     case NORTH:
@@ -215,7 +197,7 @@ public final class BoundingBox extends AxisAlignedBB {
   /**
    * Returns the vertices of the corners for the specified face in counter clockwise order, starting with the top left.
    */
-  public @Nonnull List<Vector3d> getCornersForFaceD(@Nonnull EnumFacing face) {
+  public @Nonnull List<Vector3d> getCornersForFaceD(@Nonnull Direction face) {
     List<Vector3d> result = new ArrayList<Vector3d>(4);
     switch (face) {
     case NORTH:
@@ -332,18 +314,19 @@ public final class BoundingBox extends AxisAlignedBB {
     return new BoundingBox(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
   }
 
-  @Override
+  /*@Override
   public @Nonnull BoundingBox setMaxY(double y2) {
     return new BoundingBox(this.minX, this.minY, this.minZ, this.maxX, y2, this.maxZ);
-  }
+  }*/
 
   public @Nonnull BoundingBox expand(double xyz) {
     return new BoundingBox(minX - xyz, minY - xyz, minZ - xyz, maxX + xyz, maxY + xyz, maxZ + xyz);
   }
 
   @Override
-  public @Nonnull Vec3d getCenter() {
-    return new Vec3d(this.minX + (this.maxX - this.minX) * 0.5D, this.minY + (this.maxY - this.minY) * 0.5D, this.minZ + (this.maxZ - this.minZ) * 0.5D);
+  public @Nonnull
+  net.minecraft.util.math.vector.Vector3d getCenter() {
+    return new net.minecraft.util.math.vector.Vector3d(this.minX + (this.maxX - this.minX) * 0.5D, this.minY + (this.maxY - this.minY) * 0.5D, this.minZ + (this.maxZ - this.minZ) * 0.5D);
   }
 
 }

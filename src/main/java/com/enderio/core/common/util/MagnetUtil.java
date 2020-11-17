@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.IProjectile;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
 public class MagnetUtil {
@@ -21,15 +21,15 @@ public class MagnetUtil {
 
   public static boolean shouldAttract(@Nullable BlockPos pullerPos, @Nullable Entity entity, boolean isMachine) {
 
-    if (entity == null || entity.isDead) {
+    if (entity == null || !entity.isAlive()) {
       return false;
     }
-    if (entity instanceof IProjectile && entity.motionY > 0.01) {
+    if (entity instanceof ProjectileEntity && entity.getMotion().y > 0.01) {
       return false;
     }
 
     @Nonnull
-    NBTTagCompound data = entity.getEntityData();
+    CompoundNBT data = entity.getPersistentData();
 
     if (isReservedByOthers(data, isMachine)) {
       return false;
@@ -54,8 +54,8 @@ public class MagnetUtil {
 
     // it is being pulled by something else, so check to see if we are closer
     BlockPos curOwner = BlockPos.fromLong(posL);
-    double distToCur = curOwner.distanceSqToCenter(entity.posX, entity.posY, entity.posZ);
-    double distToMe = pullerPos.distanceSqToCenter(entity.posX, entity.posY, entity.posZ);
+    double distToCur = curOwner.distanceSq(entity.getPosX(), entity.getPosY(), entity.getPosZ(), true);
+    double distToMe = pullerPos.distanceSq(entity.getPosX(), entity.getPosY(), entity.getPosZ(),true);
     if (distToMe + 1 < distToCur) {
       reserve(data, pullerPos);
       return true;
@@ -64,27 +64,27 @@ public class MagnetUtil {
   }
 
   public static void reserve(@Nullable Entity entity, @Nullable BlockPos pullerPos) {
-    if (entity != null && !entity.isDead) {
-      NBTTagCompound data = entity.getEntityData();
+    if (entity != null && entity.isAlive()) {
+      CompoundNBT data = entity.getPersistentData();
       reserve(data, pullerPos);
     }
   }
 
-  public static void reserve(@Nonnull NBTTagCompound data, @Nullable BlockPos pullerPos) {
+  public static void reserve(@Nonnull CompoundNBT data, @Nullable BlockPos pullerPos) {
     if (pullerPos != null) {
-      data.setLong(EC_PULLER_TAG, pullerPos.toLong());
+      data.putLong(EC_PULLER_TAG, pullerPos.toLong());
     }
   }
 
   public static void release(@Nullable Entity entity) {
-    if (entity != null && !entity.isDead) {
-      NBTTagCompound data = entity.getEntityData();
+    if (entity != null && entity.isAlive()) {
+      CompoundNBT data = entity.getPersistentData();
       release(data);
     }
   }
 
-  public static void release(@Nonnull NBTTagCompound data) {
-    data.removeTag(EC_PULLER_TAG);
+  public static void release(@Nonnull CompoundNBT data) {
+    data.remove(EC_PULLER_TAG);
   }
 
   @Deprecated
@@ -93,20 +93,20 @@ public class MagnetUtil {
   }
 
   public static boolean isReserved(@Nonnull Entity entity, boolean isMachine) {
-    return isReservedByUs(entity.getEntityData()) || isReservedByOthers(entity.getEntityData(), isMachine);
+    return isReservedByUs(entity.getPersistentData()) || isReservedByOthers(entity.getPersistentData(), isMachine);
   }
 
-  public static boolean isReservedByUs(@Nonnull NBTTagCompound data) {
-    return data.hasKey(EC_PULLER_TAG);
+  public static boolean isReservedByUs(@Nonnull CompoundNBT data) {
+    return data.contains(EC_PULLER_TAG);
   }
 
   @Deprecated
-  public static boolean isReservedByOthers(@Nonnull NBTTagCompound data) {
+  public static boolean isReservedByOthers(@Nonnull CompoundNBT data) {
     return isReservedByOthers(data, false);
   }
 
-  public static boolean isReservedByOthers(@Nonnull NBTTagCompound data, boolean isMachine) {
-    return data.hasKey(PREVENT_REMOTE_MOVEMENT) && (!isMachine || !data.hasKey(ALLOW_MACHINE_MOVEMENT));
+  public static boolean isReservedByOthers(@Nonnull CompoundNBT data, boolean isMachine) {
+    return data.contains(PREVENT_REMOTE_MOVEMENT) && (!isMachine || !data.contains(ALLOW_MACHINE_MOVEMENT));
   }
 
 }

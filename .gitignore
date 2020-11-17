@@ -8,7 +8,7 @@
 ## ForgeGradle
 /run
 
-## eclipse
+# eclipse
 /eclipse
 /.settings
 /.metadata
@@ -16,7 +16,7 @@
 /.project
 /bin
 
-## intellij
+# idea
 /out
 /.idea
 /*.iml
@@ -26,6 +26,13 @@
 
 ## gedit
 *~
+
+# Files from Forge MDK
+forge*changelog.txt
+
+logs/debug.log
+
+logs/latest.log
 
 ## translation reports
 resources/assets/enderio/lang/*.lang.txt

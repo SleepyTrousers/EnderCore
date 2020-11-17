@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import com.enderio.core.common.util.Scheduler;
 
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class CommonProxy {
   protected Scheduler scheduler;
@@ -37,7 +37,7 @@ public class CommonProxy {
     throw new RuntimeException(sb.toString());
   }
 
-  public void onPreInit(@Nonnull FMLPreInitializationEvent event) {
+  public void setup(@Nonnull FMLCommonSetupEvent event) {
   }
 
 }

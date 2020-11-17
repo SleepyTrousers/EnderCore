@@ -3,11 +3,12 @@ package com.enderio.core.client.gui.widget;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.enderio.core.client.gui.GuiContainerBase;
+import com.enderio.core.client.gui.BaseContainerScreen;
 import com.enderio.core.common.TileEntityBase;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.network.PacketGhostSlot;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.item.ItemStack;
 
 public abstract class GhostSlot {
@@ -41,7 +42,7 @@ public abstract class GhostSlot {
   private boolean drawStdTooltip = true;
   private boolean drawFakeHover = true;
 
-  public boolean isMouseOver(int mx, int my) {
+  public boolean isMouseOver(double mx, double my) {
     return mx >= getX() && mx < (getX() + 16) && my >= getY() && my < (getY() + 16);
   }
 
@@ -117,7 +118,7 @@ public abstract class GhostSlot {
   }
 
   /**
-   * Draw a normal item tooltip for the stack returned by {@link #getStack()}? Override {@link #drawGhostSlotToolTip(GuiContainerBase, int, int)} to draw
+   * Draw a normal item tooltip for the stack returned by {@link #getStack()}? Override {@link #drawGhostSlotToolTip(BaseContainerScreen, int, int)} to draw
    * specialized tooltips.
    */
   public boolean shouldDrawStdTooltip() {
@@ -160,11 +161,11 @@ public abstract class GhostSlot {
     this.y = y;
   }
 
-  public boolean drawGhostSlotToolTip(@Nonnull GuiContainerBase gui, int mouseX, int mouseY) {
-    if (drawStdTooltip && gui.mc.player.inventory.getItemStack().isEmpty()) {
+  public boolean drawGhostSlotToolTip(@Nonnull BaseContainerScreen gui, MatrixStack matrixStack, int mouseX, int mouseY) {
+    if (drawStdTooltip && gui.getMinecraft().player.inventory.getItemStack().isEmpty()) {
       ItemStack stack = getStack();
       if (!stack.isEmpty()) {
-        gui.renderToolTip(stack, mouseX, mouseY);
+        gui.renderToolTip2(matrixStack, stack, mouseX, mouseY);
         return true;
       }
     }

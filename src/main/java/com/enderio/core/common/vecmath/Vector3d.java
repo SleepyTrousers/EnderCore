@@ -3,7 +3,6 @@ package com.enderio.core.common.vecmath;
 import javax.annotation.Nonnull;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 
 public class Vector3d {
 
@@ -149,7 +148,8 @@ public class Vector3d {
     z = Math.abs(z);
   }
 
-  public @Nonnull Vec3d getVec3() {
-    return new Vec3d(x, y, z);
+  public @Nonnull
+  net.minecraft.util.math.vector.Vector3d getVec3() {
+    return new net.minecraft.util.math.vector.Vector3d(x, y, z);
   }
 }

@@ -5,13 +5,12 @@ import javax.annotation.Nonnull;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.vecmath.Vector3f;
 
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemUtil {
 
@@ -35,7 +34,7 @@ public class ItemUtil {
    */
   public static void spawnItemInWorldWithRandomMotion(@Nonnull World world, @Nonnull ItemStack item, int x, int y, int z) {
     if (!item.isEmpty()) {
-      spawnItemInWorldWithRandomMotion(new EntityItem(world, x + 0.5, y + 0.5, z + 0.5, item));
+      spawnItemInWorldWithRandomMotion(new ItemEntity(world, x + 0.5, y + 0.5, z + 0.5, item));
     }
   }
 
@@ -65,7 +64,7 @@ public class ItemUtil {
     float x = pos.getX() + .5f + v.x;
     float y = pos.getY() + .5f + v.y;
     float z = pos.getZ() + .5f + v.z;
-    spawnItemInWorldWithRandomMotion(new EntityItem(world, x, y, z, item));
+    spawnItemInWorldWithRandomMotion(new ItemEntity(world, x, y, z, item));
   }
 
   /**
@@ -74,36 +73,17 @@ public class ItemUtil {
    * @param entity
    *          The entity to spawn.
    */
-  public static void spawnItemInWorldWithRandomMotion(@Nonnull EntityItem entity) {
+  public static void spawnItemInWorldWithRandomMotion(@Nonnull ItemEntity entity) {
     entity.setDefaultPickupDelay();
-    entity.world.spawnEntity(entity);
+    entity.world.addEntity(entity);
   }
 
-  /**
-   * Returns true if the given stack has the given Ore Dictionary name applied to it.
-   *
-   * @param stack
-   *          The ItemStack to check.
-   * @param oredict
-   *          The oredict name.
-   * @return True if the ItemStack matches the name passed.
-   */
-  public static boolean itemStackMatchesOredict(@Nonnull ItemStack stack, String oredict) {
-    int[] ids = OreDictionary.getOreIDs(stack);
-    for (int i : ids) {
-      String name = OreDictionary.getOreName(i);
-      if (name.equals(oredict)) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   public static String getDurabilityString(@Nonnull ItemStack item) {
     if (item.isEmpty()) {
       return null;
     }
-    return EnderCore.lang.localize("tooltip.durability") + " " + (item.getMaxDamage() - item.getItemDamage()) + "/" + item.getMaxDamage();
+    return EnderCore.lang.localize("tooltip.durability") + " " + (item.getMaxDamage() - item.getDamage()) + "/" + item.getMaxDamage();
   }
 
   /**
@@ -113,11 +93,11 @@ public class ItemUtil {
    *          The ItemStack to get the tag from.
    * @return An NBTTagCompound from the stack.
    */
-  public static NBTTagCompound getOrCreateNBT(ItemStack stack) {
-    if (!stack.hasTagCompound()) {
-      stack.setTagCompound(new NBTTagCompound());
+  public static CompoundNBT getOrCreateNBT(ItemStack stack) {
+    if (!stack.hasTag()) {
+      stack.setTag(new CompoundNBT());
     }
-    return stack.getTagCompound();
+    return stack.getTag();
   }
 
   public static boolean isStackFull(@Nonnull ItemStack contents) {
@@ -186,14 +166,14 @@ public class ItemUtil {
    *          The item to pick up
    * @return The remaining stack. Empty when all was picked up.
    */
-  public static @Nonnull ItemStack fakeItemPickup(@Nonnull EntityPlayer player, @Nonnull ItemStack itemstack) {
+  public static @Nonnull ItemStack fakeItemPickup(@Nonnull PlayerEntity player, @Nonnull ItemStack itemstack) {
     if (!player.world.isRemote) {
-      EntityItem entityItem = new EntityItem(player.world, player.posX, player.posY, player.posZ, itemstack);
+      ItemEntity entityItem = new ItemEntity(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), itemstack);
       entityItem.onCollideWithPlayer(player);
-      if (entityItem.isDead) {
+      if (!entityItem.isAlive()) {
         return ItemStack.EMPTY;
       } else {
-        entityItem.setDead();
+        entityItem.setAir(1);
         return entityItem.getItem();
       }
     }

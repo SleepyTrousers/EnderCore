@@ -2,12 +2,12 @@ package com.enderio.core.client.gui;
 
 import javax.annotation.Nullable;
 
-import com.enderio.core.client.gui.widget.GuiToolTip;
+import com.enderio.core.client.gui.widget.TooltipWidget;
 
 public interface IDrawingElement {
 
   @Nullable
-  GuiToolTip getTooltip();
+  TooltipWidget getTooltip();
 
   void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY);
 

@@ -7,7 +7,7 @@ import com.google.common.base.Strings;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 
 public class BlockCoord {
@@ -20,7 +20,7 @@ public class BlockCoord {
   }
 
   public static @Nonnull BlockPos get(Entity e) {
-    return get(e.posX, e.posY, e.posZ);
+    return get(e.getPosX(), e.getPosY(), e.getPosZ());
   }
 
   public static @Nonnull BlockPos get(BlockPos bc) {
@@ -40,8 +40,8 @@ public class BlockCoord {
         Strings.isNullOrEmpty(z) ? 0 : Integer.parseInt(z));
   }
 
-  public static @Nonnull BlockPos get(RayTraceResult mop) {
-    return get(mop.getBlockPos());
+  public static @Nonnull BlockPos get(BlockRayTraceResult mop) {
+    return get(mop.getPos());
   }
 
   public static int getDistSq(BlockPos a, BlockPos b) {

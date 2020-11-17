@@ -9,12 +9,13 @@ import javax.annotation.Nullable;
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.google.common.collect.Maps;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -31,7 +32,7 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
 
   private final @Nonnull T owner;
   private final @Nonnull IItemHandler inv;
-  private final @Nonnull InventoryPlayer playerInv;
+  private final @Nonnull PlayerInventory playerInv;
 
   @Nonnull
   private static <T> T checkNotNull(T reference) {
@@ -41,9 +42,10 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
     return reference;
   }
 
-  public ContainerItemHandler(@Nonnull InventoryPlayer playerInv, @Nonnull T owner, @Nullable EnumFacing facing) {
+  public ContainerItemHandler(@Nullable ContainerType<?> type, int id, @Nonnull PlayerInventory playerInv, @Nonnull T owner, @Nullable Direction direction) {
+    super(type, id);
     this.owner = checkNotNull(owner);
-    this.inv = checkNotNull(owner.getCapability(checkNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY), facing));
+    this.inv = checkNotNull(owner.getCapability(checkNotNull(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY), direction).resolve().orElse(null));
     this.playerInv = checkNotNull(playerInv);
 
     addSlots(this.playerInv);
@@ -57,7 +59,7 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
       for (int j = 0; j < 9; ++j) {
         Point loc = new Point(x + j * 18, y + i * 18);
         Slot slot = new Slot(this.playerInv, j + i * 9 + 9, loc.x, loc.y);
-        addSlotToContainer(slot);
+        addSlot(slot);
         playerSlotLocations.put(slot, loc);
       }
     }
@@ -67,13 +69,13 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
     for (int i = 0; i < 9; ++i) {
       Point loc = new Point(x + i * 18, y + 58);
       Slot slot = new Slot(this.playerInv, i, loc.x, loc.y);
-      addSlotToContainer(slot);
+      addSlot(slot);
       playerSlotLocations.put(slot, loc);
     }
     endHotBarSlot = inventorySlots.size();
   }
 
-  protected void addSlots(@Nonnull InventoryPlayer playerInventory) {
+  protected void addSlots(@Nonnull PlayerInventory playerInventory) {
   }
 
   public @Nonnull Point getPlayerInventoryOffset() {
@@ -93,7 +95,7 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
   }
 
   @Override
-  public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer p_82846_1_, int p_82846_2_) {
+  public @Nonnull ItemStack transferStackInSlot(@Nonnull PlayerEntity p_82846_1_, int p_82846_2_) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.inventorySlots.get(p_82846_2_);
 
@@ -143,7 +145,6 @@ public abstract class ContainerItemHandler<T extends ICapabilityProvider> extend
         itemstack1 = slot.getStack();
 
         if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem()
-            && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
             && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack) && par1ItemStack != itemstack1) {
 
           int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();

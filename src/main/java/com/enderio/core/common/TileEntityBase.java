@@ -3,27 +3,26 @@ package com.enderio.core.common;
 import javax.annotation.Nonnull;
 
 import com.enderio.core.api.common.util.IProgressTile;
-import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.network.EnderPacketHandler;
 import com.enderio.core.common.network.PacketProgress;
 import com.enderio.core.common.util.NullHelper;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.server.ServerWorld;
 
-public abstract class TileEntityBase extends TileEntity implements ITickable {
+public abstract class TileEntityBase extends TileEntity implements ITickableTileEntity {
 
   private final int checkOffset = (int) (Math.random() * 20);
   protected final boolean isProgressTile;
@@ -32,20 +31,24 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   protected long lastProgressUpdate;
   private long lastUpdate = 0;
 
-  public TileEntityBase() {
+  public TileEntityBase(TileEntityType<?> tileEntityTypeIn) {
+    super(tileEntityTypeIn);
     isProgressTile = this instanceof IProgressTile;
   }
 
   @Override
-  public final void update() {
+  public void tick() {
     // Note: Commented out checks are done in World for 1.12
     if (/* !hasWorld() || isInvalid() || !world.isBlockLoaded(getPos()) || */ world.getTileEntity(getPos()) != this
-        || world.getBlockState(pos).getBlock() != getBlockType()) {
+            || world.getBlockState(pos).getBlock() != getBlockState().getBlock()) {
       // we can get ticked after being removed from the world, ignore this
       return;
     }
-    if (ConfigHandler.allowExternalTickSpeedup || world.getTotalWorldTime() != lastUpdate) {
-      lastUpdate = world.getTotalWorldTime();
+
+    // TODO: Config:
+//    if (ConfigHandler.allowExternalTickSpeedup || world.getGameTime() != lastUpdate) {
+    if (world.getGameTime() != lastUpdate) {
+      lastUpdate = world.getGameTime();
       doUpdate();
       sendProgressIf();
     }
@@ -66,7 +69,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
               || (lastUpdate - lastProgressUpdate) > 60 * 20; // also update every 60 seconds to avoid stale client status
 
       if (send) {
-        EnderPacketHandler.INSTANCE.sendToAllAround(((IProgressTile) this).getProgressPacket(), this);
+        EnderPacketHandler.sendToAllTracking(((IProgressTile) this).getProgressPacket(), this);
         lastProgressSent = progress;
         lastProgressUpdate = lastUpdate;
       }
@@ -77,7 +80,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
 
   }
 
-  public @Nonnull IMessage getProgressPacket() {
+  public @Nonnull PacketProgress getProgressPacket() {
     return new PacketProgress((IProgressTile) this);
   }
 
@@ -85,8 +88,8 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * SERVER: Called when being written to the save file.
    */
   @Override
-  public final @Nonnull NBTTagCompound writeToNBT(@Nonnull NBTTagCompound root) {
-    super.writeToNBT(root);
+  public final @Nonnull CompoundNBT write(@Nonnull CompoundNBT root) {
+    super.write(root);
     writeCustomNBT(NBTAction.SAVE, root);
     return root;
   }
@@ -95,8 +98,8 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * SERVER: Called when being read from the save file.
    */
   @Override
-  public final void readFromNBT(@Nonnull NBTTagCompound tag) {
-    super.readFromNBT(tag);
+  public final void read(BlockState state, CompoundNBT tag) {
+    super.read(state, tag);
     readCustomNBT(NBTAction.SAVE, tag);
   }
 
@@ -104,12 +107,12 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * Called when the chunk data is sent (client receiving chunks from server). Must have x/y/z tags.
    */
   @Override
-  public final @Nonnull NBTTagCompound getUpdateTag() {
-    NBTTagCompound tag = super.getUpdateTag();
+  public final @Nonnull CompoundNBT getUpdateTag() {
+    CompoundNBT tag = super.getUpdateTag();
     writeCustomNBT(NBTAction.CLIENT, tag);
     if (isProgressTile) {
       // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
-      tag.setFloat("tileprogress", ((IProgressTile) this).getProgress());
+      tag.putFloat("tileprogress", ((IProgressTile) this).getProgress());
     }
     return tag;
   }
@@ -118,8 +121,8 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * CLIENT: Called when chunk data is received (client receiving chunks from server).
    */
   @Override
-  public final void handleUpdateTag(@Nonnull NBTTagCompound tag) {
-    super.handleUpdateTag(tag);
+  public final void handleUpdateTag(BlockState state, @Nonnull CompoundNBT tag) {
+    super.handleUpdateTag(state, tag);
     readCustomNBT(NBTAction.CLIENT, tag);
     if (isProgressTile) {
       // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
@@ -131,21 +134,21 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * SERVER: Called when block data is sent (client receiving blocks from server, via notifyBlockUpdate). No need for x/y/z tags.
    */
   @Override
-  public final SPacketUpdateTileEntity getUpdatePacket() {
-    NBTTagCompound tag = new NBTTagCompound();
+  public final SUpdateTileEntityPacket getUpdatePacket() {
+    CompoundNBT tag = new CompoundNBT();
     writeCustomNBT(NBTAction.CLIENT, tag);
     if (isProgressTile) {
       // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
-      tag.setFloat("tileprogress", ((IProgressTile) this).getProgress());
+      tag.putFloat("tileprogress", ((IProgressTile) this).getProgress());
     }
-    return new SPacketUpdateTileEntity(getPos(), 1, tag);
+    return new SUpdateTileEntityPacket(getPos(), 1, tag);
   }
 
   /**
    * CLIENT: Called when block data is received (client receiving blocks from server, via notifyBlockUpdate).
    */
   @Override
-  public final void onDataPacket(@Nonnull NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
+  public final void onDataPacket(@Nonnull NetworkManager net, @Nonnull SUpdateTileEntityPacket pkt) {
     readCustomNBT(NBTAction.CLIENT, pkt.getNbtCompound());
     if (isProgressTile) {
       // TODO: nicer way to do this? This is needed so players who enter a chunk get a correct progress.
@@ -154,38 +157,39 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   }
 
   protected void writeCustomNBT(@Nonnull ItemStack stack) {
-    final NBTTagCompound tag = new NBTTagCompound();
+    final CompoundNBT tag = new CompoundNBT();
     writeCustomNBT(NBTAction.ITEM, tag);
-    if (!tag.hasNoTags()) {
-      stack.setTagCompound(tag);
+    if (!tag.isEmpty()) {
+      stack.setTag(tag);
     }
   }
 
   @Deprecated
-  protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
+  protected abstract void writeCustomNBT(@Nonnull NBTAction action, @Nonnull CompoundNBT root);
 
   protected void readCustomNBT(@Nonnull ItemStack stack) {
-    if (stack.hasTagCompound()) {
-      readCustomNBT(NBTAction.ITEM, NullHelper.notnullM(stack.getTagCompound(), "tag compound vanished"));
+    if (stack.isEmpty()) {
+      readCustomNBT(NBTAction.ITEM, NullHelper.notnullM(stack.getTag(), "tag compound vanished"));
     }
   }
 
   @Deprecated
-  protected abstract void readCustomNBT(@Nonnull NBTAction action, @Nonnull NBTTagCompound root);
+  protected abstract void readCustomNBT(@Nonnull NBTAction action, @Nonnull CompoundNBT root);
 
-  public boolean canPlayerAccess(EntityPlayer player) {
-    return hasWorld() && !isInvalid() && player.getDistanceSqToCenter(getPos()) <= 64D;
+  public boolean canPlayerAccess(PlayerEntity player) {
+    BlockPos blockPos = getPos();
+    return hasWorld() && !isRemoved() && player.getPosition().withinDistance(getPos(), 64D);
   }
 
   protected void updateBlock() {
     if (hasWorld() && world.isBlockLoaded(getPos())) {
-      IBlockState bs = world.getBlockState(getPos());
+      BlockState bs = world.getBlockState(getPos());
       world.notifyBlockUpdate(pos, bs, bs, 3);
     }
   }
 
   protected boolean isPoweredRedstone() {
-    return hasWorld() && world.isBlockLoaded(getPos()) ? world.isBlockIndirectlyGettingPowered(getPos()) > 0 : false;
+    return hasWorld() && world.isBlockLoaded(getPos()) ? world.isBlockPowered(getPos()) : false;
   }
 
   /**
@@ -213,12 +217,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * If you have different work items in your TE, use this variant to stagger your work.
    */
   protected boolean shouldDoWorkThisTick(int interval, int offset) {
-    return (world.getTotalWorldTime() + checkOffset + offset) % interval == 0;
-  }
-
-  @Override
-  public boolean shouldRefresh(@Nonnull World worldIn, @Nonnull BlockPos posIn, @Nonnull IBlockState oldState, @Nonnull IBlockState newState) {
-    return oldState.getBlock() != newState.getBlock();
+    return (world.getGameTime() + checkOffset + offset) % interval == 0;
   }
 
   /**
@@ -237,7 +236,7 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
   public void markDirty() {
     if (hasWorld() && world.isBlockLoaded(getPos())) { // we need the loaded check to make sure we don't trigger a chunk load while the chunk is loaded
       world.markChunkDirty(pos, this);
-      IBlockState state = world.getBlockState(pos);
+      BlockState state = world.getBlockState(pos);
       if (state.hasComparatorInputOverride()) {
         world.updateComparatorOutputLevel(pos, state.getBlock());
       }
@@ -249,22 +248,20 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
    * has the GUI open. And sometimes the rendering needs the inventory...
    */
   public void forceUpdatePlayers() {
-    if (!(world instanceof WorldServer)) {
+    if (!(world instanceof ServerWorld)) {
       return;
     }
 
-    WorldServer worldServer = (WorldServer) world;
-    PlayerChunkMap playerManager = worldServer.getPlayerChunkMap();
-    SPacketUpdateTileEntity updatePacket = null;
+    ServerWorld serverWorld = (ServerWorld) world;
+    SUpdateTileEntityPacket updatePacket = null;
 
     int chunkX = pos.getX() >> 4;
     int chunkZ = pos.getZ() >> 4;
 
-    for (EntityPlayer playerObj : world.playerEntities) {
-      if (playerObj instanceof EntityPlayerMP) {
-        EntityPlayerMP player = (EntityPlayerMP) playerObj;
-
-        if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)) {
+    for (PlayerEntity playerObj : world.getPlayers()) {
+      if (playerObj instanceof ServerPlayerEntity) {
+        ServerPlayerEntity player = (ServerPlayerEntity) playerObj;
+        if (serverWorld.getChunkProvider().chunkManager.getTrackingPlayers(new ChunkPos(chunkX, chunkZ), false).anyMatch(plr -> plr.equals(playerObj))) {
           if (updatePacket == null) {
             updatePacket = getUpdatePacket();
             if (updatePacket == null) {
@@ -279,12 +276,4 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
       }
     }
   }
-
-  @Override
-  protected void setWorldCreate(@Nonnull World worldIn) {
-    // Forge gives us our World earlier than vanilla. No idea why it doesn't get put into #world but is ignored by default.
-    // Anyway, this is helpful while reading our nbt, so let's use it.
-    setWorld(worldIn);
-  }
-
 }

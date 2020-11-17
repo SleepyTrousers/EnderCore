@@ -3,6 +3,8 @@ package com.enderio.core.client.gui.button;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.util.text.StringTextComponent;
 import org.lwjgl.opengl.GL11;
 
 import com.enderio.core.api.client.gui.IGuiScreen;
@@ -21,8 +23,13 @@ public class IconButton extends TooltipButton {
   private int marginY = 0;
   private int marginX = 0;
 
-  public IconButton(@Nonnull IGuiScreen gui, int id, int x, int y, @Nullable IWidgetIcon icon) {
-    super(gui, id, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, "");
+  public IconButton(@Nonnull IGuiScreen gui, int x, int y, @Nullable IWidgetIcon icon) {
+    super(gui, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, new StringTextComponent(""));
+    this.icon = icon;
+  }
+
+  public IconButton(@Nonnull IGuiScreen gui, int x, int y, @Nullable IWidgetIcon icon, IPressable pressedAction) {
+    super(gui, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT, new StringTextComponent(""), pressedAction);
     this.icon = icon;
   }
 
@@ -46,42 +53,16 @@ public class IconButton extends TooltipButton {
     this.icon = icon;
   }
 
-  /**
-   * Override this to handle mouse clicks with other buttons than the left
-   *
-   * @param mc
-   *          The MC instance
-   * @param mouseX
-   *          X coordinate of mouse click
-   * @param mouseY
-   *          Y coordinate of mouse click
-   * @param button
-   *          the mouse button - only called for button {@literal >}= 1
-   * @return true if the mouse click is handled
-   */
-  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
-    return false;
-  }
-
-  protected boolean checkMousePress(@Nonnull Minecraft mc, int mouseX, int mouseY) {
-    // call super here so that we only get the area check
-    return super.mousePressed(mc, mouseX, mouseY);
-  }
-
-  /**
-   * Draws this button to the screen.
-   */
   @Override
-  public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-    updateTooltip(mc, mouseX, mouseY);
+  public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    updateTooltip(mouseX, mouseY);
     if (isVisible()) {
-
       GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-      hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-      int hoverState = getHoverState(hovered);
-      mouseDragged(mc, mouseX, mouseY);
 
-      IWidgetIcon background = getIconForHoverState(hoverState);
+      // TODO: WHY
+//      mouseDragged(mouseX, mouseY);
+
+      IWidgetIcon background = getIconForState();
 
       GL11.glColor3f(1, 1, 1);
 
@@ -99,11 +80,11 @@ public class IconButton extends TooltipButton {
     }
   }
 
-  protected @Nonnull IWidgetIcon getIconForHoverState(int hoverState) {
-    if (hoverState == 0) {
+  protected @Nonnull IWidgetIcon getIconForState() {
+    if (!isActive()) {
       return EnderWidget.BUTTON_DISABLED;
     }
-    if (hoverState == 2) {
+    if (isHovered()) {
       return EnderWidget.BUTTON_HIGHLIGHT;
     }
     return EnderWidget.BUTTON;

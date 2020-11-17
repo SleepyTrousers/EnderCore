@@ -6,9 +6,9 @@ import javax.annotation.Nullable;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.base.Predicate;
 
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 
@@ -198,14 +198,14 @@ public class InventorySlot implements IItemHandler {
     }
   }
 
-  public void writeToNBT(@Nonnull NBTTagCompound tag) {
+  public void writeToNBT(@Nonnull CompoundNBT tag) {
     if (!itemStack.isEmpty()) {
-      itemStack.writeToNBT(tag);
+      itemStack.write(tag);
     }
   }
 
-  public void readFromNBT(@Nonnull NBTTagCompound tag) {
-    itemStack = new ItemStack(tag);
+  public void readFromNBT(@Nonnull CompoundNBT tag) {
+    itemStack = ItemStack.read(tag);
   }
 
   public void clear() {
@@ -245,6 +245,12 @@ public class InventorySlot implements IItemHandler {
   @Override
   public int getSlotLimit(int slot) {
     return getMaxStackSize();
+  }
+
+  @Override
+  public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    // TODO: Do we need validation or smth
+    return false;
   }
 
 }

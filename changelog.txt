@@ -1,1 +1,0 @@
-see http://ci.tterrag.com/job/EnderCore-1.11/ for details

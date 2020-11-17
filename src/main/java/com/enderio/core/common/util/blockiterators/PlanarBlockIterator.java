@@ -2,7 +2,7 @@ package com.enderio.core.common.util.blockiterators;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 public class PlanarBlockIterator extends CubicBlockIterator {
@@ -11,7 +11,7 @@ public class PlanarBlockIterator extends CubicBlockIterator {
     NORTH_SOUTH,
     HORIZONTAL;
 
-    public static @Nonnull Orientation perpendicular(@Nonnull EnumFacing dir) {
+    public static @Nonnull Orientation perpendicular(@Nonnull Direction dir) {
       switch (dir) {
       case NORTH:
       case SOUTH:

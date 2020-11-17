@@ -1,6 +1,7 @@
 package com.enderio.core.common;
 
 import java.awt.Point;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,17 +15,20 @@ import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.common.util.NullHelper;
 import com.google.common.collect.Maps;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.IContainerListener;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -42,7 +46,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   protected int endHotBarSlot;
 
   private final @Nonnull T inv;
-  private final @Nonnull InventoryPlayer playerInv;
+  private final @Nonnull PlayerInventory playerInv;
   private final @Nullable S te;
 
   private boolean initRan = false;
@@ -55,7 +59,8 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     return reference;
   }
 
-  public ContainerEnderCap(@Nonnull InventoryPlayer playerInv, @Nonnull T itemHandler, @Nullable S te) {
+  public ContainerEnderCap(@Nullable ContainerType<?> type, int id, @Nonnull PlayerInventory playerInv, @Nonnull T itemHandler, @Nullable S te) {
+    super(type, id);
     inv = checkNotNull(itemHandler);
     this.playerInv = checkNotNull(playerInv);
     this.te = te;
@@ -63,7 +68,8 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     init(); // TODO: Drop this line and add the init() call whenever a Container is constructed
   }
 
-  public ContainerEnderCap(@Nonnull InventoryPlayer playerInv, @Nonnull T itemHandler, @Nullable S te, boolean unused) {
+  public ContainerEnderCap(@Nullable ContainerType<?> type, int id, @Nonnull PlayerInventory playerInv, @Nonnull T itemHandler, @Nullable S te, boolean unused) {
+    super(type, id);
     inv = checkNotNull(itemHandler);
     this.playerInv = checkNotNull(playerInv);
     this.te = te;
@@ -86,7 +92,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 9; ++j) {
         Slot slot = new Slot(playerInv, j + i * 9 + 9, x + j * 18, y + i * 18);
-        addSlotToContainer(slot);
+        addSlot(slot);
       }
     }
     endPlayerSlot = inventorySlots.size();
@@ -94,7 +100,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     startHotBarSlot = inventorySlots.size();
     for (int i = 0; i < 9; ++i) {
       Slot slot = new Slot(playerInv, i, x + i * 18, y + 58);
-      addSlotToContainer(slot);
+      addSlot(slot);
     }
     endHotBarSlot = inventorySlots.size();
 
@@ -103,13 +109,13 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   }
 
   @Override
-  protected @Nonnull Slot addSlotToContainer(@Nonnull Slot slotIn) {
+  protected Slot addSlot(Slot slotIn) {
     slotLocations.put(slotIn, new Point(slotIn.xPos, slotIn.yPos));
-    return super.addSlotToContainer(slotIn);
+    return super.addSlot(slotIn);
   }
 
   @SuppressWarnings("null")
-  public @Nonnull List<net.minecraft.inventory.Slot> getPlayerSlots() {
+  public @Nonnull List<Slot> getPlayerSlots() {
     return inventorySlots.stream().filter(x -> x.inventory == playerInv).collect(Collectors.toList());
   }
 
@@ -130,7 +136,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   }
 
   @Override
-  public boolean canInteractWith(@Nonnull EntityPlayer player) {
+  public boolean canInteractWith(@Nonnull PlayerEntity player) {
     if (!initRan) {
       throw new RuntimeException("Ender IO Internal Error 10T (report this to the Ender IO devs)");
     }
@@ -159,7 +165,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
   }
 
   @Override
-  public @Nonnull ItemStack transferStackInSlot(@Nonnull EntityPlayer player, int fromSlotId) {
+  public @Nonnull ItemStack transferStackInSlot(@Nonnull PlayerEntity player, int fromSlotId) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = inventorySlots.get(fromSlotId);
 
@@ -224,7 +230,7 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
       for (Slot slot : targets) {
         if (isSlotEnabled(slot) && slot.getHasStack()) {
           ItemStack stackInSlot = slot.getStack();
-          if (stackInSlot.getItem() == stackToMove.getItem() && (!stackToMove.getHasSubtypes() || stackToMove.getItemDamage() == stackInSlot.getItemDamage())
+          if (stackInSlot.getItem() == stackToMove.getItem()
               && ItemStack.areItemStackTagsEqual(stackToMove, stackInSlot) && slot.isItemValid(stackToMove) && stackToMove != stackInSlot) {
             int mergedSize = stackInSlot.getCount() + stackToMove.getCount();
             int maxStackSize = Math.min(stackToMove.getMaxStackSize(), slot.getItemStackLimit(stackToMove));
@@ -261,15 +267,35 @@ public abstract class ContainerEnderCap<T extends IItemHandler, S extends TileEn
     return result;
   }
 
+  private static final Field listeners;
+
+  static {
+    try {
+      listeners = ObfuscationReflectionHelper.findField(Container.class, "listeners");
+      listeners.setAccessible(true);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected List<IContainerListener> getListeners() {
+    try {
+      Object val = listeners.get(this);
+      return (List<IContainerListener>) val;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Override
   public void detectAndSendChanges() {
     super.detectAndSendChanges();
     // keep in sync with ContainerEnder#detectAndSendChanges()
-    final SPacketUpdateTileEntity updatePacket = te != null ? te.getUpdatePacket() : null;
+    final SUpdateTileEntityPacket updatePacket = te != null ? te.getUpdatePacket() : null;
     if (updatePacket != null) {
-      for (IContainerListener containerListener : listeners) {
-        if (containerListener instanceof EntityPlayerMP) {
-          ((EntityPlayerMP) containerListener).connection.sendPacket(updatePacket);
+      for (IContainerListener containerListener : getListeners()) {
+        if (containerListener instanceof ServerPlayerEntity) {
+          ((ServerPlayerEntity) containerListener).connection.sendPacket(updatePacket);
         }
       }
     }

@@ -1,293 +1,158 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = "http://files.minecraftforge.net/maven" }
-        maven { url = "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
-    dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT' }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
 }
-
-plugins {
-    id "com.matthewprenger.cursegradle" version "1.0.7"
-}
-
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-ext.buildnumber = 0
-if (System.getenv('BUILD_NUMBER') != null)
-    project.buildnumber = System.getenv('BUILD_NUMBER')
-else
-    logger.lifecycle "No build number detected, setting to 0"
-
-group = "com.enderio.core"
+version = "${minecraft_version}-${mod_version}"
+group = 'com.enderio.core' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EnderCore"
-version = "${minecraft_version}-${mod_version}.${buildnumber}"
 
-sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
-
-boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE").equalsIgnoreCase("false")
-
-def type = 'alpha'
-if (project.hasProperty('mod_appendix')) {
-    version += "-${project.mod_appendix}"
-	type = project.mod_appendix
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings = "snapshot_20171212"
-    version = "${minecraft_version}-${forge_version}"
-    runDir = 'run'
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: "20201028-1.16.3"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+//    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    replace "@VERSION@", project.version
-    replaceIn "EnderCore.java"
-}
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-configurations {
-    compile.extendsFrom exportedCompile
-}
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src/main/java'
-            exclude '**/enderio/trigger/**'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
         }
-        resources {
-            srcDir 'resources'
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
         }
-    }
-}
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        data {
+            workingDirectory project.file('run')
 
-    from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        include '**/*.properties'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-    from(sourceSets.main.resources.srcDirs) {
-        exclude '**/*.info'
-        exclude '**/*.properties'
-    }
-}
+            args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
 
-/*
-// Add external annotations
-eclipse.classpath.file {
-    withXml {
-        def node = it.asNode()
-        node.get('classpathentry').each {
-            // Allow external annotations on Minecraft/Forge and JRE
-            if (it.attribute('path').contains('forgeSrc') || it.attribute('path').contains('JRE_CONTAINER')) {
-                it.appendNode('attributes').appendNode('attribute', [name: 'annotationpath', value: '/'+rootProject.name+'/externalannotations/'])
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
             }
         }
     }
 }
-*/
 
-task coreJar(type: Jar) {
-    from(sourceSets.main.output) {
-        include 'com/enderio/core/common/transform/**'
-    }
-    manifest {
-        attributes 'FMLCorePlugin': "com.enderio.core.common.transform.EnderCorePlugin"
-        attributes 'Maven-Artifact': "${project.group}:${project.archivesBaseName}:${project.version}:core"
-    }
-    classifier 'core'
+dependencies {
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // You may put jars on which you depend on in ./libs or you may define them like so..
+    // compile "some.group:artifact:version:classifier"
+    // compile "some.group:artifact:version"
+
+    // Real examples
+    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // These dependencies get remapped to your current MCP mappings
+    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
 }
 
-reobf {
-    coreJar { mappingType = 'SEARGE' }
-}
-
+// Example for how to get properties into the manifest for reading by the runtime..
 jar {
-    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
-    exclude 'com/enderio/core/common/transform/**'
-    from(coreJar.archivePath.absolutePath) {
-        include '*'
-        into ("META-INF/libraries")
-    }
     manifest {
-        attributes 'ContainedDeps': coreJar.archivePath.name
+        attributes([
+            "Specification-Title": "endercore",
+            "Specification-Vendor": "EnderCore",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"endercore",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }
 
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    from { configurations.exportedCompile.collect { it.isDirectory() ? it : zipTree(it) } }
-    classifier = 'deobf'
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+//jar.finalizedBy('reobfJar')
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
 }
 
-task apiJar(type: Jar) {
-    from sourceSets.main.allSource
-    from sourceSets.main.output
-	include 'crazypants/enderio/api/**/*'
-    classifier = 'api'
+task srcJar(type: Jar) {
+    from(sourceSets.main.output)
+    classifier = 'srcs'
 }
-
-if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
-        tasks.withType(Javadoc) {
-            options.addStringOption('Xdoclint:none', '-quiet')
-        }
-    }
-}
-
-build.dependsOn apiJar, sourceJar, deobfJar, javadoc
 
 publishing {
-    tasks.publish.dependsOn 'build'
     publications {
         mavenJava(MavenPublication) {
-            from components.java
-
-            artifact deobfJar
-            artifact sourceJar
-            artifact apiJar
-            artifact coreJar
+            artifact jar
         }
     }
-
     repositories {
-        if (project.hasProperty('mavendir')) {
-            maven { url mavendir }
-        } else {
-            mavenLocal()
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
         }
-    }
-}
-
-task checkTranslations << {
-    Map<String, String> mapen = new HashMap<String, String>()
-    (new File('resources/assets/endercore/lang/en_US.lang')).eachLine {
-        def (value1, value2) = it.tokenize( '=' )
-        if (value1 == null || value2 == null) {return}
-        mapen.put(value1, value2)
-    }
-    
-    new File('resources/assets/endercore/lang/').eachFileMatch( ~".*\\.lang\$" ) { langfile ->
-        if (!langfile.getName().contains("en_US")) {
-	        Map<String, String> map = new HashMap<String, String>()
-	        File outfile = new File("${langfile}.txt")
-	        Writer outwriter = outfile.newWriter("UTF8")
-	        outwriter.write("\n// Additional translations:\n")
-	        outwriter << langfile.filterLine {
-	            def (value1, value2) = it.tokenize( '=' )
-	            if (value1 == null || value2 == null) {return false}
-	            map.put(value1, value2)
-	            return !mapen.containsKey(value1)
-	        }
-	        
-	        outwriter.append("\n// Missing translations:\n")
-	        for (e in mapen) {
-	            if (!map.containsKey(e.key)) {
-	                outwriter.append(e.key + "=" + e.value + "\n")
-	            }
-	        }
-        println "Created translation report ${outfile}"
-        }
-    }
-}
-
-String getChangelogText() {
-    def changelogFile = file('changelog.txt')
-    String str = ''
-    int lineCount = 0
-    boolean done = false
-    changelogFile.eachLine {
-        if (done || it == null) {
-            return
-        }
-        if (it.size() > 1) {
-            def temp = it
-            if (lineCount == 0) {
-                temp = "${archivesBaseName} ${version}"
-                temp = "<h2>$temp</h2>"
-            } else if (it.startsWith('-')) {
-                temp = "&nbsp;&nbsp;&nbsp;$temp"
-            } else {
-                temp = "<h4>$temp</h4>"
-            }
-            str += "$temp<br/>"
-            lineCount++
-            return
-        } else {
-            done = true
-        }
-    }
-    return str
-}
-
-String getCN() {
-    def firsts = ['Donald', 'Lex', 'Mike', 'Arthur', 'Bridget', 'Dorian', 'Ford', 'Guy', 'James', 'Jessica', 'John', 'Michael', 'Robinson', 'Zaphod', 'Bell', 'Penelope', 'PTerry', 'Adam', 'Anathema']
-    def lasts = ['Duck', 'Luthor', 'Meyers', 'Dent', 'Jones', 'Gray', 'Prefect', 'Montag', 'Moriarty', 'Rabbit', 'Watson', 'Smith', 'Corleone', 'Crusoe', 'Beeblebrox', 'Cranel', 'Akk', 'Young', 'Device']
-    def rand = new Random()
-    return firsts[rand.nextInt(firsts.size())] + ' ' + lasts[rand.nextInt(lasts.size())]
-}
-
-task mkKeyStore(type:Exec) {
-   workingDir projectDir
-   commandLine 'keytool', '-genkey', '-alias', 'signFiles', '-keystore', 'ecstore.jks', '-storepass', '123456', '-noprompt', '-dname', 'CN='+getCN(), '-keypass', '123456'
-}
-
-task signJar(type: SignJar, dependsOn: reobfJar) {
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
-    keyStore = 'ecstore.jks'
-    alias = 'signFiles'
-    storePass = '123456'
-    keyPass = '123456'
-}
-
-task signCoreJar(type: SignJar, dependsOn: reobfCoreJar) {
-    inputFile = coreJar.archivePath
-    outputFile = coreJar.archivePath
-    keyStore = 'ecstore.jks'
-    alias = 'signFiles'
-    storePass = '123456'
-    keyPass = '123456'
-}
-
-task rmKeyStorePre(type: Delete) {
-  delete 'ecstore.jks'
-}
-task rmKeyStore(type: Delete) {
-  delete 'ecstore.jks'
-}
-
-build.dependsOn rmKeyStore
-rmKeyStore.dependsOn signJar
-signJar.dependsOn mkKeyStore
-signCoreJar.dependsOn mkKeyStore
-mkKeyStore.dependsOn rmKeyStorePre
-jar.dependsOn signCoreJar
-
-
-tasks.curseforge.enabled = !dev && project.hasProperty('curseforge_key')
-    
-curseforge {
-    if (project.hasProperty('curseforge_key')) {
-        apiKey = project.curseforge_key
-    }
-
-    project {
-        id = project.projectId
-        changelog = System.getenv('CHANGELOG') == null || System.getenv('CHANGELOG').equals('none') ? getChangelogText() : System.getenv('CHANGELOG')
-        changelogType = 'html'
-        releaseType = type
-        mainArtifact(jar) {
-            displayName = "${archivesBaseName} - ${version}"
-        }
-        addArtifact(apiJar)
     }
 }

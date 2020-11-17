@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,43 +17,40 @@ import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemPotion;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.item.*;
+
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.*;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class Util {
 
   public static @Nullable Block getBlockFromItemId(@Nonnull ItemStack itemId) {
     Item item = itemId.getItem();
-    if (item instanceof ItemBlock) {
-      return ((ItemBlock) item).getBlock();
+    if (item instanceof BlockItem) {
+      return ((BlockItem) item).getBlock();
     }
     return null;
   }
 
   public static @Nonnull ItemStack consumeItem(@Nonnull ItemStack stack) {
-    if (stack.getItem() instanceof ItemPotion) {
+    if (stack.getItem() instanceof PotionItem) {
       if (stack.getCount() == 1) {
         return new ItemStack(Items.GLASS_BOTTLE);
       } else {
-        stack.splitStack(1);
+        stack.split(1);
         return stack;
       }
     }
@@ -62,12 +61,12 @@ public class Util {
         return ItemStack.EMPTY;
       }
     } else {
-      stack.splitStack(1);
+      stack.split(1);
       return stack;
     }
   }
 
-  public static void giveExperience(@Nonnull EntityPlayer thePlayer, float experience) {
+  public static void giveExperience(@Nonnull PlayerEntity thePlayer, float experience) {
     int intExp = (int) experience;
     float fractional = experience - intExp;
     if (fractional > 0.0F) {
@@ -76,13 +75,13 @@ public class Util {
       }
     }
     while (intExp > 0) {
-      int j = EntityXPOrb.getXPSplit(intExp);
+      int j = ExperienceOrbEntity.getXPSplit(intExp);
       intExp -= j;
-      thePlayer.world.spawnEntity(new EntityXPOrb(thePlayer.world, thePlayer.posX, thePlayer.posY + 0.5D, thePlayer.posZ + 0.5D, j));
+      thePlayer.world.addEntity(new ExperienceOrbEntity(thePlayer.world, thePlayer.getPosX(), thePlayer.getPosY() + 0.5D, thePlayer.getPosZ() + 0.5D, j));
     }
   }
 
-  public static EntityItem createDrop(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
+  public static ItemEntity createDrop(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
     if (stack.isEmpty()) {
       return null;
     }
@@ -91,14 +90,12 @@ public class Util {
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d2 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
-      EntityItem entityitem = new EntityItem(world, x + d, y + d1, z + d2, stack);
+      ItemEntity entityitem = new ItemEntity(world, x + d, y + d1, z + d2, stack);
       entityitem.setDefaultPickupDelay();
       return entityitem;
     } else {
-      EntityItem entityitem = new EntityItem(world, x, y, z, stack);
-      entityitem.motionX = 0;
-      entityitem.motionY = 0;
-      entityitem.motionZ = 0;
+      ItemEntity entityitem = new ItemEntity(world, x, y, z, stack);
+      entityitem.setMotion(0, 0, 0);
       entityitem.setNoPickupDelay();
       return entityitem;
     }
@@ -113,28 +110,26 @@ public class Util {
       return;
     }
 
-    EntityItem entityitem = createEntityItem(world, stack, x, y, z, doRandomSpread);
-    world.spawnEntity(entityitem);
+    ItemEntity entityitem = createEntityItem(world, stack, x, y, z, doRandomSpread);
+    world.addEntity(entityitem);
   }
 
-  public static EntityItem createEntityItem(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z) {
+  public static ItemEntity createEntityItem(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z) {
     return createEntityItem(world, stack, x, y, z, true);
   }
 
-  public static @Nonnull EntityItem createEntityItem(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
-    EntityItem entityitem;
+  public static @Nonnull ItemEntity createEntityItem(@Nonnull World world, @Nonnull ItemStack stack, double x, double y, double z, boolean doRandomSpread) {
+    ItemEntity entityitem;
     if (doRandomSpread) {
       float f1 = 0.7F;
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d2 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
-      entityitem = new EntityItem(world, x + d, y + d1, z + d2, stack);
+      entityitem = new ItemEntity(world, x + d, y + d1, z + d2, stack);
       entityitem.setDefaultPickupDelay();
     } else {
-      entityitem = new EntityItem(world, x, y, z, stack);
-      entityitem.motionX = 0;
-      entityitem.motionY = 0;
-      entityitem.motionZ = 0;
+      entityitem = new ItemEntity(world, x, y, z, stack);
+      entityitem.setMotion(0, 0, 0);
       entityitem.setNoPickupDelay();
     }
     return entityitem;
@@ -150,16 +145,14 @@ public class Util {
       double d = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d1 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
       double d2 = (world.rand.nextFloat() * f1) + (1.0F - f1) * 0.5D;
-      EntityItem entityitem = new EntityItem(world, x + d, y + d1, z + d2, stack);
+      ItemEntity entityitem = new ItemEntity(world, x + d, y + d1, z + d2, stack);
       entityitem.setDefaultPickupDelay();
-      world.spawnEntity(entityitem);
+      world.addEntity(entityitem);
     } else {
-      EntityItem entityitem = new EntityItem(world, x + 0.5, y + 0.5, z + 0.5, stack);
-      entityitem.motionX = 0;
-      entityitem.motionY = 0;
-      entityitem.motionZ = 0;
+      ItemEntity entityitem = new ItemEntity(world, x + 0.5, y + 0.5, z + 0.5, stack);
+      entityitem.setMotion(0,0,0);
       entityitem.setNoPickupDelay();
-      world.spawnEntity(entityitem);
+      world.addEntity(entityitem);
     }
   }
 
@@ -187,13 +180,13 @@ public class Util {
   public static boolean dumpModObjects(@Nonnull File file) {
 
     StringBuilder sb = new StringBuilder();
-    for (Object key : Block.REGISTRY.getKeys()) {
+    for (Object key : ForgeRegistries.BLOCKS.getKeys()) {
       if (key != null) {
         sb.append(key.toString());
         sb.append("\n");
       }
     }
-    for (Object key : Item.REGISTRY.getKeys()) {
+    for (Object key : ForgeRegistries.ITEMS.getKeys()) {
       if (key != null) {
         sb.append(key.toString());
         sb.append("\n");
@@ -202,19 +195,6 @@ public class Util {
 
     try {
       Files.write(sb, file, Charsets.UTF_8);
-      return true;
-    } catch (IOException e) {
-      Log.warn("Error dumping ore dictionary entries: " + e.getMessage());
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  public static boolean dumpOreNames(@Nonnull File file) {
-
-    try {
-      String[] oreNames = OreDictionary.getOreNames();
-      Files.write(Joiner.on("\n").join(oreNames), file, Charsets.UTF_8);
       return true;
     } catch (IOException e) {
       Log.warn("Error dumping ore dictionary entries: " + e.getMessage());
@@ -232,194 +212,142 @@ public class Util {
         inventory.markDirty();
         return result;
       }
-      ItemStack split = item.splitStack(size);
+      ItemStack split = item.split(size);
       inventory.markDirty();
       return split;
     }
     return ItemStack.EMPTY;
   }
 
-  public static @Nonnull Vec3d getEyePosition(@Nonnull EntityPlayer player) {
-    double y = player.posY;
+  public static @Nonnull net.minecraft.util.math.vector.Vector3d getEyePosition(@Nonnull PlayerEntity player) {
+    double y = player.getPosY();
     y += player.getEyeHeight();
-    return new Vec3d(player.posX, y, player.posZ);
+    return new net.minecraft.util.math.vector.Vector3d(player.getPosX(), y, player.getPosZ());
   }
 
-  public static @Nonnull Vector3d getEyePositionEio(@Nonnull EntityPlayer player) {
-    Vector3d res = new Vector3d(player.posX, player.posY, player.posZ);
+  public static @Nonnull Vector3d getEyePositionEio(@Nonnull PlayerEntity player) {
+    Vector3d res = new Vector3d(player.getPosX(), player.getPosY(), player.getPosZ());
     res.y += player.getEyeHeight();
     return res;
   }
 
-  public static @Nonnull Vector3d getLookVecEio(@Nonnull EntityPlayer player) {
-    Vec3d lv = player.getLookVec();
+  public static @Nonnull Vector3d getLookVecEio(@Nonnull PlayerEntity player) {
+    net.minecraft.util.math.vector.Vector3d lv = player.getLookVec();
     return new Vector3d(lv.x, lv.y, lv.z);
   }
 
   // Code adapted from World.rayTraceBlocks to return all
   // collided blocks
-  public static @Nonnull List<RayTraceResult> raytraceAll(@Nonnull World world, @Nonnull Vec3d startVector, @Nonnull Vec3d endVec, boolean includeLiquids) {
-    boolean ignoreBlockWithoutBoundingBox = true;
-    Vec3d startVec = startVector;
-
-    List<RayTraceResult> result = new ArrayList<RayTraceResult>();
-
-    if (!Double.isNaN(startVec.x) && !Double.isNaN(startVec.y) && !Double.isNaN(startVec.z)) {
-      if (!Double.isNaN(endVec.x) && !Double.isNaN(endVec.y) && !Double.isNaN(endVec.z)) {
-        int i = MathHelper.floor(endVec.x);
-        int j = MathHelper.floor(endVec.y);
-        int k = MathHelper.floor(endVec.z);
-        int l = MathHelper.floor(startVec.x);
-        int i1 = MathHelper.floor(startVec.y);
-        int j1 = MathHelper.floor(startVec.z);
-        BlockPos blockpos = new BlockPos(l, i1, j1);
-        IBlockState iblockstate = world.getBlockState(blockpos);
-        Block block = iblockstate.getBlock();
-
-        if ((!ignoreBlockWithoutBoundingBox || iblockstate.getCollisionBoundingBox(world, blockpos) != Block.NULL_AABB)
-            && block.canCollideCheck(iblockstate, includeLiquids)) {
-          @Nonnull
-          RayTraceResult raytraceresult = iblockstate.collisionRayTrace(world, blockpos, startVec, endVec);
-          result.add(raytraceresult);
-        }
-
-        int k1 = 200;
-
-        while (k1-- >= 0) {
-          if (Double.isNaN(startVec.x) || Double.isNaN(startVec.y) || Double.isNaN(startVec.z)) {
-            return new ArrayList<RayTraceResult>();
-          }
-
-          if (l == i && i1 == j && j1 == k) {
-            return result;
-          }
-
-          boolean flag2 = true;
-          boolean flag = true;
-          boolean flag1 = true;
-          double d0 = 999.0D;
-          double d1 = 999.0D;
-          double d2 = 999.0D;
-
-          if (i > l) {
-            d0 = l + 1.0D;
-          } else if (i < l) {
-            d0 = l + 0.0D;
-          } else {
-            flag2 = false;
-          }
-
-          if (j > i1) {
-            d1 = i1 + 1.0D;
-          } else if (j < i1) {
-            d1 = i1 + 0.0D;
-          } else {
-            flag = false;
-          }
-
-          if (k > j1) {
-            d2 = j1 + 1.0D;
-          } else if (k < j1) {
-            d2 = j1 + 0.0D;
-          } else {
-            flag1 = false;
-          }
-
-          double d3 = 999.0D;
-          double d4 = 999.0D;
-          double d5 = 999.0D;
-          double d6 = endVec.x - startVec.x;
-          double d7 = endVec.y - startVec.y;
-          double d8 = endVec.z - startVec.z;
-
-          if (flag2) {
-            d3 = (d0 - startVec.x) / d6;
-          }
-
-          if (flag) {
-            d4 = (d1 - startVec.y) / d7;
-          }
-
-          if (flag1) {
-            d5 = (d2 - startVec.z) / d8;
-          }
-
-          if (d3 == -0.0D) {
-            d3 = -1.0E-4D;
-          }
-
-          if (d4 == -0.0D) {
-            d4 = -1.0E-4D;
-          }
-
-          if (d5 == -0.0D) {
-            d5 = -1.0E-4D;
-          }
-
-          EnumFacing enumfacing;
-
-          if (d3 < d4 && d3 < d5) {
-            enumfacing = i > l ? EnumFacing.WEST : EnumFacing.EAST;
-            startVec = new Vec3d(d0, startVec.y + d7 * d3, startVec.z + d8 * d3);
-          } else if (d4 < d5) {
-            enumfacing = j > i1 ? EnumFacing.DOWN : EnumFacing.UP;
-            startVec = new Vec3d(startVec.x + d6 * d4, d1, startVec.z + d8 * d4);
-          } else {
-            enumfacing = k > j1 ? EnumFacing.NORTH : EnumFacing.SOUTH;
-            startVec = new Vec3d(startVec.x + d6 * d5, startVec.y + d7 * d5, d2);
-          }
-
-          l = MathHelper.floor(startVec.x) - (enumfacing == EnumFacing.EAST ? 1 : 0);
-          i1 = MathHelper.floor(startVec.y) - (enumfacing == EnumFacing.UP ? 1 : 0);
-          j1 = MathHelper.floor(startVec.z) - (enumfacing == EnumFacing.SOUTH ? 1 : 0);
-          blockpos = new BlockPos(l, i1, j1);
-          IBlockState iblockstate1 = world.getBlockState(blockpos);
-          Block block1 = iblockstate1.getBlock();
-
-          if (!ignoreBlockWithoutBoundingBox || iblockstate1.getMaterial() == Material.PORTAL
-              || iblockstate1.getCollisionBoundingBox(world, blockpos) != Block.NULL_AABB) {
-            if (block1.canCollideCheck(iblockstate1, includeLiquids)) {
-              @Nonnull
-              RayTraceResult raytraceresult1 = iblockstate1.collisionRayTrace(world, blockpos, startVec, endVec);
-              result.add(raytraceresult1);
-            }
-          }
-        }
-
-        return result;
-      } else {
-        return result;
-      }
-    } else {
-      return result;
-    }
+  public static @Nonnull List<BlockRayTraceResult> raytraceAll(@Nonnull World world, RayTraceContext context) {
+    return doRayTrace(context, (p_217297_1_, p_217297_2_) -> {
+      BlockState blockstate = world.getBlockState(p_217297_2_);
+      FluidState fluidstate = world.getFluidState(p_217297_2_);
+      net.minecraft.util.math.vector.Vector3d vector3d = p_217297_1_.getStartVec();
+      net.minecraft.util.math.vector.Vector3d vector3d1 = p_217297_1_.getEndVec();
+      VoxelShape voxelshape = p_217297_1_.getBlockShape(blockstate, world, p_217297_2_);
+      BlockRayTraceResult blockraytraceresult = world.rayTraceBlocks(vector3d, vector3d1, p_217297_2_, voxelshape, blockstate);
+      VoxelShape voxelshape1 = p_217297_1_.getFluidShape(fluidstate, world, p_217297_2_);
+      BlockRayTraceResult blockraytraceresult1 = voxelshape1.rayTrace(vector3d, vector3d1, p_217297_2_);
+      double d0 = blockraytraceresult == null ? Double.MAX_VALUE : p_217297_1_.getStartVec().squareDistanceTo(blockraytraceresult.getHitVec());
+      double d1 = blockraytraceresult1 == null ? Double.MAX_VALUE : p_217297_1_.getStartVec().squareDistanceTo(blockraytraceresult1.getHitVec());
+      return d0 <= d1 ? blockraytraceresult : blockraytraceresult1;
+    }, (p_217302_0_) -> {
+      net.minecraft.util.math.vector.Vector3d vector3d = p_217302_0_.getStartVec().subtract(p_217302_0_.getEndVec());
+      return BlockRayTraceResult.createMiss(p_217302_0_.getEndVec(), Direction.getFacingFromVector(vector3d.x, vector3d.y, vector3d.z), new BlockPos(p_217302_0_.getEndVec()));
+    });
   }
 
-  public static @Nullable EnumFacing getDirFromOffset(int xOff, int yOff, int zOff) {
+  private static List<BlockRayTraceResult> doRayTrace(RayTraceContext context, BiFunction<RayTraceContext, BlockPos, BlockRayTraceResult> rayTracer, Function<RayTraceContext, BlockRayTraceResult> missFactory) {
+    List<BlockRayTraceResult> result = new ArrayList<BlockRayTraceResult>();
+
+    net.minecraft.util.math.vector.Vector3d vector3d = context.getStartVec();
+    net.minecraft.util.math.vector.Vector3d vector3d1 = context.getEndVec();
+    if (vector3d.equals(vector3d1)) {
+      return result;
+    } else {
+      double d0 = MathHelper.lerp(-1.0E-7D, vector3d1.x, vector3d.x);
+      double d1 = MathHelper.lerp(-1.0E-7D, vector3d1.y, vector3d.y);
+      double d2 = MathHelper.lerp(-1.0E-7D, vector3d1.z, vector3d.z);
+      double d3 = MathHelper.lerp(-1.0E-7D, vector3d.x, vector3d1.x);
+      double d4 = MathHelper.lerp(-1.0E-7D, vector3d.y, vector3d1.y);
+      double d5 = MathHelper.lerp(-1.0E-7D, vector3d.z, vector3d1.z);
+      int i = MathHelper.floor(d3);
+      int j = MathHelper.floor(d4);
+      int k = MathHelper.floor(d5);
+      BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable(i, j, k);
+      BlockRayTraceResult t = rayTracer.apply(context, blockpos$mutable);
+      if (t != null) {
+        result.add(t);
+      } else {
+        double d6 = d0 - d3;
+        double d7 = d1 - d4;
+        double d8 = d2 - d5;
+        int l = MathHelper.signum(d6);
+        int i1 = MathHelper.signum(d7);
+        int j1 = MathHelper.signum(d8);
+        double d9 = l == 0 ? Double.MAX_VALUE : (double)l / d6;
+        double d10 = i1 == 0 ? Double.MAX_VALUE : (double)i1 / d7;
+        double d11 = j1 == 0 ? Double.MAX_VALUE : (double)j1 / d8;
+        double d12 = d9 * (l > 0 ? 1.0D - MathHelper.frac(d3) : MathHelper.frac(d3));
+        double d13 = d10 * (i1 > 0 ? 1.0D - MathHelper.frac(d4) : MathHelper.frac(d4));
+        double d14 = d11 * (j1 > 0 ? 1.0D - MathHelper.frac(d5) : MathHelper.frac(d5));
+
+        while(d12 <= 1.0D || d13 <= 1.0D || d14 <= 1.0D) {
+          if (d12 < d13) {
+            if (d12 < d14) {
+              i += l;
+              d12 += d9;
+            } else {
+              k += j1;
+              d14 += d11;
+            }
+          } else if (d13 < d14) {
+            j += i1;
+            d13 += d10;
+          } else {
+            k += j1;
+            d14 += d11;
+          }
+
+          BlockRayTraceResult t1 = rayTracer.apply(context, blockpos$mutable.setPos(i, j, k));
+          if (t1 != null) {
+            result.add(t1);
+          }
+        }
+
+        if (result.isEmpty())
+          result.add(missFactory.apply(context));
+      }
+    }
+
+    return result;
+  }
+
+  public static @Nullable Direction getDirFromOffset(int xOff, int yOff, int zOff) {
     if (xOff != 0 && yOff == 0 && zOff == 0) {
-      return xOff < 0 ? EnumFacing.WEST : EnumFacing.EAST;
+      return xOff < 0 ? Direction.WEST : Direction.EAST;
     }
     if (zOff != 0 && yOff == 0 && xOff == 0) {
-      return zOff < 0 ? EnumFacing.NORTH : EnumFacing.SOUTH;
+      return zOff < 0 ? Direction.NORTH : Direction.SOUTH;
     }
     if (yOff != 0 && xOff == 0 && zOff == 0) {
-      return yOff < 0 ? EnumFacing.DOWN : EnumFacing.UP;
+      return yOff < 0 ? Direction.DOWN : Direction.UP;
     }
     return null;
   }
 
-  public static @Nonnull EnumFacing getFacingFromEntity(@Nonnull EntityLivingBase entity) {
+  public static @Nonnull Direction getFacingFromEntity(@Nonnull LivingEntity entity) {
     int heading = MathHelper.floor(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
     switch (heading) {
     case 0:
-      return EnumFacing.NORTH;
+      return Direction.NORTH;
     case 1:
-      return EnumFacing.EAST;
+      return Direction.EAST;
     case 2:
-      return EnumFacing.SOUTH;
+      return Direction.SOUTH;
     case 3:
     default:
-      return EnumFacing.WEST;
+      return Direction.WEST;
     }
 
   }
@@ -428,19 +356,19 @@ public class Util {
     return (int) (tile.getProgress() * scale);
   }
 
-  public static void writeFacingToNBT(@Nonnull NBTTagCompound nbtRoot, @Nonnull String name, @Nonnull EnumFacing dir) {
+  public static void writeFacingToNBT(@Nonnull CompoundNBT nbtRoot, @Nonnull String name, @Nonnull Direction dir) {
     short val = -1;
     val = (short) dir.ordinal();
-    nbtRoot.setShort(name, val);
+    nbtRoot.putShort(name, val);
   }
 
-  public static @Nullable EnumFacing readFacingFromNBT(@Nonnull NBTTagCompound nbtRoot, @Nonnull String name) {
+  public static @Nullable Direction readFacingFromNBT(@Nonnull CompoundNBT nbtRoot, @Nonnull String name) {
     short val = -1;
-    if (nbtRoot.hasKey(name)) {
+    if (nbtRoot.contains(name)) {
       val = nbtRoot.getShort(name);
     }
     if (val > 0) {
-      return EnumFacing.values()[val];
+      return Direction.values()[val];
     }
     return null;
   }

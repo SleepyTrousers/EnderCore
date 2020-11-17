@@ -10,10 +10,11 @@ import com.enderio.core.common.util.NNList;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Util;
 
 public class GhostBackgroundItemSlot extends GhostSlot {
 
@@ -72,15 +73,15 @@ public class GhostBackgroundItemSlot extends GhostSlot {
   }
 
   @Override
-  public boolean isMouseOver(int mx, int my) {
+  public boolean isMouseOver(double mx, double my) {
     return false;
   }
 
   @Override
   public @Nonnull ItemStack getStack() {
     final NonNullList<ItemStack> stacks2 = stacks;
-    if (stacks2 != null && Minecraft.getSystemTime() - lastSwitch > 1000L) {
-      lastSwitch = Minecraft.getSystemTime();
+    if (stacks2 != null && Util.milliTime() - lastSwitch > 1000L) {
+      lastSwitch = Util.milliTime();
       if (++idx >= stacks2.size()) {
         idx = 0;
         Collections.shuffle(stacks2);

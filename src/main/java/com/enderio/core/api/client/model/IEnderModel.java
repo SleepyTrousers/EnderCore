@@ -1,6 +1,7 @@
 package com.enderio.core.api.client.model;
 
-import net.minecraft.client.model.ModelRenderer;
+
+import net.minecraft.client.renderer.model.ModelRenderer;
 
 /**
  * To be used on techne-style box models

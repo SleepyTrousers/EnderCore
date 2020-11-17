@@ -16,21 +16,20 @@ import com.enderio.core.common.util.stackable.IThing.Zwieback;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.Block;
-import net.minecraft.client.util.RecipeItemHelper;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.crafting.RecipeItemHelper;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.crafting.CompoundIngredient;
-import net.minecraftforge.common.crafting.IngredientNBT;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.oredict.OreDictionary;
-import net.minecraftforge.oredict.OreIngredient;
+import net.minecraftforge.common.crafting.NBTIngredient;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * This class is a way to hold lists of configurable items and blocks.
@@ -42,7 +41,7 @@ import net.minecraftforge.oredict.OreIngredient;
  * Non-existing things are silently ignored. Adding things in the pre-init phase (i.e. before all modded things exist in the game) is safe.
  *
  */
-public class Things extends Ingredient {
+public class Things { // extends Ingredient {
   static final @Nonnull Map<String, IThing> aliases = new HashMap<String, IThing>();
 
   private static final @Nonnull List<Things> values = new ArrayList<Things>();
@@ -67,7 +66,7 @@ public class Things extends Ingredient {
   private static boolean inPreInit = true;
   private static boolean beforeLoadComplete = true;
 
-  public static void init(@Nullable FMLInitializationEvent event) {
+  public static void init(@Nullable FMLCommonSetupEvent event) {
     inPreInit = false;
     for (Things element : values) {
       element.bake();
@@ -84,10 +83,10 @@ public class Things extends Ingredient {
   }
 
   private final @Nonnull List<IThing> things = new ArrayList<IThing>();
-  private NBTTagCompound nbt = null;
+  private CompoundNBT nbt = null;
   private int size = 1;
 
-  public void setNbt(NBTTagCompound nbt) {
+  public void setNbt(CompoundNBT nbt) {
     this.nbt = nbt;
   }
 
@@ -176,27 +175,37 @@ public class Things extends Ingredient {
 
   public @Nonnull Things add(@Nullable ResourceLocation resourceLocation) {
     if (resourceLocation != null) {
-      if (net.minecraft.block.Block.REGISTRY.containsKey(resourceLocation)) {
-        Block block = net.minecraft.block.Block.REGISTRY.getObject(resourceLocation);
+      if (ForgeRegistries.BLOCKS.containsKey(resourceLocation)) {
+        Block block = ForgeRegistries.BLOCKS.getValue(resourceLocation);
         nameList.add("block:" + block.getRegistryName());
       }
       // this ugly thing seems to be what Forge wants you to use
-      Item item = net.minecraft.item.Item.REGISTRY.getObject(resourceLocation);
-      if (item != null) {
+      if (ForgeRegistries.ITEMS.containsKey(resourceLocation)) {
+        Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
         nameList.add("item:" + item.getRegistryName());
       }
+
       add(new ResourceThing(resourceLocation));
     }
     return this;
   }
 
-  public @Nonnull Things addOredict(@Nullable String name) {
+  public @Nonnull Things addTag(@Nullable ITag.INamedTag<Item> name) {
     if (name != null) {
-      nameList.add("oredict:" + name);
-      add(new OreThing(name));
+      nameList.add("itemTag:" + name.toString());
+      add(new ItemTagThing(name));
     }
     return this;
   }
+
+  // TODO: Block Tags
+//  public @Nonnull Things addTag(@Nullable ITag.INamedTag<Block> name) {
+//    if (name != null) {
+//      nameList.add("blockTag:" + name.toString());
+//      add(new BlockTagThing(name));
+//    }
+//    return this;
+//  }
 
   public @Nonnull Things add(@Nullable Things otherThings) {
     if (otherThings != null) {
@@ -226,7 +235,8 @@ public class Things extends Ingredient {
     itemStackListRaw = null;
     itemStackList = null;
     blockList = null;
-    itemIds = null;
+    // TODO: Ingredient:
+//    itemIds = null;
   }
 
   private void bake() {
@@ -271,7 +281,7 @@ public class Things extends Ingredient {
   public boolean contains(@Nullable ItemStack itemStack) { // sic!
     if (itemStack != null && !itemStack.isEmpty()) {
       for (IThing thing : things) {
-        if (thing.is(itemStack) && (nbt == null || nbt.equals(itemStack.getTagCompound()))) {
+        if (thing.is(itemStack) && (nbt == null || nbt.equals(itemStack.getTag()))) {
           return true;
         }
       }
@@ -295,14 +305,7 @@ public class Things extends Ingredient {
   }
 
   public boolean isValid() {
-    if (inPreInit) {
-      Things temp = new Things();
-      temp.add(this.getNameList());
-      temp.bake();
-      return !temp.getItemStacksRaw().isEmpty();
-    } else {
-      return !getItemStacksRaw().isEmpty();
-    }
+    return !getItemStacksRaw().isEmpty();
   }
 
   public boolean isPotentiallyValid() {
@@ -354,7 +357,7 @@ public class Things extends Ingredient {
       for (int i = 0; i < list.size(); i++) {
         ItemStack stack = list.get(i).copy();
         if (nbt != null) {
-          stack.setTagCompound(nbt.copy());
+          stack.setTag(nbt.copy());
         }
         if (size > 1) {
           stack.setCount(size);
@@ -376,11 +379,14 @@ public class Things extends Ingredient {
     if (list == null || list.isEmpty() || beforeLoadComplete) {
       list = new NNList<>();
       for (ItemStack stack : getItemStacksRaw()) {
-        if (stack.isEmpty()) {
-          // NOP
-        } else if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-          stack.getItem().getSubItems(CreativeTabs.SEARCH, list);
-        } else {
+//        if (stack.isEmpty()) {
+//          // NOP
+//        } else if (stack.getDamage() == OreDictionary.WILDCARD_VALUE) {
+//          stack.getItem().getSubItems(CreativeTabs.SEARCH, list);
+//        } else {
+//          list.add(stack);
+//        }
+        if (!stack.isEmpty()) {
           list.add(stack);
         }
       }
@@ -415,139 +421,139 @@ public class Things extends Ingredient {
 
   // Ingredient
 
-  @Override
-  public @Nonnull ItemStack[] getMatchingStacks() {
-    return getItemStacks().toArray(new ItemStack[0]);
-  }
+//  @Override
+//  public @Nonnull ItemStack[] getMatchingStacks() {
+//    return getItemStacks().toArray(new ItemStack[0]);
+//  }
+//
+//  @Override
+//  public boolean apply(@Nullable ItemStack p_apply_1_) {
+//    return contains(p_apply_1_);
+//  }
+//
+//  private @Nullable IntList itemIds = null;
+//
+//  @Override
+//  public @Nonnull IntList getValidItemStacksPacked() {
+//    IntList list = itemIds;
+//    if (list == null || list.isEmpty() || beforeLoadComplete) {
+//      list = new IntArrayList();
+//      for (NNIterator<ItemStack> itr = getItemStacks().fastIterator(); itr.hasNext();) {
+//        list.add(RecipeItemHelper.pack(itr.next()));
+//      }
+//    }
+//    return itemIds = list;
+//  }
+//
+//  @Override
+//  protected void invalidate() {
+//    NNList<String> names = nameList.copy();
+//    nameList.clear();
+//    things.clear();
+//    add(names);
+//  }
+//
+//  @Override
+//  public boolean isSimple() {
+//    return false;
+//  }
+//
+//  @SuppressWarnings("null")
+//  public @Nonnull Ingredient asIngredient() {
+//    NNList<Ingredient> ings = new NNList<>();
+//    for (IThing thing : things) {
+//      if (thing instanceof ItemTagThing) {
+//        if (nbt != null) {
+//          ings.add(new OreIngredientNBT(((ItemTagThing) thing).getTag(), nbt));
+//        } else {
+//          ings.add(new OreIngredient(((ItemTagThing) thing).getTag()) {
+//            @Override
+//            public String toString() {
+//              return "OreIngredient " + Arrays.toString(getMatchingStacks());
+//            }
+//          });
+//        }
+//      } else {
+//        NNList<ItemStack> sublist = new NNList<>();
+//        for (ItemStack stack : thing.getItemStacks()) {
+//          if (stack.isEmpty()) {
+//            // NOP
+//          } else if (stack.getDamage() == OreDictionary.WILDCARD_VALUE) {
+//            stack.getItem().getSubItems(CreativeTabs.SEARCH, sublist);
+//          } else {
+//            sublist.add(stack);
+//          }
+//        }
+//        applyNBT(sublist);
+//        for (ItemStack itemStack : sublist) {
+//          if (nbt != null) {
+//            ings.add(new NBTIngredient(itemStack) {
+//              @Override
+//              public String toString() {
+//                return "IngredientNBT " + Arrays.toString(getMatchingStacks());
+//              }
+//            });
+//          } else {
+//            ings.add(new Ingredient(itemStack) {
+//              @Override
+//              public String toString() {
+//                return "Ingredient " + Arrays.toString(getMatchingStacks());
+//              }
+//            });
+//          }
+//        }
+//      }
+//    }
+//
+//    if (ings.isEmpty()) {
+//      return this;
+//    } else if (ings.size() == 1) {
+//      return ings.get(0);
+//    } else {
+//      return new CompoundIngredient(ings) {
+//        @Override
+//        public String toString() {
+//          return "CompoundIngredient " + Arrays.toString(getMatchingStacks());
+//        }
+//      };
+//    }
+//  }
 
-  @Override
-  public boolean apply(@Nullable ItemStack p_apply_1_) {
-    return contains(p_apply_1_);
-  }
-
-  private @Nullable IntList itemIds = null;
-
-  @Override
-  public @Nonnull IntList getValidItemStacksPacked() {
-    IntList list = itemIds;
-    if (list == null || list.isEmpty() || beforeLoadComplete) {
-      list = new IntArrayList();
-      for (NNIterator<ItemStack> itr = getItemStacks().fastIterator(); itr.hasNext();) {
-        list.add(RecipeItemHelper.pack(itr.next()));
-      }
-    }
-    return itemIds = list;
-  }
-
-  @Override
-  protected void invalidate() {
-    NNList<String> names = nameList.copy();
-    nameList.clear();
-    things.clear();
-    add(names);
-  }
-
-  @Override
-  public boolean isSimple() {
-    return false;
-  }
-
-  @SuppressWarnings("null")
-  public @Nonnull Ingredient asIngredient() {
-    NNList<Ingredient> ings = new NNList<>();
-    for (IThing thing : things) {
-      if (thing instanceof OreThing) {
-        if (nbt != null) {
-          ings.add(new OreIngredientNBT(((OreThing) thing).getName(), nbt));
-        } else {
-          ings.add(new OreIngredient(((OreThing) thing).getName()) {
-            @Override
-            public String toString() {
-              return "OreIngredient " + Arrays.toString(getMatchingStacks());
-            }
-          });
-        }
-      } else {
-        NNList<ItemStack> sublist = new NNList<>();
-        for (ItemStack stack : thing.getItemStacks()) {
-          if (stack.isEmpty()) {
-            // NOP
-          } else if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-            stack.getItem().getSubItems(CreativeTabs.SEARCH, sublist);
-          } else {
-            sublist.add(stack);
-          }
-        }
-        applyNBT(sublist);
-        for (ItemStack itemStack : sublist) {
-          if (nbt != null) {
-            ings.add(new IngredientNBT(itemStack) {
-              @Override
-              public String toString() {
-                return "IngredientNBT " + Arrays.toString(getMatchingStacks());
-              }
-            });
-          } else {
-            ings.add(new Ingredient(itemStack) {
-              @Override
-              public String toString() {
-                return "Ingredient " + Arrays.toString(getMatchingStacks());
-              }
-            });
-          }
-        }
-      }
-    }
-
-    if (ings.isEmpty()) {
-      return this;
-    } else if (ings.size() == 1) {
-      return ings.get(0);
-    } else {
-      return new CompoundIngredient(ings) {
-        @Override
-        public String toString() {
-          return "CompoundIngredient " + Arrays.toString(getMatchingStacks());
-        }
-      };
-    }
-  }
-
-  private static class OreIngredientNBT extends OreIngredient {
-
-    private final @Nonnull NBTTagCompound nbt;
-
-    public OreIngredientNBT(@Nonnull String ore, @Nonnull NBTTagCompound nbt) {
-      super(ore);
-      this.nbt = nbt;
-    }
-
-    @Override
-    public boolean apply(@Nullable ItemStack input) {
-      return super.apply(input) && input != null && nbt.equals(input.getTagCompound());
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack[] getMatchingStacks() {
-      final ItemStack[] matchingStacks = super.getMatchingStacks();
-      for (ItemStack itemStack : matchingStacks) {
-        itemStack.setTagCompound(nbt.copy());
-      }
-      return matchingStacks;
-    }
-
-    @Override
-    public boolean isSimple() {
-      return false;
-    }
-
-    @Override
-    public String toString() {
-      return "OreIngredientNBT(" + nbt + ") " + Arrays.toString(getMatchingStacks());
-    }
-
-  }
+//  private static class OreIngredientNBT extends OreIngredient {
+//
+//    private final @Nonnull CompoundNBT nbt;
+//
+//    public OreIngredientNBT(@Nonnull String ore, @Nonnull CompoundNBT nbt) {
+//      super(ore);
+//      this.nbt = nbt;
+//    }
+//
+//    @Override
+//    public boolean apply(@Nullable ItemStack input) {
+//      return super.apply(input) && input != null && nbt.equals(input.getTag());
+//    }
+//
+//    @Override
+//    @Nonnull
+//    public ItemStack[] getMatchingStacks() {
+//      final ItemStack[] matchingStacks = super.getMatchingStacks();
+//      for (ItemStack itemStack : matchingStacks) {
+//        itemStack.setTagCompound(nbt.copy());
+//      }
+//      return matchingStacks;
+//    }
+//
+//    @Override
+//    public boolean isSimple() {
+//      return false;
+//    }
+//
+//    @Override
+//    public String toString() {
+//      return "OreIngredientNBT(" + nbt + ") " + Arrays.toString(getMatchingStacks());
+//    }
+//
+//  }
 
   @Override
   public String toString() {

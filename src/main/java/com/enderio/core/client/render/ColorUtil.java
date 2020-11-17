@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 
 import com.enderio.core.common.vecmath.Vector3f;
 import com.enderio.core.common.vecmath.Vector4f;
+import com.mojang.blaze3d.platform.GlStateManager;
 
-import net.minecraft.client.renderer.GlStateManager;
 
 public final class ColorUtil {
 
@@ -85,7 +85,7 @@ public final class ColorUtil {
     float red = (color >> 16 & 255) / 255.0F;
     float green = (color >> 8 & 255) / 255.0F;
     float blue = (color & 255) / 255.0F;
-    GlStateManager.color(red, green, blue, 1.0F);
+    GlStateManager.color4f(red, green, blue, 1.0F);
   }
 
   public static int toHex(int r, int g, int b) {

@@ -1,5 +1,6 @@
 package com.enderio.core.common;
 
+// TODO: Check if we're depending on AS here, or if we're moving anything that does that to EIO
 /**
  * @deprecated Moved to AutoSave
  */
