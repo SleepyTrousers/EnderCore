@@ -1,25 +1,31 @@
+/download
+/eclipseBin
+
+## gradle
+/.gradle
+/build
+
+## ForgeGradle
+/run
+
 # eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
+/eclipse
+/.settings
+/.metadata
+/.classpath
+/.project
+/bin
 
 # idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
+/out
+/.idea
+/*.iml
+/*.ipr
+/*.iws
+/atlassian-ide-plugin.xml
 
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
+## gedit
+*~
 
 # Files from Forge MDK
 forge*changelog.txt
@@ -27,3 +33,15 @@ forge*changelog.txt
 logs/debug.log
 
 logs/latest.log
+
+## translation reports
+resources/assets/enderio/lang/*.lang.txt
+/*.launch
+
+src/\.DS_Store
+
+externalannotations/\.DS_Store
+
+gradle/\.DS_Store
+
+\.DS_Store
