@@ -34,7 +34,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 @Mod.EventBusSubscriber
 public class XPBoostHandler {
 
-  private static final Method getExperiencePoints = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "getExperiencePoints", PlayerEntity.class);
+  private static final Method getExperiencePoints = ObfuscationReflectionHelper.findMethod(LivingEntity.class, "func_70693_a", PlayerEntity.class);
 
   private static final @Nonnull String NBT_KEY = "endercore:xpboost";
 

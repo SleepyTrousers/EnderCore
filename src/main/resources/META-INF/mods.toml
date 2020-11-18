@@ -11,7 +11,7 @@ updateJSONURL="http://ci.tterrag.com/job/EnderCore" #optional
 displayURL="http://enderio.com" #optional
 logoFile="examplemod.png" #optional
 credits="" #optional
-authors="tterrag, CrazyPants, HenryLoenwind, Rover656" #optional
+authors="tterrag, CrazyPants, HenryLoenwind, Rover656, HypherionSA" #optional
 description="Library mod used by EnderIO, EnderZoo, and others"
 
 [[dependencies.endercore]] #optional
