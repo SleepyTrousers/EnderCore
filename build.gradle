@@ -1,3 +1,6 @@
+import net.minecraftforge.gradle.common.task.SignJar
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
@@ -8,16 +11,39 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.0.7"
+}
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "${minecraft_version}-${mod_version}"
+minecraft {
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: "20201028-1.16.3"
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+//    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
 group = 'com.enderio.core' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EnderCore"
+version = "${minecraft_version}-${mod_version}.${buildnumber}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+def type = 'alpha'
+if (project.hasProperty('mod_appendix')) {
+    version += "-${project.mod_appendix}"
+    type = project.mod_appendix
+}
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -32,6 +58,7 @@ minecraft {
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
+
     runs {
         client {
             workingDirectory project.file('run')
@@ -85,6 +112,10 @@ minecraft {
     }
 }
 
+configurations {
+    compile.extendsFrom exportedCompile
+}
+
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
@@ -132,11 +163,18 @@ jar {
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
 //publish.dependsOn('reobfJar')
 
-def reobfFile = file("$buildDir/reobfJar/output.jar")
 
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'reobfJar'
+task srcJar(type: Jar) {
+    from(sourceSets.main.output)
+    classifier = 'srcs'
+}
+
+
+task apiJar(type: Jar) {
+    from sourceSets.main.allSource
+    //from sourceSets.main.output
+    include 'com/enderio/core/api/**/*'
+    classifier = 'api'
 }
 
 task srcJar(type: Jar) {
@@ -144,15 +182,114 @@ task srcJar(type: Jar) {
     classifier = 'srcs'
 }
 
+build.dependsOn apiJar, srcJar, javadoc
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            from components.java
+            artifact srcJar
+            artifact apiJar
         }
     }
     repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
+        if (project.hasProperty('mavendir')) {
+            maven { url mavendir }
+        } else if (project.hasProperty('mavenURL')) {
+            maven {
+                url mavenURL
+                credentials {
+                    username System.getenv('MAVEN_USER')
+                    password System.getenv('MAVEN_PASS')
+                }
+            }
+        } else {
+            mavenLocal()
         }
     }
 }
+
+String getChangelogText() {
+    def changelogFile = file('changelog.txt')
+    String str = ''
+    int lineCount = 0
+    boolean done = false
+    changelogFile.eachLine {
+        if (done || it == null) {
+            return
+        }
+        if (it.size() > 1) {
+            def temp = it
+            if (lineCount == 0) {
+                temp = "${archivesBaseName} ${version}"
+                temp = "<h2>$temp</h2>"
+            } else if (it.startsWith('-')) {
+                temp = "&nbsp;&nbsp;&nbsp;$temp"
+            } else {
+                temp = "<h4>$temp</h4>"
+            }
+            str += "$temp<br/>"
+            lineCount++
+            return
+        } else {
+            done = true
+        }
+    }
+    return str
+}
+
+String getCN() {
+    def firsts = ['Donald', 'Lex', 'Mike', 'Arthur', 'Bridget', 'Dorian', 'Ford', 'Guy', 'James', 'Jessica', 'John', 'Michael', 'Robinson', 'Zaphod', 'Bell', 'Penelope', 'PTerry', 'Adam', 'Anathema']
+    def lasts = ['Duck', 'Luthor', 'Meyers', 'Dent', 'Jones', 'Gray', 'Prefect', 'Montag', 'Moriarty', 'Rabbit', 'Watson', 'Smith', 'Corleone', 'Crusoe', 'Beeblebrox', 'Cranel', 'Akk', 'Young', 'Device']
+    def rand = new Random()
+    return firsts[rand.nextInt(firsts.size())] + ' ' + lasts[rand.nextInt(lasts.size())]
+}
+
+task mkKeyStore(type:Exec) {
+    workingDir projectDir
+    commandLine 'keytool', '-genkey', '-alias', 'signFiles', '-keystore', 'ecstore.jks', '-storepass', '123456', '-noprompt', '-dname', 'CN='+getCN(), '-keypass', '123456'
+}
+
+task signJar(type: SignJar, dependsOn: jar) {
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+    keyStore = 'ecstore.jks'
+    alias = 'signFiles'
+    storePass = '123456'
+    keyPass = '123456'
+}
+
+
+task rmKeyStorePre(type: Delete) {
+    delete 'ecstore.jks'
+}
+task rmKeyStore(type: Delete) {
+    delete 'ecstore.jks'
+}
+
+build.dependsOn rmKeyStore
+rmKeyStore.dependsOn signJar
+signJar.dependsOn mkKeyStore
+mkKeyStore.dependsOn rmKeyStorePre
+
+
+tasks.curseforge.enabled = !dev && project.hasProperty('curseforge_key')
+
+curseforge {
+    if (project.hasProperty('curseforge_key')) {
+        apiKey = project.curseforge_key
+    }
+
+    project {
+        id = project.projectId
+        changelog = System.getenv('CHANGELOG') == null || System.getenv('CHANGELOG').equals('none') ? getChangelogText() : System.getenv('CHANGELOG')
+        changelogType = 'html'
+        releaseType = type
+        mainArtifact(jar) {
+            displayName = "${archivesBaseName} - ${version}"
+        }
+        addArtifact(apiJar)
+    }
+}
+
