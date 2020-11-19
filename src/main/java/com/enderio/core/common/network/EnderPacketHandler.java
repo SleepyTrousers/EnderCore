@@ -1,15 +1,18 @@
 package com.enderio.core.common.network;
 
+import com.enderio.core.EnderCore;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -23,6 +26,11 @@ public class EnderPacketHandler {
   private static int ID = 0;
 
   public static void init() {
+    INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(EnderCore.MODID, "ender_channel"),
+        () -> "1.0",
+        s -> true,
+        s -> true);
+
     registerClientMessage(PacketProgress.class, PacketProgress::toBytes, PacketProgress::new, PacketProgress::handle);
     registerServerMessage(PacketGhostSlot.class, PacketGhostSlot::toBytes, PacketGhostSlot::new, PacketGhostSlot::handle);
   }
