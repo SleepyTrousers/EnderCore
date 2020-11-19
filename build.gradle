@@ -19,16 +19,11 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: "20201028-1.16.3"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
-//    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+ext.buildnumber = 0
+if (System.getenv('BUILD_NUMBER') != null)
+    project.buildnumber = System.getenv('BUILD_NUMBER')
+else
+    logger.lifecycle "No build number detected, setting to 0"
 
 group = 'com.enderio.core' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "EnderCore"
@@ -36,8 +31,7 @@ version = "${minecraft_version}-${mod_version}.${buildnumber}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE").equalsIgnoreCase("false")
 
 def type = 'alpha'
 if (project.hasProperty('mod_appendix')) {
@@ -51,9 +45,9 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'snapshot', version: "20201028-1.16.3"
+    mappings channel: 'snapshot', version: "${mappings_version}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    
+
 //    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
@@ -146,13 +140,13 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title": "endercore",
-            "Specification-Vendor": "EnderCore",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"endercore",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Specification-Title": "endercore",
+                "Specification-Vendor": "EnderCore",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"endercore",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -177,15 +171,19 @@ task apiJar(type: Jar) {
     classifier = 'api'
 }
 
-task srcJar(type: Jar) {
-    from(sourceSets.main.output)
-    classifier = 'srcs'
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
 }
 
 build.dependsOn apiJar, srcJar, javadoc
 
 
 publishing {
+    tasks.publish.dependsOn 'build'
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -193,6 +191,7 @@ publishing {
             artifact apiJar
         }
     }
+
     repositories {
         if (project.hasProperty('mavendir')) {
             maven { url mavendir }
@@ -292,4 +291,3 @@ curseforge {
         addArtifact(apiJar)
     }
 }
-

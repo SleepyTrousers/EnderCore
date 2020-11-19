@@ -25,9 +25,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber
-class FireworkHandler {
+public class FireworkHandler {
   @SubscribeEvent
-  public void onAchievement(AdvancementEvent event) {
+  public static void onAchievement(AdvancementEvent event) {
     final @Nonnull Advancement advancement = NullHelper.notnullF(event.getAdvancement(), "AdvancementEvent.getAdvancement()");
     DisplayInfo display = advancement.getDisplay();
     // TODO: Config:
@@ -39,7 +39,7 @@ class FireworkHandler {
   }
 
   @SubscribeEvent
-  public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+  public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
     // TODO: Config:
 //    if(!ConfigHandler.newYearsFireworks) {
 //      return;
