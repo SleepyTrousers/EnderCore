@@ -23,6 +23,10 @@ public class DeferredEnderFluidRegistry {
   private final DeferredRegister<Block> BLOCKS;
   private final DeferredRegister<Fluid> FLUIDS;
 
+  /**
+   * Create a deferred ender fluid registry.
+   * @param modid The modid/domain for the registers.
+   */
   public DeferredEnderFluidRegistry(String modid) {
     ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, modid);
     BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, modid);
@@ -34,11 +38,13 @@ public class DeferredEnderFluidRegistry {
    * @param name Fluid name
    * @param still Still fluid
    * @param flowing Flowing fluid
+   * @param properties Fluid block properties.
+   * @param fogColor Fluid fog color.
    * @return EnderFluid container
    */
   public <StillFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> EnderFluid<EnderFluidBlock, BucketItem, StillFlowingFluid, FlowingFluid> register(
       String name, Supplier<StillFlowingFluid> still, Supplier<FlowingFluid> flowing, AbstractBlock.Properties properties, int fogColor) {
-    return register(name, still, flowing, getDefaultBlock(still, properties, fogColor), getDefaultBucket(name, still));
+    return register(name, still, flowing, getDefaultBlock(still, properties, fogColor), getDefaultBucket(still));
   }
 
   /**
@@ -51,7 +57,7 @@ public class DeferredEnderFluidRegistry {
    */
   public <FluidBlock extends EnderFluidBlock, StillFlowingBlock extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> EnderFluid<FluidBlock, BucketItem, StillFlowingBlock, FlowingFluid> register(
       String name, Supplier<StillFlowingBlock> still, Supplier<FlowingFluid> flowing, Supplier<FluidBlock> block) {
-    return register(name, still, flowing, block, getDefaultBucket(name, still));
+    return register(name, still, flowing, block, getDefaultBucket(still));
   }
 
   /**
@@ -59,6 +65,8 @@ public class DeferredEnderFluidRegistry {
    * @param name Fluid name
    * @param still Still fluid
    * @param flowing Flowing fluid
+   * @param properties Fluid block properties.
+   * @param fogColor Fluid fog color.
    * @param bucket Bucket item
    * @return EnderFluid container
    */
@@ -79,20 +87,25 @@ public class DeferredEnderFluidRegistry {
    */
   public <FluidBlock extends EnderFluidBlock, Bucket extends BucketItem, StillFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> EnderFluid<FluidBlock, Bucket, StillFlowingFluid, FlowingFluid> register(
       String name, Supplier<StillFlowingFluid> still, Supplier<FlowingFluid> flowing, Supplier<FluidBlock> block, Supplier<Bucket> bucket) {
-    RegistryObject<EnderFluidBlock> regBlock = BLOCKS.register(name + "_block", block);
-    RegistryObject<BucketItem> regBucket = ITEMS.register(name + "_bucket", bucket);
+    RegistryObject<FluidBlock> regBlock = BLOCKS.register(name + "_block", block);
+    RegistryObject<Bucket> regBucket = ITEMS.register(name + "_bucket", bucket);
     RegistryObject<StillFlowingFluid> regStill = FLUIDS.register(name, still);
     RegistryObject<FlowingFluid> regFlowing = FLUIDS.register(name + "_flowing", flowing);
-    return new EnderFluid(regBlock, regBucket, regStill, regFlowing);
+    return new EnderFluid<>(regBlock, regBucket, regStill, regFlowing);
   }
 
+  /**
+   * Register all of the fluids and their component parts.
+   * @param bus The event bus.
+   */
   public void register(IEventBus bus) {
     BLOCKS.register(bus);
     FLUIDS.register(bus);
     ITEMS.register(bus);
   }
 
-  private Supplier<BucketItem> getDefaultBucket(String fluidName, Supplier<? extends EnderFlowingFluid> still) {
+  // The default bucket and block. Put here for clarity.
+  private Supplier<BucketItem> getDefaultBucket(Supplier<? extends EnderFlowingFluid> still) {
     return () -> new BucketItem(still, new Item.Properties().containerItem(Items.BUCKET).maxStackSize(1).group(ItemGroup.MISC));
   }
 

@@ -2,9 +2,8 @@ package com.enderio.core.common.fluid;
 
 import com.enderio.core.common.util.NullHelper;
 import it.unimi.dsi.fastutil.objects.Object2ByteLinkedOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
@@ -12,6 +11,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.state.StateContainer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -26,6 +26,7 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
@@ -48,25 +49,20 @@ public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
   @Override protected void flowAround(IWorld worldIn, BlockPos pos, FluidState stateIn) {
     if (!flowUpward) {
       super.flowAround(worldIn, pos, stateIn);
-      return;
-    }
-    if (!stateIn.isEmpty()) {
-      BlockState blockstate = worldIn.getBlockState(pos);
-      BlockPos blockpos = pos.up();
-      BlockState blockstate1 = worldIn.getBlockState(blockpos);
-      FluidState fluidstate = this.calculateCorrectFlowingState(worldIn, blockpos, blockstate1);
-      if (this.canFlow(worldIn, pos, blockstate, Direction.UP, blockpos, blockstate1, worldIn.getFluidState(blockpos), fluidstate.getFluid())) {
-        this.flowInto(worldIn, blockpos, blockstate1, Direction.UP, fluidstate);
-        //        if (this.getNumHorizontallyAdjacentSources(worldIn, pos) >= 3) {
-        //          this.func_207937_a(worldIn, pos, stateIn, blockstate);
-        //        }
-      }// else if (stateIn.isSource() || !this.func_211759_a(worldIn, fluidstate.getFluid(), pos, blockstate, blockpos, blockstate1)) {
-      //        this.func_207937_a(worldIn, pos, stateIn, blockstate);
-      //      }
-
+    } else {
+      if (!stateIn.isEmpty()) {
+        BlockState blockstate = worldIn.getBlockState(pos);
+        BlockPos blockpos = pos.up();
+        BlockState blockstate1 = worldIn.getBlockState(blockpos);
+        FluidState fluidstate = this.calculateCorrectFlowingState(worldIn, blockpos, blockstate1);
+        if (this.canFlow(worldIn, pos, blockstate, Direction.UP, blockpos, blockstate1, worldIn.getFluidState(blockpos), fluidstate.getFluid())) {
+          this.flowInto(worldIn, blockpos, blockstate1, Direction.UP, fluidstate);
+        }
+      }
     }
   }
 
+  // Same as super but with upward flows.
   @Override public Vector3d getFlow(IBlockReader blockReader, BlockPos pos, FluidState fluidState) {
     double d0 = 0.0D;
     double d1 = 0.0D;
@@ -115,6 +111,7 @@ public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
     return vector3d.normalize();
   }
 
+  // The same as the original, except it allows upward flows.
   @Override protected FluidState calculateCorrectFlowingState(IWorldReader worldIn, BlockPos pos, BlockState blockStateIn) {
     int i = 0;
     int j = 0;
@@ -152,6 +149,8 @@ public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
       return k <= 0 ? Fluids.EMPTY.getDefaultState() : this.getFlowingFluidState(k, false);
     }
   }
+
+  // Here comes some hateful private copying!!!!
 
   private static final Field field_212756_e_ref;
 
@@ -245,9 +244,10 @@ public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
     }
   }
 
-
-  // Wrapper around ForgeFlowingFluid.Properties.
-  // This basically grabs the viscosity and sets tick speed to viscosity / 200 as default.
+  /**
+   * Wrapper around ForgeFlowingFluid.Properties.
+   * This basically grabs the viscosity and sets tick speed to viscosity / 200 as default.
+   */
   public static class Properties extends ForgeFlowingFluid.Properties {
     private static final Field viscosity;
 
@@ -255,7 +255,7 @@ public abstract class EnderFlowingFluid extends ForgeFlowingFluid {
       viscosity = ObfuscationReflectionHelper.findField(FluidAttributes.Builder.class, "viscosity");
     }
 
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
+    public Properties(Supplier<? extends EnderFlowingFluid> still, Supplier<? extends EnderFlowingFluid> flowing, FluidAttributes.Builder attributes) {
       super(still, flowing, attributes);
       try {
         tickRate(((int) viscosity.get(attributes)) / 200);

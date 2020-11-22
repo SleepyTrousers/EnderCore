@@ -7,38 +7,52 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
 
+import javax.annotation.Nonnull;
+
 /**
- * An EnderCore fluid.
- * This simply keeps all fluid registry objects nicely tucked in one.
- * @param <SourceFlowingFluid> The source flowing fluid class.
+ * A fluid's different registry objects, all kept together.
+ * @param <StillFlowingFluid> The still flowing fluid class.
  * @param <FlowingFluid> The flowing fluid class.
  */
-public class EnderFluid<FluidBlock extends EnderFluidBlock, Bucket extends BucketItem, SourceFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> {
-  private final RegistryObject<FluidBlock> block;
-  private final RegistryObject<Bucket> bucket;
-  private final RegistryObject<SourceFlowingFluid> still;
-  private final RegistryObject<FlowingFluid> flowing;
+public class EnderFluid<FluidBlock extends EnderFluidBlock, Bucket extends BucketItem, StillFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> {
+  @Nonnull private final RegistryObject<FluidBlock> block;
+  @Nonnull private final RegistryObject<Bucket> bucket;
+  @Nonnull private final RegistryObject<StillFlowingFluid> still;
+  @Nonnull private final RegistryObject<FlowingFluid> flowing;
 
-  public EnderFluid(RegistryObject<FluidBlock> block, RegistryObject<Bucket> bucket, RegistryObject<SourceFlowingFluid> still, RegistryObject<FlowingFluid> flowing) {
+  public EnderFluid(RegistryObject<FluidBlock> block, RegistryObject<Bucket> bucket, RegistryObject<StillFlowingFluid> still, RegistryObject<FlowingFluid> flowing) {
     this.block = block;
     this.bucket = bucket;
     this.still = still;
     this.flowing = flowing;
   }
 
-  public RegistryObject<FluidBlock> getBlock() {
+  /**
+   * Get the fluid block
+   */
+  @Nonnull public RegistryObject<FluidBlock> getBlock() {
     return block;
   }
 
-  public RegistryObject<Bucket> getBucket() {
+  /**
+   * Get the bucket item
+   */
+  @Nonnull public RegistryObject<Bucket> getBucket() {
     return bucket;
   }
 
-  public RegistryObject<SourceFlowingFluid> getStill() {
+  /**
+   * Get the still fluid.
+   */
+  @Nonnull public RegistryObject<StillFlowingFluid> getStill() {
     return still;
   }
 
-  public RegistryObject<FlowingFluid> getFlowing() {
+  /**
+   * Get the flowing fluid.
+   * @return
+   */
+  @Nonnull public RegistryObject<FlowingFluid> getFlowing() {
     return flowing;
   }
 
