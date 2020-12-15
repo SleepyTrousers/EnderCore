@@ -68,6 +68,24 @@ public enum EnderWidget implements IWidgetIcon {
   STOP_BUT_HOVER(200, 80, 8, 8),
   RETURN_BUT_HOVER(200, 88, 8, 8),
 
+  // Item colors
+  COLOR_BLACK(0, 240), // 0: #1e1b1b #242020 black
+  COLOR_RED(16, 240), // 1: #b3312c #d63a34 red
+  COLOR_GREEN(32, 240), // 2: #3b511a #46611f green
+  COLOR_BROWN(48, 240), // 3: #51301a #61391f brown
+  COLOR_BLUE(64, 240), // 4: #253192 #2c3aaf blue
+  COLOR_PURPLE(80, 240), // 5: #7b2fbe #9338e4 purple
+  COLOR_CYAN(96, 240), // 6: #287697 #308db5 cyan
+  COLOR_SILVER(112, 240), // 7: #ababab #888888 silver
+  COLOR_GRAY(128, 240), // 8: #434343 #505050 gray
+  COLOR_PINK(144, 240), // 9: #d88198 #ac6779 pink
+  COLOR_LIME(160, 240), // 10: #41cd34 #4ef63e lime
+  COLOR_YELLOW(176, 240), // 11: #decf2a #b1a521 yellow
+  COLOR_LIGHTBLUE(192, 240), // 12: #6689d3 #516da8 lightBlue
+  COLOR_MAGENTA(208, 240), // 13: #c354cd #9c43a4 magenta
+  COLOR_ORANGE(224, 240), // 14: #eb8844 #bc6c36 orange
+  COLOR_WHITE(240, 240),// 15: #f0f0f0 #c0c0c0 white
+
   ;
 
   public static final @Nonnull ResourceLocation TEXTURE = new ResourceLocation(EnderCore.MODID, "textures/gui/widgets.png");

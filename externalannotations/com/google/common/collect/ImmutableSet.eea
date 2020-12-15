@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableSet
+copyOf
+ <E:Ljava/lang/Object;>(Ljava/util/Collection<+TE;>;)Lcom/google/common/collect/ImmutableSet<TE;>;
+ <E:Ljava/lang/Object;>(Ljava/util/Collection<+TE;>;)L1com/google/common/collect/ImmutableSet<TE;>;

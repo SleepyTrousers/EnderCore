@@ -1,0 +1,4 @@
+class com/google/common/base/Optional
+fromNullable
+ <T:Ljava/lang/Object;>(TT;)Lcom/google/common/base/Optional<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1com/google/common/base/Optional<TT;>;

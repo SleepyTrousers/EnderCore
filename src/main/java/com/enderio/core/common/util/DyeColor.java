@@ -1,9 +1,14 @@
 package com.enderio.core.common.util;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.enderio.core.EnderCore;
+import com.enderio.core.api.client.render.IWidgetIcon;
+import com.enderio.core.client.gui.button.CycleButton.ICycleEnum;
+import com.enderio.core.client.render.EnderWidget;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemDye;
@@ -11,7 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.oredict.OreDictionary;
 
-public enum DyeColor {
+public enum DyeColor implements ICycleEnum {
 
   BLACK,
   RED,
@@ -39,6 +44,14 @@ public enum DyeColor {
       "item.fireworksCharge.purple", "item.fireworksCharge.cyan", "item.fireworksCharge.silver", "item.fireworksCharge.gray", "item.fireworksCharge.pink",
       "item.fireworksCharge.lime", "item.fireworksCharge.yellow", "item.fireworksCharge.lightBlue", "item.fireworksCharge.magenta",
       "item.fireworksCharge.orange", "item.fireworksCharge.white"
+
+  };
+
+  public static final IWidgetIcon[] DYE_ICONS = {
+
+      EnderWidget.COLOR_BLACK, EnderWidget.COLOR_RED, EnderWidget.COLOR_GREEN, EnderWidget.COLOR_BROWN, EnderWidget.COLOR_BLUE, EnderWidget.COLOR_PURPLE,
+      EnderWidget.COLOR_CYAN, EnderWidget.COLOR_SILVER, EnderWidget.COLOR_GRAY, EnderWidget.COLOR_PINK, EnderWidget.COLOR_LIME, EnderWidget.COLOR_YELLOW,
+      EnderWidget.COLOR_LIGHTBLUE, EnderWidget.COLOR_MAGENTA, EnderWidget.COLOR_ORANGE, EnderWidget.COLOR_WHITE
 
   };
 
@@ -88,5 +101,17 @@ public enum DyeColor {
   @Override
   public String toString() {
     return getName();
+  }
+
+  @Override
+  @Nonnull
+  public IWidgetIcon getIcon() {
+    return NullHelper.first(DYE_ICONS[ordinal()], EnderWidget.COLOR_BLACK);
+  }
+
+  @Override
+  @Nonnull
+  public List<String> getTooltipLines() {
+    return new NNList<>(getLocalisedName());
   }
 }
