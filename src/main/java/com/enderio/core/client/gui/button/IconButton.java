@@ -11,7 +11,7 @@ import com.enderio.core.client.render.EnderWidget;
 
 import net.minecraft.client.Minecraft;
 
-public class IconButton extends TooltipButton {
+public class IconButton extends TooltipButton implements IButtonAwareButton {
 
   public static final int DEFAULT_WIDTH = 16;
   public static final int DEFAULT_HEIGHT = 16;
@@ -47,23 +47,21 @@ public class IconButton extends TooltipButton {
   }
 
   /**
-   * Override this to handle mouse clicks with other buttons than the left
-   *
-   * @param mc
-   *          The MC instance
-   * @param mouseX
-   *          X coordinate of mouse click
-   * @param mouseY
-   *          Y coordinate of mouse click
-   * @param button
-   *          the mouse button - only called for button {@literal >}= 1
-   * @return true if the mouse click is handled
+   * @deprecated use {@link #mousePressedButton(Minecraft, int, int, int)}
    */
-  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
-    return false;
+  @Deprecated
+  @Override
+  public boolean mousePressed(@Nonnull Minecraft mc, int mouseX, int mouseY) {
+    return mousePressedButton(mc, mouseX, mouseY, 0);
   }
 
-  protected boolean checkMousePress(@Nonnull Minecraft mc, int mouseX, int mouseY) {
+  @Override
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
+    return button == 0 && checkMousePress(mc, mouseX, mouseY);
+  }
+
+  @Override
+  public boolean checkMousePress(@Nonnull Minecraft mc, int mouseX, int mouseY) {
     // call super here so that we only get the area check
     return super.mousePressed(mc, mouseX, mouseY);
   }

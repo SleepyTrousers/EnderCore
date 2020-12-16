@@ -1,6 +1,7 @@
 package com.enderio.core.client.gui;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -11,6 +12,8 @@ import org.lwjgl.input.Mouse;
 import com.enderio.core.api.client.gui.IGuiOverlay;
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
+import com.enderio.core.client.gui.button.IButtonAwareButton;
+import com.enderio.core.client.gui.button.IPriorityButton;
 import com.enderio.core.client.gui.button.IconButton;
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.gui.widget.GuiToolTip;
@@ -29,6 +32,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen {
 
@@ -191,6 +196,11 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   protected void mouseClicked(int x, int y, int button) throws IOException {
+    for (GuiButton guibutton : buttonList) {
+      if (guibutton instanceof IPriorityButton && ((IPriorityButton) guibutton).isTopmost() && doHandleButtonClick(x, y, button, guibutton)) {
+        return;
+      }
+    }
     for (GuiTextField f : textFields) {
       f.mouseClicked(x, y, button);
     }
@@ -221,19 +231,36 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
         }
       }
     }
-    // Button events for non-left-clicks
-    if (button >= 1) {
-      for (Object obj : buttonList) {
-        if (obj instanceof IconButton) {
-          IconButton btn = (IconButton) obj;
-          if (btn.mousePressedButton(mc, x, y, button)) {
-            btn.playPressSound(this.mc.getSoundHandler());
-            actionPerformedButton(btn, button);
-          }
-        }
+    // Button events for (a) non-left-clicks and (b) for buttons that don't want their click to be propagated to the rest of the gui
+    for (GuiButton guibutton : buttonList) {
+      if (doHandleButtonClick(x, y, button, guibutton)) {
+        return;
       }
     }
-    super.mouseClicked(x, y, button);
+    List<GuiButton> temp = buttonList; // we don't want the buttons to be tested twice, that'd be a waste
+    try {
+      buttonList = Collections.emptyList();
+      super.mouseClicked(x, y, button);
+    } finally {
+      buttonList = temp;
+    }
+  }
+
+  private boolean doHandleButtonClick(int x, int y, int button, GuiButton guibutton) throws IOException {
+    if (guibutton instanceof IButtonAwareButton ? ((IButtonAwareButton) guibutton).mousePressedButton(mc, x, y, button) : guibutton.mousePressed(mc, x, y)) {
+      GuiScreenEvent.ActionPerformedEvent.Pre event = new GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, buttonList);
+      if (!MinecraftForge.EVENT_BUS.post(event)) {
+        guibutton = event.getButton();
+        selectedButton = guibutton;
+        guibutton.playPressSound(mc.getSoundHandler());
+        actionPerformed(guibutton);
+        if (this.equals(mc.currentScreen)) {
+          MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.ActionPerformedEvent.Post(this, event.getButton(), buttonList));
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

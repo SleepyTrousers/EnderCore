@@ -11,9 +11,9 @@ import com.enderio.core.common.util.DyeColor;
 import com.enderio.core.common.vecmath.Vector3f;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemDye;
 import net.minecraft.util.math.MathHelper;
@@ -29,21 +29,17 @@ public class ColorButton extends IconButton {
   }
 
   @Override
-  public boolean mousePressed(@Nonnull Minecraft par1Minecraft, int par2, int par3) {
-    boolean result = super.mousePressed(par1Minecraft, par2, par3);
-    if (result) {
-      nextColor();
-    }
-    return result;
-  }
-
-  @Override
   public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
-    boolean result = button == 1 && super.checkMousePress(mc, mouseX, mouseY);
-    if (result) {
-      prevColor();
+    if (super.checkMousePress(mc, mouseX, mouseY)) {
+      if (button == 0) {
+        nextColor();
+        return true;
+      } else if (button == 1) {
+        prevColor();
+        return true;
+      }
     }
-    return result;
+    return false;
   }
 
   public @Nonnull String getTooltipPrefix() {

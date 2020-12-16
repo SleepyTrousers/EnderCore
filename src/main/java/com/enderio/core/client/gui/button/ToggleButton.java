@@ -60,9 +60,12 @@ public class ToggleButton extends IconButton {
   }
 
   @Override
-  public boolean mousePressed(@Nonnull Minecraft par1Minecraft, int par2, int par3) {
-    if (super.mousePressed(par1Minecraft, par2, par3)) {
-      return toggleSelected();
+  public boolean mousePressedButton(@Nonnull Minecraft mc, int mouseX, int mouseY, int button) {
+    if (super.checkMousePress(mc, mouseX, mouseY)) {
+      if (button == 0) {
+        toggleSelected();
+        return true;
+      }
     }
     return false;
   }
