@@ -46,7 +46,7 @@ public class EnderFluidBlock extends FlowingFluidBlock {
   }
 
   @Override public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-    // Pass event through.
+    // Pass event through. Makes custom behaviour more simple to implement.
     ((EnderFlowingFluid) getFluid()).onEntityCollision(state, worldIn, pos, entityIn);
     super.onEntityCollision(state, worldIn, pos, entityIn);
   }

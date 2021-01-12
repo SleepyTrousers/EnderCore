@@ -1,14 +1,13 @@
 package com.enderio.core.common.fluid;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CapabilityFluidWrapper implements IFluidWrapper {
 
@@ -38,5 +37,15 @@ public class CapabilityFluidWrapper implements IFluidWrapper {
   @Nullable
   public FluidStack getAvailableFluid() {
     return fluidHandler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.SIMULATE);
+  }
+
+  @Override
+  public List<Tuple<FluidStack, Integer>> getFluidInTanks() {
+    List<Tuple<FluidStack, Integer>> result = new ArrayList<>();
+    for (int i = 0; i < fluidHandler.getTanks(); i++) {
+      result.add(new Tuple<>(fluidHandler.getFluidInTank(i), fluidHandler.getTankCapacity(i)));
+
+    }
+    return result;
   }
 }

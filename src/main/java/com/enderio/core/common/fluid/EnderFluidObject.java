@@ -14,13 +14,13 @@ import javax.annotation.Nonnull;
  * @param <StillFlowingFluid> The still flowing fluid class.
  * @param <FlowingFluid> The flowing fluid class.
  */
-public class EnderFluid<FluidBlock extends EnderFluidBlock, Bucket extends BucketItem, StillFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> {
+public class EnderFluidObject<FluidBlock extends EnderFluidBlock, Bucket extends BucketItem, StillFlowingFluid extends EnderFlowingFluid, FlowingFluid extends EnderFlowingFluid> {
   @Nonnull private final RegistryObject<FluidBlock> block;
   @Nonnull private final RegistryObject<Bucket> bucket;
   @Nonnull private final RegistryObject<StillFlowingFluid> still;
   @Nonnull private final RegistryObject<FlowingFluid> flowing;
 
-  public EnderFluid(RegistryObject<FluidBlock> block, RegistryObject<Bucket> bucket, RegistryObject<StillFlowingFluid> still, RegistryObject<FlowingFluid> flowing) {
+  public EnderFluidObject(RegistryObject<FluidBlock> block, RegistryObject<Bucket> bucket, RegistryObject<StillFlowingFluid> still, RegistryObject<FlowingFluid> flowing) {
     this.block = block;
     this.bucket = bucket;
     this.still = still;

@@ -39,7 +39,7 @@ public interface ITankAccess {
     public static enum EnumTankType {
       STORAGE,
       INPUT,
-      OUTPUT;
+      OUTPUT
     }
 
     @Nonnull

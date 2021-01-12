@@ -72,7 +72,7 @@ public class FluidWrapper {
     Map<Direction, IFluidWrapper> res = new EnumMap<Direction, IFluidWrapper>(Direction.class);
     for (Direction dir : Direction.values()) {
       if (dir == null) {
-        throw new NullPointerException("EnumFacing.values() contains null values???");
+        throw new NullPointerException("Direction.values() contains null values???");
       }
       IFluidWrapper wrapper = wrap(world, pos.offset(dir), dir.getOpposite());
       if (wrapper != null) {

@@ -50,6 +50,8 @@ public class FluidUtil {
   // }
   // }
 
+  // TODO: Add canFill and canDrain helpers?
+
   public static @Nonnull Capability<IFluidHandler> getFluidCapability() {
     return NullHelper.notnullF(FLUID_HANDLER, "IFluidHandler capability is missing");
   }
