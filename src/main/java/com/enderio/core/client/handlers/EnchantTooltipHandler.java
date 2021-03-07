@@ -6,6 +6,7 @@ import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.Handlers.Handler;
 
+import com.enderio.core.common.config.ConfigHandler;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -17,6 +18,10 @@ public class EnchantTooltipHandler {
 
   @SubscribeEvent
   public static void handleTooltip(ItemTooltipEvent event) {
+    if (!ConfigHandler.showEnchantmentTooltips) {
+      return;
+    }
+
     if (event.getItemStack().hasTagCompound()) {
       Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(event.getItemStack());
 
