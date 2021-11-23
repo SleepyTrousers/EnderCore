@@ -48,7 +48,7 @@ public class EnderCore implements IEnderMod {
   public static final String MODID = "endercore";
   public static final String NAME = "EnderCore";
   public static final String BASE_PACKAGE = "com.enderio";
-  public static final String VERSION = "@VERSION@";
+  public static final String VERSION = "GRADLETOKEN_VERSION";
 
   public static final Logger logger = LogManager.getLogger(NAME);
   public static final Lang lang = new Lang(MODID);

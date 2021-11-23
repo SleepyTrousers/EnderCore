@@ -1,10 +1,10 @@
 [
 {
-  "modid": "endercore",
-  "name": "EnderCore",
+  "modid": "${modId}",
+  "name": "${modName}",
   "description": "Library mod used by EnderIO, EnderZoo, and others",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${modVersion}",
+  "mcversion": "${minecraftVersion}",
   "url": "http://enderio.com",
   "updateUrl": "http://ci.tterrag.com/job/EnderCore",
   "authorList": ["tterrag", "CrazyPants"],

@@ -1,0 +1,6 @@
+// Add your dependencies here
+
+dependencies {
+    compile("com.github.GTNewHorizons:NotEnoughItems:master-SNAPSHOT:dev")
+    compileOnly("curse.maven:cofh-core-69162:2388751")
+}
