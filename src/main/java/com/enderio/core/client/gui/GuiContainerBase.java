@@ -230,6 +230,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
       GhostSlot slot = getGhostSlot(x, y);
       if (slot != null) {
         ghostSlotClicked(slot, x, y, button);
+        super.mouseClicked(x, y, button);
         return;
       }
     }
@@ -621,7 +622,13 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   @Optional.Method(modid = "NotEnoughItems")
-  public boolean handleDragNDrop(GuiContainer gc, int i, int i1, ItemStack is, int i2) {
+  public boolean handleDragNDrop(GuiContainer gc, int x, int y, ItemStack is, int button)
+  {
+    if (gc instanceof GuiContainerBase && button == 0) {
+        GhostSlot slot = getGhostSlot(x,y);
+        if (slot != null)
+            ghostSlotHandler.ghostSlotClickedPrimaryMouseButton(slot, is, slot.getStack());
+    }
     return false;
   }
 
