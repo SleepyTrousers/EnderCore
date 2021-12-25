@@ -91,6 +91,7 @@ public class EnderCoreTransformer implements IClassTransformer {
           while (methods.hasNext()) {
             MethodNode m = methods.next();
             if (voidFogMethod.equals(m.name)) {
+              m.localVariables.clear();
               m.instructions.clear();
 
               m.instructions.add(new VarInsnNode(ALOAD, 0));
