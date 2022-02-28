@@ -42,6 +42,8 @@ public class AutoSmeltHandler {
               if (!smeltingResult.isEmpty()) {
                 @Nonnull
                 ItemStack furnaceStack = smeltingResult.copy();
+                
+                furnaceStack.setCount(stack.getCount() * furnaceStack.getCount());
 
                 event.getDrops().set(i, furnaceStack);
 
