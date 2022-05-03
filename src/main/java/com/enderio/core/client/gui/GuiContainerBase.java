@@ -19,6 +19,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerObjectHandler;
 import codechicken.nei.VisiblityData;
 import codechicken.nei.api.INEIGuiHandler;
 import codechicken.nei.api.TaggedInventoryArea;
@@ -34,10 +36,11 @@ import com.enderio.core.client.gui.widget.VScrollbar;
 import com.enderio.core.client.render.RenderUtil;
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 
-@Optional.InterfaceList({ @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems") })
-public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen, INEIGuiHandler {
+@Optional.InterfaceList({ @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems"), @Optional.Interface(iface = "codechicken.nei.api.guihook.IContainerObjectHandler", modid = "NotEnoughItems") })
+public abstract class GuiContainerBase extends GuiContainer implements ToolTipRenderer, IGuiScreen, INEIGuiHandler, IContainerObjectHandler {
 
   protected ToolTipManager ttMan = new ToolTipManager();
   protected List<IGuiOverlay> overlays = Lists.newArrayList();
@@ -52,6 +55,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   protected VScrollbar draggingScrollbar;
 
+  protected boolean registeredNEIHandler;
+
   protected GuiContainerBase(Container par1Container) {
     super(par1Container);
   }
@@ -65,6 +70,11 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     }
     for (TextFieldEnder f : textFields) {
       f.init(this);
+    }
+
+    if (Loader.isModLoaded("NotEnoughItems") && !registeredNEIHandler) {
+      GuiContainerManager.addObjectHandler(this);
+      registeredNEIHandler = true;
     }
   }
 
@@ -602,6 +612,10 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     actionPerformed(guiButton);
   }
 
+  // === NEI methods ===
+
+  // INEIGuiHandler
+
   @Override
   @Optional.Method(modid = "NotEnoughItems")
   public VisiblityData modifyVisiblity(GuiContainer gc, VisiblityData vd) {
@@ -625,9 +639,12 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   public boolean handleDragNDrop(GuiContainer gc, int x, int y, ItemStack is, int button)
   {
     if (gc instanceof GuiContainerBase && button == 0) {
-        GhostSlot slot = getGhostSlot(x,y);
-        if (slot != null)
-            ghostSlotHandler.ghostSlotClickedPrimaryMouseButton(slot, is, slot.getStack());
+      GhostSlot slot = getGhostSlot(x,y);
+      if (slot != null) {
+        ghostSlotHandler.ghostSlotClickedPrimaryMouseButton(slot, is, slot.getStack());
+        is.stackSize = 0;
+        return true;
+      }
     }
     return false;
   }
@@ -636,5 +653,43 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   @Optional.Method(modid = "NotEnoughItems")
   public boolean hideItemPanelSlot(GuiContainer gc, int x, int y, int w, int h) {
     return false;
+  }
+
+  // IContainerObjectHandler
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public void guiTick(GuiContainer guiContainer) {}
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public void refresh(GuiContainer guiContainer) {}
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public void load(GuiContainer guiContainer) {}
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public ItemStack getStackUnderMouse(GuiContainer guiContainer, int mouseX, int mouseY) {
+    if (guiContainer instanceof GuiContainerBase) {
+      GhostSlot slot = getGhostSlot(mouseX, mouseY);
+      if (slot != null) {
+        return slot.getStack();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public boolean objectUnderMouse(GuiContainer guiContainer, int mouseX, int mouseY) {
+    return false;
+  }
+
+  @Override
+  @Optional.Method(modid = "NotEnoughItems")
+  public boolean shouldShowTooltip(GuiContainer guiContainer) {
+    return true;
   }
 }
