@@ -55,7 +55,8 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   protected VScrollbar draggingScrollbar;
 
-  protected boolean registeredNEIHandler;
+  protected static boolean registeredNEIHandler;
+  protected final boolean isNEILoaded = Loader.isModLoaded("NotEnoughItems");
 
   protected GuiContainerBase(Container par1Container) {
     super(par1Container);
@@ -72,7 +73,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
       f.init(this);
     }
 
-    if (Loader.isModLoaded("NotEnoughItems") && !registeredNEIHandler) {
+    if (isNEILoaded && !registeredNEIHandler) {
       GuiContainerManager.addObjectHandler(this);
       registeredNEIHandler = true;
     }
@@ -427,7 +428,9 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   public void renderToolTip(ItemStack p_146285_1_, int p_146285_2_, int p_146285_3_) {
-    super.renderToolTip(p_146285_1_, p_146285_2_, p_146285_3_);
+    if (!isNEILoaded) {
+      super.renderToolTip(p_146285_1_, p_146285_2_, p_146285_3_);
+    }
   }
 
   @Deprecated
@@ -612,6 +615,14 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     actionPerformed(guiButton);
   }
 
+  public ItemStack getHoveredStack(int mouseX, int mouseY) {
+    GhostSlot slot = getGhostSlot(mouseX, mouseY);
+    if (slot != null) {
+      return slot.getStack();
+    }
+    return null;
+  }
+
   // === NEI methods ===
 
   // INEIGuiHandler
@@ -673,10 +684,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   @Optional.Method(modid = "NotEnoughItems")
   public ItemStack getStackUnderMouse(GuiContainer guiContainer, int mouseX, int mouseY) {
     if (guiContainer instanceof GuiContainerBase) {
-      GhostSlot slot = getGhostSlot(mouseX, mouseY);
-      if (slot != null) {
-        return slot.getStack();
-      }
+      return ((GuiContainerBase) guiContainer).getHoveredStack(mouseX, mouseY);
     }
     return null;
   }
