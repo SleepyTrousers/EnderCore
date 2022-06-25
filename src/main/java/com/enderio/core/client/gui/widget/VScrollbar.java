@@ -2,6 +2,7 @@ package com.enderio.core.client.gui.widget;
 
 import java.awt.Rectangle;
 
+import com.enderio.core.api.client.gui.IHideable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 
@@ -12,7 +13,7 @@ import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.client.render.EnderWidget;
 import com.enderio.core.client.render.RenderUtil;
 
-public class VScrollbar {
+public class VScrollbar implements IHideable {
 
   protected final IGuiScreen gui;
 
@@ -35,6 +36,8 @@ public class VScrollbar {
   protected boolean pressedThumb;
   protected int scrollDir;
   protected long timeNextScroll;
+
+  protected boolean visible = true;
 
   public VScrollbar(IGuiScreen gui, int xOrigin, int yOrigin, int height) {
     this.gui = gui;
@@ -76,58 +79,60 @@ public class VScrollbar {
   }
 
   public void drawScrollbar(int mouseX, int mouseY) {
-    boolean hoverUp = btnUp.contains(mouseX, mouseY);
-    boolean hoverDown = btnDown.contains(mouseX, mouseY);
+    if (visible) {
+      boolean hoverUp = btnUp.contains(mouseX, mouseY);
+      boolean hoverDown = btnDown.contains(mouseX, mouseY);
 
-    IWidgetIcon iconUp;
-    if (pressedUp) {
-      iconUp = hoverUp ? EnderWidget.UP_ARROW_HOVER_ON : EnderWidget.UP_ARROW_ON;
-    } else {
-      iconUp = hoverUp ? EnderWidget.UP_ARROW_HOVER_OFF : EnderWidget.UP_ARROW_OFF;
-    }
-
-    IWidgetIcon iconDown;
-    if (pressedDown) {
-      iconDown = hoverDown ? EnderWidget.DOWN_ARROW_HOVER_ON : EnderWidget.DOWN_ARROW_ON;
-    } else {
-      iconDown = hoverDown ? EnderWidget.DOWN_ARROW_HOVER_OFF : EnderWidget.DOWN_ARROW_OFF;
-    }
-
-    if (scrollDir != 0) {
-      long time = Minecraft.getSystemTime();
-      if ((timeNextScroll - time) <= 0) {
-        timeNextScroll = time + 100;
-        scrollBy(scrollDir);
-      }
-    }
-
-    RenderUtil.bindTexture(EnderWidget.TEXTURE);
-    GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
-    GL11.glEnable(GL11.GL_BLEND);
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-    GL11.glColor3f(1, 1, 1);
-
-    Tessellator tes = Tessellator.instance;
-    tes.startDrawingQuads();
-
-    iconUp.getMap().render(iconUp, btnUp.x, btnUp.y, false);
-    iconDown.getMap().render(iconDown, btnDown.x, btnDown.y, false);
-
-    if (scrollMax > 0) {
-      int thumbPos = getThumbPosition();
-      boolean hoverThumb = thumbArea.contains(mouseX, mouseY) && mouseY >= thumbPos && mouseY < thumbPos + (int) EnderWidget.VSCROLL_THUMB_OFF.height;
-
-      EnderWidget iconThumb;
-      if (pressedThumb) {
-        iconThumb = EnderWidget.VSCROLL_THUMB_HOVER_ON;
+      IWidgetIcon iconUp;
+      if (pressedUp) {
+        iconUp = hoverUp ? EnderWidget.UP_ARROW_HOVER_ON : EnderWidget.UP_ARROW_ON;
       } else {
-        iconThumb = hoverThumb ? EnderWidget.VSCROLL_THUMB_HOVER_OFF : EnderWidget.VSCROLL_THUMB_OFF;
+        iconUp = hoverUp ? EnderWidget.UP_ARROW_HOVER_OFF : EnderWidget.UP_ARROW_OFF;
       }
-      iconThumb.getMap().render(iconThumb, thumbArea.x, thumbPos, false);
-    }
 
-    tes.draw();
-    GL11.glPopAttrib();
+      IWidgetIcon iconDown;
+      if (pressedDown) {
+        iconDown = hoverDown ? EnderWidget.DOWN_ARROW_HOVER_ON : EnderWidget.DOWN_ARROW_ON;
+      } else {
+        iconDown = hoverDown ? EnderWidget.DOWN_ARROW_HOVER_OFF : EnderWidget.DOWN_ARROW_OFF;
+      }
+
+      if (scrollDir != 0) {
+        long time = Minecraft.getSystemTime();
+        if ((timeNextScroll - time) <= 0) {
+          timeNextScroll = time + 100;
+          scrollBy(scrollDir);
+        }
+      }
+
+      RenderUtil.bindTexture(EnderWidget.TEXTURE);
+      GL11.glPushAttrib(GL11.GL_ENABLE_BIT);
+      GL11.glEnable(GL11.GL_BLEND);
+      GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+      GL11.glColor3f(1, 1, 1);
+
+      Tessellator tes = Tessellator.instance;
+      tes.startDrawingQuads();
+
+      iconUp.getMap().render(iconUp, btnUp.x, btnUp.y, false);
+      iconDown.getMap().render(iconDown, btnDown.x, btnDown.y, false);
+
+      if (scrollMax > 0) {
+        int thumbPos = getThumbPosition();
+        boolean hoverThumb = thumbArea.contains(mouseX, mouseY) && mouseY >= thumbPos && mouseY < thumbPos + (int) EnderWidget.VSCROLL_THUMB_OFF.height;
+
+        EnderWidget iconThumb;
+        if (pressedThumb) {
+          iconThumb = EnderWidget.VSCROLL_THUMB_HOVER_ON;
+        } else {
+          iconThumb = hoverThumb ? EnderWidget.VSCROLL_THUMB_HOVER_OFF : EnderWidget.VSCROLL_THUMB_OFF;
+        }
+        iconThumb.getMap().render(iconThumb, thumbArea.x, thumbPos, false);
+      }
+
+      tes.draw();
+      GL11.glPopAttrib();
+    }
   }
 
   public boolean mouseClicked(int x, int y, int button) {
@@ -187,5 +192,15 @@ public class VScrollbar {
 
   protected int limitPos(int pos) {
     return Math.max(0, Math.min(pos, scrollMax));
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    this.visible = visible;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return this.visible;
   }
 }

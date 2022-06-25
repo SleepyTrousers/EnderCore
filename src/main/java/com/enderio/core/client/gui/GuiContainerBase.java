@@ -46,6 +46,7 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
   protected List<IGuiOverlay> overlays = Lists.newArrayList();
   protected List<TextFieldEnder> textFields = Lists.newArrayList();
   protected List<VScrollbar> scrollbars = Lists.newArrayList();
+  protected List<IDrawingElement> drawingElements = Lists.newArrayList();
   protected GhostSlotHandler ghostSlotHandler = new GhostSlotHandler();
 
   @Deprecated
@@ -324,6 +325,22 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
     }
   }
 
+  public void addDrawingElement(IDrawingElement element) {
+    drawingElements.add(element);
+    GuiToolTip tooltip = element.getTooltip();
+    if (tooltip != null) {
+      addToolTip(tooltip);
+    }
+  }
+
+  public void removeDrawingElement(IDrawingElement element) {
+    drawingElements.remove(element);
+    GuiToolTip tooltip = element.getTooltip();
+    if (tooltip != null) {
+      removeToolTip(tooltip);
+    }
+  }
+
   private int realMx, realMy;
 
   @Override
@@ -348,6 +365,9 @@ public abstract class GuiContainerBase extends GuiContainer implements ToolTipRe
 
   @Override
   protected void drawGuiContainerBackgroundLayer(float par1, int mouseX, int mouseY) {
+    for (IDrawingElement drawingElement : drawingElements) {
+      drawingElement.drawGuiContainerBackgroundLayer(par1, mouseX, mouseY);
+    }
     for (GuiTextField f : textFields) {
       f.drawTextBox();
     }

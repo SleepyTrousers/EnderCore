@@ -2,6 +2,7 @@ package com.enderio.core.client.gui.widget;
 
 import java.lang.reflect.Field;
 
+import com.enderio.core.api.client.gui.IHideable;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiTextField;
 
@@ -10,7 +11,7 @@ import com.google.common.base.Strings;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
-public class TextFieldEnder extends GuiTextField {
+public class TextFieldEnder extends GuiTextField implements IHideable {
 
   public interface ICharFilter {
 
@@ -97,5 +98,10 @@ public class TextFieldEnder extends GuiTextField {
 
   public boolean contains(int x, int y) {
     return x >= this.xPosition && x < this.xPosition + this.width && y >= this.yPosition && y < this.yPosition + this.height;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return super.getVisible();
   }
 }

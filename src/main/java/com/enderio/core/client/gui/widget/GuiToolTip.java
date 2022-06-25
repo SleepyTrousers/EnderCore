@@ -1,10 +1,12 @@
 package com.enderio.core.client.gui.widget;
 
+import com.enderio.core.api.client.gui.IHideable;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiToolTip {
+public class GuiToolTip implements IHideable {
 
   private static final long DELAY = 0;
 
