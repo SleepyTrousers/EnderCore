@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import codechicken.nei.recipe.StackInfo;
 import com.enderio.core.api.common.util.IFluidReceptor;
 import com.enderio.core.api.common.util.ITankAccess;
 
@@ -89,6 +90,9 @@ public class FluidUtil {
         if (fluid != null) {
           return new FluidStack(fluid, 1000);
         }
+      }
+      if (fluidStack == null && Loader.isModLoaded("NotEnoughItems")) {
+        fluidStack = StackInfo.getFluid(stack);
       }
       return fluidStack;
     }
