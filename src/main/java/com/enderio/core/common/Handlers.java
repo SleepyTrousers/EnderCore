@@ -4,9 +4,7 @@ import static com.enderio.core.common.Handlers.Handler.Inst.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -84,8 +82,9 @@ public class Handlers {
      * <p>
      * This can also be explicitly set using {@link #getInstFrom()} to avoid invoking code that may cause issues.
      */
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
+    // Explicit names to work around https://bugs.openjdk.org/browse/JDK-8185328
+    @java.lang.annotation.Target(ElementType.TYPE)
+    @java.lang.annotation.Retention(RetentionPolicy.RUNTIME)
     public @interface Handler {
 
         @Deprecated
