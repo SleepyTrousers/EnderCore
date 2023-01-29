@@ -9,47 +9,49 @@ import cpw.mods.fml.common.event.FMLInterModComms.IMCEvent;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 
 public class IMCRegistry {
-  public interface IIMC {
-    String getKey();
 
-    void act(IMCMessage msg);
-  }
+    public interface IIMC {
 
-  public static abstract class IMCBase implements IIMC {
-    private String key;
+        String getKey();
 
-    public IMCBase(String key) {
-      this.key = key;
+        void act(IMCMessage msg);
     }
 
-    @Override
-    public String getKey() {
-      return key;
-    }
-  }
+    public static abstract class IMCBase implements IIMC {
 
-  public static final IMCRegistry INSTANCE = new IMCRegistry();
+        private String key;
 
-  private List<IIMC> handlers = Lists.newArrayList();
-
-  private IMCRegistry() {
-  }
-
-  public void addIMCHandler(IIMC handler) {
-    handlers.add(handler);
-  }
-
-  public void handleEvent(IMCEvent event) {
-    for (IIMC handler : handlers) {
-      for (IMCMessage msg : event.getMessages()) {
-        if (msg.key.equals(handler.getKey())) {
-          handler.act(msg);
+        public IMCBase(String key) {
+            this.key = key;
         }
-      }
-    }
-  }
 
-  public void init() {
-    addIMCHandler(new IMCRightClickCrop());
-  }
+        @Override
+        public String getKey() {
+            return key;
+        }
+    }
+
+    public static final IMCRegistry INSTANCE = new IMCRegistry();
+
+    private List<IIMC> handlers = Lists.newArrayList();
+
+    private IMCRegistry() {}
+
+    public void addIMCHandler(IIMC handler) {
+        handlers.add(handler);
+    }
+
+    public void handleEvent(IMCEvent event) {
+        for (IIMC handler : handlers) {
+            for (IMCMessage msg : event.getMessages()) {
+                if (msg.key.equals(handler.getKey())) {
+                    handler.act(msg);
+                }
+            }
+        }
+    }
+
+    public void init() {
+        addIMCHandler(new IMCRightClickCrop());
+    }
 }

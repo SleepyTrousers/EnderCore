@@ -4,16 +4,16 @@ import javax.annotation.Nullable;
 
 public interface IWidgetIcon {
 
-  int getX();
+    int getX();
 
-  int getY();
+    int getY();
 
-  int getWidth();
+    int getWidth();
 
-  int getHeight();
+    int getHeight();
 
-  @Nullable
-  IWidgetIcon getOverlay();
+    @Nullable
+    IWidgetIcon getOverlay();
 
-  IWidgetMap getMap();
+    IWidgetMap getMap();
 }

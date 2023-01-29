@@ -8,27 +8,27 @@ import java.util.zip.DeflaterOutputStream;
 
 public class CompressedDataOutput extends DataOutputStream {
 
-  final ByteArrayOutputStream baos;
+    final ByteArrayOutputStream baos;
 
-  public CompressedDataOutput() {
-    this(new ByteArrayOutputStream());
-  }
-
-  private CompressedDataOutput(ByteArrayOutputStream baos) {
-    super(new BufferedOutputStream(new DeflaterOutputStream(baos)));
-    this.baos = baos;
-  }
-
-  public void writeVariable(int value) throws IOException {
-    while ((value & ~0x7F) != 0) {
-      writeByte(value | 0x80);
-      value >>= 7;
+    public CompressedDataOutput() {
+        this(new ByteArrayOutputStream());
     }
-    writeByte(value);
-  }
 
-  public byte[] getCompressed() throws IOException {
-    close();
-    return baos.toByteArray();
-  }
+    private CompressedDataOutput(ByteArrayOutputStream baos) {
+        super(new BufferedOutputStream(new DeflaterOutputStream(baos)));
+        this.baos = baos;
+    }
+
+    public void writeVariable(int value) throws IOException {
+        while ((value & ~0x7F) != 0) {
+            writeByte(value | 0x80);
+            value >>= 7;
+        }
+        writeByte(value);
+    }
+
+    public byte[] getCompressed() throws IOException {
+        close();
+        return baos.toByteArray();
+    }
 }

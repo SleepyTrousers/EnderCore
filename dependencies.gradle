@@ -2,6 +2,6 @@
 
 dependencies {
     compile("com.github.GTNewHorizons:NotEnoughItems:2.2.15-GTNH:dev")
-    runtime("com.github.GTNewHorizons:CodeChickenLib:1.1.5.4:dev")
+    runtimeOnly("com.github.GTNewHorizons:CodeChickenLib:1.1.5.4:dev")
     compileOnly("curse.maven:cofh-core-69162:2388751")
 }

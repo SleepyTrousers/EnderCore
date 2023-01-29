@@ -5,19 +5,20 @@ import java.util.Iterator;
 import com.enderio.core.common.util.BlockCoord;
 
 public abstract class AbstractBlockIterator implements Iterable<BlockCoord>, Iterator<BlockCoord> {
-  protected BlockCoord base;
 
-  protected AbstractBlockIterator(BlockCoord base) {
-    this.base = base;
-  }
+    protected BlockCoord base;
 
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException("You can't remove blocks silly!");
-  }
+    protected AbstractBlockIterator(BlockCoord base) {
+        this.base = base;
+    }
 
-  @Override
-  public Iterator<BlockCoord> iterator() {
-    return this;
-  }
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("You can't remove blocks silly!");
+    }
+
+    @Override
+    public Iterator<BlockCoord> iterator() {
+        return this;
+    }
 }

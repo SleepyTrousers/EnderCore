@@ -8,22 +8,22 @@ import com.enderio.core.common.util.Scheduler;
 
 public class ClientProxy extends CommonProxy {
 
-  @Override
-  public Scheduler getScheduler() {
-    if (scheduler == null) {
-      scheduler = new Scheduler(false);
+    @Override
+    public Scheduler getScheduler() {
+        if (scheduler == null) {
+            scheduler = new Scheduler(false);
+        }
+        return scheduler;
     }
-    return scheduler;
-  }
 
-  @Override
-  public World getClientWorld() {
-    return Minecraft.getMinecraft().theWorld;
-  }
+    @Override
+    public World getClientWorld() {
+        return Minecraft.getMinecraft().theWorld;
+    }
 
-  @Override
-  public void throwModCompatibilityError(String... msgs) {
-    throw new EnderCoreModConflictException(msgs);
-  }
+    @Override
+    public void throwModCompatibilityError(String... msgs) {
+        throw new EnderCoreModConflictException(msgs);
+    }
 
 }

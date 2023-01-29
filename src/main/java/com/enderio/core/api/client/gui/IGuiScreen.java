@@ -2,33 +2,33 @@ package com.enderio.core.api.client.gui;
 
 import java.util.List;
 
+import net.minecraft.client.gui.GuiButton;
+
 import com.enderio.core.client.gui.widget.GhostSlot;
 import com.enderio.core.client.gui.widget.GuiToolTip;
 
-import net.minecraft.client.gui.GuiButton;
-
 public interface IGuiScreen {
 
-  void addToolTip(GuiToolTip toolTip);
+    void addToolTip(GuiToolTip toolTip);
 
-  boolean removeToolTip(GuiToolTip toolTip);
+    boolean removeToolTip(GuiToolTip toolTip);
 
-  int getGuiLeft();
+    int getGuiLeft();
 
-  int getGuiTop();
+    int getGuiTop();
 
-  int getXSize();
+    int getXSize();
 
-  int getYSize();
+    int getYSize();
 
-  void addButton(GuiButton button);
+    void addButton(GuiButton button);
 
-  void removeButton(GuiButton button);
+    void removeButton(GuiButton button);
 
-  int getOverlayOffsetX();
+    int getOverlayOffsetX();
 
-  void doActionPerformed(GuiButton but);
+    void doActionPerformed(GuiButton but);
 
-  List<GhostSlot> getGhostSlots();
+    List<GhostSlot> getGhostSlots();
 
 }

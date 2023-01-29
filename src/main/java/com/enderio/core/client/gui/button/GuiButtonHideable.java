@@ -2,10 +2,10 @@ package com.enderio.core.client.gui.button;
 
 import javax.annotation.Nonnull;
 
-import com.enderio.core.api.client.gui.IHideable;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+
+import com.enderio.core.api.client.gui.IHideable;
 
 public class GuiButtonHideable extends GuiButton implements IHideable {
 

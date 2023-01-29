@@ -5,10 +5,10 @@ import java.awt.Rectangle;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.minecraft.client.Minecraft;
+
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.widget.GuiToolTip;
-
-import net.minecraft.client.Minecraft;
 
 public class TooltipButton extends GuiButtonHideable {
 
@@ -18,7 +18,8 @@ public class TooltipButton extends GuiButtonHideable {
     protected @Nullable String[] toolTipText;
     protected @Nullable GuiToolTip toolTip;
 
-    public TooltipButton(@Nonnull IGuiScreen gui, int id, int x, int y, int widthIn, int heightIn, @Nonnull String buttonText) {
+    public TooltipButton(@Nonnull IGuiScreen gui, int id, int x, int y, int widthIn, int heightIn,
+            @Nonnull String buttonText) {
         super(id, x, y, widthIn, heightIn, buttonText);
         this.gui = gui;
         this.xOrigin = x;
