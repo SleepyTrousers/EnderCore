@@ -18,8 +18,6 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
-import org.lwjgl.input.Keyboard;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.client.gui.IAdvancedTooltipProvider;
 import com.enderio.core.api.client.gui.IResourceTooltipProvider;
@@ -152,7 +150,7 @@ public enum SpecialTooltipHandler {
     }
 
     public static boolean showAdvancedTooltips() {
-        return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+        return ClientHandler.isShiftDown();
     }
 
     public static void addDetailedTooltipFromResources(List list, String unlocalizedName) {
