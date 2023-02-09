@@ -46,7 +46,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
         modid = EnderCore.MODID,
         name = EnderCore.NAME,
         version = EnderCore.VERSION,
-        dependencies = "after:ttCore",
+        dependencies = "after:ttCore; after:gtnhlib@[0.0.10,)",
         guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
 

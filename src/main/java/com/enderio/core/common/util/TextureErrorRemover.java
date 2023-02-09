@@ -1,8 +1,6 @@
 package com.enderio.core.common.util;
 
 import java.io.FileNotFoundException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 import net.minecraft.client.renderer.texture.TextureMap;
 
@@ -14,7 +12,8 @@ import org.apache.logging.log4j.message.Message;
 
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import com.gtnewhorizon.gtnhlib.reflect.Fields;
+import cpw.mods.fml.common.Loader;
 
 public class TextureErrorRemover extends Logger {
 
@@ -51,15 +50,17 @@ public class TextureErrorRemover extends Logger {
     }
 
     public static void beginIntercepting() {
+        if (!Loader.isModLoaded("gtnhlib")) return;
         EnderCore.logger.info("Attempting to initialize texture error message interceptor.");
         try {
-            Field f = ReflectionHelper.findField(TextureMap.class, "logger", "field_147635_d", "d");
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-            f.setAccessible(true);
-            INSTANCE = new TextureErrorRemover((Logger) f.get(null));
-            f.set(null, INSTANCE);
+            Fields.ClassFields<TextureMap>.Field<org.apache.logging.log4j.Logger> f = Fields.ofClass(TextureMap.class)
+                    .getField(Fields.LookupType.DECLARED, "logger", org.apache.logging.log4j.Logger.class);
+            if (f == null) {
+                f = Fields.ofClass(TextureMap.class)
+                        .getField(Fields.LookupType.DECLARED, "field_147635_d", org.apache.logging.log4j.Logger.class);
+            }
+            INSTANCE = new TextureErrorRemover((Logger) f.getValue(null));
+            f.setValue(null, INSTANCE);
         } catch (Exception e) {
             EnderCore.logger.error("Failed to initialize texture error interceptor!", e);
         }
