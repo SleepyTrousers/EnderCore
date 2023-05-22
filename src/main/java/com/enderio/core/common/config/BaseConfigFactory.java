@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 import com.enderio.core.client.config.BaseConfigGui;
+
 import cpw.mods.fml.client.IModGuiFactory;
 
 public class BaseConfigFactory implements IModGuiFactory {

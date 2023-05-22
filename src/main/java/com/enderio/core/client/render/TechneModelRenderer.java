@@ -10,6 +10,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.model.obj.GroupObject;
 
 import com.enderio.core.api.client.render.VertexTransform;
+
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class TechneModelRenderer implements ISimpleBlockRenderingHandler {

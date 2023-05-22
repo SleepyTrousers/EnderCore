@@ -4,6 +4,7 @@ import com.enderio.core.api.common.imc.IMC;
 import com.enderio.core.common.handlers.RightClickCropHandler;
 import com.enderio.core.common.handlers.RightClickCropHandler.PlantInfo;
 import com.enderio.core.common.imc.IMCRegistry.IMCBase;
+
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 
 public class IMCRightClickCrop extends IMCBase {

@@ -22,10 +22,10 @@ import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 
-import codechicken.nei.recipe.StackInfo;
-
 import com.enderio.core.api.common.util.IFluidReceptor;
 import com.enderio.core.api.common.util.ITankAccess;
+
+import codechicken.nei.recipe.StackInfo;
 import cpw.mods.fml.common.Loader;
 
 public class FluidUtil {

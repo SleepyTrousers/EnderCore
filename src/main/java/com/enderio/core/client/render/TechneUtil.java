@@ -50,6 +50,7 @@ import org.lwjgl.util.vector.Vector4f;
 import com.enderio.core.api.client.render.VertexTransform;
 import com.enderio.core.common.vecmath.Vector3d;
 import com.google.common.collect.Maps;
+
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 /**

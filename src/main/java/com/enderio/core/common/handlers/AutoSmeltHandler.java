@@ -13,6 +13,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.config.ConfigHandler;
 import com.enderio.core.common.enchant.EnchantAutoSmelt;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Handler

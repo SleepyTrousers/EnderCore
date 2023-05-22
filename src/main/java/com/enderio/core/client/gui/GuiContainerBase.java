@@ -19,12 +19,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import codechicken.nei.VisiblityData;
-import codechicken.nei.api.INEIGuiHandler;
-import codechicken.nei.api.TaggedInventoryArea;
-import codechicken.nei.guihook.GuiContainerManager;
-import codechicken.nei.guihook.IContainerObjectHandler;
-
 import com.enderio.core.api.client.gui.IGuiOverlay;
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.client.gui.ToolTipManager.ToolTipRenderer;
@@ -36,6 +30,11 @@ import com.enderio.core.client.gui.widget.VScrollbar;
 import com.enderio.core.client.render.RenderUtil;
 import com.google.common.collect.Lists;
 
+import codechicken.nei.VisiblityData;
+import codechicken.nei.api.INEIGuiHandler;
+import codechicken.nei.api.TaggedInventoryArea;
+import codechicken.nei.guihook.GuiContainerManager;
+import codechicken.nei.guihook.IContainerObjectHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 

@@ -22,10 +22,10 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import cofh.api.transport.IItemDuct;
-
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.util.IItemReceptor;
+
+import cofh.api.transport.IItemDuct;
 import cpw.mods.fml.common.Loader;
 
 public class ItemUtil {

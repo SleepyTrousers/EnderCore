@@ -13,6 +13,7 @@ import org.apache.logging.log4j.message.Message;
 import com.enderio.core.EnderCore;
 import com.enderio.core.common.config.ConfigHandler;
 import com.gtnewhorizon.gtnhlib.reflect.Fields;
+
 import cpw.mods.fml.common.Loader;
 
 public class TextureErrorRemover extends Logger {

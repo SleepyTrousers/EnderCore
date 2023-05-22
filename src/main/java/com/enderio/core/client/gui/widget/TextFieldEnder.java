@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiTextField;
 import com.enderio.core.api.client.gui.IGuiScreen;
 import com.enderio.core.api.client.gui.IHideable;
 import com.google.common.base.Strings;
+
 import cpw.mods.fml.relauncher.ReflectionHelper;
 
 public class TextFieldEnder extends GuiTextField implements IHideable {

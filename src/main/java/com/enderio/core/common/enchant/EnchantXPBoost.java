@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import com.enderio.core.EnderCore;
 import com.enderio.core.api.common.enchant.IAdvancedEnchant;
 import com.enderio.core.common.config.ConfigHandler;
+
 import cpw.mods.fml.common.event.FMLInterModComms;
 
 public class EnchantXPBoost extends Enchantment implements IAdvancedEnchant {

@@ -24,6 +24,7 @@ import com.enderio.core.api.client.gui.IResourceTooltipProvider;
 import com.enderio.core.common.Handlers.Handler;
 import com.enderio.core.common.util.ItemUtil;
 import com.google.common.collect.Lists;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 @Handler
