@@ -38,6 +38,21 @@ public class ColorButton extends IconButton {
         return result;
     }
 
+    @Override
+    public boolean mouseScrolled(Minecraft mc, int x, int y, int scrollDelta) {
+        if (super.checkMousePress(mc, x, y)) {
+            if (scrollDelta > 0) {
+                nextColor();
+            } else if (scrollDelta < 0) {
+                prevColor();
+            } else {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     public String getTooltipPrefix() {
         return tooltipPrefix;
     }

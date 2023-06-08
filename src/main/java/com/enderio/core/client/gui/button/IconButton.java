@@ -63,6 +63,19 @@ public class IconButton extends TooltipButton {
     }
 
     /**
+     * Override this to handle scrolling when the mouse is hovering over the button
+     *
+     * @param mc          The MC instance
+     * @param x           X coordinate of mouse click
+     * @param y           Y coordinate of mouse click
+     * @param scrollDelta the amount by which was scrolled
+     * @return true if the mouse scroll is handled
+     */
+    public boolean mouseScrolled(Minecraft mc, int x, int y, int scrollDelta) {
+        return false;
+    }
+
+    /**
      * Draws this button to the screen.
      */
     @SuppressWarnings("synthetic-access")

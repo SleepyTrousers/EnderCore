@@ -300,9 +300,22 @@ public abstract class GuiContainerBase extends GuiContainer
                 ghostSlotClicked(slot, x, y, delta < 0 ? -1 : -2);
             }
         }
+        for (Object obj : buttonList) {
+            if (obj instanceof IconButton) {
+                IconButton btn = (IconButton) obj;
+                if (btn.mouseScrolled(mc, x, y, delta)) {
+                    btn.func_146113_a(this.mc.getSoundHandler());
+                    actionPerformedWheel(btn, delta);
+                }
+            }
+        }
     }
 
     protected void actionPerformedButton(IconButton btn, int mouseButton) {
+        actionPerformed(btn);
+    }
+
+    protected void actionPerformedWheel(IconButton btn, int scrollDelta) {
         actionPerformed(btn);
     }
 

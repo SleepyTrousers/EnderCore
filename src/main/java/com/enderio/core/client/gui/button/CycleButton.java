@@ -56,6 +56,21 @@ public class CycleButton<T extends Enum<T> & ICycleEnum> extends IconButton {
         return result;
     }
 
+    @Override
+    public boolean mouseScrolled(Minecraft mc, int x, int y, int scrollDelta) {
+        if (super.checkMousePress(mc, x, y)) {
+            if (scrollDelta > 0) {
+                nextMode();
+            } else if (scrollDelta < 0) {
+                prevMode();
+            } else {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     private void nextMode() {
         setMode(modes[(mode.ordinal() + 1) % modes.length]);
     }
