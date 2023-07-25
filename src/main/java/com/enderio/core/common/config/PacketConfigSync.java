@@ -3,11 +3,20 @@ package com.enderio.core.common.config;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import com.google.common.base.Throwables;
 
@@ -67,7 +76,7 @@ public class PacketConfigSync implements IMessage {
         for (short i = 0; i < len; i++) compressedBody[i] = buf.readByte();
 
         try {
-            ObjectInputStream obj = new ObjectInputStream(
+            ObjectInputStream obj = new ValidatingObjectInputStream(
                     new GZIPInputStream(new ByteArrayInputStream(compressedBody)));
             configValues = (Map<String, Object>) obj.readObject();
             obj.close();
@@ -87,6 +96,29 @@ public class PacketConfigSync implements IMessage {
                 processor.syncTo(message.configValues);
             }
             return null;
+        }
+    }
+
+    private static class ValidatingObjectInputStream extends ObjectInputStream {
+
+        private static final List<String> WHITELIST = Arrays
+                .asList("java.util.HashMap", "java.lang.Integer", "java.lang.Number", "java.lang.Boolean");
+
+        private static final Logger logger = LogManager.getLogger();
+        private static final Marker securityMarker = MarkerManager.getMarker("SuspiciousPackets");
+
+        private ValidatingObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            String name = desc.getName();
+            if (!WHITELIST.contains(name)) {
+                logger.warn(securityMarker, "Received packet containing disallowed class: " + name);
+                throw new RuntimeException();
+            }
+            return super.resolveClass(desc);
         }
     }
 }

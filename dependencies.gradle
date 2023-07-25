@@ -2,6 +2,9 @@
 
 dependencies {
     implementation('com.github.GTNewHorizons:GTNHLib:0.0.13:dev')
-    implementation("com.github.GTNewHorizons:NotEnoughItems:2.3.54-GTNH:dev")
+    implementation("com.github.GTNewHorizons:NotEnoughItems:2.3.79-GTNH:dev")
     compileOnly("curse.maven:cofh-core-69162:2388750-dev:dev")
+
+    // for testing
+    //runtimeOnlyNonPublishable("com.github.GTNewHorizons:EnderIO:2.4.24:dev") { transitive = false }
 }
