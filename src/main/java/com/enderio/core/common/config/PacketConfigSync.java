@@ -1,5 +1,8 @@
 package com.enderio.core.common.config;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,7 +68,7 @@ public class PacketConfigSync implements IMessage {
     if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
       return;
     }
-    
+
     short len = buf.readShort();
     byte[] compressedBody = new byte[len];
 
