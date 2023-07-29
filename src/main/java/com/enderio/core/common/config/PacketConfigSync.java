@@ -62,6 +62,10 @@ public class PacketConfigSync implements IMessage {
   @SuppressWarnings("unchecked")
   @Override
   public void fromBytes(ByteBuf buf) {
+    if(FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+      return;
+    }
+
     short len = buf.readShort();
     byte[] compressedBody = new byte[len];
 
