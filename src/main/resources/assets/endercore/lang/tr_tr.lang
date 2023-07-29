@@ -1,0 +1,27 @@
+endercore.tooltip.oreDictNames=Ore Dictionary İsimleri:
+endercore.tooltip.showDetails=<Shift'e Basılı Tut>
+endercore.tooltip.durability=Dayanıklılık:
+
+endercore.command.config.result.success=%s için config ayarlarının yeniden yüklenmesi başarılı
+endercore.command.config.result.fail=%s için config ayarlarının yeniden yüklenmesi başarısız
+endercore.command.config.result.invalid=%s için Mod-ID geçerli değil 
+
+enchantment.xpboost=XP Artırıcı
+endercore.enchantment.xpboost.tooltip=Yaratıklar ve bloklardan daha fazla tecrübe puanı düşer
+
+enchantment.autosmelt=Oto-Pişirici
+endercore.enchantment.autosmelt.tooltip=Kazdıklarını otomatik olarak pişirir
+
+endercore.celebrate=Mutlu Yıllar!
+
+endercore.resourcepack.readme=Bu, oyun içi kaynakların kullanıldığı asıl dosyadır.
+endercore.resourcepack.readme2=Bunu düzenlemeyin, mod tarafından oluşturulur/silinir.
+
+endercore.chat.invis.warn.1=EnderCore şu anda %1$sgörünmez modda%2$s %3$s.
+endercore.chat.invis.warn.2=Bu demek oluyor ki %1$soynanış değişiklikleri aktif olmayacaktır%2$s.
+endercore.chat.invis.warn.3=Bunu config dosyasından geçersiz kılabilirsiniz.
+endercore.chat.invis.warn.4=Başka şekilde ayarlanmadığı sürece bu uyarı bir defa görünecektir.
+endercore.chat.invis.reason.1=, çünkü bu mod(lar) tarafından istendi: %s
+endercore.chat.invis.reason.2=, çünkü öyle ayarlandı
+
+endercore.config.title=Ender Core
