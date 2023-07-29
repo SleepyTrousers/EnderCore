@@ -1,5 +1,8 @@
 package com.enderio.core.common.config;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+
 import io.netty.buffer.ByteBuf;
 
 import java.io.ByteArrayInputStream;
