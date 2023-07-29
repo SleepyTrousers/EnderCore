@@ -1,9 +1,5 @@
 package com.enderio.core.common;
 
-import com.enderio.core.api.common.util.IProgressTile;
-import com.enderio.core.common.network.EnderPacketHandler;
-import com.enderio.core.common.network.PacketProgress;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,6 +12,15 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 
+import com.enderio.core.api.common.util.IProgressTile;
+import com.enderio.core.common.autosave.Reader;
+import com.enderio.core.common.autosave.Writer;
+import com.enderio.core.common.autosave.annotations.Storable;
+import com.enderio.core.common.autosave.annotations.Store.StoreFor;
+import com.enderio.core.common.network.EnderPacketHandler;
+import com.enderio.core.common.network.PacketProgress;
+
+@Storable
 public abstract class TileEntityBase extends TileEntity implements ITickable {
 
     private final int checkOffset = (int) (Math.random() * 20);
@@ -69,37 +74,44 @@ public abstract class TileEntityBase extends TileEntity implements ITickable {
         return 20;
     }
 
-    @Override
-    public final void readFromNBT(NBTTagCompound root) {
-        super.readFromNBT(root);
-        readCustomNBT(root);
-    }
+  @Override
+  public final void readFromNBT(NBTTagCompound root) {
+    super.readFromNBT(root);
+    Reader.read(StoreFor.SAVE, root, this);
+  }
 
-    @Override
-    public final void writeToNBT(NBTTagCompound root) {
-        super.writeToNBT(root);
-        writeCustomNBT(root);
-    }
+  @Override
+  public final void writeToNBT(NBTTagCompound root) {
+    super.writeToNBT(root);
+    Writer.write(StoreFor.SAVE, root, this);
+  }
 
-    @Override
-    public Packet<?> getDescriptionPacket() {
-        NBTTagCompound tag = new NBTTagCompound();
-        writeCustomNBT(tag);
-        return new S35PacketUpdateTileEntity(getPos(), 1, tag);
-    }
+  @Override
+  public final Packet<?> getDescriptionPacket() {
+    NBTTagCompound root = new NBTTagCompound();
+    super.writeToNBT(root);
+    Writer.write(StoreFor.CLIENT, root, this);
+    return new S35PacketUpdateTileEntity(getPos(), 1, root);
+  }
 
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-        readCustomNBT(pkt.getNbtCompound());
-    }
+  @Override
+  public final void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+    NBTTagCompound root = pkt.getNbtCompound();
+    super.readFromNBT(root);
+    Reader.read(StoreFor.CLIENT, root, this);
+  }
 
-    public boolean canPlayerAccess(EntityPlayer player) {
-        return !isInvalid() && player.getDistanceSqToCenter(getPos().add(0.5, 0.5, 0.5)) <= 64D;
-    }
+  protected final void readItemNBT(NBTTagCompound root) {
+    Reader.read(StoreFor.ITEM, root, this);
+  }
 
-    protected abstract void writeCustomNBT(NBTTagCompound root);
+  protected final void writeItemNBT(NBTTagCompound root) {
+    Writer.write(StoreFor.ITEM, root, this);
+  }
 
-    protected abstract void readCustomNBT(NBTTagCompound root);
+  public boolean canPlayerAccess(EntityPlayer player) {
+    return !isInvalid() && player.getDistanceSqToCenter(getPos().add(0.5, 0.5, 0.5)) <= 64D;
+  }
 
     protected void updateBlock() {
         if (worldObj != null) {
