@@ -180,7 +180,7 @@ public class RenderUtil {
     if (face == EnumFacing.DOWN) {
       return 0.5f;
     }
-    if (face.getFrontOffsetX() != 0) {
+    if (face.getXOffset() != 0) {
       return 0.6f;
     }
     return 0.8f; // z
@@ -262,13 +262,13 @@ public class RenderUtil {
    */
   public static List<EnumFacing> getEdgesForFace(@Nonnull EnumFacing face) {
     List<EnumFacing> result = new ArrayList<EnumFacing>(4);
-    if (face.getFrontOffsetY() != 0) {
+    if (face.getYOffset() != 0) {
       result.add(NORTH);
       result.add(EAST);
       result.add(SOUTH);
       result.add(WEST);
 
-    } else if (face.getFrontOffsetX() != 0) {
+    } else if (face.getXOffset() != 0) {
       result.add(DOWN);
       result.add(SOUTH);
       result.add(UP);

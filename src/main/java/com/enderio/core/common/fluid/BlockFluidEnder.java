@@ -27,17 +27,17 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
   private float fogColorRed = 1f;
   private float fogColorGreen = 1f;
   private float fogColorBlue = 1f;
-  private final @Nonnull Material material;
+  private final @Nonnull Material fluidMaterial;
 
-  protected BlockFluidEnder(@Nonnull Fluid fluid, @Nonnull Material material, int fogColor) {
-    super(fluid, new MaterialLiquid(material.getMaterialMapColor()) {
+  protected BlockFluidEnder(@Nonnull Fluid fluid, @Nonnull Material fluidMaterial, int fogColor) {
+    super(fluid, new MaterialLiquid(fluidMaterial.getMaterialMapColor()) {
       // new Material for each liquid so neighboring different liquids render correctly and don't bleed into each other
       @Override
       public boolean blocksMovement() {
         return true; // so our liquids are not replaced by water
       }
     });
-    this.material = material;
+    this.fluidMaterial = fluidMaterial;
 
     // darken fog color to fit the fog rendering
     float dim = 1;
@@ -52,7 +52,7 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
   }
 
   protected void setNames(Fluid fluid) {
-    setUnlocalizedName(NullHelper.notnullF(fluid.getUnlocalizedName(), "encountered fluid without a name"));
+    setTranslationKey(NullHelper.notnullF(fluid.getUnlocalizedName(), "encountered fluid without a name"));
     setRegistryName("block_fluid_" + fluid.getName().toLowerCase(Locale.ENGLISH));
   }
 
@@ -83,7 +83,7 @@ public abstract class BlockFluidEnder extends BlockFluidClassic {
   @Override
   public Boolean isEntityInsideMaterial(@Nonnull IBlockAccess world, @Nonnull BlockPos blockpos, @Nonnull IBlockState iblockstate, @Nonnull Entity entity,
       double yToTest, @Nonnull Material materialIn, boolean testingHead) {
-    if (materialIn == material || materialIn == this.blockMaterial) {
+    if (materialIn == fluidMaterial || materialIn == this.material) {
       return Boolean.TRUE;
     }
     return super.isEntityInsideMaterial(world, blockpos, iblockstate, entity, yToTest, materialIn, testingHead);

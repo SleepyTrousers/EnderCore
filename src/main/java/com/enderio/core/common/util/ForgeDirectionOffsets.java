@@ -10,7 +10,7 @@ public final class ForgeDirectionOffsets {
 
   static {
     for (EnumFacing dir : EnumFacing.values()) {
-      OFFSETS[dir.ordinal()] = new Vector3d(dir.getFrontOffsetX(), dir.getFrontOffsetY(), dir.getFrontOffsetZ());
+      OFFSETS[dir.ordinal()] = new Vector3d(dir.getXOffset(), dir.getYOffset(), dir.getZOffset());
     }
   }
 

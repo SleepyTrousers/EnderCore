@@ -42,7 +42,7 @@ public class CreativeTabsCustom extends CreativeTabs {
   }
 
   @Override
-  public @Nonnull ItemStack getTabIconItem() {
+  public @Nonnull ItemStack createIcon() {
     return displayStack;
   }
 }
