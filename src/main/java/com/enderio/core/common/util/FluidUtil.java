@@ -230,7 +230,7 @@ public class FluidUtil {
             if (resultFluid != null && resultFluid.amount > 0
                     && resultFluid.amount <= maxDrain
                     && (target == null || resultFluid.isFluidEqual(target))) {
-                ItemStack resultStack = source.getItem().getContainerItem(source);
+                ItemStack resultStack = FluidContainerRegistry.drainFluidContainer(source);
                 // TODO
                 // if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof ItemPotion
                 // && source.stackTagCompound == null) {
@@ -285,7 +285,7 @@ public class FluidUtil {
                     FluidStack target = targetTank.getFluid();
                     int maxDrain = targetTank.getCapacity() - (target != null ? target.amount : 0);
                     if (resultFluid.amount <= maxDrain && (target == null || resultFluid.isFluidEqual(target))) {
-                        ItemStack resultStack = source.getItem().getContainerItem(source);
+                        ItemStack resultStack = FluidContainerRegistry.drainFluidContainer(source);
                         // if (resultStack == null && Config.enableWaterFromBottles && source.getItem() instanceof
                         // ItemPotion
                         // && source.stackTagCompound == null) {

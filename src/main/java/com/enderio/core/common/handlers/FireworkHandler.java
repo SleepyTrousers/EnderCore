@@ -1,6 +1,8 @@
 package com.enderio.core.common.handlers;
 
-import static java.util.Calendar.*;
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.MONTH;
 
 import java.util.Calendar;
 

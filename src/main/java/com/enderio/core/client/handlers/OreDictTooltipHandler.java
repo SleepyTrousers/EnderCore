@@ -1,6 +1,7 @@
 package com.enderio.core.client.handlers;
 
-import static com.enderio.core.common.config.ConfigHandler.*;
+import static com.enderio.core.common.config.ConfigHandler.showOredictTooltips;
+import static com.enderio.core.common.config.ConfigHandler.showRegistryNameTooltips;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;

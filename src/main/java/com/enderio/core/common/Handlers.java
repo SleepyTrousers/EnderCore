@@ -1,6 +1,10 @@
 package com.enderio.core.common;
 
-import static com.enderio.core.common.Handlers.Handler.Inst.*;
+import static com.enderio.core.common.Handlers.Handler.Inst.AUTO;
+import static com.enderio.core.common.Handlers.Handler.Inst.CONSTRUCTOR;
+import static com.enderio.core.common.Handlers.Handler.Inst.FIELD;
+import static com.enderio.core.common.Handlers.Handler.Inst.METHOD;
+import static com.enderio.core.common.Handlers.Handler.Inst.SCALA_OBJECT;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
