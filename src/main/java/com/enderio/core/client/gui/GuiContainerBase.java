@@ -30,6 +30,7 @@ import com.enderio.core.client.gui.widget.VScrollbar;
 import com.enderio.core.client.render.RenderUtil;
 import com.google.common.collect.Lists;
 
+import codechicken.nei.ItemPanels;
 import codechicken.nei.VisiblityData;
 import codechicken.nei.api.INEIGuiHandler;
 import codechicken.nei.api.TaggedInventoryArea;
@@ -242,8 +243,11 @@ public abstract class GuiContainerBase extends GuiContainer
         if (!ghostSlotHandler.getGhostSlots().isEmpty()) {
             GhostSlot slot = getGhostSlot(x, y);
             if (slot != null) {
-                ghostSlotClicked(slot, x, y, button);
-                super.mouseClicked(x, y, button);
+                if (ItemPanels.itemPanel.draggedStack != null || ItemPanels.bookmarkPanel.draggedStack != null) {
+                    super.mouseClicked(x, y, button);
+                } else {
+                    ghostSlotClicked(slot, x, y, button);
+                }
                 return;
             }
         }
@@ -681,10 +685,15 @@ public abstract class GuiContainerBase extends GuiContainer
     @Override
     @Optional.Method(modid = "NotEnoughItems")
     public boolean handleDragNDrop(GuiContainer gc, int x, int y, ItemStack is, int button) {
-        if (gc instanceof GuiContainerBase && button == 0) {
+        if (gc instanceof GuiContainerBase && button == 0 || gc instanceof GuiContainerBase && button == 1) {
             GhostSlot slot = getGhostSlot(x, y);
             if (slot != null) {
-                ghostSlotHandler.ghostSlotClickedPrimaryMouseButton(slot, is, slot.getStack());
+                if (button == 0) {
+                    ghostSlotHandler.ghostSlotClickedPrimaryMouseButton(slot, is, slot.getStack());
+                }
+                if (button == 1) {
+                    ghostSlotHandler.ghostSlotClickedSecondaryMouseButton(slot, is, slot.getStack());
+                }
                 is.stackSize = 0;
                 return true;
             }
