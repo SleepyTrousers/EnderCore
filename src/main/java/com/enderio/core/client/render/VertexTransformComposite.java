@@ -26,22 +26,22 @@ public class VertexTransformComposite implements VertexTransform {
 
     @Override
     public void apply(Vertex vertex) {
-        for (VertexTransform xform : xforms) {
-            xform.apply(vertex);
+        for (int i = 0; i < xforms.length; i++) {
+            xforms[i].apply(vertex);
         }
     }
 
     @Override
     public void apply(Vector3d vec) {
-        for (VertexTransform xform : xforms) {
-            xform.apply(vec);
+        for (int i = 0; i < xforms.length; i++) {
+            xforms[i].apply(vec);
         }
     }
 
     @Override
     public void applyToNormal(Vector3f vec) {
-        for (VertexTransform xform : xforms) {
-            xform.applyToNormal(vec);
+        for (int i = 0; i < xforms.length; i++) {
+            xforms[i].applyToNormal(vec);
         }
     }
 

@@ -11,8 +11,6 @@ import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class SimpleModelRenderer implements ISimpleBlockRenderingHandler {
 
-    private final Tessellator tes = Tessellator.instance;
-
     private final WavefrontObject model;
 
     private final int renderId;
@@ -29,6 +27,7 @@ public class SimpleModelRenderer implements ISimpleBlockRenderingHandler {
 
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
+        final Tessellator tes = Tessellator.instance;
         RenderHelper.disableStandardItemLighting();
         tes.startDrawingQuads();
         tes.setColorOpaque_F(1, 1, 1);
@@ -40,6 +39,7 @@ public class SimpleModelRenderer implements ISimpleBlockRenderingHandler {
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
             RenderBlocks renderer) {
+        final Tessellator tes = Tessellator.instance;
         tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
         tes.setColorOpaque_F(1, 1, 1);
         tes.addTranslation(x + .5F, y + .5F, z + .5F);

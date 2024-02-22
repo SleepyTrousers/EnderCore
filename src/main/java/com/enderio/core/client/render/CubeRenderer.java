@@ -10,18 +10,24 @@ import com.enderio.core.common.vecmath.Vector3d;
 
 public final class CubeRenderer {
 
-    public static final Vector3d[] verts = new Vector3d[8];
-    static {
+    private static final ThreadLocal<CubeRenderer> instance = ThreadLocal.withInitial(CubeRenderer::new);
+    public final Vector3d[] verts = new Vector3d[8];
+
+    public CubeRenderer() {
         for (int i = 0; i < verts.length; i++) {
             verts[i] = new Vector3d();
         }
     }
 
-    public static void render(Block block, int meta) {
+    public static CubeRenderer get() {
+        return instance.get();
+    }
+
+    public void render(Block block, int meta) {
         render(block, meta, null);
     }
 
-    public static void render(Block block, int meta, VertexTransform xForm) {
+    public void render(Block block, int meta, VertexTransform xForm) {
         IIcon[] icons = new IIcon[6];
         for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
             icons[dir.ordinal()] = block.getIcon(dir.ordinal(), meta);
@@ -29,20 +35,19 @@ public final class CubeRenderer {
         render(BoundingBox.UNIT_CUBE.translate(0, -0.1f, 0), icons, xForm, true);
     }
 
-    public static void render(BoundingBox bb, IIcon tex) {
+    public void render(BoundingBox bb, IIcon tex) {
         render(bb, tex, null, false);
     }
 
-    public static void render(BoundingBox bb, IIcon tex, boolean tintSides) {
+    public void render(BoundingBox bb, IIcon tex, boolean tintSides) {
         render(bb, tex, null, tintSides);
     }
 
-    public static void render(BoundingBox bb, IIcon tex, VertexTransform xForm) {
+    public void render(BoundingBox bb, IIcon tex, VertexTransform xForm) {
         render(bb, tex.getMinU(), tex.getMaxU(), tex.getMinV(), tex.getMaxV(), xForm, false);
     }
 
-    public static void render(BoundingBox bb, IIcon tex, VertexTransform xForm, float[] brightnessPerSide,
-            boolean tintSides) {
+    public void render(BoundingBox bb, IIcon tex, VertexTransform xForm, float[] brightnessPerSide, boolean tintSides) {
         float minU = 0;
         float minV = 0;
         float maxU = 1;
@@ -56,7 +61,7 @@ public final class CubeRenderer {
         render(bb, minU, maxU, minV, maxV, xForm, brightnessPerSide, tintSides);
     }
 
-    public static void render(BoundingBox bb, IIcon tex, VertexTransform xForm, boolean tintSides) {
+    public void render(BoundingBox bb, IIcon tex, VertexTransform xForm, boolean tintSides) {
         float minU = 0;
         float minV = 0;
         float maxU = 1;
@@ -70,19 +75,19 @@ public final class CubeRenderer {
         render(bb, minU, maxU, minV, maxV, xForm, tintSides);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, boolean tintSides) {
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, boolean tintSides) {
         render(bb, minU, maxU, minV, maxV, null, tintSides);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV) {
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV) {
         render(bb, minU, maxU, minV, maxV, null, false);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm) {
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm) {
         render(bb, minU, maxU, minV, maxV, xForm, false);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
             boolean tintSides) {
         float[] brightnessPerSide = null;
         if (tintSides) {
@@ -94,7 +99,7 @@ public final class CubeRenderer {
         render(bb, minU, maxU, minV, maxV, xForm, brightnessPerSide);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
             float[] brightnessPerSide, boolean tintSides) {
 
         if (tintSides) {
@@ -110,7 +115,7 @@ public final class CubeRenderer {
         render(bb, minU, maxU, minV, maxV, xForm, brightnessPerSide);
     }
 
-    public static void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
+    public void render(BoundingBox bb, float minU, float maxU, float minV, float maxV, VertexTransform xForm,
             float[] brightnessPerSide) {
 
         if (brightnessPerSide != null && brightnessPerSide.length != 6) {
@@ -186,7 +191,7 @@ public final class CubeRenderer {
         addVecWithUV(verts[3], minU, maxV);
     }
 
-    public static void render(BoundingBox bb, IIcon[] icons, boolean tintSides) {
+    public void render(BoundingBox bb, IIcon[] icons, boolean tintSides) {
         float[] brightnessPerSide = null;
         if (tintSides) {
             brightnessPerSide = new float[6];
@@ -198,7 +203,7 @@ public final class CubeRenderer {
 
     }
 
-    public static void render(BoundingBox bb, IIcon[] icons, VertexTransform xForm, boolean tintSides) {
+    public void render(BoundingBox bb, IIcon[] icons, VertexTransform xForm, boolean tintSides) {
         float[] brightnessPerSide = null;
         if (tintSides) {
             brightnessPerSide = new float[6];
@@ -209,7 +214,7 @@ public final class CubeRenderer {
         render(bb, icons, xForm, brightnessPerSide);
     }
 
-    public static void render(BoundingBox bb, IIcon[] faceTextures, VertexTransform xForm, float[] brightnessPerSide) {
+    public void render(BoundingBox bb, IIcon[] faceTextures, VertexTransform xForm, float[] brightnessPerSide) {
         setupVertices(bb, xForm);
         float minU;
         float maxU;
@@ -217,7 +222,7 @@ public final class CubeRenderer {
         float maxV;
         IIcon tex;
 
-        Tessellator tessellator = Tessellator.instance;
+        final Tessellator tessellator = Tessellator.instance;
 
         tessellator.setNormal(0, 0, -1);
         if (brightnessPerSide != null) {
@@ -311,11 +316,11 @@ public final class CubeRenderer {
         addVecWithUV(verts[3], minU, minV);
     }
 
-    public static void setupVertices(BoundingBox bound) {
+    public void setupVertices(BoundingBox bound) {
         setupVertices(bound, null);
     }
 
-    public static void setupVertices(BoundingBox bound, VertexTransform xForm) {
+    public void setupVertices(BoundingBox bound, VertexTransform xForm) {
         verts[0].set(bound.minX, bound.minY, bound.minZ);
         verts[1].set(bound.maxX, bound.minY, bound.minZ);
         verts[2].set(bound.maxX, bound.maxY, bound.minZ);
@@ -332,10 +337,8 @@ public final class CubeRenderer {
         }
     }
 
-    public static void addVecWithUV(Vector3d vec, double u, double v) {
+    public void addVecWithUV(Vector3d vec, double u, double v) {
         Tessellator.instance.addVertexWithUV(vec.x, vec.y, vec.z, u, v);
     }
-
-    private CubeRenderer() {}
 
 }

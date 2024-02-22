@@ -257,15 +257,16 @@ public class RenderUtil {
         Block block = world.getBlock(x, y, z);
         int res = block == null ? world.getLightBrightnessForSkyBlocks(x, y, z, 0)
                 : block.getMixedBrightnessForBlock(world, x, y, z);
-        Tessellator.instance.setBrightness(res);
-        Tessellator.instance.setColorRGBA_F(1, 1, 1, 1);
+        final Tessellator tessellator = Tessellator.instance;
+        tessellator.setBrightness(res);
+        tessellator.setColorRGBA_F(1, 1, 1, 1);
         return res;
     }
 
     public static void renderQuad2D(double x, double y, double z, double width, double height, int colorRGB) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        Tessellator tessellator = Tessellator.instance;
+        final Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         tessellator.setColorOpaque_I(colorRGB);
         tessellator.addVertex(x, y + height, z);
@@ -279,7 +280,7 @@ public class RenderUtil {
     public static void renderQuad2D(double x, double y, double z, double width, double height, Vector4f colorRGBA) {
         GL11.glColor4f(colorRGBA.x, colorRGBA.y, colorRGBA.z, colorRGBA.w);
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        Tessellator tessellator = Tessellator.instance;
+        final Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         tessellator.addVertex(x, y + height, z);
         tessellator.addVertex(x + width, y + height, z);
@@ -706,7 +707,7 @@ public class RenderUtil {
         float width = fnt.getStringWidth(toRender);
         float height = fnt.FONT_HEIGHT;
         float padding = 2f;
-        Tessellator tessellator = Tessellator.instance;
+        final Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(color.x, color.y, color.z, color.w);
         tessellator.addVertex(-padding, -padding, 0);

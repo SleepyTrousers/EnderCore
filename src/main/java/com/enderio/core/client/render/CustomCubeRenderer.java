@@ -10,7 +10,11 @@ import com.enderio.core.api.client.render.IRenderFace;
 
 public class CustomCubeRenderer {
 
-    public static final CustomCubeRenderer instance = new CustomCubeRenderer();
+    private static final ThreadLocal<CustomCubeRenderer> instance = ThreadLocal.withInitial(CustomCubeRenderer::new);
+
+    public static CustomCubeRenderer get() {
+        return instance.get();
+    }
 
     private CustomRenderBlocks rb = null;
 

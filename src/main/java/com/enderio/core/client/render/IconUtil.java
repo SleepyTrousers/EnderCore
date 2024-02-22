@@ -21,7 +21,7 @@ public class IconUtil {
         public int getTextureType();
     }
 
-    private static ArrayList<IIconProvider> iconProviders = new ArrayList<IIconProvider>();
+    private static ArrayList<IIconProvider> iconProviders = new ArrayList<>();
 
     public static IIcon whiteTexture;
     public static IIcon blankTexture;

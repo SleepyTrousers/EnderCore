@@ -64,8 +64,6 @@ public class TechneUtil {
 
     private static final TechneModelLoader modelLoader = new TechneModelLoader();
 
-    private static final Tessellator tes = Tessellator.instance;
-
     public static List<GroupObject> bakeModel(ModelRenderer model, TechneModel supermodel) {
         return bakeModel(model, supermodel, 1);
     }
@@ -352,6 +350,7 @@ public class TechneUtil {
 
     public static void renderInventoryBlock(Collection<GroupObject> model, IIcon icon, Block block, int metadata,
             RenderBlocks rb) {
+        final Tessellator tes = Tessellator.instance;
         tes.startDrawingQuads();
         tes.setColorOpaque_F(1, 1, 1);
         tes.addTranslation(0, -0.47f, 0);
@@ -363,6 +362,7 @@ public class TechneUtil {
 
     public static void renderInventoryBlock(GroupObject model, Block block, int metadata, RenderBlocks rb) {
         IIcon icon = getIconFor(block, metadata);
+        final Tessellator tes = Tessellator.instance;
         tes.startDrawingQuads();
         tes.setColorOpaque_F(1, 1, 1);
         tes.addTranslation(0, -0.47f, 0);
@@ -383,6 +383,7 @@ public class TechneUtil {
         if (icon == null) {
             return false;
         }
+        final Tessellator tes = Tessellator.instance;
         tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
         tes.setColorOpaque_F(1, 1, 1);
         tes.addTranslation(x + .5F, y + 0.0375f, z + .5F);
@@ -395,6 +396,7 @@ public class TechneUtil {
     public static boolean renderWorldBlock(GroupObject model, IBlockAccess world, int x, int y, int z, Block block,
             RenderBlocks rb) {
         IIcon icon = getIconFor(block, world, x, y, z);
+        final Tessellator tes = Tessellator.instance;
         tes.setBrightness(block.getMixedBrightnessForBlock(world, x, y, z));
         tes.setColorOpaque_F(1, 1, 1);
         tes.addTranslation(x + .5F, y + 0.0375f, z + .5F);
