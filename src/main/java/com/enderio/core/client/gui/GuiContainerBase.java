@@ -40,7 +40,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 
 @Optional.InterfaceList({ @Optional.Interface(iface = "codechicken.nei.api.INEIGuiHandler", modid = "NotEnoughItems"),
-        @Optional.Interface(iface = "codechicken.nei.api.guihook.IContainerObjectHandler", modid = "NotEnoughItems") })
+        @Optional.Interface(iface = "codechicken.nei.guihook.IContainerObjectHandler", modid = "NotEnoughItems") })
 public abstract class GuiContainerBase extends GuiContainer
         implements ToolTipRenderer, IGuiScreen, INEIGuiHandler, IContainerObjectHandler {
 

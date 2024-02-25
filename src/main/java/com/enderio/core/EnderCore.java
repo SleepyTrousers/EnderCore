@@ -45,7 +45,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 @Mod(
         modid = EnderCore.MODID,
         name = EnderCore.NAME,
-        version = EnderCore.VERSION,
+        version = EnderCoreTags.VERSION,
         dependencies = "after:ttCore; after:gtnhlib@[0.0.10,)",
         guiFactory = "com.enderio.core.common.config.BaseConfigFactory")
 public class EnderCore implements IEnderMod {
@@ -53,7 +53,6 @@ public class EnderCore implements IEnderMod {
     public static final String MODID = "endercore";
     public static final String NAME = "EnderCore";
     public static final String BASE_PACKAGE = "com.enderio";
-    public static final String VERSION = "GRADLETOKEN_VERSION";
 
     public static final Logger logger = LogManager.getLogger(NAME);
     public static final Lang lang = new Lang(MODID);
@@ -155,6 +154,6 @@ public class EnderCore implements IEnderMod {
 
     @Override
     public String version() {
-        return VERSION;
+        return EnderCoreTags.VERSION;
     }
 }
