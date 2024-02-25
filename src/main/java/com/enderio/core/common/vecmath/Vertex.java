@@ -3,6 +3,9 @@ package com.enderio.core.common.vecmath;
 public class Vertex {
 
     public Vector3d xyz = new Vector3d();
+
+    /* some parts of EIO are relying on nulls as special values, can't just pre allocate new objects and
+       set them when required, unless everything relying on nulls is rewritten */
     public Vector2f uv = null;
     public Vector3f normal = null;
     public Vector4f color = null;
@@ -74,6 +77,45 @@ public class Vertex {
 
     public void setBrightness(int brightness) {
         this.brightness = brightness;
+    }
+
+    public void set(Vertex other){
+        xyz.set(other.xyz);
+
+        if (other.uv != null) {
+            if(uv == null){
+                uv = new Vector2f(other.uv);
+            }
+            else {
+                uv.set(other.uv);
+            }
+        }else{
+            uv = null;
+        }
+
+        if (other.normal != null) {
+            if (normal == null){
+                normal = new Vector3f(other.normal);
+            }
+            else {
+                normal.set(other.normal);
+            }
+        }else{
+            normal = null;
+        }
+
+        if (other.color != null) {
+            if (color == null){
+                color = new Vector4f(other.color);
+            }
+            else {
+                color.set(other.color);
+            }
+        }else{
+            color = null;
+        }
+
+        brightness = other.brightness;
     }
 
     public Vector4f getColor() {

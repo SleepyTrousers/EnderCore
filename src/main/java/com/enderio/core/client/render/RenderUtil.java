@@ -376,6 +376,24 @@ public class RenderUtil {
         }
     }
 
+    public static void addVerticesToTessellator(Vertex[] vertices, Tessellator tes) {
+        for (Vertex v : vertices) {
+            if (v.brightness != -1) {
+                tes.setBrightness(v.brightness);
+            }
+            if (v.color != null) {
+                tes.setColorRGBA_F(v.r(), v.g(), v.b(), v.a());
+            }
+            if (v.uv != null) {
+                tes.setTextureUV(v.u(), v.v());
+            }
+            if (v.normal != null) {
+                tes.setNormal(v.nx(), v.ny(), v.nz());
+            }
+            tes.addVertex(v.x(), v.y(), v.z());
+        }
+    }
+
     public static void renderConnectedTextureFace(IBlockAccess blockAccess, Block block, int x, int y, int z,
             ForgeDirection face, IIcon texture, boolean forceAllEdges) {
         renderConnectedTextureFace(blockAccess, block, x, y, z, face, texture, forceAllEdges, true, true);
